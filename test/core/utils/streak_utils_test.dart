@@ -45,6 +45,32 @@ void main() {
       expect(streak, 3);
     });
 
+    test(
+      'returns 0 current streak when neither today nor yesterday is completed',
+      () {
+        final streak = StreakUtils.currentStreak(
+          completionDates: <DateTime>[
+            DateTime(2026, 4, 6),
+            DateTime(2026, 4, 8),
+          ],
+          today: DateTime(2026, 4, 10),
+        );
+
+        expect(streak, 0);
+      },
+    );
+
+    test('ignores duplicate completion dates in streak calculations', () {
+      final streak = StreakUtils.longestStreak(<DateTime>[
+        DateTime(2026, 4, 8),
+        DateTime(2026, 4, 8),
+        DateTime(2026, 4, 9),
+        DateTime(2026, 4, 10),
+      ]);
+
+      expect(streak, 3);
+    });
+
     test('calculates completion rate using valid day range of viewed year', () {
       final rate = StreakUtils.completionRateForYear(
         completionDates: <DateTime>[
@@ -58,6 +84,30 @@ void main() {
       );
 
       expect(rate, closeTo(3 / 27, 0.0001));
+    });
+
+    test(
+      'returns 0 completion rate when the viewed year has no valid days',
+      () {
+        final rate = StreakUtils.completionRateForYear(
+          completionDates: <DateTime>[DateTime(2026, 3, 15)],
+          startDate: DateTime(2026, 3, 15),
+          year: 2025,
+          today: DateTime(2026, 4, 10),
+        );
+
+        expect(rate, 0);
+      },
+    );
+
+    test('counts valid days across leap-year boundaries correctly', () {
+      final validDays = StreakUtils.validDayCountForYear(
+        startDate: DateTime(2024, 2, 28),
+        year: 2024,
+        today: DateTime(2024, 3, 1),
+      );
+
+      expect(validDays, 3);
     });
   });
 }
