@@ -21,6 +21,7 @@ dependencies:
   flutter_bloc: ^9.1.1
   path_provider: ^2.1.5
   cupertino_icons: ^1.0.8
+  easy_localization: ^3.0.8
   sqlite3_flutter_libs: ^0.6.0+eol
   flutter_local_notifications: ^21.0.0
 
@@ -34,3 +35,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/translations/

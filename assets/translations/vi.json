@@ -1,0 +1,11 @@
+{
+  "app": {
+    "title": "StarNyx"
+  },
+  "home": {
+    "title": "Trang chủ chòm sao",
+    "subtitle": "Lớp widget dùng chung đã sẵn sàng cho các tính năng tiếp theo.",
+    "empty_title": "Chưa có StarNyx nào",
+    "empty_message": "Hãy tạo chòm sao đầu tiên để bắt đầu theo dõi thói quen offline."
+  }
+}

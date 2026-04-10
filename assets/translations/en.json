@@ -1,0 +1,11 @@
+{
+  "app": {
+    "title": "StarNyx"
+  },
+  "home": {
+    "title": "Constellation Home",
+    "subtitle": "The shared core widget layer is ready for the next feature slices.",
+    "empty_title": "No StarNyx yet",
+    "empty_message": "Create your first constellation to start tracking a habit offline."
+  }
+}
