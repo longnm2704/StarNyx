@@ -140,7 +140,7 @@ Issue checklist:
 - [x] `STX-002` Tạo lại folder structure theo tài liệu `flutter_bloc_structure_starnyx.md`
 - [x] `STX-003` Tạo `app.dart`, app router cơ bản, app theme cơ bản, entry point sạch
 - [x] `STX-004` Tạo `core/utils` cho date, streak, JSON validation, reminder time rounding
-- [ ] `STX-005` Tạo `core/constants` và `core/widgets` dùng chung
+- [x] `STX-005` Tạo `core/constants` và `core/widgets` dùng chung
 - [ ] `STX-006` Setup `get_it` để đăng ký database, repository, service, use case, bloc factory
 
 Definition of done:
