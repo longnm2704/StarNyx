@@ -24,6 +24,7 @@ Mỗi thói quen được biểu diễn như một chòm sao, và tiến trình 
 ## 2. Phạm vi MVP
 
 - Tạo / sửa / xoá StarNyx
+- Chuyển StarNyx đang chọn khi có nhiều StarNyx
 - Check-in theo ngày
 - Hiển thị lưới sao theo năm
 - Thống kê:
@@ -66,6 +67,13 @@ Mở app → tạo mới → vào màn chính
 
 Mở app → hiển thị StarNyx gần nhất → thao tác
 
+### Nhiều StarNyx
+
+- Có thể tạo nhiều StarNyx
+- App luôn có 1 StarNyx đang chọn để hiển thị chính
+- Có thể đổi StarNyx đang chọn từ màn chính
+- Lần mở app tiếp theo khôi phục StarNyx được chọn gần nhất
+
 ---
 
 ## 6. Chức năng chi tiết
@@ -88,10 +96,11 @@ Mở app → hiển thị StarNyx gần nhất → thao tác
 
 ### Giờ nhắc mặc định
 
-- Làm tròn theo mốc 15 phút:
-  - < 15 phút → xuống mốc trước
-  - ≥ 15 phút → lên mốc sau  
-    Ví dụ: 10:12 → 10:00, 10:20 → 10:30
+- Làm tròn về mốc 30 phút gần nhất:
+  - phút 00-14 → `HH:00`
+  - phút 15-44 → `HH:30`
+  - phút 45-59 → giờ kế tiếp `HH+1:00`
+  - Ví dụ: `10:12 → 10:00`, `10:20 → 10:30`, `10:50 → 11:00`
 
 ---
 
@@ -116,6 +125,7 @@ Mở app → hiển thị StarNyx gần nhất → thao tác
   → dùng để đánh dấu hoàn thành
 - Nút trái / phải → chuyển ngày
 - Nút “Today” → về hôm nay
+- Có lối vào để đổi StarNyx đang chọn ngay từ màn chính
 
 ---
 
@@ -186,6 +196,9 @@ Mở app → hiển thị StarNyx gần nhất → thao tác
 
 - Tính theo năm đang xem
 - = số ngày hoàn thành / số ngày hợp lệ
+- Số ngày hợp lệ được tính từ `max(startDate, 01-01 của năm đang xem)`
+  đến `min(hôm nay, 31-12 của năm đang xem)`
+- Nếu số ngày hợp lệ = 0 thì tỉ lệ = 0
 
 ---
 
@@ -206,6 +219,12 @@ Mở app → hiển thị StarNyx gần nhất → thao tác
 
 - Đổi giờ
 - Nhập dữ liệu
+
+### Khi đồng bộ lại
+
+- Khi app khởi động
+- Khi mở app lại sau khi timezone thay đổi
+- Thực hiện bằng cách huỷ toàn bộ lịch cũ và schedule lại từ local data hiện tại
 
 ---
 
@@ -249,6 +268,17 @@ Mở app → hiển thị StarNyx gần nhất → thao tác
 
 ---
 
+### Cài đặt ứng dụng
+
+```json
+{
+  "lastSelectedStarnyxId": "string | null",
+  "updatedAt": "ISO-8601"
+}
+```
+
+---
+
 ## 10. Định dạng import
 
 ```json
@@ -256,7 +286,11 @@ Mở app → hiển thị StarNyx gần nhất → thao tác
   "schemaVersion": 1,
   "starnyxs": [],
   "completions": [],
-  "journalEntries": []
+  "journalEntries": [],
+  "appSettings": {
+    "lastSelectedStarnyxId": null,
+    "updatedAt": "ISO-8601"
+  }
 }
 ```
 
@@ -283,6 +317,7 @@ Mở app → hiển thị StarNyx gần nhất → thao tác
 ## 13. Điều kiện hoàn thành
 
 - Mở app → đúng StarNyx gần nhất
+- Có thể đổi giữa nhiều StarNyx
 - Sao hôm nay chính xác
 - Thao tác phản hồi ngay
 - Import lỗi → không ghi đè

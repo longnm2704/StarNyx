@@ -56,7 +56,24 @@ Ghi chú:
 
 ---
 
-## 4. Target Folder Structure
+## 4. Finalized Product Decisions
+
+Các quyết định dưới đây đã được chốt để tránh mơ hồ khi implement:
+
+- Nhiều StarNyx được hỗ trợ ngay trong MVP; app luôn có 1 StarNyx đang chọn.
+- StarNyx đang chọn được đổi từ màn chính hoặc quick actions, và được lưu lại để restore ở lần mở app sau.
+- Reminder mặc định được làm tròn về mốc `:00` hoặc `:30` gần nhất:
+  - `00-14 -> :00`
+  - `15-44 -> :30`
+  - `45-59 -> giờ kế tiếp :00`
+- Completion rate theo năm dùng mẫu số là số ngày hợp lệ trong đoạn:
+  `max(startDate, Jan 1 của năm đang xem)` đến `min(today, Dec 31 của năm đang xem)`.
+- File import/export JSON bắt buộc có `appSettings`, trong đó MVP hiện lưu `lastSelectedStarnyxId`.
+- Reminder phải được resync toàn bộ khi app khởi động, sau import thành công, và sau các thay đổi dữ liệu có liên quan.
+
+---
+
+## 5. Target Folder Structure
 
 ```txt
 lib/
@@ -89,7 +106,7 @@ lib/
 
 ---
 
-## 5. Delivery Strategy
+## 6. Delivery Strategy
 
 Thứ tự nên làm:
 
@@ -108,7 +125,7 @@ Lý do:
 
 ---
 
-## 6. Phase Plan
+## 7. Phase Plan
 
 ## Phase 0 - Foundation
 
@@ -130,6 +147,7 @@ Definition of done:
 
 - App chạy được với cấu trúc mới
 - Không còn `Hello World`
+- Có smoke flow mở app vào shell UI mới
 - `flutter analyze` pass
 
 ---
@@ -148,7 +166,7 @@ Issue checklist:
 - [ ] `STX-009` Tạo domain entities cho StarNyx, Completion, JournalEntry, AppSettings
 - [ ] `STX-010` Tạo abstract repositories trong `domain/repositories`
 - [ ] `STX-011` Implement repositories trong `data/repositories`
-- [ ] `STX-012` Tạo use case cho create, update, delete, load, toggle completion, save note, export, import
+- [ ] `STX-012` Tạo use case cho create, update, delete, load, select active StarNyx, toggle completion, save note, export, import
 - [ ] `STX-013` Implement rule tính streak hiện tại, streak dài nhất, completion rate theo năm
 - [ ] `STX-014` Implement rule validate start date, future date, 7-day edit lock, one-note-per-day
 
@@ -156,7 +174,7 @@ Definition of done:
 
 - Có thể thao tác dữ liệu hoàn toàn local
 - Use case bao phủ rule chính của spec
-- Unit test cho logic date và streak chạy pass
+- Unit test cho logic date, completion rate, streak chạy pass
 
 ---
 
@@ -173,16 +191,19 @@ Issue checklist:
 - [ ] `STX-016` Tạo `StarnyxFormBloc` với state cho create và edit
 - [ ] `STX-017` Tạo màn create StarNyx bám theo UI `docs/ui/starnyx_new_constellation.PNG`
 - [ ] `STX-018` Validate title bắt buộc, start date không lớn hơn hôm nay, reminder chỉ lưu giờ khi bật
-- [ ] `STX-019` Implement rule làm tròn reminder time theo mốc 15 phút
+- [ ] `STX-019` Implement rule làm tròn reminder time về mốc `:00` / `:30`
 - [ ] `STX-020` Implement edit StarNyx và prefill dữ liệu
 - [ ] `STX-021` Implement delete StarNyx với confirm dialog
-- [ ] `STX-022` Lưu và restore StarNyx được chọn gần nhất khi mở app lại
+- [ ] `STX-022` Tạo UI để list / switch StarNyx đang chọn từ màn chính hoặc quick actions
+- [ ] `STX-023` Lưu và restore StarNyx được chọn gần nhất khi mở app lại
 
 Definition of done:
 
 - User có thể tạo ít nhất 1 StarNyx
+- User có thể chuyển giữa nhiều StarNyx
 - Có thể sửa và xoá an toàn
 - First launch và returning user có luồng khác nhau đúng spec
+- Bloc hoặc widget test bao phủ validation chính của form và restore selected StarNyx
 
 ---
 
@@ -195,22 +216,23 @@ Mục tiêu:
 
 Issue checklist:
 
-- [ ] `STX-023` Tạo `HomeBloc` với event load data, select day, move previous/next day, jump today, change year, toggle completion
-- [ ] `STX-024` Tạo home page bám theo UI `docs/ui/starnyx_home.PNG`
-- [ ] `STX-025` Build star grid 365/366 ngày với 18 cột
-- [ ] `STX-026` Render đầy đủ các trạng thái: before start, completed, missed, future, selected, today
-- [ ] `STX-027` Chặn check-in cho ngày tương lai và ngày trước start date
-- [ ] `STX-028` Cho phép sửa completion chỉ trong 7 ngày gần nhất
-- [ ] `STX-029` Tạo cụm action bên dưới cho ngày đang chọn, previous / next / today
-- [ ] `STX-030` Hiển thị thống kê: current streak, longest streak, total completed, completion rate
-- [ ] `STX-031` Hỗ trợ đổi năm đang xem và tính lại completion rate đúng theo năm đó
-- [ ] `STX-032` Tạo bottom sheet hoặc quick actions bám theo UI `docs/ui/starnyx_bottom_sheet.PNG`
+- [ ] `STX-024` Tạo `HomeBloc` với event load data, select day, move previous/next day, jump today, change year, change active StarNyx, toggle completion
+- [ ] `STX-025` Tạo home page bám theo UI `docs/ui/starnyx_home.PNG`
+- [ ] `STX-026` Build star grid 365/366 ngày với 18 cột
+- [ ] `STX-027` Render đầy đủ các trạng thái: before start, completed, missed, future, selected, today
+- [ ] `STX-028` Chặn check-in cho ngày tương lai và ngày trước start date
+- [ ] `STX-029` Cho phép sửa completion chỉ trong 7 ngày gần nhất
+- [ ] `STX-030` Tạo cụm action bên dưới cho ngày đang chọn, previous / next / today
+- [ ] `STX-031` Hiển thị thống kê: current streak, longest streak, total completed, completion rate
+- [ ] `STX-032` Hỗ trợ đổi năm đang xem và tính lại completion rate đúng theo năm đó
+- [ ] `STX-033` Tạo bottom sheet hoặc quick actions bám theo UI `docs/ui/starnyx_bottom_sheet.PNG`
 
 Definition of done:
 
 - User hoàn thành được check-in flow đầy đủ
 - Rule completion hoạt động đúng
 - Grid phản hồi nhanh, không lag trên dữ liệu 1 năm
+- Bloc test hoặc widget test bao phủ select day, toggle completion, 7-day lock
 
 ---
 
@@ -223,21 +245,22 @@ Mục tiêu:
 
 Issue checklist:
 
-- [ ] `STX-033` Tạo `JournalBloc` hoặc state flow tương đương cho journal
-- [ ] `STX-034` Tạo màn journal bám theo UI `docs/ui/starnyx_journal.PNG`
-- [ ] `STX-035` Chỉ cho tạo 1 note mỗi ngày cho ngày hiện tại
-- [ ] `STX-036` Không cho sửa note đã tạo; chỉ hỗ trợ xoá rồi tạo lại
-- [ ] `STX-037` Hiển thị danh sách journal entries theo thứ tự mới nhất trước
-- [ ] `STX-038` Tạo `SettingsBloc` và màn settings bám theo `docs/ui/starnyx_settings.PNG`
-- [ ] `STX-039` Tạo màn general settings bám theo `docs/ui/starnyx_settings_general.PNG`
-- [ ] `STX-040` Implement notification service: create, update, cancel theo rule trong spec
-- [ ] `STX-041` Đồng bộ notification khi tạo, sửa, xoá, import dữ liệu
+- [ ] `STX-034` Tạo `JournalBloc` hoặc state flow tương đương cho journal
+- [ ] `STX-035` Tạo màn journal bám theo UI `docs/ui/starnyx_journal.PNG`
+- [ ] `STX-036` Chỉ cho tạo 1 note mỗi ngày cho ngày hiện tại
+- [ ] `STX-037` Không cho sửa note đã tạo; chỉ hỗ trợ xoá rồi tạo lại
+- [ ] `STX-038` Hiển thị danh sách journal entries theo thứ tự mới nhất trước
+- [ ] `STX-039` Tạo `SettingsBloc` và màn settings bám theo `docs/ui/starnyx_settings.PNG`
+- [ ] `STX-040` Tạo màn general settings bám theo `docs/ui/starnyx_settings_general.PNG`
+- [ ] `STX-041` Implement notification service: create, update, cancel theo rule trong spec
+- [ ] `STX-042` Đồng bộ notification khi tạo, sửa, xoá, import dữ liệu
 
 Definition of done:
 
 - Journal hoạt động đúng rule
 - Settings có thể điều khiển reminder và app preferences cơ bản
 - Notification được schedule lại đúng khi dữ liệu thay đổi
+- Có test cho journal rule và notification service bằng fake/mock service
 
 ---
 
@@ -250,21 +273,22 @@ Mục tiêu:
 
 Issue checklist:
 
-- [ ] `STX-042` Tạo màn backup hoặc section backup trong settings
-- [ ] `STX-043` Export toàn bộ dữ liệu ra file JSON theo schema trong spec
-- [ ] `STX-044` Import JSON với validate schema version và dữ liệu bắt buộc
-- [ ] `STX-045` Khi import: ghi đè toàn bộ dữ liệu hiện tại
-- [ ] `STX-046` Có rollback nếu import lỗi giữa chừng
-- [ ] `STX-047` Rebuild reminder schedule sau import thành công
-- [ ] `STX-048` Viết unit test cho JSON parser, import validator, rollback path
-- [ ] `STX-049` Viết bloc test hoặc widget test cho form, home, journal
-- [ ] `STX-050` Tạo manual QA checklist cho toàn bộ MVP
+- [ ] `STX-043` Tạo màn backup hoặc section backup trong settings
+- [ ] `STX-044` Export toàn bộ dữ liệu ra file JSON theo schema trong spec
+- [ ] `STX-045` Import JSON với validate schema version và dữ liệu bắt buộc
+- [ ] `STX-046` Khi import: ghi đè toàn bộ dữ liệu hiện tại
+- [ ] `STX-047` Có rollback nếu import lỗi giữa chừng
+- [ ] `STX-048` Rebuild reminder schedule sau import thành công
+- [ ] `STX-049` Viết unit test cho JSON parser, import validator, rollback path
+- [ ] `STX-050` Viết bloc test hoặc widget test cho form, home, journal
+- [ ] `STX-051` Tạo manual QA checklist cho toàn bộ MVP
 
 Definition of done:
 
 - Export ra file hợp lệ
 - Import dữ liệu hợp lệ hoạt động ổn định
 - Import lỗi không làm hỏng dữ liệu cũ
+- Test bao phủ parser, validator, rollback, rebuild reminder sau import
 
 ---
 
@@ -276,12 +300,12 @@ Mục tiêu:
 
 Issue checklist:
 
-- [ ] `STX-051` Rà soát toàn bộ copy text và empty states
-- [ ] `STX-052` Tối ưu spacing, color, typography cho đúng tinh thần StarNyx
-- [ ] `STX-053` Kiểm tra UX mobile nhỏ, dark/light nếu có, safe area, keyboard overlap
-- [ ] `STX-054` Thêm loading, error state, retry state cho các màn cần thiết
-- [ ] `STX-055` Kiểm tra icon, haptic, animation nhẹ cho check-in
-- [ ] `STX-056` Chuẩn bị app icon, splash, release config cơ bản
+- [ ] `STX-052` Rà soát toàn bộ copy text và empty states
+- [ ] `STX-053` Tối ưu spacing, color, typography cho đúng tinh thần StarNyx
+- [ ] `STX-054` Kiểm tra UX mobile nhỏ, dark/light nếu có, safe area, keyboard overlap
+- [ ] `STX-055` Thêm loading, error state, retry state cho các màn cần thiết
+- [ ] `STX-056` Kiểm tra icon, haptic, animation nhẹ cho check-in
+- [ ] `STX-057` Chuẩn bị app icon, splash, release config cơ bản
 
 Definition of done:
 
@@ -291,12 +315,13 @@ Definition of done:
 
 ---
 
-## 7. Screen Checklist
+## 8. Screen Checklist
 
 Checklist theo các file UI hiện có trong `docs/ui/`:
 
 - [ ] Welcome screen
 - [ ] Home screen
+- [ ] StarNyx switcher / picker
 - [ ] New constellation screen
 - [ ] Journal screen
 - [ ] Bottom sheet actions
@@ -305,7 +330,7 @@ Checklist theo các file UI hiện có trong `docs/ui/`:
 
 ---
 
-## 8. Suggested Execution Order by Week
+## 9. Suggested Execution Order by Week
 
 Nếu làm theo nhịp ngắn gọn:
 
@@ -331,21 +356,24 @@ Nếu làm theo nhịp ngắn gọn:
 
 ---
 
-## 9. High-Risk Areas
+## 10. High-Risk Areas
 
 Các phần cần cẩn thận ngay từ đầu:
 
 - Rule check-in trong 7 ngày gần nhất
 - Tính streak và completion rate đúng theo năm đang xem
+- Quản lý nhiều StarNyx và restore đúng StarNyx gần nhất
 - Import ghi đè toàn bộ nhưng vẫn rollback an toàn
 - Đồng bộ notification khi edit, delete, import
+- JSON contract phải giữ ổn định giữa DB model và file backup
 - Hiệu năng grid 365/366 ô khi rebuild
 
 ---
 
-## 10. MVP Exit Checklist
+## 11. MVP Exit Checklist
 
 - [ ] Tạo / sửa / xoá StarNyx hoạt động ổn
+- [ ] Chuyển được giữa nhiều StarNyx và restore đúng StarNyx gần nhất
 - [ ] Check-in theo ngày hoạt động đúng rule
 - [ ] Grid sao hiển thị đúng trạng thái ngày
 - [ ] Thống kê hiển thị đúng
@@ -359,19 +387,21 @@ Các phần cần cẩn thận ngay từ đầu:
 
 ---
 
-## 11. Recommended First Slice
+## 12. Recommended First Slice
 
 Nếu bắt đầu ngay, nên làm theo lát cắt nhỏ này trước:
 
 1. Setup structure + dependencies
 2. Tạo database + StarNyx entity + repository
 3. Làm create StarNyx
-4. Làm home screen tối giản chỉ với selected day
-5. Bật toggle completion cho hôm nay
-6. Sau đó mới mở rộng ra grid full year, stats, journal, settings
+4. Lưu và restore selected StarNyx
+5. Làm home screen tối giản chỉ với selected day
+6. Bật toggle completion cho hôm nay
+7. Sau đó mới mở rộng ra grid full year, stats, journal, settings
 
 Lý do:
 
 - Có một vertical slice chạy được rất sớm
 - Giảm rủi ro thiết kế sai data model
+- Chốt được luồng nhiều StarNyx trước khi UI phình ra
 - Dễ demo tiến độ ngay từ tuần đầu
