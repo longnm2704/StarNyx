@@ -79,6 +79,12 @@ void _registerUseCases() {
       serviceLocator<AppSettingsRepository>(),
     ),
   );
+  serviceLocator.registerLazySingleton<LoadStarNyxProgressStatsUseCase>(
+    () => LoadStarNyxProgressStatsUseCase(
+      serviceLocator<StarNyxRepository>(),
+      serviceLocator<CompletionRepository>(),
+    ),
+  );
   serviceLocator.registerLazySingleton<SelectActiveStarNyxUseCase>(
     () => SelectActiveStarNyxUseCase(
       serviceLocator<StarNyxRepository>(),
