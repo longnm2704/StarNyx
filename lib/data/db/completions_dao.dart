@@ -22,6 +22,18 @@ class CompletionsDao extends DatabaseAccessor<AppDatabase>
         .watch();
   }
 
+  // Toggle flows often need to inspect one completion record for one date.
+  Future<Completion?> getCompletion({
+    required String starnyxId,
+    required String date,
+  }) {
+    return (select(completions)..where(
+          (table) =>
+              table.starnyxId.equals(starnyxId) & table.date.equals(date),
+        ))
+        .getSingleOrNull();
+  }
+
   // Composite key upsert keeps one completion record per StarNyx per day.
   Future<void> upsertCompletion(CompletionsCompanion companion) {
     return into(completions).insertOnConflictUpdate(companion);

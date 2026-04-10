@@ -2,6 +2,8 @@ import 'package:uuid/uuid.dart';
 import 'package:get_it/get_it.dart';
 import 'package:starnyx/data/db/app_database.dart';
 import 'package:starnyx/app/router/app_router.dart';
+import 'package:starnyx/data/repositories/data_repositories.dart';
+import 'package:starnyx/domain/repositories/domain_repositories.dart';
 
 final GetIt serviceLocator = GetIt.instance;
 
@@ -34,7 +36,21 @@ void _registerCoreDependencies() {
 // These empty sections keep future registrations organized by layer.
 void _registerServices() {}
 
-void _registerRepositories() {}
+void _registerRepositories() {
+  // Domain code depends on abstractions while DI wires the Drift implementations.
+  serviceLocator.registerLazySingleton<StarNyxRepository>(
+    () => DriftStarNyxRepository(serviceLocator<AppDatabase>()),
+  );
+  serviceLocator.registerLazySingleton<CompletionRepository>(
+    () => DriftCompletionRepository(serviceLocator<AppDatabase>()),
+  );
+  serviceLocator.registerLazySingleton<JournalEntryRepository>(
+    () => DriftJournalEntryRepository(serviceLocator<AppDatabase>()),
+  );
+  serviceLocator.registerLazySingleton<AppSettingsRepository>(
+    () => DriftAppSettingsRepository(serviceLocator<AppDatabase>()),
+  );
+}
 
 void _registerUseCases() {}
 
