@@ -55,10 +55,22 @@ Lệnh cơ bản:
 
 ```bash
 fvm flutter pub get
+dart run build_runner build --delete-conflicting-outputs
 fvm flutter analyze
 fvm flutter test
 fvm flutter run
 ```
+
+## Generated Files
+
+- Repo không commit file generated như `*.g.dart`.
+- Sau khi pull code mới hoặc sau khi đổi schema / annotation / codegen input, hãy chạy lại:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+- Nếu chưa chạy codegen, project có thể analyze hoặc build lỗi do thiếu file generated ở local.
 
 ## Working Rules
 
