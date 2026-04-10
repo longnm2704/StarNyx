@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
+// Shared section header used to keep screen blocks visually consistent.
 class AppSectionTitle extends StatelessWidget {
   const AppSectionTitle({
     required this.title,

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:starnyx/data/db/tables/starnyxs_table.dart';
 
+// Date-only journal entries stored per StarNyx.
 class JournalEntries extends Table {
   @override
   String get tableName => 'journal_entries';
@@ -14,5 +15,6 @@ class JournalEntries extends Table {
   TextColumn get content => text().withLength(min: 1, max: 4000)();
 
   @override
+  // One journal entry per StarNyx per date.
   Set<Column<Object>>? get primaryKey => <Column<Object>>{starnyxId, date};
 }

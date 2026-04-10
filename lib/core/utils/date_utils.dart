@@ -1,9 +1,11 @@
+// Inclusive range used by yearly metrics that count both start and end dates.
 class InclusiveDateRange {
   const InclusiveDateRange({required this.start, required this.end});
 
   final DateTime start;
   final DateTime end;
 
+  // Product metrics count both endpoints as valid days.
   int get dayCount => end.difference(start).inDays + 1;
 
   bool contains(DateTime value) {
@@ -12,6 +14,7 @@ class InclusiveDateRange {
   }
 }
 
+// Shared date-only helpers for rules that must ignore time-of-day.
 abstract final class DateUtils {
   static DateTime nowDate([DateTime? now]) => dateOnly(now ?? DateTime.now());
 
@@ -76,6 +79,7 @@ abstract final class DateUtils {
     required int year,
     DateTime? today,
   }) {
+    // Completion rate only uses valid dates inside the viewed year.
     final normalizedStartDate = dateOnly(startDate);
     final normalizedToday = nowDate(today);
     final rangeStart = maxDate(normalizedStartDate, startOfYear(year));

@@ -1,5 +1,6 @@
 import 'package:starnyx/core/utils/reminder_time_utils.dart';
 
+// Lightweight validation result used before import touches local data.
 class JsonValidationResult {
   const JsonValidationResult._(this.errors);
 
@@ -16,6 +17,7 @@ class JsonValidationResult {
   }
 }
 
+// Shared JSON validation helpers for backup import pre-checks.
 abstract final class JsonValidationUtils {
   static JsonValidationResult validateImportJson(Map<String, dynamic> json) {
     final errors = <String>[];
@@ -26,6 +28,7 @@ abstract final class JsonValidationUtils {
     final journalEntries = _readList(json, 'journalEntries', errors);
     final appSettings = _readMap(json, 'appSettings', errors);
 
+    // Collect ids first so child records can validate references without hitting the database.
     final knownStarNyxIds = <String>{};
 
     for (var index = 0; index < starnyxs.length; index++) {
@@ -202,6 +205,7 @@ abstract final class JsonValidationUtils {
     Set<String> knownStarNyxIds,
     List<String> errors,
   ) {
+    // `lastSelectedStarnyxId` can be null when no habit is selected yet.
     final selectedId = appSettings['lastSelectedStarnyxId'];
     if (selectedId != null && selectedId is! String) {
       errors.add('appSettings.lastSelectedStarnyxId must be a string or null.');

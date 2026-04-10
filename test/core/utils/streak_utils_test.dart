@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/core/utils/streak_utils.dart';
 
+// Covers streak and completion-rate helpers used by stats.
 void main() {
   group('StreakUtils', () {
     test('calculates current streak from today when today is completed', () {

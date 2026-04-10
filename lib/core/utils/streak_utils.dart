@@ -1,5 +1,6 @@
 import 'package:starnyx/core/utils/date_utils.dart';
 
+// Shared progress metrics used by stats and yearly views.
 abstract final class StreakUtils {
   static int currentStreak({
     required Iterable<DateTime> completionDates,
@@ -8,6 +9,10 @@ abstract final class StreakUtils {
     final normalizedToday = DateUtils.nowDate(today);
     final completedDays = _normalizedDayKeys(completionDates);
 
+    // Spec rule:
+    // - if today is completed, count backwards from today
+    // - otherwise, if yesterday is completed, count backwards from yesterday
+    // - otherwise the current streak is 0
     if (completedDays.contains(_dayKey(normalizedToday))) {
       return _countBackwardsFrom(
         start: normalizedToday,
@@ -97,6 +102,7 @@ abstract final class StreakUtils {
     required int year,
     DateTime? today,
   }) {
+    // Returning 0 matches the product rule for years with no valid tracking dates.
     final validDayCount = validDayCountForYear(
       startDate: startDate,
       year: year,

@@ -5,7 +5,9 @@ import 'package:easy_localization/easy_localization.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Register app-level dependencies before any widget tree needs them.
   await configureDependencies();
+  // Localization must be initialized before EasyLocalization wraps the app.
   await EasyLocalization.ensureInitialized();
 
   runApp(

@@ -4,11 +4,13 @@ import 'package:starnyx/app/router/app_router.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:easy_localization/easy_localization.dart';
 
+// Root app widget that wires theme, localization, and navigation together.
 class StarNyxApp extends StatelessWidget {
   const StarNyxApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Router comes from DI so later route guards or feature modules stay centralized.
     final router = serviceLocator<AppRouter>();
 
     return MaterialApp(

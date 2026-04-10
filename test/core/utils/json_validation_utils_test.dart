@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/core/utils/json_validation_utils.dart';
 
+// Covers import payload validation before database writes happen.
 void main() {
   group('JsonValidationUtils', () {
     test('accepts a valid import payload', () {

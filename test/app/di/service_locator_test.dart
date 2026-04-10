@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/app/router/app_router.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 
+// Covers the minimal DI contract expected before feature registrations grow.
 void main() {
   tearDown(() async {
     await resetDependencies();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
+// Shared loading widget for simple page and section states.
 class AppLoadingIndicator extends StatelessWidget {
   const AppLoadingIndicator({super.key, this.label});
 
