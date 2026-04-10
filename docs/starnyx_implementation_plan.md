@@ -168,7 +168,7 @@ Issue checklist:
 - [x] `STX-011` Implement repositories trong `data/repositories`
 - [x] `STX-012` Tạo use case cho create, update, delete, load, select active StarNyx, toggle completion, save note, export, import
 - [x] `STX-013` Implement rule tính streak hiện tại, streak dài nhất, completion rate theo năm
-- [ ] `STX-014` Implement rule validate start date, future date, 7-day edit lock, one-note-per-day
+- [x] `STX-014` Implement rule validate start date, future date, 7-day edit lock, one-note-per-day
 
 Definition of done:
 
