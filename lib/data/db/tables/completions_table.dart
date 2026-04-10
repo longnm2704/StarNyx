@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:starnyx/data/db/tables/starnyxs_table.dart';
 
+// Date-only completion records for each StarNyx.
 class Completions extends Table {
   @override
   String get tableName => 'completions';
@@ -14,5 +15,6 @@ class Completions extends Table {
   BoolColumn get completed => boolean().withDefault(const Constant(true))();
 
   @override
+  // One completion record per StarNyx per date.
   Set<Column<Object>>? get primaryKey => <Column<Object>>{starnyxId, date};
 }

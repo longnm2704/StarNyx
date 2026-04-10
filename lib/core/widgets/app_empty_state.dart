@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
+// Shared empty-state card for screens that have no content yet.
 class AppEmptyState extends StatelessWidget {
   const AppEmptyState({
     required this.title,

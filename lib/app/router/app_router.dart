@@ -9,6 +9,7 @@ class AppRouter {
   const AppRouter();
 
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    // Centralizing route creation here keeps MaterialApp simple and gives us one place to add route arguments, guards, and feature modules later.
     switch (settings.name) {
       case AppRoutes.home:
         return MaterialPageRoute<void>(

@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+// Main habit table that mirrors the import/export StarNyx payload.
 class StarNyxs extends Table {
   @override
   String get tableName => 'starnyxs';
@@ -26,5 +27,6 @@ class StarNyxs extends Table {
   DateTimeColumn get updatedAt => dateTime()();
 
   @override
+  // String ids are generated in app code so import/export can preserve them exactly.
   Set<Column<Object>>? get primaryKey => <Column<Object>>{id};
 }

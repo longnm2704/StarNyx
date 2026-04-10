@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Central theme entrypoint for the current light-mode visual baseline.
 abstract final class AppTheme {
   static ThemeData light() {
     const seedColor = Color(0xFF1D3557);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
+// Shared error-state card with an optional retry action.
 class AppErrorState extends StatelessWidget {
   const AppErrorState({
     required this.title,

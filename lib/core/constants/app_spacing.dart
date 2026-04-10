@@ -1,3 +1,4 @@
+// Shared spacing scale used across widgets and screens.
 abstract final class AppSpacing {
   static const xxs = 4.0;
   static const xs = 8.0;

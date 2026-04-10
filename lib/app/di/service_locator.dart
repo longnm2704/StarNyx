@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 final GetIt serviceLocator = GetIt.instance;
 
 Future<void> configureDependencies() async {
+  // This guard keeps hot restart / repeated bootstrap from double-registering.
   if (serviceLocator.isRegistered<AppRouter>()) {
     return;
   }
@@ -21,10 +22,12 @@ Future<void> resetDependencies() {
 }
 
 void _registerCoreDependencies() {
+  // Keeping AppRouter injectable makes later navigation changes easier.
   serviceLocator.registerLazySingleton<AppRouter>(AppRouter.new);
   serviceLocator.registerLazySingleton<Uuid>(Uuid.new);
 }
 
+// These empty sections keep future registrations organized by layer.
 void _registerServices() {}
 
 void _registerRepositories() {}

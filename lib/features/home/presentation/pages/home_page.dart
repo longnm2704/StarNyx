@@ -3,6 +3,7 @@ import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
+// Temporary home placeholder until the real MVP home flow is implemented.
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
