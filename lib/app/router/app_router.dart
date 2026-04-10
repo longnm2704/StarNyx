@@ -5,8 +5,10 @@ abstract final class AppRoutes {
   static const home = '/';
 }
 
-abstract final class AppRouter {
-  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+class AppRouter {
+  const AppRouter();
+
+  Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case AppRoutes.home:
         return MaterialPageRoute<void>(
