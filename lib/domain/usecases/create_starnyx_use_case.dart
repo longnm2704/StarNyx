@@ -1,6 +1,7 @@
 import 'package:uuid/uuid.dart';
 import 'package:starnyx/core/utils/date_utils.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
+import 'package:starnyx/domain/usecases/use_case_validation.dart';
 import 'package:starnyx/domain/repositories/starnyx_repository.dart';
 
 // Creates a new StarNyx entity with generated id and timestamps.
@@ -20,6 +21,7 @@ class CreateStarNyxUseCase {
     DateTime? now,
   }) async {
     final timestamp = now ?? DateTime.now();
+    UseCaseValidation.validateStartDate(startDate, today: timestamp);
     final starnyx = StarNyx(
       id: _uuid.v4(),
       title: title,

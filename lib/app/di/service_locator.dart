@@ -92,7 +92,10 @@ void _registerUseCases() {
     ),
   );
   serviceLocator.registerLazySingleton<ToggleCompletionUseCase>(
-    () => ToggleCompletionUseCase(serviceLocator<CompletionRepository>()),
+    () => ToggleCompletionUseCase(
+      serviceLocator<StarNyxRepository>(),
+      serviceLocator<CompletionRepository>(),
+    ),
   );
   serviceLocator.registerLazySingleton<SaveJournalEntryUseCase>(
     () => SaveJournalEntryUseCase(serviceLocator<JournalEntryRepository>()),

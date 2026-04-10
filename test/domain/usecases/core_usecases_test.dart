@@ -39,6 +39,55 @@ void main() {
     expect(await starNyxRepository.getStarnyxById(created.id), created);
   });
 
+  test('create use case rejects a future start date', () async {
+    final useCase = CreateStarNyxUseCase(starNyxRepository, const Uuid());
+
+    expect(
+      () => useCase(
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 11),
+        reminderEnabled: false,
+        reminderTime: null,
+        now: DateTime(2026, 4, 10, 8, 30),
+      ),
+      throwsA(
+        isA<UseCaseValidationException>().having(
+          (error) => error.code,
+          'code',
+          UseCaseValidationCode.startDateInFuture,
+        ),
+      ),
+    );
+  });
+
+  test('update use case rejects a future start date', () async {
+    final useCase = UpdateStarNyxUseCase(starNyxRepository);
+    final starnyx = StarNyx(
+      id: 'habit-1',
+      title: 'Hydrate',
+      description: null,
+      color: '#102030',
+      startDate: DateTime(2026, 4, 11),
+      reminderEnabled: false,
+      reminderTime: null,
+      createdAt: DateTime(2026, 4, 1, 8),
+      updatedAt: DateTime(2026, 4, 1, 8),
+    );
+
+    expect(
+      () => useCase(starnyx, now: DateTime(2026, 4, 10, 8, 30)),
+      throwsA(
+        isA<UseCaseValidationException>().having(
+          (error) => error.code,
+          'code',
+          UseCaseValidationCode.startDateInFuture,
+        ),
+      ),
+    );
+  });
+
   test(
     'load active use case falls back to the first StarNyx and repairs settings',
     () async {
@@ -81,15 +130,33 @@ void main() {
   test(
     'toggle completion use case creates then removes a completion',
     () async {
-      final useCase = ToggleCompletionUseCase(completionRepository);
+      await starNyxRepository.saveStarnyx(
+        StarNyx(
+          id: 'habit-1',
+          title: 'Hydrate',
+          description: null,
+          color: '#102030',
+          startDate: DateTime(2026, 4, 1),
+          reminderEnabled: false,
+          reminderTime: null,
+          createdAt: DateTime(2026, 4, 1, 8),
+          updatedAt: DateTime(2026, 4, 2, 9),
+        ),
+      );
+      final useCase = ToggleCompletionUseCase(
+        starNyxRepository,
+        completionRepository,
+      );
 
       final firstResult = await useCase(
         starnyxId: 'habit-1',
         date: DateTime(2026, 4, 10, 12),
+        today: DateTime(2026, 4, 10),
       );
       final secondResult = await useCase(
         starnyxId: 'habit-1',
         date: DateTime(2026, 4, 10, 23, 30),
+        today: DateTime(2026, 4, 10),
       );
 
       expect(firstResult, isTrue);
@@ -100,6 +167,139 @@ void main() {
           date: DateTime(2026, 4, 10),
         ),
         isNull,
+      );
+    },
+  );
+
+  test('toggle completion use case rejects dates before start date', () async {
+    await starNyxRepository.saveStarnyx(
+      StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 5),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 5, 8),
+        updatedAt: DateTime(2026, 4, 5, 8),
+      ),
+    );
+    final useCase = ToggleCompletionUseCase(
+      starNyxRepository,
+      completionRepository,
+    );
+
+    expect(
+      () => useCase(
+        starnyxId: 'habit-1',
+        date: DateTime(2026, 4, 4),
+        today: DateTime(2026, 4, 10),
+      ),
+      throwsA(
+        isA<UseCaseValidationException>().having(
+          (error) => error.code,
+          'code',
+          UseCaseValidationCode.dateBeforeStartDate,
+        ),
+      ),
+    );
+  });
+
+  test('toggle completion use case rejects future dates', () async {
+    await starNyxRepository.saveStarnyx(
+      StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 1, 8),
+      ),
+    );
+    final useCase = ToggleCompletionUseCase(
+      starNyxRepository,
+      completionRepository,
+    );
+
+    expect(
+      () => useCase(
+        starnyxId: 'habit-1',
+        date: DateTime(2026, 4, 11),
+        today: DateTime(2026, 4, 10),
+      ),
+      throwsA(
+        isA<UseCaseValidationException>().having(
+          (error) => error.code,
+          'code',
+          UseCaseValidationCode.dateInFuture,
+        ),
+      ),
+    );
+  });
+
+  test('toggle completion use case rejects edits older than 7 days', () async {
+    await starNyxRepository.saveStarnyx(
+      StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 1, 8),
+      ),
+    );
+    final useCase = ToggleCompletionUseCase(
+      starNyxRepository,
+      completionRepository,
+    );
+
+    expect(
+      () => useCase(
+        starnyxId: 'habit-1',
+        date: DateTime(2026, 4, 2),
+        today: DateTime(2026, 4, 10),
+      ),
+      throwsA(
+        isA<UseCaseValidationException>().having(
+          (error) => error.code,
+          'code',
+          UseCaseValidationCode.completionEditWindowExpired,
+        ),
+      ),
+    );
+  });
+
+  test(
+    'save journal entry use case rejects a second note on the same day',
+    () async {
+      final useCase = SaveJournalEntryUseCase(journalEntryRepository);
+
+      await useCase(
+        starnyxId: 'habit-1',
+        date: DateTime(2026, 4, 10, 8),
+        content: 'First note',
+      );
+
+      expect(
+        () => useCase(
+          starnyxId: 'habit-1',
+          date: DateTime(2026, 4, 10, 20),
+          content: 'Second note',
+        ),
+        throwsA(
+          isA<UseCaseValidationException>().having(
+            (error) => error.code,
+            'code',
+            UseCaseValidationCode.journalEntryAlreadyExists,
+          ),
+        ),
       );
     },
   );

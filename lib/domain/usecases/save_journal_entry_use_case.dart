@@ -1,5 +1,6 @@
 import 'package:starnyx/core/utils/date_utils.dart';
 import 'package:starnyx/domain/entities/journal_entry.dart';
+import 'package:starnyx/domain/usecases/use_case_validation.dart';
 import 'package:starnyx/domain/repositories/journal_entry_repository.dart';
 
 // Saves one daily journal entry for a StarNyx.
@@ -13,9 +14,15 @@ class SaveJournalEntryUseCase {
     required DateTime date,
     required String content,
   }) async {
+    final normalizedDate = DateUtils.dateOnly(date);
+    await UseCaseValidation.validateJournalEntryCreation(
+      repository: _repository,
+      starnyxId: starnyxId,
+      date: normalizedDate,
+    );
     final entry = JournalEntry(
       starnyxId: starnyxId,
-      date: DateUtils.dateOnly(date),
+      date: normalizedDate,
       content: content,
     );
 
