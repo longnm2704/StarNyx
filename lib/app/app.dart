@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:starnyx/app/theme/app_theme.dart';
 import 'package:starnyx/app/router/app_router.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class StarNyxApp extends StatelessWidget {
   const StarNyxApp({super.key});
@@ -8,11 +9,14 @@ class StarNyxApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'StarNyx',
-      debugShowCheckedModeBanner: false,
+      locale: context.locale,
       theme: AppTheme.light(),
       initialRoute: AppRoutes.home,
+      debugShowCheckedModeBanner: false,
       onGenerateRoute: AppRouter.onGenerateRoute,
+      supportedLocales: context.supportedLocales,
+      localizationsDelegates: context.localizationDelegates,
+      onGenerateTitle: (BuildContext context) => 'app.title'.tr(),
     );
   }
 }
