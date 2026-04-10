@@ -9,6 +9,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'StarNyx', home: const Text('Hello World'));
+    return MaterialApp(
+      title: 'StarNyx',
+      home: Container(
+        color: Colors.white,
+        child: const Center(child: Text('StarNyx')),
+      ),
+    );
   }
 }
