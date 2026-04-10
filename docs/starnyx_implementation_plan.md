@@ -165,7 +165,7 @@ Issue checklist:
 - [x] `STX-008` Tạo database class, table, DAO và migration strategy version 1
 - [x] `STX-009` Tạo domain entities cho StarNyx, Completion, JournalEntry, AppSettings
 - [x] `STX-010` Tạo abstract repositories trong `domain/repositories`
-- [ ] `STX-011` Implement repositories trong `data/repositories`
+- [x] `STX-011` Implement repositories trong `data/repositories`
 - [ ] `STX-012` Tạo use case cho create, update, delete, load, select active StarNyx, toggle completion, save note, export, import
 - [ ] `STX-013` Implement rule tính streak hiện tại, streak dài nhất, completion rate theo năm
 - [ ] `STX-014` Implement rule validate start date, future date, 7-day edit lock, one-note-per-day
