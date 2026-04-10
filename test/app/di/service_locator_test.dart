@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/data/db/app_database.dart';
 import 'package:starnyx/app/router/app_router.dart';
 import 'package:starnyx/app/di/service_locator.dart';
+import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
 
 // Covers the minimal DI contract expected before feature registrations grow.
@@ -22,6 +23,16 @@ void main() {
     expect(serviceLocator.isRegistered<CompletionRepository>(), isTrue);
     expect(serviceLocator.isRegistered<JournalEntryRepository>(), isTrue);
     expect(serviceLocator.isRegistered<AppSettingsRepository>(), isTrue);
+    expect(serviceLocator.isRegistered<CreateStarNyxUseCase>(), isTrue);
+    expect(serviceLocator.isRegistered<UpdateStarNyxUseCase>(), isTrue);
+    expect(serviceLocator.isRegistered<DeleteStarNyxUseCase>(), isTrue);
+    expect(serviceLocator.isRegistered<LoadStarnyxsUseCase>(), isTrue);
+    expect(serviceLocator.isRegistered<LoadActiveStarNyxUseCase>(), isTrue);
+    expect(serviceLocator.isRegistered<SelectActiveStarNyxUseCase>(), isTrue);
+    expect(serviceLocator.isRegistered<ToggleCompletionUseCase>(), isTrue);
+    expect(serviceLocator.isRegistered<SaveJournalEntryUseCase>(), isTrue);
+    expect(serviceLocator.isRegistered<ExportDataUseCase>(), isTrue);
+    expect(serviceLocator.isRegistered<ImportDataUseCase>(), isTrue);
   });
 
   test('keeps AppRouter as a lazy singleton', () async {
