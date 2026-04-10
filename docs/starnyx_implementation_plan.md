@@ -161,7 +161,7 @@ Mục tiêu:
 
 Issue checklist:
 
-- [ ] `STX-007` Thiết kế Drift schema cho `starnyxs`, `completions`, `journal_entries`, `app_settings`
+- [x] `STX-007` Thiết kế Drift schema cho `starnyxs`, `completions`, `journal_entries`, `app_settings`
 - [ ] `STX-008` Tạo database class, table, DAO và migration strategy version 1
 - [ ] `STX-009` Tạo domain entities cho StarNyx, Completion, JournalEntry, AppSettings
 - [ ] `STX-010` Tạo abstract repositories trong `domain/repositories`
