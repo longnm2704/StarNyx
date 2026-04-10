@@ -22,6 +22,18 @@ class JournalEntriesDao extends DatabaseAccessor<AppDatabase>
         .watch();
   }
 
+  // Save-note flows often need to inspect one journal entry for one date.
+  Future<JournalEntry?> getJournalEntry({
+    required String starnyxId,
+    required String date,
+  }) {
+    return (select(journalEntries)..where(
+          (table) =>
+              table.starnyxId.equals(starnyxId) & table.date.equals(date),
+        ))
+        .getSingleOrNull();
+  }
+
   // Composite key upsert keeps one journal entry per StarNyx per date.
   Future<void> upsertJournalEntry(JournalEntriesCompanion companion) {
     return into(journalEntries).insertOnConflictUpdate(companion);

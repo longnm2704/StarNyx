@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/data/db/app_database.dart';
 import 'package:starnyx/app/router/app_router.dart';
 import 'package:starnyx/app/di/service_locator.dart';
+import 'package:starnyx/domain/repositories/domain_repositories.dart';
 
 // Covers the minimal DI contract expected before feature registrations grow.
 void main() {
@@ -17,6 +18,10 @@ void main() {
     expect(serviceLocator.isRegistered<Uuid>(), isTrue);
     expect(serviceLocator.isRegistered<AppRouter>(), isTrue);
     expect(serviceLocator.isRegistered<AppDatabase>(), isTrue);
+    expect(serviceLocator.isRegistered<StarNyxRepository>(), isTrue);
+    expect(serviceLocator.isRegistered<CompletionRepository>(), isTrue);
+    expect(serviceLocator.isRegistered<JournalEntryRepository>(), isTrue);
+    expect(serviceLocator.isRegistered<AppSettingsRepository>(), isTrue);
   });
 
   test('keeps AppRouter as a lazy singleton', () async {
