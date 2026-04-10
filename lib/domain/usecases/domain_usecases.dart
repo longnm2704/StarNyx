@@ -1,4 +1,5 @@
 // Barrel export for domain use cases used by blocs and DI.
+export 'use_case_validation.dart';
 export 'export_data_use_case.dart';
 export 'import_data_use_case.dart';
 export 'load_starnyxs_use_case.dart';
