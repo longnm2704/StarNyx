@@ -3,6 +3,7 @@ import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
 import 'package:starnyx/features/home/presentation/widgets/home_widgets.dart';
+import 'package:starnyx/features/starnyx_form/presentation/pages/create_starnyx_bottom_sheet.dart';
 
 // Root screen that shows the first-run welcome state until the real home flow lands.
 class HomePage extends StatefulWidget {
@@ -36,6 +37,24 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _onCreatePressed() {
+    if (widget._onCreatePressed != null) {
+      widget._onCreatePressed!();
+      return;
+    }
+
+    _openCreateBottomSheet();
+  }
+
+  Future<void> _openCreateBottomSheet() async {
+    final created = await showCreateStarnyxBottomSheet(context);
+    if (!mounted || created == null) {
+      return;
+    }
+
+    _retryLoad();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,9 +71,7 @@ class _HomePageState extends State<HomePage> {
 
           final starnyxs = snapshot.data ?? const <StarNyx>[];
           if (starnyxs.isEmpty) {
-            return FirstRunWelcomeView(
-              onCreatePressed: widget._onCreatePressed,
-            );
+            return FirstRunWelcomeView(onCreatePressed: _onCreatePressed);
           }
 
           return ReturningPlaceholderView(starnyxCount: starnyxs.length);

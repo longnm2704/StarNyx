@@ -1,4 +1,3 @@
-import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/core/utils/core_utils.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
@@ -104,7 +103,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
       mode: StarnyxFormMode.create,
       title: '',
       description: '',
-      color: _colorToHex(AppColors.accentViolet),
+      color: AppColors.starnyxPresetColorHexes.first,
       startDate: DateUtils.nowDate(now),
       reminderEnabled: false,
       reminderTime: roundedReminder,
@@ -364,12 +363,5 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
   String? _normalizedDescription(String description) {
     final trimmed = description.trim();
     return trimmed.isEmpty ? null : trimmed;
-  }
-
-  /// Converts Flutter Color to hex string (e.g., #8E5BFF).
-  /// Strips alpha channel and only uses RGB components.
-  static String _colorToHex(Color color) {
-    final rgb = color.toARGB32() & 0x00FFFFFF;
-    return '#${rgb.toRadixString(16).padLeft(6, '0').toUpperCase()}';
   }
 }
