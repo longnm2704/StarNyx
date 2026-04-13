@@ -57,19 +57,14 @@ void main() {
   });
 
   group('ReminderTimeUtils', () {
-    test('rounds to the finalized :00 / :30 slots', () {
-      expect(
-        ReminderTimeUtils.roundToNearestSlot(DateTime(2026, 4, 10, 10, 12)),
-        DateTime(2026, 4, 10, 10, 0),
+    test('parses and formats exact HH:mm values without rounding', () {
+      final parsed = ReminderTimeUtils.parseTimeString(
+        '15:39',
+        anchorDate: DateTime(2026, 4, 10),
       );
-      expect(
-        ReminderTimeUtils.roundToNearestSlot(DateTime(2026, 4, 10, 10, 20)),
-        DateTime(2026, 4, 10, 10, 30),
-      );
-      expect(
-        ReminderTimeUtils.roundToNearestSlot(DateTime(2026, 4, 10, 10, 50)),
-        DateTime(2026, 4, 10, 11, 0),
-      );
+
+      expect(parsed, DateTime(2026, 4, 10, 15, 39));
+      expect(ReminderTimeUtils.formatTime(parsed!), '15:39');
     });
   });
 }

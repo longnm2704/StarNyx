@@ -26,24 +26,27 @@ void main() {
     updateUseCase = UpdateStarNyxUseCase(repository);
   });
 
-  test('create mode starts with today and a rounded reminder slot', () {
-    /// Verifies that create mode:
-    /// - Starts with today's date
-    /// - Disables reminder by default
-    /// - Suggests a rounded reminder time (next 30-min slot)
-    /// - Shows title validation error (required field)
-    final bloc = StarnyxFormBloc(
-      createStarNyxUseCase: createUseCase,
-      updateStarNyxUseCase: updateUseCase,
-      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
-    );
+  test(
+    'create mode starts with today and preserves the current reminder time',
+    () {
+      /// Verifies that create mode:
+      /// - Starts with today's date
+      /// - Disables reminder by default
+      /// - Suggests the current reminder time without rounding
+      /// - Shows title validation error (required field)
+      final bloc = StarnyxFormBloc(
+        createStarNyxUseCase: createUseCase,
+        updateStarNyxUseCase: updateUseCase,
+        nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+      );
 
-    expect(bloc.state.mode, StarnyxFormMode.create);
-    expect(bloc.state.startDate, DateTime(2026, 4, 13));
-    expect(bloc.state.reminderEnabled, isFalse);
-    expect(bloc.state.reminderTime, '10:30');
-    expect(bloc.state.titleError, StarnyxFormTitleError.empty);
-  });
+      expect(bloc.state.mode, StarnyxFormMode.create);
+      expect(bloc.state.startDate, DateTime(2026, 4, 13));
+      expect(bloc.state.reminderEnabled, isFalse);
+      expect(bloc.state.reminderTime, '10:20');
+      expect(bloc.state.titleError, StarnyxFormTitleError.empty);
+    },
+  );
 
   test('edit mode prefills fields from the existing StarNyx', () {
     /// Verifies that edit mode:
@@ -77,6 +80,28 @@ void main() {
     expect(bloc.state.reminderTime, '09:30');
   });
 
+  test('edit mode preserves an existing reminder time exactly', () {
+    final existing = StarNyx(
+      id: 'habit-1',
+      title: 'Hydrate',
+      description: 'Drink enough water',
+      color: '#102030',
+      startDate: DateTime(2026, 4, 10),
+      reminderEnabled: true,
+      reminderTime: '09:20',
+      createdAt: DateTime(2026, 4, 10, 8),
+      updatedAt: DateTime(2026, 4, 10, 8),
+    );
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      initialStarnyx: existing,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    expect(bloc.state.reminderTime, '09:20');
+  });
+
   test('changing fields updates validation state', () async {
     /// Verifies that:
     /// - Title changes trigger revalidation (shows error when empty)
@@ -102,6 +127,25 @@ void main() {
     bloc.add(const StarnyxFormReminderTimeChanged('07:30'));
     await pumpEventQueue();
     expect(bloc.state.reminderTimeError, isNull);
+  });
+
+  test('changing reminder time preserves the selected minutes', () async {
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    bloc.add(const StarnyxFormReminderToggled(true));
+    bloc.add(const StarnyxFormReminderTimeChanged('07:44'));
+    await pumpEventQueue();
+
+    expect(bloc.state.reminderTime, '07:44');
+
+    bloc.add(const StarnyxFormReminderTimeChanged('07:45'));
+    await pumpEventQueue();
+
+    expect(bloc.state.reminderTime, '07:45');
   });
 
   test('start date older than 7 days surfaces a form error', () async {
@@ -149,6 +193,28 @@ void main() {
     expect(bloc.state.savedStarnyx?.reminderTime, '21:00');
     expect(await repository.getAllStarnyxs(), hasLength(1));
   });
+
+  test(
+    'submit persists the exact reminder time selected by the user',
+    () async {
+      final bloc = StarnyxFormBloc(
+        createStarNyxUseCase: createUseCase,
+        updateStarNyxUseCase: updateUseCase,
+        nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+      );
+
+      bloc.add(const StarnyxFormTitleChanged('Read 20 pages'));
+      bloc.add(const StarnyxFormReminderToggled(true));
+      bloc.add(const StarnyxFormReminderTimeChanged('21:20'));
+      await pumpEventQueue();
+
+      bloc.add(const StarnyxFormSubmitted());
+      await pumpEventQueue(times: 10);
+
+      expect(bloc.state.submissionStatus, StarnyxFormSubmissionStatus.success);
+      expect(bloc.state.savedStarnyx?.reminderTime, '21:20');
+    },
+  );
 
   test('submit updates an existing StarNyx in edit mode', () async {
     /// Verifies that:
