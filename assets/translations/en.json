@@ -3,9 +3,21 @@
     "title": "StarNyx"
   },
   "home": {
-    "title": "Constellation Home",
-    "subtitle": "The shared core widget layer is ready for the next feature slices.",
-    "empty_title": "No StarNyx yet",
-    "empty_message": "Create your first constellation to start tracking a habit offline."
+    "returning_title": "Constellation Home",
+    "returning_subtitle": "{} constellation ready. The real home grid lands in STX-025.",
+    "returning_empty_title": "Your cosmos is already seeded",
+    "returning_empty_message": "The first-launch welcome state is complete. The interactive home screen replaces this placeholder in the next UI slice.",
+    "load_error_title": "Unable to load StarNyx data",
+    "load_error_message": "The first-run check could not read local data. Retry once before investigating the database layer.",
+    "retry": "Retry"
+  },
+  "welcome": {
+    "settings": "Settings",
+    "heart": "Heart",
+    "title_lead": "Welcome\n",
+    "title_emphasis": "back.",
+    "subtitle": "Need to create a new constellation? You're in the right place.",
+    "primary_action": "New Constellation",
+    "pending_flow": "Create StarNyx flow arrives in STX-017."
   }
 }

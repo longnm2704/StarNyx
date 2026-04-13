@@ -13,12 +13,12 @@ class AppRouter {
     switch (settings.name) {
       case AppRoutes.home:
         return MaterialPageRoute<void>(
-          builder: (_) => const HomePage(),
+          builder: (_) => HomePage(),
           settings: settings,
         );
       default:
         return MaterialPageRoute<void>(
-          builder: (_) => const HomePage(),
+          builder: (_) => HomePage(),
           settings: settings,
         );
     }
