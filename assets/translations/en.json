@@ -7,6 +7,13 @@
     "returning_subtitle": "{} constellation ready. The real home grid lands in STX-025.",
     "returning_empty_title": "Your cosmos is already seeded",
     "returning_empty_message": "The first-launch welcome state is complete. The interactive home screen replaces this placeholder in the next UI slice.",
+    "new_constellation": "New",
+    "constellation_list_title": "Saved Constellations",
+    "constellation_no_description": "No description yet",
+    "edit_constellation": "Edit",
+    "start_date_chip": "Start: {}",
+    "reminder_enabled_chip": "Reminder: {}",
+    "reminder_disabled_chip": "Reminder off",
     "load_error_title": "Unable to load StarNyx data",
     "load_error_message": "The first-run check could not read local data. Retry once before investigating the database layer.",
     "retry": "Retry"
@@ -21,7 +28,8 @@
     "pending_flow": "Create StarNyx flow arrives in STX-017."
   },
   "starnyx_form": {
-    "sheet_title": "New Constellation",
+    "create_sheet_title": "New Constellation",
+    "edit_sheet_title": "Edit Constellation",
     "title_label": "Title",
     "title_hint": "Required",
     "title_error_required": "Title is required",
@@ -34,6 +42,7 @@
     "start_on_label": "Start On",
     "picker_done": "Done",
     "save_button": "Save Constellation",
+    "update_button": "Update Constellation",
     "save_error": "Unable to save the StarNyx right now. Please try again."
   }
 }

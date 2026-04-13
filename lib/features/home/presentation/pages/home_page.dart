@@ -11,12 +11,15 @@ class HomePage extends StatefulWidget {
     super.key,
     LoadStarnyxsUseCase? loadStarnyxsUseCase,
     VoidCallback? onCreatePressed,
+    ValueChanged<StarNyx>? onEditPressed,
   }) : _loadStarnyxsUseCase =
            loadStarnyxsUseCase ?? serviceLocator<LoadStarnyxsUseCase>(),
-       _onCreatePressed = onCreatePressed;
+       _onCreatePressed = onCreatePressed,
+       _onEditPressed = onEditPressed;
 
   final LoadStarnyxsUseCase _loadStarnyxsUseCase;
   final VoidCallback? _onCreatePressed;
+  final ValueChanged<StarNyx>? _onEditPressed;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -55,6 +58,24 @@ class _HomePageState extends State<HomePage> {
     _retryLoad();
   }
 
+  void _onEditPressed(StarNyx starnyx) {
+    if (widget._onEditPressed != null) {
+      widget._onEditPressed!(starnyx);
+      return;
+    }
+
+    _openEditBottomSheet(starnyx);
+  }
+
+  Future<void> _openEditBottomSheet(StarNyx starnyx) async {
+    final updated = await showEditStarnyxBottomSheet(context, starnyx);
+    if (!mounted || updated == null) {
+      return;
+    }
+
+    _retryLoad();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +95,11 @@ class _HomePageState extends State<HomePage> {
             return FirstRunWelcomeView(onCreatePressed: _onCreatePressed);
           }
 
-          return ReturningPlaceholderView(starnyxCount: starnyxs.length);
+          return ReturningPlaceholderView(
+            starnyxs: starnyxs,
+            onCreatePressed: _onCreatePressed,
+            onEditPressed: _onEditPressed,
+          );
         },
       ),
     );

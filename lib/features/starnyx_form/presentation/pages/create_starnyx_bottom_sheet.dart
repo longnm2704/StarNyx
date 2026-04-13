@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
+import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -19,6 +20,20 @@ const LinearGradient _sheetTopDownGradient = LinearGradient(
 );
 
 Future<StarNyx?> showCreateStarnyxBottomSheet(BuildContext context) {
+  return showStarnyxFormBottomSheet(context);
+}
+
+Future<StarNyx?> showEditStarnyxBottomSheet(
+  BuildContext context,
+  StarNyx initialStarnyx,
+) {
+  return showStarnyxFormBottomSheet(context, initialStarnyx: initialStarnyx);
+}
+
+Future<StarNyx?> showStarnyxFormBottomSheet(
+  BuildContext context, {
+  StarNyx? initialStarnyx,
+}) {
   return showModalBottomSheet<StarNyx>(
     context: context,
     isScrollControlled: true,
@@ -27,23 +42,23 @@ Future<StarNyx?> showCreateStarnyxBottomSheet(BuildContext context) {
     barrierColor: AppColors.black.withValues(alpha: 0.72),
     builder: (_) {
       return BlocProvider<StarnyxFormBloc>(
-        create: (_) => serviceLocator<StarnyxFormBloc>(),
-        child: const _CreateStarnyxBottomSheetView(),
+        create: (_) => serviceLocator<StarnyxFormBloc>(param1: initialStarnyx),
+        child: const _StarnyxFormBottomSheetView(),
       );
     },
   );
 }
 
-class _CreateStarnyxBottomSheetView extends StatefulWidget {
-  const _CreateStarnyxBottomSheetView();
+class _StarnyxFormBottomSheetView extends StatefulWidget {
+  const _StarnyxFormBottomSheetView();
 
   @override
-  State<_CreateStarnyxBottomSheetView> createState() =>
-      _CreateStarnyxBottomSheetViewState();
+  State<_StarnyxFormBottomSheetView> createState() =>
+      _StarnyxFormBottomSheetViewState();
 }
 
-class _CreateStarnyxBottomSheetViewState
-    extends State<_CreateStarnyxBottomSheetView> {
+class _StarnyxFormBottomSheetViewState
+    extends State<_StarnyxFormBottomSheetView> {
   bool _showValidationErrors = false;
 
   Future<void> _pickReminderTime(StarnyxFormState state) async {
@@ -150,7 +165,14 @@ class _CreateStarnyxBottomSheetViewState
                 final isSaving =
                     state.submissionStatus ==
                     StarnyxFormSubmissionStatus.inProgress;
-                final formattedStartDate = _formatDate(state.startDate);
+                final formattedStartDate =
+                    core_date_utils.DateUtils.formatDdMmYyyy(state.startDate);
+                final sheetTitle = state.isEditing
+                    ? 'starnyx_form.edit_sheet_title'.tr()
+                    : 'starnyx_form.create_sheet_title'.tr();
+                final saveButtonLabel = state.isEditing
+                    ? 'starnyx_form.update_button'.tr()
+                    : 'starnyx_form.save_button'.tr();
 
                 return GestureDetector(
                   behavior: HitTestBehavior.translucent,
@@ -168,7 +190,7 @@ class _CreateStarnyxBottomSheetViewState
                           AppSpacing.md,
                         ),
                         child: StarnyxFormHeader(
-                          title: 'starnyx_form.sheet_title'.tr(),
+                          title: sheetTitle,
                           onClosePressed: () =>
                               Navigator.of(context).maybePop(),
                         ),
@@ -275,7 +297,7 @@ class _CreateStarnyxBottomSheetViewState
                                 )
                               else
                                 GradientOutlineButton(
-                                  label: 'starnyx_form.save_button'.tr(),
+                                  label: saveButtonLabel,
                                   onPressed: _submitForm,
                                 ),
                             ],
@@ -317,11 +339,4 @@ String _formatTime(TimeOfDay time) {
   final h = time.hour.toString().padLeft(2, '0');
   final m = time.minute.toString().padLeft(2, '0');
   return '$h:$m';
-}
-
-String _formatDate(DateTime date) {
-  final d = date.day.toString().padLeft(2, '0');
-  final m = date.month.toString().padLeft(2, '0');
-  final y = date.year.toString();
-  return '$d/$m/$y';
 }
