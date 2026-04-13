@@ -17,7 +17,7 @@ Muc tieu: bien project scaffold thanh mot nen tang Flutter/BLoC co the phat trie
 | STX-001 | Phase 0 - Foundation | Update `pubspec.yaml` with MVP dependencies | Add and lock the core dependency baseline for state management, Drift, local notifications, file import/export, date handling, UUIDs, and test support required by the MVP. |
 | STX-002 | Phase 0 - Foundation | Create the target folder structure | Reorganize `lib/` to match the approved BLoC-oriented structure in `docs/flutter_bloc_structure_starnyx.md`, including `app`, `core`, `data`, `domain`, and `features`. |
 | STX-003 | Phase 0 - Foundation | Create `app.dart`, router, theme, and clean entrypoint | Replace the default scaffold with a minimal app shell that initializes `MaterialApp`, base routing, theme setup, and a clean `main.dart` entry flow. |
-| STX-004 | Phase 0 - Foundation | Create shared utils for date, streak, JSON, and reminder rounding | Add reusable utility helpers for date calculations, streak/completion logic support, import validation helpers, and the finalized reminder rounding rule. |
+| STX-004 | Phase 0 - Foundation | Create shared utils for date, streak, JSON, and reminder time helpers | Add reusable utility helpers for date calculations, streak/completion logic support, import validation helpers, and reminder time parsing/formatting. |
 | STX-005 | Phase 0 - Foundation | Create shared constants and widgets | Add common constants and small reusable widgets that will be shared across screens instead of duplicating low-level UI code later. |
 | STX-006 | Phase 0 - Foundation | Setup `get_it` dependency registration | Register database, repositories, services, use cases, and bloc factories in one dependency composition root suitable for the MVP scope. |
 
@@ -46,7 +46,7 @@ Muc tieu: hoan thanh luong tao, sua, xoa, chon habit va first-run experience.
 | STX-016 | Phase 2 - StarNyx Management Flow | Create `StarnyxFormBloc` | Implement form state management for both create and edit modes, including validation, field state, submission, and error handling. |
 | STX-017 | Phase 2 - StarNyx Management Flow | Build create StarNyx screen | Implement the create form UI based on `docs/ui/starnyx_new_constellation.PNG`, wired to the form bloc and domain use cases. |
 | STX-018 | Phase 2 - StarNyx Management Flow | Enforce core form validation | Enforce required title, restrict start dates to the range from 7 days ago through today, and only persist reminder time when reminder is enabled. |
-| STX-019 | Phase 2 - StarNyx Management Flow | Implement reminder rounding to `:00` / `:30` | Apply the finalized default reminder rounding rule so times are normalized to the nearest allowed `:00` or `:30` slot. |
+| STX-019 | Phase 2 - StarNyx Management Flow | Preserve exact reminder time selected by the user | Ensure reminder times are stored exactly as the user picks them, without automatic minute rounding. |
 | STX-020 | Phase 2 - StarNyx Management Flow | Implement edit StarNyx flow | Add edit mode with field prefill, update handling, and proper persistence through the form bloc and update use case. |
 | STX-021 | Phase 2 - StarNyx Management Flow | Implement delete StarNyx with confirmation | Allow deleting a StarNyx safely with a confirm dialog and correct cleanup of related local data. |
 | STX-022 | Phase 2 - StarNyx Management Flow | Create StarNyx switcher UI | Provide a UI entry point on the main flow to list available StarNyx items and switch the active selection quickly. |

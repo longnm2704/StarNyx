@@ -94,13 +94,11 @@ Mở app → hiển thị StarNyx gần nhất → thao tác
 - Ngày bắt đầu chỉ được chọn trong khoảng từ 7 ngày trước đến hôm nay
 - Chỉ lưu giờ nhắc khi bật
 
-### Giờ nhắc mặc định
+### Giờ nhắc
 
-- Làm tròn về mốc 30 phút gần nhất:
-  - phút 00-14 → `HH:00`
-  - phút 15-44 → `HH:30`
-  - phút 45-59 → giờ kế tiếp `HH+1:00`
-  - Ví dụ: `10:12 → 10:00`, `10:20 → 10:30`, `10:50 → 11:00`
+- Người dùng chọn giờ nào thì lưu đúng giờ đó
+- Không tự làm tròn phút
+- Giá trị lưu theo định dạng `HH:mm`
 
 ---
 
@@ -330,7 +328,7 @@ Mở app → hiển thị StarNyx gần nhất → thao tác
 - Sửa check-in trong 7 ngày
 - Ghi chú không chỉnh sửa
 - Tỉ lệ theo năm
-- Giờ nhắc làm tròn
+- Giờ nhắc giữ nguyên theo lựa chọn của người dùng
 
 ---
 

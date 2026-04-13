@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/core/utils/date_utils.dart';
 import 'package:starnyx/core/utils/reminder_time_utils.dart';
 
-// Covers date-only rules and reminder rounding behavior.
+// Covers date-only rules and exact reminder time handling.
 void main() {
   group('DateUtils', () {
     test('returns valid date range for a viewed year', () {

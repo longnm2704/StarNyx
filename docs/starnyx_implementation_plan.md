@@ -62,10 +62,7 @@ Các quyết định dưới đây đã được chốt để tránh mơ hồ kh
 
 - Nhiều StarNyx được hỗ trợ ngay trong MVP; app luôn có 1 StarNyx đang chọn.
 - StarNyx đang chọn được đổi từ màn chính hoặc quick actions, và được lưu lại để restore ở lần mở app sau.
-- Reminder mặc định được làm tròn về mốc `:00` hoặc `:30` gần nhất:
-  - `00-14 -> :00`
-  - `15-44 -> :30`
-  - `45-59 -> giờ kế tiếp :00`
+- Reminder giữ nguyên đúng thời gian người dùng chọn, không tự làm tròn phút.
 - Completion rate theo năm dùng mẫu số là số ngày hợp lệ trong đoạn:
   `max(startDate, Jan 1 của năm đang xem)` đến `min(today, Dec 31 của năm đang xem)`.
 - File import/export JSON bắt buộc có `appSettings`, trong đó MVP hiện lưu `lastSelectedStarnyxId`.
@@ -139,7 +136,7 @@ Issue checklist:
 - [x] `STX-001` Cập nhật `pubspec.yaml` với các package cần cho BLoC, Drift, notification, import/export
 - [x] `STX-002` Tạo lại folder structure theo tài liệu `flutter_bloc_structure_starnyx.md`
 - [x] `STX-003` Tạo `app.dart`, app router cơ bản, app theme cơ bản, entry point sạch
-- [x] `STX-004` Tạo `core/utils` cho date, streak, JSON validation, reminder time rounding
+- [x] `STX-004` Tạo `core/utils` cho date, streak, JSON validation, và reminder time parsing/formatting
 - [x] `STX-005` Tạo `core/constants` và `core/widgets` dùng chung
 - [x] `STX-006` Setup `get_it` để đăng ký database, repository, service, use case, bloc factory
 
@@ -191,7 +188,7 @@ Issue checklist:
 - [x] `STX-016` Tạo `StarnyxFormBloc` với state cho create và edit
 - [x] `STX-017` Tạo màn create StarNyx bám theo UI `docs/ui/starnyx_new_constellation.PNG`
 - [x] `STX-018` Validate title bắt buộc, start date chỉ được chọn trong 7 ngày gần nhất đến hôm nay, reminder chỉ lưu giờ khi bật
-- [ ] `STX-019` Implement rule làm tròn reminder time về mốc `:00` / `:30`
+- [x] `STX-019` Cập nhật rule reminder time để giữ nguyên giờ người dùng chọn
 - [ ] `STX-020` Implement edit StarNyx và prefill dữ liệu
 - [ ] `STX-021` Implement delete StarNyx với confirm dialog
 - [ ] `STX-022` Tạo UI để list / switch StarNyx đang chọn từ màn chính hoặc quick actions
