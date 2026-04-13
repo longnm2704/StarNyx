@@ -18,6 +18,14 @@ class InclusiveDateRange {
 abstract final class DateUtils {
   static DateTime nowDate([DateTime? now]) => dateOnly(now ?? DateTime.now());
 
+  static String formatDdMmYyyy(DateTime value) {
+    final normalized = dateOnly(value);
+    final day = normalized.day.toString().padLeft(2, '0');
+    final month = normalized.month.toString().padLeft(2, '0');
+    final year = normalized.year.toString();
+    return '$day/$month/$year';
+  }
+
   static DateTime dateOnly(DateTime value) {
     return DateTime(value.year, value.month, value.day);
   }
