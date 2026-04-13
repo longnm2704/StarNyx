@@ -13,7 +13,7 @@ enum StarnyxFormSubmissionStatus { idle, inProgress, success, failure }
 enum StarnyxFormTitleError { empty }
 
 /// Indicates validation errors for the start date field.
-enum StarnyxFormStartDateError { inFuture }
+enum StarnyxFormStartDateError { inFuture, tooFarInPast }
 
 /// Indicates validation errors for the reminder time field.
 enum StarnyxFormReminderTimeError { missing, invalid }

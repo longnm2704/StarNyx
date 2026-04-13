@@ -104,6 +104,20 @@ void main() {
     expect(bloc.state.reminderTimeError, isNull);
   });
 
+  test('start date older than 7 days surfaces a form error', () async {
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    bloc.add(const StarnyxFormTitleChanged('Hydrate'));
+    bloc.add(StarnyxFormStartDateChanged(DateTime(2026, 4, 5)));
+    await pumpEventQueue();
+
+    expect(bloc.state.startDateError, StarnyxFormStartDateError.tooFarInPast);
+  });
+
   test('submit creates a new StarNyx when the form is valid', () async {
     /// Verifies the complete submit flow:
     /// - Valid form → inProgress → success state
@@ -172,6 +186,24 @@ void main() {
     expect(bloc.state.savedStarnyx?.title, 'Hydrate Daily');
   });
 
+  test('submit drops reminder time when reminder is disabled', () async {
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    bloc.add(const StarnyxFormTitleChanged('Stretch'));
+    bloc.add(const StarnyxFormReminderTimeChanged('21:00'));
+    await pumpEventQueue();
+    bloc.add(const StarnyxFormSubmitted());
+    await pumpEventQueue(times: 10);
+
+    expect(bloc.state.submissionStatus, StarnyxFormSubmissionStatus.success);
+    expect(bloc.state.savedStarnyx?.reminderEnabled, isFalse);
+    expect(bloc.state.savedStarnyx?.reminderTime, isNull);
+  });
+
   test(
     'submit surfaces validation errors instead of calling use cases',
     () async {
@@ -214,6 +246,23 @@ void main() {
 
     expect(bloc.state.submissionStatus, StarnyxFormSubmissionStatus.idle);
     expect(bloc.state.startDateError, StarnyxFormStartDateError.inFuture);
+  });
+
+  test('submit maps start dates older than 7 days to form errors', () async {
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    bloc.add(const StarnyxFormTitleChanged('Hydrate'));
+    bloc.add(StarnyxFormStartDateChanged(DateTime(2026, 4, 5)));
+    await pumpEventQueue();
+    bloc.add(const StarnyxFormSubmitted());
+    await pumpEventQueue(times: 10);
+
+    expect(bloc.state.submissionStatus, StarnyxFormSubmissionStatus.idle);
+    expect(bloc.state.startDateError, StarnyxFormStartDateError.tooFarInPast);
   });
 }
 

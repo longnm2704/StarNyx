@@ -300,15 +300,19 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
   ///
   /// Validation rules:
   /// - **Title**: Required (cannot be empty after trim)
-  /// - **Start date**: Must not be in the future
+  /// - **Start date**: Must be within the last 7 days and not in the future
   /// - **Reminder time**: Required if reminder is enabled, must be valid HH:mm format
   StarnyxFormState _validatedState(StarnyxFormState candidate) {
     final titleError = candidate.title.trim().isEmpty
         ? StarnyxFormTitleError.empty
         : null;
-    final startDateError =
-        DateUtils.isFutureDate(candidate.startDate, today: _nowBuilder())
+    final today = DateUtils.nowDate(_nowBuilder());
+    final earliestAllowedDate = today.subtract(const Duration(days: 7));
+    final normalizedStartDate = DateUtils.dateOnly(candidate.startDate);
+    final startDateError = normalizedStartDate.isAfter(today)
         ? StarnyxFormStartDateError.inFuture
+        : normalizedStartDate.isBefore(earliestAllowedDate)
+        ? StarnyxFormStartDateError.tooFarInPast
         : null;
     final reminderTimeError = _reminderTimeErrorFor(candidate);
 
@@ -329,6 +333,9 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     return switch (error.code) {
       UseCaseValidationCode.startDateInFuture => candidate.copyWith(
         startDateError: StarnyxFormStartDateError.inFuture,
+      ),
+      UseCaseValidationCode.startDateTooFarInPast => candidate.copyWith(
+        startDateError: StarnyxFormStartDateError.tooFarInPast,
       ),
       _ => candidate,
     };

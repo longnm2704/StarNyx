@@ -22,6 +22,7 @@ class CreateStarNyxUseCase {
   }) async {
     final timestamp = now ?? DateTime.now();
     UseCaseValidation.validateStartDate(startDate, today: timestamp);
+    final normalizedReminderTime = reminderEnabled ? reminderTime : null;
     final starnyx = StarNyx(
       id: _uuid.v4(),
       title: title,
@@ -29,7 +30,7 @@ class CreateStarNyxUseCase {
       color: color,
       startDate: DateUtils.dateOnly(startDate),
       reminderEnabled: reminderEnabled,
-      reminderTime: reminderTime,
+      reminderTime: normalizedReminderTime,
       createdAt: timestamp,
       updatedAt: timestamp,
     );
