@@ -187,7 +187,7 @@ Mục tiêu:
 
 Issue checklist:
 
-- [ ] `STX-015` Tạo màn welcome / empty state cho lần mở app đầu tiên
+- [x] `STX-015` Tạo màn welcome / empty state cho lần mở app đầu tiên
 - [ ] `STX-016` Tạo `StarnyxFormBloc` với state cho create và edit
 - [ ] `STX-017` Tạo màn create StarNyx bám theo UI `docs/ui/starnyx_new_constellation.PNG`
 - [ ] `STX-018` Validate title bắt buộc, start date không lớn hơn hôm nay, reminder chỉ lưu giờ khi bật
