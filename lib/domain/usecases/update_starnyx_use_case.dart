@@ -14,6 +14,7 @@ class UpdateStarNyxUseCase {
     UseCaseValidation.validateStartDate(starnyx.startDate, today: timestamp);
     final updated = starnyx.copyWith(
       startDate: DateUtils.dateOnly(starnyx.startDate),
+      reminderTime: starnyx.reminderEnabled ? starnyx.reminderTime : null,
       updatedAt: timestamp,
     );
 

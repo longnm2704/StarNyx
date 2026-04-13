@@ -62,6 +62,49 @@ void main() {
     );
   });
 
+  test('create use case rejects start dates older than 7 days', () async {
+    final useCase = CreateStarNyxUseCase(starNyxRepository, const Uuid());
+
+    expect(
+      () => useCase(
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 5),
+        reminderEnabled: false,
+        reminderTime: null,
+        now: DateTime(2026, 4, 13, 8, 30),
+      ),
+      throwsA(
+        isA<UseCaseValidationException>().having(
+          (error) => error.code,
+          'code',
+          UseCaseValidationCode.startDateTooFarInPast,
+        ),
+      ),
+    );
+  });
+
+  test(
+    'create use case clears reminder time when reminder is disabled',
+    () async {
+      final useCase = CreateStarNyxUseCase(starNyxRepository, const Uuid());
+
+      final created = await useCase(
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 10),
+        reminderEnabled: false,
+        reminderTime: '09:30',
+        now: DateTime(2026, 4, 10, 8, 30),
+      );
+
+      expect(created.reminderEnabled, isFalse);
+      expect(created.reminderTime, isNull);
+    },
+  );
+
   test('update use case rejects a future start date', () async {
     final useCase = UpdateStarNyxUseCase(starNyxRepository);
     final starnyx = StarNyx(
@@ -87,6 +130,55 @@ void main() {
       ),
     );
   });
+
+  test('update use case rejects start dates older than 7 days', () async {
+    final useCase = UpdateStarNyxUseCase(starNyxRepository);
+    final starnyx = StarNyx(
+      id: 'habit-1',
+      title: 'Hydrate',
+      description: null,
+      color: '#102030',
+      startDate: DateTime(2026, 4, 5),
+      reminderEnabled: false,
+      reminderTime: null,
+      createdAt: DateTime(2026, 4, 1, 8),
+      updatedAt: DateTime(2026, 4, 1, 8),
+    );
+
+    expect(
+      () => useCase(starnyx, now: DateTime(2026, 4, 13, 8, 30)),
+      throwsA(
+        isA<UseCaseValidationException>().having(
+          (error) => error.code,
+          'code',
+          UseCaseValidationCode.startDateTooFarInPast,
+        ),
+      ),
+    );
+  });
+
+  test(
+    'update use case clears reminder time when reminder is disabled',
+    () async {
+      final useCase = UpdateStarNyxUseCase(starNyxRepository);
+      final starnyx = StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 10),
+        reminderEnabled: false,
+        reminderTime: '09:30',
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 1, 8),
+      );
+
+      final updated = await useCase(starnyx, now: DateTime(2026, 4, 10, 8, 30));
+
+      expect(updated.reminderEnabled, isFalse);
+      expect(updated.reminderTime, isNull);
+    },
+  );
 
   test(
     'load active use case falls back to the first StarNyx and repairs settings',

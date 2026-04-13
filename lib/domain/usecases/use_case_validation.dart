@@ -4,6 +4,7 @@ import 'package:starnyx/domain/repositories/journal_entry_repository.dart';
 // Typed validation codes make UI error handling predictable later on.
 enum UseCaseValidationCode {
   startDateInFuture,
+  startDateTooFarInPast,
   dateInFuture,
   dateBeforeStartDate,
   completionEditWindowExpired,
@@ -24,6 +25,18 @@ class UseCaseValidationException implements Exception {
 // Shared validation helpers keep business rule checks consistent across use cases.
 abstract final class UseCaseValidation {
   static void validateStartDate(DateTime startDate, {DateTime? today}) {
+    final normalizedToday = DateUtils.nowDate(today);
+    final normalizedStartDate = DateUtils.dateOnly(startDate);
+
+    if (normalizedStartDate.isBefore(
+      normalizedToday.subtract(const Duration(days: 7)),
+    )) {
+      throw const UseCaseValidationException(
+        code: UseCaseValidationCode.startDateTooFarInPast,
+        message: 'Start date cannot be earlier than 7 days before today.',
+      );
+    }
+
     if (!DateUtils.isFutureDate(startDate, today: today)) {
       return;
     }

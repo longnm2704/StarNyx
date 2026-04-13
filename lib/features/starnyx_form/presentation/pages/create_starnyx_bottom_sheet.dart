@@ -75,13 +75,14 @@ class _CreateStarnyxBottomSheetViewState
 
   Future<void> _pickStartDate(StarnyxFormState state) async {
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
 
     final picked = await showStarnyxCupertinoDateTimePicker(
       context: context,
       mode: CupertinoDatePickerMode.date,
       initialDateTime: state.startDate,
-      minimumDate: DateTime(2000),
-      maximumDate: DateTime(now.year, now.month, now.day),
+      minimumDate: today.subtract(const Duration(days: 7)),
+      maximumDate: today,
     );
 
     if (picked == null || !mounted) {
