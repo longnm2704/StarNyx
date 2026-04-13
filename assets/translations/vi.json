@@ -19,5 +19,21 @@
     "subtitle": "Bạn muốn tạo một chòm sao mới? Bắt đầu ngay từ đây.",
     "primary_action": "Tạo Chòm Sao Mới",
     "pending_flow": "Luồng tạo StarNyx sẽ được nối vào ở STX-017."
+  },
+  "starnyx_form": {
+    "sheet_title": "Chòm Sao Mới",
+    "title_label": "Tiêu đề",
+    "title_hint": "Bắt buộc",
+    "title_error_required": "Tiêu đề là bắt buộc",
+    "description_label": "Mô tả",
+    "description_hint": "Tùy chọn",
+    "color_label": "Màu sắc",
+    "selected_color_label": "Màu đã chọn",
+    "reminder_label": "Nhắc nhở",
+    "reminder_time_label": "Nhắc vào lúc",
+    "start_on_label": "Bắt đầu từ",
+    "picker_done": "Xong",
+    "save_button": "Lưu Chòm Sao",
+    "save_error": "Không thể lưu StarNyx lúc này. Vui lòng thử lại."
   }
 }

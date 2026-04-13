@@ -19,5 +19,21 @@
     "subtitle": "Need to create a new constellation? You're in the right place.",
     "primary_action": "New Constellation",
     "pending_flow": "Create StarNyx flow arrives in STX-017."
+  },
+  "starnyx_form": {
+    "sheet_title": "New Constellation",
+    "title_label": "Title",
+    "title_hint": "Required",
+    "title_error_required": "Title is required",
+    "description_label": "Description",
+    "description_hint": "Optional",
+    "color_label": "Color",
+    "selected_color_label": "Selected Color",
+    "reminder_label": "Reminder",
+    "reminder_time_label": "Remind At Time",
+    "start_on_label": "Start On",
+    "picker_done": "Done",
+    "save_button": "Save Constellation",
+    "save_error": "Unable to save the StarNyx right now. Please try again."
   }
 }

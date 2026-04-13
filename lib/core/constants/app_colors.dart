@@ -41,4 +41,11 @@ abstract final class AppColors {
     end: Alignment.centerRight,
     colors: <Color>[Color(0xFF354E88), Color(0xFF4B3884), Color(0xFF7E439B)],
   );
+
+  static const List<String> starnyxPresetColorHexes = <String>[
+    '#AF2395',
+    '#2360E9',
+    '#DE7B30',
+    '#1CB269',
+  ];
 }
