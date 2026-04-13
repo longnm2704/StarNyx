@@ -3,11 +3,19 @@ import 'package:get_it/get_it.dart';
 import 'package:starnyx/data/db/app_database.dart';
 import 'package:starnyx/app/router/app_router.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
+import 'package:starnyx/domain/entities/starnyx.dart' as domain;
 import 'package:starnyx/data/repositories/data_repositories.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
+import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_bloc.dart';
 
 final GetIt serviceLocator = GetIt.instance;
 
+/// Registers all application dependencies in a single setup call.
+/// Organizes registration into layers:
+/// 1. Repositories (data layer)
+/// 2. Use cases (domain layer)
+/// 3. BLoC factories (presentation layer)
+/// 4. Router and app infrastructure
 Future<void> configureDependencies() async {
   // This guard keeps hot restart / repeated bootstrap from double-registering.
   if (serviceLocator.isRegistered<AppRouter>()) {
@@ -118,4 +126,31 @@ void _registerUseCases() {
   );
 }
 
-void _registerBlocFactories() {}
+void _registerBlocFactories() {
+  /// Registers StarnyxFormBloc as a factory with optional parameter support.
+  ///
+  /// GetIt's registerFactoryParam allows the BLoC to be created in two modes:
+  /// - **Create mode**: Called with no parameters or param1=null → new form
+  /// - **Edit mode**: Called with param1=StarNyx → form prefilled with entity data
+  ///
+  /// Usage:
+  /// ```dart
+  /// // Create mode
+  /// final bloc = serviceLocator<StarnyxFormBloc>();
+  ///
+  /// // Edit mode
+  /// final bloc = serviceLocator<StarnyxFormBloc>(param1: existingStarnyx);
+  /// ```
+  ///
+  /// The factory automatically injects use cases from the service locator.
+  serviceLocator.registerFactoryParam<StarnyxFormBloc, domain.StarNyx?, void>((
+    initialStarnyx,
+    _,
+  ) {
+    return StarnyxFormBloc(
+      createStarNyxUseCase: serviceLocator<CreateStarNyxUseCase>(),
+      updateStarNyxUseCase: serviceLocator<UpdateStarNyxUseCase>(),
+      initialStarnyx: initialStarnyx,
+    );
+  });
+}
