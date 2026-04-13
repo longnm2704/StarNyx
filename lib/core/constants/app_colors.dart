@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 // Shared cosmic palette derived from the approved StarNyx UI mockups.
 abstract final class AppColors {
+  static const white = Color(0xFFFFFFFF);
+  static const black = Color(0xFF000000);
+
   static const background = Color(0xFF05030A);
   static const backgroundMid = Color(0xFF1A0D2E);
   static const backgroundBottom = Color(0xFF6A38A5);
@@ -22,6 +25,27 @@ abstract final class AppColors {
 
   static const star = Color(0xFF5B3C89);
   static const starMuted = Color(0xFF2A173F);
+
+  static const formCardStart = Color(0xFF1F2024);
+  static const formCardEnd = Color(0xFF28292F);
+  static const formCardEndAlt = Color(0xFF292A30);
+
+  static const pickerBg = Color(0xFF1A1526);
+  static const sheetBg = Color(0xFF1A1523);
+  static const switchTrack = Color(0xFF666874);
+  static const iconMuted = Color(0xFFA7A8AF);
+
+  static const previewOuter = Color(0xFF9C9EA8);
+  static const previewInner = Color(0xFFCFD0D6);
+  static const lockIcon = Color(0xFFE6DFF2);
+
+  static const sheetTop = Color(0xFF5B30A2);
+  static const sheetMid = Color(0xFF2A1F59);
+
+  static const sysGreen = Color(0xFF35C759);
+  static const sysBlue = Color(0xFF0A84FF);
+  static const sysPurple = Color(0xFFAF52DE);
+  static const sysOrange = Color(0xFFFF9F0A);
 
   static const screenGradient = LinearGradient(
     begin: Alignment.topCenter,

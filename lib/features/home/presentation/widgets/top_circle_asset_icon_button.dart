@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
 
 class TopCircleAssetIconButton extends StatelessWidget {
   const TopCircleAssetIconButton({
@@ -25,7 +25,7 @@ class TopCircleAssetIconButton extends StatelessWidget {
         border: Border.all(color: AppColors.outline.withValues(alpha: 0.52)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.22),
+            color: AppColors.black.withValues(alpha: 0.22),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),

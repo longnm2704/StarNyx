@@ -28,7 +28,7 @@ class StarnyxFormReminderCard extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
-            colors: <Color>[Color(0xFF1F2024), Color(0xFF28292F)],
+            colors: <Color>[AppColors.formCardStart, AppColors.formCardEnd],
           ),
           border: Border.all(color: AppColors.outline.withValues(alpha: 0.62)),
         ),
@@ -49,10 +49,10 @@ class StarnyxFormReminderCard extends StatelessWidget {
               child: Switch.adaptive(
                 value: reminderEnabled,
                 onChanged: onToggle,
-                activeThumbColor: Colors.white,
-                activeTrackColor: const Color(0xFF666874),
-                inactiveThumbColor: Colors.white,
-                inactiveTrackColor: const Color(0xFF666874),
+                activeThumbColor: AppColors.white,
+                activeTrackColor: AppColors.switchTrack,
+                inactiveThumbColor: AppColors.white,
+                inactiveTrackColor: AppColors.switchTrack,
               ),
             ),
           ],
