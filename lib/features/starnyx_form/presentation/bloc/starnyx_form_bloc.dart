@@ -95,9 +95,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     }
 
     final now = nowBuilder();
-    final roundedReminder = ReminderTimeUtils.formatTime(
-      ReminderTimeUtils.roundToNearestSlot(now),
-    );
+    final defaultReminder = ReminderTimeUtils.formatTime(now);
 
     return StarnyxFormState(
       mode: StarnyxFormMode.create,
@@ -106,7 +104,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
       color: AppColors.starnyxPresetColorHexes.first,
       startDate: DateUtils.nowDate(now),
       reminderEnabled: false,
-      reminderTime: roundedReminder,
+      reminderTime: defaultReminder,
       titleError: StarnyxFormTitleError.empty,
       startDateError: null,
       reminderTimeError: null,
