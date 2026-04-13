@@ -91,7 +91,7 @@ Mở app → hiển thị StarNyx gần nhất → thao tác
 ### Quy tắc
 
 - Tiêu đề không được rỗng
-- Ngày bắt đầu không lớn hơn hôm nay
+- Ngày bắt đầu chỉ được chọn trong khoảng từ 7 ngày trước đến hôm nay
 - Chỉ lưu giờ nhắc khi bật
 
 ### Giờ nhắc mặc định

@@ -45,7 +45,7 @@ Muc tieu: hoan thanh luong tao, sua, xoa, chon habit va first-run experience.
 | STX-015 | Phase 2 - StarNyx Management Flow | Create welcome and empty state screen | Build the first-launch experience shown before the user has any StarNyx, with a clear CTA to create the first one. |
 | STX-016 | Phase 2 - StarNyx Management Flow | Create `StarnyxFormBloc` | Implement form state management for both create and edit modes, including validation, field state, submission, and error handling. |
 | STX-017 | Phase 2 - StarNyx Management Flow | Build create StarNyx screen | Implement the create form UI based on `docs/ui/starnyx_new_constellation.PNG`, wired to the form bloc and domain use cases. |
-| STX-018 | Phase 2 - StarNyx Management Flow | Enforce core form validation | Enforce required title, disallow start dates after today, and only persist reminder time when reminder is enabled. |
+| STX-018 | Phase 2 - StarNyx Management Flow | Enforce core form validation | Enforce required title, restrict start dates to the range from 7 days ago through today, and only persist reminder time when reminder is enabled. |
 | STX-019 | Phase 2 - StarNyx Management Flow | Implement reminder rounding to `:00` / `:30` | Apply the finalized default reminder rounding rule so times are normalized to the nearest allowed `:00` or `:30` slot. |
 | STX-020 | Phase 2 - StarNyx Management Flow | Implement edit StarNyx flow | Add edit mode with field prefill, update handling, and proper persistence through the form bloc and update use case. |
 | STX-021 | Phase 2 - StarNyx Management Flow | Implement delete StarNyx with confirmation | Allow deleting a StarNyx safely with a confirm dialog and correct cleanup of related local data. |
