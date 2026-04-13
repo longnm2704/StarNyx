@@ -1,6 +1,6 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
 Future<DateTime?> showStarnyxCupertinoDateTimePicker({
@@ -22,7 +22,7 @@ Future<DateTime?> showStarnyxCupertinoDateTimePicker({
           height: 320 + mediaQuery.viewPadding.bottom,
           padding: EdgeInsets.only(bottom: mediaQuery.viewPadding.bottom),
           decoration: const BoxDecoration(
-            color: Color(0xFF1A1526),
+            color: AppColors.pickerBg,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -58,7 +58,7 @@ Future<DateTime?> showStarnyxCupertinoDateTimePicker({
                   data: const CupertinoThemeData(
                     brightness: Brightness.dark,
                     primaryColor: AppColors.accentLavender,
-                    scaffoldBackgroundColor: Color(0xFF1A1526),
+                    scaffoldBackgroundColor: AppColors.pickerBg,
                   ),
                   child: CupertinoDatePicker(
                     mode: mode,

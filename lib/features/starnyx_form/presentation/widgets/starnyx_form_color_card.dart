@@ -25,7 +25,7 @@ class StarnyxFormColorCard extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
-          colors: <Color>[Color(0xFF1F2024), Color(0xFF292A30)],
+          colors: <Color>[AppColors.formCardStart, AppColors.formCardEndAlt],
         ),
         border: Border.all(color: AppColors.outline.withValues(alpha: 0.62)),
       ),
@@ -116,12 +116,12 @@ class _SelectedColorPreview extends StatelessWidget {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF9C9EA8), width: 1.8),
+        border: Border.all(color: AppColors.previewOuter, width: 1.8),
       ),
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: const Color(0xFFCFD0D6), width: 1.2),
+          border: Border.all(color: AppColors.previewInner, width: 1.2),
           color: color,
         ),
       ),
@@ -155,7 +155,7 @@ class _ColorDotButton extends StatelessWidget {
           shape: BoxShape.circle,
           border: isSelected
               ? Border.all(
-                  color: Colors.white.withValues(alpha: 0.92),
+                  color: AppColors.white.withValues(alpha: 0.92),
                   width: 2,
                 )
               : null,
@@ -186,23 +186,23 @@ class _LockedColorDot extends StatelessWidget {
           shape: BoxShape.circle,
           gradient: SweepGradient(
             colors: <Color>[
-              Color(0xFF35C759),
-              Color(0xFF0A84FF),
-              Color(0xFFAF52DE),
-              Color(0xFFFF9F0A),
-              Color(0xFF35C759),
+              AppColors.sysGreen,
+              AppColors.sysBlue,
+              AppColors.sysPurple,
+              AppColors.sysOrange,
+              AppColors.sysGreen,
             ],
           ),
         ),
         child: Container(
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: Color(0xFF1A1523),
+            color: AppColors.sheetBg,
           ),
           child: const Icon(
             Icons.lock_outline_rounded,
             size: 20,
-            color: Color(0xFFE6DFF2),
+            color: AppColors.lockIcon,
           ),
         ),
       ),
@@ -231,7 +231,7 @@ Future<String?> _showColorPickerSheet(
               16 + MediaQuery.of(context).viewInsets.bottom,
             ),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1523),
+              color: AppColors.sheetBg,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(28),
               ),

@@ -14,7 +14,7 @@ import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_
 const LinearGradient _sheetTopDownGradient = LinearGradient(
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
-  colors: <Color>[Color(0xFF5B30A2), Color(0xFF2A1F59), Color(0xFF05030A)],
+  colors: <Color>[AppColors.sheetTop, AppColors.sheetMid, AppColors.background],
   stops: <double>[0.0, 0.48, 1.0],
 );
 
@@ -24,7 +24,7 @@ Future<StarNyx?> showCreateStarnyxBottomSheet(BuildContext context) {
     isScrollControlled: true,
     useSafeArea: false,
     backgroundColor: Colors.transparent,
-    barrierColor: Colors.black.withValues(alpha: 0.72),
+    barrierColor: AppColors.black.withValues(alpha: 0.72),
     builder: (_) {
       return BlocProvider<StarnyxFormBloc>(
         create: (_) => serviceLocator<StarnyxFormBloc>(),

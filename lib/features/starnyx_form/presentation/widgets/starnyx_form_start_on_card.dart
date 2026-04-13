@@ -23,7 +23,7 @@ class StarnyxFormStartOnCard extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
-            colors: <Color>[Color(0xFF1F2024), Color(0xFF28292F)],
+            colors: <Color>[AppColors.formCardStart, AppColors.formCardEnd],
           ),
           border: Border.all(color: AppColors.outline.withValues(alpha: 0.62)),
         ),
@@ -41,7 +41,7 @@ class StarnyxFormStartOnCard extends StatelessWidget {
             const Icon(
               Icons.calendar_today_outlined,
               size: 18,
-              color: Color(0xFFA7A8AF),
+              color: AppColors.iconMuted,
             ),
           ],
         ),
