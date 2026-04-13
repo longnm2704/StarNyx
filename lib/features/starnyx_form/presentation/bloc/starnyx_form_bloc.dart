@@ -19,8 +19,6 @@ import 'starnyx_form_state.dart';
 /// 1. **Create mode**: No initial StarNyx provided, starts with empty form
 /// 2. **Edit mode**: StarNyx provided, prefills all fields from the entity
 ///
-/// When created in edit mode, the reminder time is automatically rounded to the nearest
-/// 30-minute slot for better UX when setting default reminders.
 class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
   /// Creates a new StarnyxFormBloc instance.
   ///
@@ -70,7 +68,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
   /// For **create mode** (when [initialStarnyx] is null):
   /// - Starts with empty title and description
   /// - Sets start date to today
-  /// - Reminder defaults to disabled but suggests rounded time (next 30-min slot)
+  /// - Reminder defaults to disabled but suggests the current time as HH:mm
   /// - Shows title validation error (empty) to prompt user input
   static StarnyxFormState _buildInitialState(
     StarNyx? initialStarnyx,
