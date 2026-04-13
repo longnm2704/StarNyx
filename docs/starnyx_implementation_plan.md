@@ -190,7 +190,7 @@ Issue checklist:
 - [x] `STX-015` Tạo màn welcome / empty state cho lần mở app đầu tiên
 - [x] `STX-016` Tạo `StarnyxFormBloc` với state cho create và edit
 - [x] `STX-017` Tạo màn create StarNyx bám theo UI `docs/ui/starnyx_new_constellation.PNG`
-- [ ] `STX-018` Validate title bắt buộc, start date không lớn hơn hôm nay, reminder chỉ lưu giờ khi bật
+- [x] `STX-018` Validate title bắt buộc, start date chỉ được chọn trong 7 ngày gần nhất đến hôm nay, reminder chỉ lưu giờ khi bật
 - [ ] `STX-019` Implement rule làm tròn reminder time về mốc `:00` / `:30`
 - [ ] `STX-020` Implement edit StarNyx và prefill dữ liệu
 - [ ] `STX-021` Implement delete StarNyx với confirm dialog
