@@ -3,9 +3,21 @@
     "title": "StarNyx"
   },
   "home": {
-    "title": "Trang chủ chòm sao",
-    "subtitle": "Lớp widget dùng chung đã sẵn sàng cho các tính năng tiếp theo.",
-    "empty_title": "Chưa có StarNyx nào",
-    "empty_message": "Hãy tạo chòm sao đầu tiên để bắt đầu theo dõi thói quen offline."
+    "returning_title": "Trang chủ chòm sao",
+    "returning_subtitle": "Bạn đã có {} chòm sao. Màn hình chính hoàn chỉnh sẽ được triển khai ở STX-025.",
+    "returning_empty_title": "Vũ trụ của bạn đã sẵn sàng",
+    "returning_empty_message": "Màn hình khởi động lần đầu đã hoàn tất. Phần tạm này sẽ được thay bằng màn hình chính tương tác ở issue tiếp theo.",
+    "load_error_title": "Không thể tải dữ liệu StarNyx",
+    "load_error_message": "Ứng dụng không đọc được dữ liệu local để xác định đây có phải lần mở đầu tiên hay không. Hãy thử tải lại một lần trước khi kiểm tra tầng database.",
+    "retry": "Thử lại"
+  },
+  "welcome": {
+    "settings": "Cài đặt",
+    "heart": "Trái tim",
+    "title_lead": "Chào mừng\n",
+    "title_emphasis": "trở lại.",
+    "subtitle": "Bạn muốn tạo một chòm sao mới? Bắt đầu ngay từ đây.",
+    "primary_action": "Tạo Chòm Sao Mới",
+    "pending_flow": "Luồng tạo StarNyx sẽ được nối vào ở STX-017."
   }
 }

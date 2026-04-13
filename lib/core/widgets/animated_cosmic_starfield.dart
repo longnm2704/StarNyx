@@ -117,7 +117,7 @@ class _AnimatedCosmicStarfieldState extends State<AnimatedCosmicStarfield>
                               ],
                             ),
                             child: Image.asset(
-                              'assets/icons/star.png',
+                              'assets/icons/ic_star.png',
                               width: star.size,
                               height: star.size,
                               color: starColor,
