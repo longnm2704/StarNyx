@@ -17,6 +17,7 @@ dependencies:
   timezone: ^0.11.0
   equatable: ^2.0.8
   share_plus: ^12.0.2
+  flutter_svg: ^2.2.1
   file_picker: ^11.0.2
   flutter_bloc: ^9.1.1
   path_provider: ^2.1.5
@@ -36,4 +37,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/icons/
     - assets/translations/
