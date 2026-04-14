@@ -20,7 +20,7 @@ class HomeErrorView extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.cardPadding,
               child: AppEmptyState(
-                icon: Icons.sync_problem_outlined,
+                iconAssetPath: 'assets/icons/ic_error.svg',
                 title: 'home.load_error_title'.tr(),
                 message: 'home.load_error_message'.tr(),
                 actionLabel: 'home.retry'.tr(),
