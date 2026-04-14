@@ -15,7 +15,7 @@ Future<void> main() async {
       useOnlyLangCode: true,
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
-      supportedLocales: const <Locale>[Locale('en'), Locale('vi')],
+      supportedLocales: const <Locale>[Locale('en')],
       child: const StarNyxApp(),
     ),
   );
