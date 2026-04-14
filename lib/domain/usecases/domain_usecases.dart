@@ -11,3 +11,4 @@ export 'save_journal_entry_use_case.dart';
 export 'load_active_starnyx_use_case.dart';
 export 'select_active_starnyx_use_case.dart';
 export 'load_starnyx_progress_stats_use_case.dart';
+export 'load_starnyx_completion_dates_for_year_use_case.dart';

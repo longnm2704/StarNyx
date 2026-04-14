@@ -94,6 +94,11 @@ void _registerUseCases() {
       serviceLocator<CompletionRepository>(),
     ),
   );
+  serviceLocator.registerLazySingleton<LoadStarNyxCompletionDatesForYearUseCase>(
+    () => LoadStarNyxCompletionDatesForYearUseCase(
+      serviceLocator<CompletionRepository>(),
+    ),
+  );
   serviceLocator.registerLazySingleton<SelectActiveStarNyxUseCase>(
     () => SelectActiveStarNyxUseCase(
       serviceLocator<StarNyxRepository>(),
@@ -133,6 +138,11 @@ void _registerBlocFactories() {
       loadStarnyxsUseCase: serviceLocator<LoadStarnyxsUseCase>(),
       loadActiveStarNyxUseCase: serviceLocator<LoadActiveStarNyxUseCase>(),
       selectActiveStarNyxUseCase: serviceLocator<SelectActiveStarNyxUseCase>(),
+      loadStarNyxProgressStatsUseCase:
+          serviceLocator<LoadStarNyxProgressStatsUseCase>(),
+      loadStarNyxCompletionDatesForYearUseCase:
+          serviceLocator<LoadStarNyxCompletionDatesForYearUseCase>(),
+      toggleCompletionUseCase: serviceLocator<ToggleCompletionUseCase>(),
     ),
   );
 

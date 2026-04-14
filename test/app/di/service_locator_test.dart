@@ -38,6 +38,10 @@ void main() {
       serviceLocator.isRegistered<LoadStarNyxProgressStatsUseCase>(),
       isTrue,
     );
+    expect(
+      serviceLocator.isRegistered<LoadStarNyxCompletionDatesForYearUseCase>(),
+      isTrue,
+    );
     expect(serviceLocator.isRegistered<SelectActiveStarNyxUseCase>(), isTrue);
     expect(serviceLocator.isRegistered<ToggleCompletionUseCase>(), isTrue);
     expect(serviceLocator.isRegistered<SaveJournalEntryUseCase>(), isTrue);
