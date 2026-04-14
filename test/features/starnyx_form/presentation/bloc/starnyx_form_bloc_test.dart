@@ -15,15 +15,19 @@ import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_sta
 /// - Edge cases (empty description, whitespace trimming, etc.)
 void main() {
   late _InMemoryStarNyxRepository repository;
+  late _InMemoryAppSettingsRepository appSettingsRepository;
   late CreateStarNyxUseCase createUseCase;
   late UpdateStarNyxUseCase updateUseCase;
+  late DeleteStarNyxUseCase deleteUseCase;
 
   /// Sets up mock repository and use cases before each test.
   /// This ensures each test starts with a clean state.
   setUp(() {
     repository = _InMemoryStarNyxRepository();
+    appSettingsRepository = _InMemoryAppSettingsRepository();
     createUseCase = CreateStarNyxUseCase(repository, const Uuid());
     updateUseCase = UpdateStarNyxUseCase(repository);
+    deleteUseCase = DeleteStarNyxUseCase(repository, appSettingsRepository);
   });
 
   test(
@@ -37,6 +41,7 @@ void main() {
       final bloc = StarnyxFormBloc(
         createStarNyxUseCase: createUseCase,
         updateStarNyxUseCase: updateUseCase,
+        deleteStarNyxUseCase: deleteUseCase,
         nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
       );
 
@@ -67,6 +72,7 @@ void main() {
     final bloc = StarnyxFormBloc(
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
       initialStarnyx: existing,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
@@ -95,6 +101,7 @@ void main() {
     final bloc = StarnyxFormBloc(
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
       initialStarnyx: existing,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
@@ -111,6 +118,7 @@ void main() {
     final bloc = StarnyxFormBloc(
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -133,6 +141,7 @@ void main() {
     final bloc = StarnyxFormBloc(
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -152,6 +161,7 @@ void main() {
     final bloc = StarnyxFormBloc(
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -173,6 +183,7 @@ void main() {
     final bloc = StarnyxFormBloc(
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -200,6 +211,7 @@ void main() {
       final bloc = StarnyxFormBloc(
         createStarNyxUseCase: createUseCase,
         updateStarNyxUseCase: updateUseCase,
+        deleteStarNyxUseCase: deleteUseCase,
         nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
       );
 
@@ -238,6 +250,7 @@ void main() {
     final bloc = StarnyxFormBloc(
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
       initialStarnyx: existing,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
@@ -256,6 +269,7 @@ void main() {
     final bloc = StarnyxFormBloc(
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -281,6 +295,7 @@ void main() {
       final bloc = StarnyxFormBloc(
         createStarNyxUseCase: createUseCase,
         updateStarNyxUseCase: updateUseCase,
+        deleteStarNyxUseCase: deleteUseCase,
         nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
       );
 
@@ -301,6 +316,7 @@ void main() {
     final bloc = StarnyxFormBloc(
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -318,6 +334,7 @@ void main() {
     final bloc = StarnyxFormBloc(
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -329,6 +346,60 @@ void main() {
 
     expect(bloc.state.submissionStatus, StarnyxFormSubmissionStatus.idle);
     expect(bloc.state.startDateError, StarnyxFormStartDateError.tooFarInPast);
+  });
+
+  test('delete removes an existing StarNyx in edit mode', () async {
+    final existing = StarNyx(
+      id: 'habit-1',
+      title: 'Hydrate',
+      description: null,
+      color: '#102030',
+      startDate: DateTime(2026, 4, 10),
+      reminderEnabled: false,
+      reminderTime: null,
+      createdAt: DateTime(2026, 4, 10, 8),
+      updatedAt: DateTime(2026, 4, 10, 8),
+    );
+    await repository.saveStarnyx(existing);
+    await appSettingsRepository.saveAppSettings(
+      AppSettings(
+        lastSelectedStarnyxId: 'habit-1',
+        updatedAt: DateTime(2026, 4, 12, 9),
+      ),
+    );
+
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
+      initialStarnyx: existing,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    bloc.add(const StarnyxFormDeleted());
+    await pumpEventQueue(times: 10);
+
+    expect(bloc.state.deletionStatus, StarnyxFormDeletionStatus.success);
+    expect(bloc.state.deletedStarnyxId, 'habit-1');
+    expect(await repository.getStarnyxById('habit-1'), isNull);
+    expect(
+      (await appSettingsRepository.getAppSettings())?.lastSelectedStarnyxId,
+      isNull,
+    );
+  });
+
+  test('delete event is ignored in create mode', () async {
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    bloc.add(const StarnyxFormDeleted());
+    await pumpEventQueue();
+
+    expect(bloc.state.deletionStatus, StarnyxFormDeletionStatus.idle);
   });
 }
 
@@ -366,5 +437,22 @@ class _InMemoryStarNyxRepository implements StarNyxRepository {
   @override
   Stream<List<StarNyx>> watchAllStarnyxs() async* {
     yield _items.values.toList();
+  }
+}
+
+class _InMemoryAppSettingsRepository implements AppSettingsRepository {
+  AppSettings? _settings;
+
+  @override
+  Future<AppSettings?> getAppSettings() async => _settings;
+
+  @override
+  Future<void> saveAppSettings(AppSettings settings) async {
+    _settings = settings;
+  }
+
+  @override
+  Stream<AppSettings?> watchAppSettings() async* {
+    yield _settings;
   }
 }

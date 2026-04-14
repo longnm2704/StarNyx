@@ -43,6 +43,12 @@
     "picker_done": "Done",
     "save_button": "Save Constellation",
     "update_button": "Update Constellation",
-    "save_error": "Unable to save the StarNyx right now. Please try again."
+    "save_error": "Unable to save the StarNyx right now. Please try again.",
+    "delete_button": "Delete Constellation",
+    "delete_confirm_title": "Delete this constellation?",
+    "delete_confirm_message": "This removes the StarNyx and its related local progress data.",
+    "delete_cancel": "Cancel",
+    "delete_confirm": "Delete",
+    "delete_error": "Unable to delete the StarNyx right now. Please try again."
   }
 }

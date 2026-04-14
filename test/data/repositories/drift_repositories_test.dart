@@ -106,6 +106,57 @@ void main() {
     expect(saved, equals(entry));
   });
 
+  test(
+    'deleting a StarNyx cascades related completions and journal entries',
+    () async {
+      await starNyxRepository.saveStarnyx(
+        domain.StarNyx(
+          id: 'habit-1',
+          title: 'Hydrate',
+          description: null,
+          color: '#102030',
+          startDate: DateTime(2026, 4, 1),
+          reminderEnabled: false,
+          reminderTime: null,
+          createdAt: DateTime(2026, 4, 1, 8),
+          updatedAt: DateTime(2026, 4, 2, 9),
+        ),
+      );
+      await completionRepository.saveCompletion(
+        domain.Completion(
+          starnyxId: 'habit-1',
+          date: DateTime(2026, 4, 10),
+          completed: true,
+        ),
+      );
+      await journalEntryRepository.saveJournalEntry(
+        domain.JournalEntry(
+          starnyxId: 'habit-1',
+          date: DateTime(2026, 4, 10),
+          content: 'Stayed consistent today.',
+        ),
+      );
+
+      await starNyxRepository.deleteStarnyxById('habit-1');
+
+      expect(await starNyxRepository.getStarnyxById('habit-1'), isNull);
+      expect(
+        await completionRepository.getCompletionByDate(
+          starnyxId: 'habit-1',
+          date: DateTime(2026, 4, 10),
+        ),
+        isNull,
+      );
+      expect(
+        await journalEntryRepository.getJournalEntryByDate(
+          starnyxId: 'habit-1',
+          date: DateTime(2026, 4, 10),
+        ),
+        isNull,
+      );
+    },
+  );
+
   test('saves and loads app settings domain entities', () async {
     await starNyxRepository.saveStarnyx(
       domain.StarNyx(

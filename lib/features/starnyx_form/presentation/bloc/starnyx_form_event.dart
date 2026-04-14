@@ -88,3 +88,8 @@ final class StarnyxFormReminderTimeChanged extends StarnyxFormEvent {
 final class StarnyxFormSubmitted extends StarnyxFormEvent {
   const StarnyxFormSubmitted();
 }
+
+/// Triggered when the user confirms deletion in edit mode.
+final class StarnyxFormDeleted extends StarnyxFormEvent {
+  const StarnyxFormDeleted();
+}

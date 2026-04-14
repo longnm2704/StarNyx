@@ -150,6 +150,7 @@ void _registerBlocFactories() {
     return StarnyxFormBloc(
       createStarNyxUseCase: serviceLocator<CreateStarNyxUseCase>(),
       updateStarNyxUseCase: serviceLocator<UpdateStarNyxUseCase>(),
+      deleteStarNyxUseCase: serviceLocator<DeleteStarNyxUseCase>(),
       initialStarnyx: initialStarnyx,
     );
   });
