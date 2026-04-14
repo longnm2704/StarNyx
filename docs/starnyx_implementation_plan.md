@@ -192,7 +192,7 @@ Issue checklist:
 - [x] `STX-020` Implement edit StarNyx và prefill dữ liệu
 - [x] `STX-021` Implement delete StarNyx với confirm dialog
 - [x] `STX-022` Tạo UI để list / switch StarNyx đang chọn từ màn chính hoặc quick actions
-- [ ] `STX-023` Lưu và restore StarNyx được chọn gần nhất khi mở app lại
+- [x] `STX-023` Lưu và restore StarNyx được chọn gần nhất khi mở app lại
 
 Definition of done:
 

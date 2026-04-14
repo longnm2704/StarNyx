@@ -85,7 +85,12 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    _homeBloc.add(const HomeReloadRequested());
+    final saved = result.savedStarnyx;
+    if (saved != null) {
+      _homeBloc.add(HomeActiveStarnyxSelected(saved.id));
+    } else {
+      _homeBloc.add(const HomeReloadRequested());
+    }
   }
 
   Future<void> _onEditPressed(StarNyx starnyx) async {
