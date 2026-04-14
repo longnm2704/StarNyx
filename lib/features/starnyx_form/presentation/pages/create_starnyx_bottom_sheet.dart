@@ -130,6 +130,7 @@ class _StarnyxFormBottomSheetViewState
       message: 'starnyx_form.delete_confirm_message'.tr(),
       cancelLabel: 'starnyx_form.delete_cancel'.tr(),
       confirmLabel: 'starnyx_form.delete_confirm'.tr(),
+      iconAssetPath: 'assets/icons/ic_trash.svg',
       actionStyle: AppConfirmActionStyle.destructive,
     );
 

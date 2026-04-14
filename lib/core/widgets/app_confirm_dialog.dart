@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
+import 'app_svg_icon.dart';
+
 const LinearGradient _appConfirmDialogGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
@@ -15,7 +17,7 @@ Future<bool?> showAppConfirmDialog({
   required String message,
   required String cancelLabel,
   required String confirmLabel,
-  IconData icon = Icons.auto_awesome_rounded,
+  String iconAssetPath = 'assets/icons/ic_trash.svg',
   AppConfirmActionStyle actionStyle = AppConfirmActionStyle.neutral,
 }) {
   return showGeneralDialog<bool>(
@@ -30,7 +32,7 @@ Future<bool?> showAppConfirmDialog({
         message: message,
         cancelLabel: cancelLabel,
         confirmLabel: confirmLabel,
-        icon: icon,
+        iconAssetPath: iconAssetPath,
         actionStyle: actionStyle,
       );
     },
@@ -65,7 +67,7 @@ class AppConfirmDialog extends StatelessWidget {
     required this.cancelLabel,
     required this.confirmLabel,
     super.key,
-    this.icon = Icons.auto_awesome_rounded,
+    this.iconAssetPath = 'assets/icons/ic_trash.svg',
     this.actionStyle = AppConfirmActionStyle.neutral,
   });
 
@@ -73,7 +75,7 @@ class AppConfirmDialog extends StatelessWidget {
   final String message;
   final String cancelLabel;
   final String confirmLabel;
-  final IconData icon;
+  final String iconAssetPath;
   final AppConfirmActionStyle actionStyle;
 
   @override
@@ -122,7 +124,12 @@ class AppConfirmDialog extends StatelessWidget {
                           color: _accentColor.withValues(alpha: 0.36),
                         ),
                       ),
-                      child: Icon(icon, color: _iconColor, size: 28),
+                      child: AppSvgIcon(
+                        assetPath: iconAssetPath,
+                        color: _iconColor,
+                        size: 28,
+                        semanticsLabel: title,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Text(

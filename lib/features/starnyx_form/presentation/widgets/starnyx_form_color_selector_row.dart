@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
 class StarnyxFormColorSelectorRow extends StatelessWidget {
@@ -118,10 +119,13 @@ class _LockedColorDot extends StatelessWidget {
             shape: BoxShape.circle,
             color: AppColors.sheetBg,
           ),
-          child: const Icon(
-            Icons.lock_outline_rounded,
-            size: 20,
-            color: AppColors.lockIcon,
+          child: const Center(
+            child: AppSvgIcon(
+              assetPath: 'assets/icons/ic_color_picker.svg',
+              semanticsLabel: 'Color picker',
+              size: 18,
+              color: AppColors.lockIcon,
+            ),
           ),
         ),
       ),

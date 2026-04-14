@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 
 class StarnyxFormStartOnCard extends StatelessWidget {
   const StarnyxFormStartOnCard({
@@ -38,10 +39,11 @@ class StarnyxFormStartOnCard extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(
-              Icons.calendar_today_outlined,
+            const AppSvgIcon(
+              assetPath: 'assets/icons/ic_calendar.svg',
               size: 18,
               color: AppColors.iconMuted,
+              semanticsLabel: 'Calendar',
             ),
           ],
         ),
