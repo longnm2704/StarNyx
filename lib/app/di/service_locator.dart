@@ -6,6 +6,7 @@ import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/domain/entities/starnyx.dart' as domain;
 import 'package:starnyx/data/repositories/data_repositories.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
+import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_bloc.dart';
 
 final GetIt serviceLocator = GetIt.instance;
@@ -127,6 +128,14 @@ void _registerUseCases() {
 }
 
 void _registerBlocFactories() {
+  serviceLocator.registerFactory<HomeBloc>(
+    () => HomeBloc(
+      loadStarnyxsUseCase: serviceLocator<LoadStarnyxsUseCase>(),
+      loadActiveStarNyxUseCase: serviceLocator<LoadActiveStarNyxUseCase>(),
+      selectActiveStarNyxUseCase: serviceLocator<SelectActiveStarNyxUseCase>(),
+    ),
+  );
+
   /// Registers StarnyxFormBloc as a factory with optional parameter support.
   ///
   /// GetIt's registerFactoryParam allows the BLoC to be created in two modes:

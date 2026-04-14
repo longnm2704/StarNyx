@@ -23,7 +23,7 @@ class ReturningPlaceholderView extends StatefulWidget {
   final List<StarNyx> starnyxs;
   final String? activeStarnyxId;
   final FutureOr<void> Function() onCreatePressed;
-  final ValueChanged<StarNyx> onEditPressed;
+  final FutureOr<void> Function(StarNyx) onEditPressed;
   final ValueChanged<StarNyx> onSelectPressed;
 
   @override
@@ -49,7 +49,6 @@ class _ReturningPlaceholderViewState extends State<ReturningPlaceholderView> {
         return ConstellationSwitcherSheet(
           starnyxs: widget.starnyxs,
           activeStarnyxId: widget.activeStarnyxId,
-          onEditPressed: widget.onEditPressed,
           onSelectPressed: widget.onSelectPressed,
         );
       },
@@ -68,8 +67,7 @@ class _ReturningPlaceholderViewState extends State<ReturningPlaceholderView> {
     while (mounted) {
       final action = await _showConstellationSheet();
 
-      if (!mounted ||
-          action != ConstellationSwitcherSheetAction.createRequested) {
+      if (!mounted || action == null) {
         break;
       }
 
@@ -78,7 +76,16 @@ class _ReturningPlaceholderViewState extends State<ReturningPlaceholderView> {
         break;
       }
 
-      await Future.sync(widget.onCreatePressed);
+      switch (action.type) {
+        case ConstellationSwitcherSheetActionType.createRequested:
+          await Future.sync(widget.onCreatePressed);
+        case ConstellationSwitcherSheetActionType.editRequested:
+          final starnyx = action.starnyx;
+          if (starnyx == null) {
+            break;
+          }
+          await Future.sync(() => widget.onEditPressed(starnyx));
+      }
       if (!mounted) {
         break;
       }

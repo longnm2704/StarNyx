@@ -5,21 +5,72 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
-enum ConstellationSwitcherSheetAction { createRequested }
+enum ConstellationSwitcherSheetActionType { createRequested, editRequested }
 
-class ConstellationSwitcherSheet extends StatelessWidget {
+class ConstellationSwitcherSheetAction {
+  const ConstellationSwitcherSheetAction._(this.type, [this.starnyx]);
+
+  const ConstellationSwitcherSheetAction.createRequested()
+    : this._(ConstellationSwitcherSheetActionType.createRequested);
+
+  const ConstellationSwitcherSheetAction.editRequested(StarNyx starnyx)
+    : this._(ConstellationSwitcherSheetActionType.editRequested, starnyx);
+
+  final ConstellationSwitcherSheetActionType type;
+  final StarNyx? starnyx;
+}
+
+class ConstellationSwitcherSheet extends StatefulWidget {
   const ConstellationSwitcherSheet({
     required this.starnyxs,
     required this.activeStarnyxId,
-    required this.onEditPressed,
     required this.onSelectPressed,
     super.key,
   });
 
   final List<StarNyx> starnyxs;
   final String? activeStarnyxId;
-  final ValueChanged<StarNyx> onEditPressed;
   final ValueChanged<StarNyx> onSelectPressed;
+
+  @override
+  State<ConstellationSwitcherSheet> createState() =>
+      _ConstellationSwitcherSheetState();
+}
+
+class _ConstellationSwitcherSheetState
+    extends State<ConstellationSwitcherSheet> {
+  late List<StarNyx> _orderedStarnyxs;
+  bool _isReorderMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _orderedStarnyxs = List<StarNyx>.of(widget.starnyxs);
+  }
+
+  @override
+  void didUpdateWidget(covariant ConstellationSwitcherSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.starnyxs != widget.starnyxs) {
+      _orderedStarnyxs = List<StarNyx>.of(widget.starnyxs);
+    }
+  }
+
+  void _toggleReorderMode() {
+    setState(() {
+      _isReorderMode = !_isReorderMode;
+    });
+  }
+
+  void _onReorder(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final item = _orderedStarnyxs.removeAt(oldIndex);
+      _orderedStarnyxs.insert(newIndex, item);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +78,9 @@ class ConstellationSwitcherSheet extends StatelessWidget {
     final topInset = mediaQuery.viewPadding.top > 0
         ? mediaQuery.viewPadding.top
         : mediaQuery.padding.top;
-    final activeStarnyx = starnyxs.firstWhere(
-      (StarNyx item) => item.id == activeStarnyxId,
-      orElse: () => starnyxs.first,
+    final activeStarnyx = _orderedStarnyxs.firstWhere(
+      (StarNyx item) => item.id == widget.activeStarnyxId,
+      orElse: () => _orderedStarnyxs.first,
     );
     final activeColor = starnyxColorFromHex(activeStarnyx.color);
     final panelColor = Color.lerp(AppColors.surface, AppColors.black, 0.38)!;
@@ -131,17 +182,13 @@ class ConstellationSwitcherSheet extends StatelessWidget {
                   const SizedBox(height: AppSpacing.md),
                   Row(
                     children: <Widget>[
-                      Expanded(
+                      const Expanded(
                         child: _SheetActionPill(
                           assetPath: 'assets/icons/ic_settings.svg',
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            onEditPressed(activeStarnyx);
-                          },
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
-                      Expanded(
+                      const Expanded(
                         child: _SheetActionPill(
                           assetPath: 'assets/icons/ic_book.svg',
                         ),
@@ -151,7 +198,7 @@ class ConstellationSwitcherSheet extends StatelessWidget {
                         child: _SheetActionPill(
                           assetPath: 'assets/icons/ic_plus.svg',
                           onPressed: () => Navigator.of(context).pop(
-                            ConstellationSwitcherSheetAction.createRequested,
+                            const ConstellationSwitcherSheetAction.createRequested(),
                           ),
                         ),
                       ),
@@ -185,9 +232,11 @@ class ConstellationSwitcherSheet extends StatelessWidget {
                         ),
                       ),
                       TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: _toggleReorderMode,
                         child: Text(
-                          'home.edit_constellation'.tr(),
+                          _isReorderMode
+                              ? 'starnyx_form.picker_done'.tr()
+                              : 'home.edit_constellation'.tr(),
                           style: TextStyle(
                             color: sectionAccent,
                             fontWeight: FontWeight.w800,
@@ -198,27 +247,73 @@ class ConstellationSwitcherSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Expanded(
-                    child: ListView.separated(
-                      padding: EdgeInsets.zero,
-                      itemCount: starnyxs.length,
-                      separatorBuilder: (_, _) =>
-                          const SizedBox(height: AppSpacing.md),
-                      itemBuilder: (BuildContext context, int index) {
-                        final starnyx = starnyxs[index];
-                        return _ConstellationSwitcherCard(
-                          starnyx: starnyx,
-                          isActive: starnyx.id == activeStarnyxId,
-                          onEditPressed: () {
-                            Navigator.of(context).pop();
-                            onEditPressed(starnyx);
-                          },
-                          onSelectPressed: () {
-                            Navigator.of(context).pop();
-                            onSelectPressed(starnyx);
-                          },
-                        );
-                      },
-                    ),
+                    child: _isReorderMode
+                        ? ReorderableListView.builder(
+                            buildDefaultDragHandles: false,
+                            padding: EdgeInsets.zero,
+                            itemCount: _orderedStarnyxs.length,
+                            onReorder: _onReorder,
+                            proxyDecorator:
+                                (
+                                  Widget child,
+                                  int index,
+                                  Animation<double> animation,
+                                ) {
+                                  return Material(
+                                    color: Colors.transparent,
+                                    child: FadeTransition(
+                                      opacity: animation.drive(
+                                        Tween<double>(begin: 0.94, end: 1),
+                                      ),
+                                      child: child,
+                                    ),
+                                  );
+                                },
+                            itemBuilder: (BuildContext context, int index) {
+                              final starnyx = _orderedStarnyxs[index];
+                              return Padding(
+                                key: ValueKey<String>(starnyx.id),
+                                padding: EdgeInsets.only(
+                                  bottom: index == _orderedStarnyxs.length - 1
+                                      ? 0
+                                      : AppSpacing.md,
+                                ),
+                                child: _ConstellationSwitcherCard(
+                                  starnyx: starnyx,
+                                  isActive:
+                                      starnyx.id == widget.activeStarnyxId,
+                                  orderIndex: index + 1,
+                                  isReorderMode: true,
+                                  onEditPressed: () {},
+                                  onSelectPressed: () {},
+                                ),
+                              );
+                            },
+                          )
+                        : ListView.separated(
+                            padding: EdgeInsets.zero,
+                            itemCount: _orderedStarnyxs.length,
+                            separatorBuilder: (_, _) =>
+                                const SizedBox(height: AppSpacing.md),
+                            itemBuilder: (BuildContext context, int index) {
+                              final starnyx = _orderedStarnyxs[index];
+                              return _ConstellationSwitcherCard(
+                                starnyx: starnyx,
+                                isActive: starnyx.id == widget.activeStarnyxId,
+                                orderIndex: index + 1,
+                                isReorderMode: false,
+                                onEditPressed: () => Navigator.of(context).pop(
+                                  ConstellationSwitcherSheetAction.editRequested(
+                                    starnyx,
+                                  ),
+                                ),
+                                onSelectPressed: () {
+                                  Navigator.of(context).pop();
+                                  widget.onSelectPressed(starnyx);
+                                },
+                              );
+                            },
+                          ),
                   ),
                 ],
               ),
@@ -334,12 +429,16 @@ class _ConstellationSwitcherCard extends StatelessWidget {
   const _ConstellationSwitcherCard({
     required this.starnyx,
     required this.isActive,
+    required this.orderIndex,
+    required this.isReorderMode,
     required this.onEditPressed,
     required this.onSelectPressed,
   });
 
   final StarNyx starnyx;
   final bool isActive;
+  final int orderIndex;
+  final bool isReorderMode;
   final VoidCallback onEditPressed;
   final VoidCallback onSelectPressed;
 
@@ -357,7 +456,7 @@ class _ConstellationSwitcherCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.pill),
-        onTap: isActive ? null : onSelectPressed,
+        onTap: isReorderMode || isActive ? null : onSelectPressed,
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.md,
@@ -379,6 +478,8 @@ class _ConstellationSwitcherCard extends StatelessWidget {
           ),
           child: Row(
             children: <Widget>[
+              _OrderBadge(index: orderIndex, color: itemColor),
+              const SizedBox(width: AppSpacing.sm),
               Container(
                 width: 10,
                 height: 10,
@@ -397,18 +498,55 @@ class _ConstellationSwitcherCard extends StatelessWidget {
                   ),
                 ),
               ),
-              IconButton(
-                onPressed: onEditPressed,
-                icon: AppSvgIcon(
-                  assetPath: 'assets/icons/ic_edit.svg',
-                  color: itemColor,
-                  size: 18,
-                  semanticsLabel: 'Edit ${starnyx.title}',
+              if (isReorderMode)
+                ReorderableDragStartListener(
+                  index: orderIndex - 1,
+                  child: Icon(
+                    Icons.drag_indicator_rounded,
+                    color: itemColor.withValues(alpha: 0.92),
+                  ),
+                )
+              else
+                IconButton(
+                  onPressed: onEditPressed,
+                  icon: AppSvgIcon(
+                    assetPath: 'assets/icons/ic_edit.svg',
+                    color: itemColor,
+                    size: 18,
+                    semanticsLabel: 'Edit ${starnyx.title}',
+                  ),
+                  visualDensity: VisualDensity.compact,
                 ),
-                visualDensity: VisualDensity.compact,
-              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OrderBadge extends StatelessWidget {
+  const _OrderBadge({required this.index, required this.color});
+
+  final int index;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 28,
+      height: 28,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: color.withValues(alpha: 0.58)),
+      ),
+      child: Text(
+        '$index',
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );

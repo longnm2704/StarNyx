@@ -7,6 +7,7 @@ import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/domain/entities/starnyx.dart' as domain;
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
+import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_bloc.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_state.dart';
 
@@ -42,6 +43,7 @@ void main() {
     expect(serviceLocator.isRegistered<SaveJournalEntryUseCase>(), isTrue);
     expect(serviceLocator.isRegistered<ExportDataUseCase>(), isTrue);
     expect(serviceLocator.isRegistered<ImportDataUseCase>(), isTrue);
+    expect(serviceLocator.isRegistered<HomeBloc>(), isTrue);
     expect(serviceLocator.isRegistered<StarnyxFormBloc>(), isTrue);
   });
 
