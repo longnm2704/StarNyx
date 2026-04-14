@@ -84,6 +84,21 @@ void main() {
       expect(_findSvg('assets/icons/ic_book.svg'), findsOneWidget);
       expect(_findSvg('assets/icons/ic_plus.svg'), findsOneWidget);
 
+      await tester.tap(_findSvg('assets/icons/ic_settings.svg'));
+      await tester.pump();
+      expect(edited, isNull);
+      expect(find.text('Observation Deck'), findsOneWidget);
+
+      await tester.tap(find.text('Edit'));
+      await tester.pump();
+      expect(find.text('Done'), findsOneWidget);
+      expect(find.text('1'), findsWidgets);
+      expect(find.text('2'), findsWidgets);
+
+      await tester.tap(find.text('Done'));
+      await tester.pump();
+      expect(find.text('Edit'), findsOneWidget);
+
       await tester.tap(_findSvg('assets/icons/ic_plus.svg'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 220));
@@ -109,7 +124,12 @@ void main() {
       await tester.pump();
       await tester.tap(_findSvg('assets/icons/ic_edit.svg').last);
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 220));
+      await tester.pump(const Duration(milliseconds: 220));
+      await tester.pump(const Duration(milliseconds: 220));
       expect(edited, starnyxs[1]);
+      edited = null;
+      expect(find.text('Observation Deck'), findsOneWidget);
     },
   );
 }

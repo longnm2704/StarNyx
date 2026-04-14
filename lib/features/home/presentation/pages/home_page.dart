@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
+import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
+import 'package:starnyx/features/home/presentation/bloc/home_event.dart';
+import 'package:starnyx/features/home/presentation/bloc/home_state.dart';
 import 'package:starnyx/domain/usecases/load_active_starnyx_use_case.dart';
 import 'package:starnyx/domain/usecases/select_active_starnyx_use_case.dart';
 import 'package:starnyx/features/home/presentation/widgets/home_widgets.dart';
@@ -18,7 +22,7 @@ class HomePage extends StatefulWidget {
     LoadActiveStarNyxUseCase? loadActiveStarNyxUseCase,
     SelectActiveStarNyxUseCase? selectActiveStarNyxUseCase,
     FutureOr<void> Function()? onCreatePressed,
-    ValueChanged<StarNyx>? onEditPressed,
+    FutureOr<void> Function(StarNyx)? onEditPressed,
     ValueChanged<StarNyx>? onSelectPressed,
   }) : _loadStarnyxsUseCase =
            loadStarnyxsUseCase ?? serviceLocator<LoadStarnyxsUseCase>(),
@@ -36,7 +40,7 @@ class HomePage extends StatefulWidget {
   final LoadActiveStarNyxUseCase _loadActiveStarNyxUseCase;
   final SelectActiveStarNyxUseCase _selectActiveStarNyxUseCase;
   final FutureOr<void> Function()? _onCreatePressed;
-  final ValueChanged<StarNyx>? _onEditPressed;
+  final FutureOr<void> Function(StarNyx)? _onEditPressed;
   final ValueChanged<StarNyx>? _onSelectPressed;
 
   @override
@@ -44,25 +48,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Future<_HomePageData> _homeDataFuture;
+  late final HomeBloc _homeBloc;
 
   @override
   void initState() {
     super.initState();
-    _homeDataFuture = _loadHomeData();
+    _homeBloc = HomeBloc(
+      loadStarnyxsUseCase: widget._loadStarnyxsUseCase,
+      loadActiveStarNyxUseCase: widget._loadActiveStarNyxUseCase,
+      selectActiveStarNyxUseCase: widget._selectActiveStarNyxUseCase,
+    )..add(const HomeLoadRequested());
   }
 
-  Future<_HomePageData> _loadHomeData() async {
-    final starnyxs = await widget._loadStarnyxsUseCase();
-    final activeStarnyx = await widget._loadActiveStarNyxUseCase();
-
-    return _HomePageData(starnyxs: starnyxs, activeStarnyx: activeStarnyx);
+  @override
+  void dispose() {
+    _homeBloc.close();
+    super.dispose();
   }
 
   void _retryLoad() {
-    setState(() {
-      _homeDataFuture = _loadHomeData();
-    });
+    _homeBloc.add(const HomeReloadRequested());
   }
 
   Future<void> _onCreatePressed() async {
@@ -80,16 +85,16 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    _retryLoad();
+    _homeBloc.add(const HomeReloadRequested());
   }
 
-  void _onEditPressed(StarNyx starnyx) {
+  Future<void> _onEditPressed(StarNyx starnyx) async {
     if (widget._onEditPressed != null) {
-      widget._onEditPressed!(starnyx);
+      await Future.sync(() => widget._onEditPressed!(starnyx));
       return;
     }
 
-    _openEditBottomSheet(starnyx);
+    await _openEditBottomSheet(starnyx);
   }
 
   Future<void> _openEditBottomSheet(StarNyx starnyx) async {
@@ -98,7 +103,7 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    _retryLoad();
+    _homeBloc.add(const HomeReloadRequested());
   }
 
   Future<void> _onSelectPressed(StarNyx starnyx) async {
@@ -106,59 +111,50 @@ class _HomePageState extends State<HomePage> {
       widget._onSelectPressed!(starnyx);
       return;
     }
-
-    try {
-      await widget._selectActiveStarNyxUseCase(starnyx.id);
-      if (!mounted) {
-        return;
-      }
-      _retryLoad();
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('home.switch_error_message'.tr())));
-    }
+    _homeBloc.add(HomeActiveStarnyxSelected(starnyx.id));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder<_HomePageData>(
-        future: _homeDataFuture,
-        builder: (BuildContext context, AsyncSnapshot<_HomePageData> snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return const HomeLoadingView();
+    return BlocProvider<HomeBloc>.value(
+      value: _homeBloc,
+      child: BlocListener<HomeBloc, HomeState>(
+        listenWhen: (HomeState previous, HomeState current) =>
+            previous.selectionFeedbackCount != current.selectionFeedbackCount,
+        listener: (BuildContext context, HomeState state) {
+          if (state.selectionStatus == HomeSelectionStatus.failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('home.switch_error_message'.tr())),
+            );
           }
-
-          if (snapshot.hasError) {
-            return HomeErrorView(onRetry: _retryLoad);
-          }
-
-          final homeData = snapshot.data;
-          final starnyxs = homeData?.starnyxs ?? const <StarNyx>[];
-          if (starnyxs.isEmpty) {
-            return FirstRunWelcomeView(onCreatePressed: _onCreatePressed);
-          }
-
-          return ReturningPlaceholderView(
-            starnyxs: starnyxs,
-            activeStarnyxId: homeData?.activeStarnyx?.id,
-            onCreatePressed: _onCreatePressed,
-            onEditPressed: _onEditPressed,
-            onSelectPressed: _onSelectPressed,
-          );
         },
+        child: Scaffold(
+          body: BlocBuilder<HomeBloc, HomeState>(
+            builder: (BuildContext context, HomeState state) {
+              if (state.status == HomeStatus.initial ||
+                  state.status == HomeStatus.loading) {
+                return const HomeLoadingView();
+              }
+
+              if (state.status == HomeStatus.failure) {
+                return HomeErrorView(onRetry: _retryLoad);
+              }
+
+              if (state.starnyxs.isEmpty) {
+                return FirstRunWelcomeView(onCreatePressed: _onCreatePressed);
+              }
+
+              return ReturningPlaceholderView(
+                starnyxs: state.starnyxs,
+                activeStarnyxId: state.activeStarnyxId,
+                onCreatePressed: _onCreatePressed,
+                onEditPressed: _onEditPressed,
+                onSelectPressed: _onSelectPressed,
+              );
+            },
+          ),
+        ),
       ),
     );
   }
-}
-
-class _HomePageData {
-  const _HomePageData({required this.starnyxs, required this.activeStarnyx});
-
-  final List<StarNyx> starnyxs;
-  final StarNyx? activeStarnyx;
 }
