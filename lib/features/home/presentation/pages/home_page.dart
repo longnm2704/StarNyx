@@ -5,7 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:starnyx/domain/usecases/load_starnyx_completion_dates_for_year_use_case.dart';
+import 'package:starnyx/domain/usecases/load_starnyx_progress_stats_use_case.dart';
 import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
+import 'package:starnyx/domain/usecases/toggle_completion_use_case.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_event.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_state.dart';
@@ -21,6 +24,10 @@ class HomePage extends StatefulWidget {
     LoadStarnyxsUseCase? loadStarnyxsUseCase,
     LoadActiveStarNyxUseCase? loadActiveStarNyxUseCase,
     SelectActiveStarNyxUseCase? selectActiveStarNyxUseCase,
+    LoadStarNyxProgressStatsUseCase? loadStarNyxProgressStatsUseCase,
+    LoadStarNyxCompletionDatesForYearUseCase?
+    loadStarNyxCompletionDatesForYearUseCase,
+    ToggleCompletionUseCase? toggleCompletionUseCase,
     FutureOr<void> Function()? onCreatePressed,
     FutureOr<void> Function(StarNyx)? onEditPressed,
     ValueChanged<StarNyx>? onSelectPressed,
@@ -29,16 +36,28 @@ class HomePage extends StatefulWidget {
        _loadActiveStarNyxUseCase =
            loadActiveStarNyxUseCase ??
            serviceLocator<LoadActiveStarNyxUseCase>(),
-       _selectActiveStarNyxUseCase =
-           selectActiveStarNyxUseCase ??
-           serviceLocator<SelectActiveStarNyxUseCase>(),
-       _onCreatePressed = onCreatePressed,
-       _onEditPressed = onEditPressed,
-       _onSelectPressed = onSelectPressed;
+        _selectActiveStarNyxUseCase =
+            selectActiveStarNyxUseCase ??
+            serviceLocator<SelectActiveStarNyxUseCase>(),
+        _loadStarNyxProgressStatsUseCase =
+            loadStarNyxProgressStatsUseCase ??
+            serviceLocator<LoadStarNyxProgressStatsUseCase>(),
+        _loadStarNyxCompletionDatesForYearUseCase =
+            loadStarNyxCompletionDatesForYearUseCase ??
+            serviceLocator<LoadStarNyxCompletionDatesForYearUseCase>(),
+        _toggleCompletionUseCase =
+            toggleCompletionUseCase ?? serviceLocator<ToggleCompletionUseCase>(),
+        _onCreatePressed = onCreatePressed,
+        _onEditPressed = onEditPressed,
+        _onSelectPressed = onSelectPressed;
 
   final LoadStarnyxsUseCase _loadStarnyxsUseCase;
   final LoadActiveStarNyxUseCase _loadActiveStarNyxUseCase;
   final SelectActiveStarNyxUseCase _selectActiveStarNyxUseCase;
+  final LoadStarNyxProgressStatsUseCase _loadStarNyxProgressStatsUseCase;
+  final LoadStarNyxCompletionDatesForYearUseCase
+  _loadStarNyxCompletionDatesForYearUseCase;
+  final ToggleCompletionUseCase _toggleCompletionUseCase;
   final FutureOr<void> Function()? _onCreatePressed;
   final FutureOr<void> Function(StarNyx)? _onEditPressed;
   final ValueChanged<StarNyx>? _onSelectPressed;
@@ -57,6 +76,10 @@ class _HomePageState extends State<HomePage> {
       loadStarnyxsUseCase: widget._loadStarnyxsUseCase,
       loadActiveStarNyxUseCase: widget._loadActiveStarNyxUseCase,
       selectActiveStarNyxUseCase: widget._selectActiveStarNyxUseCase,
+      loadStarNyxProgressStatsUseCase: widget._loadStarNyxProgressStatsUseCase,
+      loadStarNyxCompletionDatesForYearUseCase:
+          widget._loadStarNyxCompletionDatesForYearUseCase,
+      toggleCompletionUseCase: widget._toggleCompletionUseCase,
     )..add(const HomeLoadRequested());
   }
 
