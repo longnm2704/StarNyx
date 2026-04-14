@@ -1,8 +1,9 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starnyx/features/home/presentation/widgets/returning_placeholder_view.dart';
 
 void main() {
@@ -47,10 +48,14 @@ void main() {
         _buildLocalizedApp(
           ReturningPlaceholderView(
             starnyxs: starnyxs,
+            activeStarnyxId: '1',
             onCreatePressed: () {
               createPressed = true;
             },
             onEditPressed: (starnyx) {
+              edited = starnyx;
+            },
+            onSelectPressed: (starnyx) {
               edited = starnyx;
             },
           ),
@@ -59,23 +64,59 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 200));
 
-      expect(find.text('Saved Constellations'), findsOneWidget);
-      expect(find.text('Hydrate'), findsOneWidget);
+      expect(find.text('Active Constellation'), findsOneWidget);
+      expect(find.text('Hydrate'), findsWidgets);
+      expect(find.text('Swipe up'), findsOneWidget);
+      expect(find.text('New'), findsNothing);
+
+      await tester.tap(find.text('Swipe up'));
+      await tester.pump(const Duration(milliseconds: 220));
+      await tester.pump(const Duration(milliseconds: 220));
+      await tester.pump(const Duration(milliseconds: 220));
+
+      expect(find.text('Observation Deck'), findsOneWidget);
+      expect(find.text('Manage'), findsOneWidget);
+      expect(find.text('StarNyx Plus'), findsOneWidget);
+      expect(find.text('Constellations'), findsOneWidget);
+      expect(find.text('(Tap Edit to reorder)'), findsOneWidget);
       expect(find.text('Stretch'), findsOneWidget);
-      expect(find.text('No description yet'), findsOneWidget);
-      expect(find.text('Reminder: 09:15'), findsOneWidget);
-      expect(find.text('Reminder off'), findsOneWidget);
+      expect(_findSvg('assets/icons/ic_settings.svg'), findsOneWidget);
+      expect(_findSvg('assets/icons/ic_book.svg'), findsOneWidget);
+      expect(_findSvg('assets/icons/ic_plus.svg'), findsOneWidget);
 
-      await tester.tap(find.text('New'));
+      await tester.tap(_findSvg('assets/icons/ic_plus.svg'));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 220));
+      await tester.pump(const Duration(milliseconds: 220));
+      await tester.pump(const Duration(milliseconds: 220));
       expect(createPressed, isTrue);
+      createPressed = false;
+      expect(find.text('Observation Deck'), findsOneWidget);
 
-      await tester.ensureVisible(find.text('Edit').last);
+      await tester.ensureVisible(find.text('Stretch'));
       await tester.pump();
-      await tester.tap(find.text('Edit').last);
+      await tester.tap(find.text('Stretch'));
+      await tester.pump();
+      expect(edited, starnyxs[1]);
+      edited = null;
+
+      await tester.tap(find.text('Swipe up'));
+      await tester.pump(const Duration(milliseconds: 220));
+      await tester.pump(const Duration(milliseconds: 220));
+      await tester.pump(const Duration(milliseconds: 220));
+
+      await tester.ensureVisible(_findSvg('assets/icons/ic_edit.svg').last);
+      await tester.pump();
+      await tester.tap(_findSvg('assets/icons/ic_edit.svg').last);
       await tester.pump();
       expect(edited, starnyxs[1]);
     },
+  );
+}
+
+Finder _findSvg(String assetPath) {
+  return find.byWidgetPredicate(
+    (Widget widget) => widget is AppSvgIcon && widget.assetPath == assetPath,
   );
 }
 

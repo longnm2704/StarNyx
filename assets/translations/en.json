@@ -2,18 +2,34 @@
   "app": {
     "title": "StarNyx"
   },
+  "common": {
+    "close": "Close"
+  },
   "home": {
     "returning_title": "Constellation Home",
     "returning_subtitle": "{} constellation ready. The real home grid lands in STX-025.",
     "returning_empty_title": "Your cosmos is already seeded",
     "returning_empty_message": "The first-launch welcome state is complete. The interactive home screen replaces this placeholder in the next UI slice.",
     "new_constellation": "New",
+    "active_constellation_title": "Active Constellation",
+    "active_constellation_hint": "This selection will be restored when the user returns.",
+    "active_constellation_badge": "Active",
     "constellation_list_title": "Saved Constellations",
+    "swipe_hint": "Swipe up",
+    "sheet_title": "Observation Deck",
+    "sheet_manage_label": "Manage",
+    "sheet_active_label": "StarNyx Plus",
+    "sheet_constellations_title": "Constellations",
+    "sheet_constellations_helper": "(Tap Edit to reorder)",
+    "sheet_helper": "Choose a constellation to switch focus quickly.",
     "constellation_no_description": "No description yet",
     "edit_constellation": "Edit",
+    "switch_constellation_button": "Use This Constellation",
+    "selected_constellation_button": "Currently Selected",
     "start_date_chip": "Start: {}",
     "reminder_enabled_chip": "Reminder: {}",
     "reminder_disabled_chip": "Reminder off",
+    "switch_error_message": "Unable to switch the active constellation right now.",
     "load_error_title": "Unable to load StarNyx data",
     "load_error_message": "The first-run check could not read local data. Retry once before investigating the database layer.",
     "retry": "Retry"
