@@ -190,7 +190,7 @@ Issue checklist:
 - [x] `STX-018` Validate title bắt buộc, start date chỉ được chọn trong 7 ngày gần nhất đến hôm nay, reminder chỉ lưu giờ khi bật
 - [x] `STX-019` Cập nhật rule reminder time để giữ nguyên giờ người dùng chọn
 - [x] `STX-020` Implement edit StarNyx và prefill dữ liệu
-- [ ] `STX-021` Implement delete StarNyx với confirm dialog
+- [x] `STX-021` Implement delete StarNyx với confirm dialog
 - [ ] `STX-022` Tạo UI để list / switch StarNyx đang chọn từ màn chính hoặc quick actions
 - [ ] `STX-023` Lưu và restore StarNyx được chọn gần nhất khi mở app lại
 
