@@ -30,10 +30,12 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
   StarnyxFormBloc({
     required CreateStarNyxUseCase createStarNyxUseCase,
     required UpdateStarNyxUseCase updateStarNyxUseCase,
+    required DeleteStarNyxUseCase deleteStarNyxUseCase,
     DateTime Function()? nowBuilder,
     StarNyx? initialStarnyx,
   }) : _createStarNyxUseCase = createStarNyxUseCase,
        _updateStarNyxUseCase = updateStarNyxUseCase,
+       _deleteStarNyxUseCase = deleteStarNyxUseCase,
        _nowBuilder = nowBuilder ?? DateTime.now,
        _initialStarnyx = initialStarnyx,
        super(_buildInitialState(initialStarnyx, nowBuilder ?? DateTime.now)) {
@@ -45,6 +47,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     on<StarnyxFormReminderToggled>(_onReminderToggled);
     on<StarnyxFormReminderTimeChanged>(_onReminderTimeChanged);
     on<StarnyxFormSubmitted>(_onSubmitted);
+    on<StarnyxFormDeleted>(_onDeleted);
   }
 
   /// Injected use case for creating new StarNyx entities.
@@ -52,6 +55,9 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
 
   /// Injected use case for updating existing StarNyx entities.
   final UpdateStarNyxUseCase _updateStarNyxUseCase;
+
+  /// Injected use case for deleting existing StarNyx entities.
+  final DeleteStarNyxUseCase _deleteStarNyxUseCase;
 
   /// Callback to get current date/time (injectable for testing time-dependent logic).
   final DateTime Function() _nowBuilder;
@@ -89,6 +95,9 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
         submissionStatus: StarnyxFormSubmissionStatus.idle,
         savedStarnyx: null,
         submissionErrorMessage: null,
+        deletionStatus: StarnyxFormDeletionStatus.idle,
+        deletedStarnyxId: null,
+        deletionErrorMessage: null,
       );
     }
 
@@ -109,6 +118,9 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
       submissionStatus: StarnyxFormSubmissionStatus.idle,
       savedStarnyx: null,
       submissionErrorMessage: null,
+      deletionStatus: StarnyxFormDeletionStatus.idle,
+      deletedStarnyxId: null,
+      deletionErrorMessage: null,
     );
   }
 
@@ -212,6 +224,8 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
         submissionStatus: StarnyxFormSubmissionStatus.inProgress,
         submissionErrorMessage: null,
         savedStarnyx: null,
+        deletionErrorMessage: null,
+        deletedStarnyxId: null,
       ),
     );
 
@@ -249,6 +263,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
           submissionStatus: StarnyxFormSubmissionStatus.success,
           savedStarnyx: saved,
           submissionErrorMessage: null,
+          deletionErrorMessage: null,
         ),
       );
     } on UseCaseValidationException catch (error) {
@@ -257,6 +272,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
           submissionStatus: StarnyxFormSubmissionStatus.failure,
           submissionErrorMessage: error.message,
           savedStarnyx: null,
+          deletionErrorMessage: null,
         ),
       );
     } catch (_) {
@@ -266,6 +282,45 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
           submissionErrorMessage:
               'Unable to save the StarNyx right now. Please try again.',
           savedStarnyx: null,
+          deletionErrorMessage: null,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onDeleted(
+    StarnyxFormDeleted event,
+    Emitter<StarnyxFormState> emit,
+  ) async {
+    if (_initialStarnyx == null || !state.isEditing) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        deletionStatus: StarnyxFormDeletionStatus.inProgress,
+        deletionErrorMessage: null,
+        deletedStarnyxId: null,
+        submissionErrorMessage: null,
+        savedStarnyx: null,
+      ),
+    );
+
+    try {
+      await _deleteStarNyxUseCase(_initialStarnyx.id, now: _nowBuilder());
+      emit(
+        state.copyWith(
+          deletionStatus: StarnyxFormDeletionStatus.success,
+          deletedStarnyxId: _initialStarnyx.id,
+          deletionErrorMessage: null,
+        ),
+      );
+    } catch (_) {
+      emit(
+        state.copyWith(
+          deletionStatus: StarnyxFormDeletionStatus.failure,
+          deletionErrorMessage:
+              'Unable to delete the StarNyx right now. Please try again.',
         ),
       );
     }
@@ -289,6 +344,9 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
       submissionStatus: StarnyxFormSubmissionStatus.idle,
       submissionErrorMessage: null,
       savedStarnyx: null,
+      deletionStatus: StarnyxFormDeletionStatus.idle,
+      deletedStarnyxId: null,
+      deletionErrorMessage: null,
     );
   }
 

@@ -43,6 +43,12 @@
     "picker_done": "Xong",
     "save_button": "Lưu Chòm Sao",
     "update_button": "Cập Nhật Chòm Sao",
-    "save_error": "Không thể lưu StarNyx lúc này. Vui lòng thử lại."
+    "save_error": "Không thể lưu StarNyx lúc này. Vui lòng thử lại.",
+    "delete_button": "Xóa Chòm Sao",
+    "delete_confirm_title": "Xóa chòm sao này?",
+    "delete_confirm_message": "Thao tác này sẽ xóa StarNyx và dữ liệu tiến độ local liên quan.",
+    "delete_cancel": "Hủy",
+    "delete_confirm": "Xóa",
+    "delete_error": "Không thể xóa StarNyx lúc này. Vui lòng thử lại."
   }
 }

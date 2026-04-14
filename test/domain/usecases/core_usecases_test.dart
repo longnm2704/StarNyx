@@ -220,6 +220,86 @@ void main() {
   );
 
   test(
+    'delete use case removes the selected StarNyx and clears invalid selection',
+    () async {
+      await starNyxRepository.saveStarnyx(
+        StarNyx(
+          id: 'habit-1',
+          title: 'Hydrate',
+          description: null,
+          color: '#102030',
+          startDate: DateTime(2026, 4, 1),
+          reminderEnabled: false,
+          reminderTime: null,
+          createdAt: DateTime(2026, 4, 1, 8),
+          updatedAt: DateTime(2026, 4, 2, 9),
+        ),
+      );
+      await appSettingsRepository.saveAppSettings(
+        AppSettings(
+          lastSelectedStarnyxId: 'habit-1',
+          updatedAt: DateTime(2026, 4, 10, 8),
+        ),
+      );
+
+      final useCase = DeleteStarNyxUseCase(
+        starNyxRepository,
+        appSettingsRepository,
+      );
+
+      await useCase('habit-1', now: DateTime(2026, 4, 13, 8, 30));
+
+      expect(await starNyxRepository.getStarnyxById('habit-1'), isNull);
+      expect(
+        (await appSettingsRepository.getAppSettings())?.lastSelectedStarnyxId,
+        isNull,
+      );
+    },
+  );
+
+  test(
+    'delete use case falls back to another StarNyx when selected item is removed',
+    () async {
+      final first = StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 4, 9),
+      );
+      final second = first.copyWith(
+        id: 'habit-2',
+        title: 'Read',
+        updatedAt: DateTime(2026, 4, 3, 9),
+      );
+      await starNyxRepository.saveStarnyx(first);
+      await starNyxRepository.saveStarnyx(second);
+      await appSettingsRepository.saveAppSettings(
+        AppSettings(
+          lastSelectedStarnyxId: 'habit-1',
+          updatedAt: DateTime(2026, 4, 10, 8),
+        ),
+      );
+
+      final useCase = DeleteStarNyxUseCase(
+        starNyxRepository,
+        appSettingsRepository,
+      );
+
+      await useCase('habit-1', now: DateTime(2026, 4, 13, 8, 30));
+
+      expect(
+        (await appSettingsRepository.getAppSettings())?.lastSelectedStarnyxId,
+        'habit-2',
+      );
+    },
+  );
+
+  test(
     'toggle completion use case creates then removes a completion',
     () async {
       await starNyxRepository.saveStarnyx(

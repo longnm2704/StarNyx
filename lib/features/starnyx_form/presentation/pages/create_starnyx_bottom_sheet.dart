@@ -19,22 +19,31 @@ const LinearGradient _sheetTopDownGradient = LinearGradient(
   stops: <double>[0.0, 0.48, 1.0],
 );
 
-Future<StarNyx?> showCreateStarnyxBottomSheet(BuildContext context) {
+class StarnyxFormResult {
+  const StarnyxFormResult({this.savedStarnyx, this.deletedStarnyxId});
+
+  final StarNyx? savedStarnyx;
+  final String? deletedStarnyxId;
+
+  bool get hasChanges => savedStarnyx != null || deletedStarnyxId != null;
+}
+
+Future<StarnyxFormResult?> showCreateStarnyxBottomSheet(BuildContext context) {
   return showStarnyxFormBottomSheet(context);
 }
 
-Future<StarNyx?> showEditStarnyxBottomSheet(
+Future<StarnyxFormResult?> showEditStarnyxBottomSheet(
   BuildContext context,
   StarNyx initialStarnyx,
 ) {
   return showStarnyxFormBottomSheet(context, initialStarnyx: initialStarnyx);
 }
 
-Future<StarNyx?> showStarnyxFormBottomSheet(
+Future<StarnyxFormResult?> showStarnyxFormBottomSheet(
   BuildContext context, {
   StarNyx? initialStarnyx,
 }) {
-  return showModalBottomSheet<StarNyx>(
+  return showModalBottomSheet<StarnyxFormResult>(
     context: context,
     isScrollControlled: true,
     useSafeArea: false,
@@ -114,16 +123,51 @@ class _StarnyxFormBottomSheetViewState
     context.read<StarnyxFormBloc>().add(const StarnyxFormSubmitted());
   }
 
+  Future<void> _confirmDelete() async {
+    final confirmed = await showAppConfirmDialog(
+      context: context,
+      title: 'starnyx_form.delete_confirm_title'.tr(),
+      message: 'starnyx_form.delete_confirm_message'.tr(),
+      cancelLabel: 'starnyx_form.delete_cancel'.tr(),
+      confirmLabel: 'starnyx_form.delete_confirm'.tr(),
+      actionStyle: AppConfirmActionStyle.destructive,
+    );
+
+    if (confirmed != true || !mounted) {
+      return;
+    }
+
+    context.read<StarnyxFormBloc>().add(const StarnyxFormDeleted());
+  }
+
   void _onSubmissionChanged(BuildContext context, StarnyxFormState state) {
     if (state.submissionStatus == StarnyxFormSubmissionStatus.success &&
         state.savedStarnyx != null) {
-      Navigator.of(context).pop(state.savedStarnyx);
+      Navigator.of(
+        context,
+      ).pop(StarnyxFormResult(savedStarnyx: state.savedStarnyx));
       return;
     }
 
     if (state.submissionStatus == StarnyxFormSubmissionStatus.failure) {
       final message =
           state.submissionErrorMessage ?? 'starnyx_form.save_error'.tr();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+
+    if (state.deletionStatus == StarnyxFormDeletionStatus.success &&
+        state.deletedStarnyxId != null) {
+      Navigator.of(
+        context,
+      ).pop(StarnyxFormResult(deletedStarnyxId: state.deletedStarnyxId));
+      return;
+    }
+
+    if (state.deletionStatus == StarnyxFormDeletionStatus.failure) {
+      final message =
+          state.deletionErrorMessage ?? 'starnyx_form.delete_error'.tr();
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
@@ -147,11 +191,13 @@ class _StarnyxFormBottomSheetViewState
           bottom: false,
           child: BlocListener<StarnyxFormBloc, StarnyxFormState>(
             listenWhen: (previous, current) =>
-                previous.submissionStatus != current.submissionStatus,
+                previous.submissionStatus != current.submissionStatus ||
+                previous.deletionStatus != current.deletionStatus,
             listener: _onSubmissionChanged,
             child: BlocBuilder<StarnyxFormBloc, StarnyxFormState>(
               buildWhen: (StarnyxFormState previous, StarnyxFormState current) {
                 return previous.submissionStatus != current.submissionStatus ||
+                    previous.deletionStatus != current.deletionStatus ||
                     previous.titleError != current.titleError ||
                     previous.color != current.color ||
                     previous.reminderEnabled != current.reminderEnabled ||
@@ -165,6 +211,9 @@ class _StarnyxFormBottomSheetViewState
                 final isSaving =
                     state.submissionStatus ==
                     StarnyxFormSubmissionStatus.inProgress;
+                final isDeleting =
+                    state.deletionStatus ==
+                    StarnyxFormDeletionStatus.inProgress;
                 final formattedStartDate =
                     core_date_utils.DateUtils.formatDdMmYyyy(state.startDate);
                 final sheetTitle = state.isEditing
@@ -286,7 +335,7 @@ class _StarnyxFormBottomSheetViewState
                                 onTap: () => _pickStartDate(state),
                               ),
                               const SizedBox(height: AppSpacing.xl),
-                              if (isSaving)
+                              if (isSaving || isDeleting)
                                 const SizedBox(
                                   height: AppSize.ctaHeight,
                                   child: Center(
@@ -295,11 +344,26 @@ class _StarnyxFormBottomSheetViewState
                                     ),
                                   ),
                                 )
-                              else
+                              else ...<Widget>[
+                                if (state.isEditing) ...<Widget>[
+                                  TextButton(
+                                    onPressed: state.canDelete
+                                        ? _confirmDelete
+                                        : null,
+                                    child: Text(
+                                      'starnyx_form.delete_button'.tr(),
+                                      style: const TextStyle(
+                                        color: AppColors.accentPink,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.sm),
+                                ],
                                 GradientOutlineButton(
                                   label: saveButtonLabel,
                                   onPressed: _submitForm,
                                 ),
+                              ],
                             ],
                           ),
                         ),

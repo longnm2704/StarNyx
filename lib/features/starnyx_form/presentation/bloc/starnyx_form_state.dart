@@ -9,6 +9,9 @@ enum StarnyxFormMode { create, edit }
 /// UI uses this to show loading spinners, disable buttons, or display success/error messages.
 enum StarnyxFormSubmissionStatus { idle, inProgress, success, failure }
 
+/// Tracks the progress of delete action in edit mode.
+enum StarnyxFormDeletionStatus { idle, inProgress, success, failure }
+
 /// Indicates validation errors for the title field.
 enum StarnyxFormTitleError { empty }
 
@@ -43,6 +46,9 @@ class StarnyxFormState extends Equatable {
     required this.submissionStatus,
     required this.savedStarnyx,
     required this.submissionErrorMessage,
+    required this.deletionStatus,
+    required this.deletedStarnyxId,
+    required this.deletionErrorMessage,
   });
 
   /// Whether the form is creating a new StarNyx or editing an existing one.
@@ -84,6 +90,15 @@ class StarnyxFormState extends Equatable {
   /// Human-readable error message from failed submission (from use case exception).
   final String? submissionErrorMessage;
 
+  /// Current stage of the delete process.
+  final StarnyxFormDeletionStatus deletionStatus;
+
+  /// Deleted StarNyx id when the delete action succeeds.
+  final String? deletedStarnyxId;
+
+  /// Human-readable error message from failed deletion.
+  final String? deletionErrorMessage;
+
   /// Convenience getter: true if form is in edit mode.
   bool get isEditing => mode == StarnyxFormMode.edit;
 
@@ -96,8 +111,13 @@ class StarnyxFormState extends Equatable {
   /// UI uses this to enable/disable the submit button.
   bool get canSubmit =>
       submissionStatus != StarnyxFormSubmissionStatus.inProgress &&
+      deletionStatus != StarnyxFormDeletionStatus.inProgress &&
       !hasValidationErrors &&
       title.trim().isNotEmpty;
+
+  /// Convenience getter: true if delete action can run.
+  bool get canDelete =>
+      isEditing && deletionStatus != StarnyxFormDeletionStatus.inProgress;
 
   /// Creates a new state with specified fields replaced.
   /// Uses [_unset] sentinel to distinguish null from unmodified, enabling nullable fields to be explicitly set to null.
@@ -116,6 +136,9 @@ class StarnyxFormState extends Equatable {
     StarnyxFormSubmissionStatus? submissionStatus,
     Object? savedStarnyx = _unset,
     Object? submissionErrorMessage = _unset,
+    StarnyxFormDeletionStatus? deletionStatus,
+    Object? deletedStarnyxId = _unset,
+    Object? deletionErrorMessage = _unset,
   }) {
     return StarnyxFormState(
       mode: mode ?? this.mode,
@@ -141,6 +164,13 @@ class StarnyxFormState extends Equatable {
       submissionErrorMessage: identical(submissionErrorMessage, _unset)
           ? this.submissionErrorMessage
           : submissionErrorMessage as String?,
+      deletionStatus: deletionStatus ?? this.deletionStatus,
+      deletedStarnyxId: identical(deletedStarnyxId, _unset)
+          ? this.deletedStarnyxId
+          : deletedStarnyxId as String?,
+      deletionErrorMessage: identical(deletionErrorMessage, _unset)
+          ? this.deletionErrorMessage
+          : deletionErrorMessage as String?,
     );
   }
 
@@ -162,5 +192,8 @@ class StarnyxFormState extends Equatable {
     submissionStatus,
     savedStarnyx,
     submissionErrorMessage,
+    deletionStatus,
+    deletedStarnyxId,
+    deletionErrorMessage,
   ];
 }

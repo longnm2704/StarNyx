@@ -50,8 +50,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _openCreateBottomSheet() async {
-    final created = await showCreateStarnyxBottomSheet(context);
-    if (!mounted || created == null) {
+    final result = await showCreateStarnyxBottomSheet(context);
+    if (!mounted || result == null || !result.hasChanges) {
       return;
     }
 
@@ -68,8 +68,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _openEditBottomSheet(StarNyx starnyx) async {
-    final updated = await showEditStarnyxBottomSheet(context, starnyx);
-    if (!mounted || updated == null) {
+    final result = await showEditStarnyxBottomSheet(context, starnyx);
+    if (!mounted || result == null || !result.hasChanges) {
       return;
     }
 
