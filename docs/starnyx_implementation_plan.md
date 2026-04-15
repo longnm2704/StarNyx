@@ -214,7 +214,7 @@ Mục tiêu:
 Issue checklist:
 
 - [x] `STX-024` Tạo `HomeBloc` với event load data, select day, move previous/next day, jump today, change year, change active StarNyx, toggle completion
-- [ ] `STX-025` Tạo home page bám theo UI `docs/ui/starnyx_home.PNG`
+- [x] `STX-025` Tạo home page bám theo UI `docs/ui/starnyx_home.PNG`
 - [ ] `STX-026` Build star grid 365/366 ngày với 18 cột
 - [ ] `STX-027` Render đầy đủ các trạng thái: before start, completed, missed, future, selected, today
 - [ ] `STX-028` Chặn check-in cho ngày tương lai và ngày trước start date
