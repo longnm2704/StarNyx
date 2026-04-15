@@ -9,8 +9,6 @@ const LinearGradient _appConfirmDialogGradient = LinearGradient(
   colors: <Color>[Color(0xFF32284B), Color(0xFF1A1526)],
 );
 
-enum AppConfirmActionStyle { neutral, destructive }
-
 Future<bool?> showAppConfirmDialog({
   required BuildContext context,
   required String title,

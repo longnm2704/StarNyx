@@ -48,10 +48,7 @@ void main() {
   });
 
   test('select active use case throws when starnyx does not exist', () async {
-    expect(
-      () => selectUseCase('missing-id'),
-      throwsA(isA<StateError>()),
-    );
+    expect(() => selectUseCase('missing-id'), throwsA(isA<StateError>()));
   });
 
   test('load active use case restores previously selected starnyx', () async {
@@ -88,7 +85,8 @@ class _InMemoryStarNyxRepository implements StarNyxRepository {
   Future<StarNyx?> getStarnyxById(String id) async => _items[id];
 
   @override
-  Future<void> saveStarnyx(StarNyx starnyx) async => _items[starnyx.id] = starnyx;
+  Future<void> saveStarnyx(StarNyx starnyx) async =>
+      _items[starnyx.id] = starnyx;
 
   @override
   Stream<List<StarNyx>> watchAllStarnyxs() => throw UnimplementedError();
@@ -101,7 +99,8 @@ class _InMemoryAppSettingsRepository implements AppSettingsRepository {
   Future<AppSettings?> getAppSettings() async => _settings;
 
   @override
-  Future<void> saveAppSettings(AppSettings settings) async => _settings = settings;
+  Future<void> saveAppSettings(AppSettings settings) async =>
+      _settings = settings;
 
   @override
   Stream<AppSettings?> watchAppSettings() => throw UnimplementedError();

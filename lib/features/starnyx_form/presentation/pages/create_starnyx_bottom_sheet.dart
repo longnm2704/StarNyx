@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
-import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_bloc.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_event.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_state.dart';
@@ -142,7 +142,7 @@ class _StarnyxFormBottomSheetViewState
   }
 
   void _onSubmissionChanged(BuildContext context, StarnyxFormState state) {
-    if (state.submissionStatus == StarnyxFormSubmissionStatus.success &&
+    if (state.submissionStatus == AsyncStatus.success &&
         state.savedStarnyx != null) {
       Navigator.of(
         context,
@@ -150,7 +150,7 @@ class _StarnyxFormBottomSheetViewState
       return;
     }
 
-    if (state.submissionStatus == StarnyxFormSubmissionStatus.failure) {
+    if (state.submissionStatus == AsyncStatus.failure) {
       final message =
           state.submissionErrorMessage ?? 'starnyx_form.save_error'.tr();
       ScaffoldMessenger.of(
@@ -158,7 +158,7 @@ class _StarnyxFormBottomSheetViewState
       ).showSnackBar(SnackBar(content: Text(message)));
     }
 
-    if (state.deletionStatus == StarnyxFormDeletionStatus.success &&
+    if (state.deletionStatus == AsyncStatus.success &&
         state.deletedStarnyxId != null) {
       Navigator.of(
         context,
@@ -166,7 +166,7 @@ class _StarnyxFormBottomSheetViewState
       return;
     }
 
-    if (state.deletionStatus == StarnyxFormDeletionStatus.failure) {
+    if (state.deletionStatus == AsyncStatus.failure) {
       final message =
           state.deletionErrorMessage ?? 'starnyx_form.delete_error'.tr();
       ScaffoldMessenger.of(
@@ -210,11 +210,9 @@ class _StarnyxFormBottomSheetViewState
                 final titleHasError =
                     _showValidationErrors && state.titleError != null;
                 final isSaving =
-                    state.submissionStatus ==
-                    StarnyxFormSubmissionStatus.inProgress;
+                    state.submissionStatus == AsyncStatus.inProgress;
                 final isDeleting =
-                    state.deletionStatus ==
-                    StarnyxFormDeletionStatus.inProgress;
+                    state.deletionStatus == AsyncStatus.inProgress;
                 final formattedStartDate =
                     core_date_utils.DateUtils.formatDdMmYyyy(state.startDate);
                 final sheetTitle = state.isEditing

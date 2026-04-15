@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/app_svg_icon.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
 
 import 'home_grid_utils.dart';
 
@@ -72,15 +72,15 @@ class HomeStarGrid extends StatelessWidget {
             final DateTime date = homeGridDateForIndex(viewedYear, index);
             final bool isSelected = _isSameDate(date, normalizedSelectedDate);
             final bool isToday = _isSameDate(date, normalizedTodayDate);
-            final _GridStarDayState dayState = _resolveDayState(
+            final HomeGridStarDayState dayState = _resolveDayState(
               date: date,
               startDate: normalizedStartDate,
               todayDate: normalizedTodayDate,
               isCompleted: completedDayIndexes.contains(index),
             );
             final bool canSelectDay =
-                dayState != _GridStarDayState.beforeStart &&
-                dayState != _GridStarDayState.future;
+                dayState != HomeGridStarDayState.beforeStart &&
+                dayState != HomeGridStarDayState.future;
 
             return KeyedSubtree(
               key: index == 0
@@ -99,16 +99,16 @@ class HomeStarGrid extends StatelessWidget {
                 selectedKey: isSelected
                     ? const Key('home-selected-star-cell')
                     : null,
-                completedKey: dayState == _GridStarDayState.completed
+                completedKey: dayState == HomeGridStarDayState.completed
                     ? Key('home-completed-star-cell-$index')
                     : null,
-                beforeStartKey: dayState == _GridStarDayState.beforeStart
+                beforeStartKey: dayState == HomeGridStarDayState.beforeStart
                     ? Key('home-before-start-star-cell-$index')
                     : null,
-                missedKey: dayState == _GridStarDayState.missed
+                missedKey: dayState == HomeGridStarDayState.missed
                     ? Key('home-missed-star-cell-$index')
                     : null,
-                futureKey: dayState == _GridStarDayState.future
+                futureKey: dayState == HomeGridStarDayState.future
                     ? Key('home-future-star-cell-$index')
                     : null,
                 todayKey: isToday ? Key('home-today-star-cell-$index') : null,
@@ -135,26 +135,24 @@ class HomeStarGrid extends StatelessWidget {
         left.day == right.day;
   }
 
-  _GridStarDayState _resolveDayState({
+  HomeGridStarDayState _resolveDayState({
     required DateTime date,
     required DateTime startDate,
     required DateTime todayDate,
     required bool isCompleted,
   }) {
     if (date.isBefore(startDate)) {
-      return _GridStarDayState.beforeStart;
+      return HomeGridStarDayState.beforeStart;
     }
     if (date.isAfter(todayDate)) {
-      return _GridStarDayState.future;
+      return HomeGridStarDayState.future;
     }
     if (isCompleted) {
-      return _GridStarDayState.completed;
+      return HomeGridStarDayState.completed;
     }
-    return _GridStarDayState.missed;
+    return HomeGridStarDayState.missed;
   }
 }
-
-enum _GridStarDayState { beforeStart, completed, missed, future }
 
 class _GridStarCell extends StatelessWidget {
   const _GridStarCell({
@@ -174,7 +172,7 @@ class _GridStarCell extends StatelessWidget {
   });
 
   final double size;
-  final _GridStarDayState dayState;
+  final HomeGridStarDayState dayState;
   final bool isSelected;
   final bool isToday;
   final Color accentColor;
@@ -243,11 +241,11 @@ class _GridStarCell extends StatelessWidget {
 
   String _starAssetPath() {
     switch (dayState) {
-      case _GridStarDayState.beforeStart:
-      case _GridStarDayState.future:
+      case HomeGridStarDayState.beforeStart:
+      case HomeGridStarDayState.future:
         return 'assets/icons/ic_star.svg';
-      case _GridStarDayState.completed:
-      case _GridStarDayState.missed:
+      case HomeGridStarDayState.completed:
+      case HomeGridStarDayState.missed:
         return 'assets/icons/ic_star_active.svg';
     }
   }
@@ -257,13 +255,13 @@ class _GridStarCell extends StatelessWidget {
       return accentColor.withValues(alpha: 0.98);
     }
     switch (dayState) {
-      case _GridStarDayState.beforeStart:
+      case HomeGridStarDayState.beforeStart:
         return AppColors.white.withValues(alpha: 0.1);
-      case _GridStarDayState.completed:
+      case HomeGridStarDayState.completed:
         return accentColor.withValues(alpha: 0.88);
-      case _GridStarDayState.missed:
+      case HomeGridStarDayState.missed:
         return accentColor.withValues(alpha: 0.28);
-      case _GridStarDayState.future:
+      case HomeGridStarDayState.future:
         return AppColors.white.withValues(alpha: 0.2);
     }
   }

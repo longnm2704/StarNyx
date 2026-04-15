@@ -1,15 +1,7 @@
+import 'package:starnyx/core/constants/enums.dart';
+export 'package:starnyx/core/constants/enums.dart';
 import 'package:starnyx/core/utils/date_utils.dart';
 import 'package:starnyx/domain/repositories/journal_entry_repository.dart';
-
-// Typed validation codes make UI error handling predictable later on.
-enum UseCaseValidationCode {
-  startDateInFuture,
-  startDateTooFarInPast,
-  dateInFuture,
-  dateBeforeStartDate,
-  completionEditWindowExpired,
-  journalEntryAlreadyExists,
-}
 
 // Domain use cases throw this when business rules reject an action.
 class UseCaseValidationException implements Exception {

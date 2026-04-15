@@ -1,11 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
+import 'package:starnyx/core/constants/enums.dart';
+export 'package:starnyx/core/constants/enums.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
-
-enum HomeStatus { initial, loading, success, failure }
-
-enum HomeSelectionStatus { idle, inProgress, success, failure }
-enum HomeCompletionStatus { idle, inProgress, success, failure }
+import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 
 class HomeState extends Equatable {
   const HomeState({
@@ -25,8 +22,8 @@ class HomeState extends Equatable {
   HomeState.initial()
     : this(
         status: HomeStatus.initial,
-        selectionStatus: HomeSelectionStatus.idle,
-        completionStatus: HomeCompletionStatus.idle,
+        selectionStatus: AsyncStatus.idle,
+        completionStatus: AsyncStatus.idle,
         starnyxs: const <StarNyx>[],
         selectionFeedbackCount: 0,
         completionFeedbackCount: 0,
@@ -36,8 +33,8 @@ class HomeState extends Equatable {
       );
 
   final HomeStatus status;
-  final HomeSelectionStatus selectionStatus;
-  final HomeCompletionStatus completionStatus;
+  final AsyncStatus selectionStatus;
+  final AsyncStatus completionStatus;
   final List<StarNyx> starnyxs;
   final String? activeStarnyxId;
   final int selectionFeedbackCount;
@@ -51,8 +48,8 @@ class HomeState extends Equatable {
 
   HomeState copyWith({
     HomeStatus? status,
-    HomeSelectionStatus? selectionStatus,
-    HomeCompletionStatus? completionStatus,
+    AsyncStatus? selectionStatus,
+    AsyncStatus? completionStatus,
     List<StarNyx>? starnyxs,
     Object? activeStarnyxId = _unset,
     int? selectionFeedbackCount,

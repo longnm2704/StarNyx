@@ -5,8 +5,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
-enum ConstellationSwitcherSheetActionType { createRequested, editRequested }
-
 class ConstellationSwitcherSheetAction {
   const ConstellationSwitcherSheetAction._(this.type, [this.starnyx]);
 

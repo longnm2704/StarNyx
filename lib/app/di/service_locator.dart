@@ -94,11 +94,12 @@ void _registerUseCases() {
       serviceLocator<CompletionRepository>(),
     ),
   );
-  serviceLocator.registerLazySingleton<LoadStarNyxCompletionDatesForYearUseCase>(
-    () => LoadStarNyxCompletionDatesForYearUseCase(
-      serviceLocator<CompletionRepository>(),
-    ),
-  );
+  serviceLocator
+      .registerLazySingleton<LoadStarNyxCompletionDatesForYearUseCase>(
+        () => LoadStarNyxCompletionDatesForYearUseCase(
+          serviceLocator<CompletionRepository>(),
+        ),
+      );
   serviceLocator.registerLazySingleton<SelectActiveStarNyxUseCase>(
     () => SelectActiveStarNyxUseCase(
       serviceLocator<StarNyxRepository>(),

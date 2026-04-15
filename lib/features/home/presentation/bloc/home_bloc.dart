@@ -2,14 +2,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/core/utils/date_utils.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
-import 'package:starnyx/domain/usecases/load_starnyx_completion_dates_for_year_use_case.dart';
-import 'package:starnyx/domain/usecases/load_starnyx_progress_stats_use_case.dart';
 import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
 import 'package:starnyx/domain/usecases/toggle_completion_use_case.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_event.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_state.dart';
 import 'package:starnyx/domain/usecases/load_active_starnyx_use_case.dart';
 import 'package:starnyx/domain/usecases/select_active_starnyx_use_case.dart';
+import 'package:starnyx/domain/usecases/load_starnyx_progress_stats_use_case.dart';
+import 'package:starnyx/domain/usecases/load_starnyx_completion_dates_for_year_use_case.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc({
@@ -22,14 +22,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required ToggleCompletionUseCase toggleCompletionUseCase,
     DateTime Function()? nowBuilder,
   }) : _loadStarnyxsUseCase = loadStarnyxsUseCase,
-        _loadActiveStarNyxUseCase = loadActiveStarNyxUseCase,
-        _selectActiveStarNyxUseCase = selectActiveStarNyxUseCase,
-        _loadStarNyxProgressStatsUseCase = loadStarNyxProgressStatsUseCase,
-        _loadStarNyxCompletionDatesForYearUseCase =
-            loadStarNyxCompletionDatesForYearUseCase,
-        _toggleCompletionUseCase = toggleCompletionUseCase,
-        _nowBuilder = nowBuilder ?? DateTime.now,
-        super(HomeState.initial()) {
+       _loadActiveStarNyxUseCase = loadActiveStarNyxUseCase,
+       _selectActiveStarNyxUseCase = selectActiveStarNyxUseCase,
+       _loadStarNyxProgressStatsUseCase = loadStarNyxProgressStatsUseCase,
+       _loadStarNyxCompletionDatesForYearUseCase =
+           loadStarNyxCompletionDatesForYearUseCase,
+       _toggleCompletionUseCase = toggleCompletionUseCase,
+       _nowBuilder = nowBuilder ?? DateTime.now,
+       super(HomeState.initial()) {
     on<HomeLoadRequested>(_onLoadRequested);
     on<HomeReloadRequested>(_onLoadRequested);
     on<HomeActiveStarnyxSelected>(_onActiveStarnyxSelected);
@@ -61,8 +61,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(
       state.copyWith(
         status: HomeStatus.loading,
-        selectionStatus: HomeSelectionStatus.idle,
-        completionStatus: HomeCompletionStatus.idle,
+        selectionStatus: AsyncStatus.idle,
+        completionStatus: AsyncStatus.idle,
         selectedDate: context.selectedDate,
         viewedYear: context.viewedYear,
       ),
@@ -79,8 +79,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(
         state.copyWith(
           status: HomeStatus.success,
-          selectionStatus: HomeSelectionStatus.idle,
-          completionStatus: HomeCompletionStatus.idle,
+          selectionStatus: AsyncStatus.idle,
+          completionStatus: AsyncStatus.idle,
           starnyxs: data.starnyxs,
           activeStarnyxId: data.activeStarnyx?.id,
           selectedDate: context.selectedDate,
@@ -96,8 +96,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(
         state.copyWith(
           status: HomeStatus.failure,
-          selectionStatus: HomeSelectionStatus.idle,
-          completionStatus: HomeCompletionStatus.idle,
+          selectionStatus: AsyncStatus.idle,
+          completionStatus: AsyncStatus.idle,
           starnyxs: const <StarNyx>[],
           activeStarnyxId: null,
           progressStats: null,
@@ -113,18 +113,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     final today = DateUtils.nowDate(_nowBuilder());
     final requestId = _nextDataRequestId();
-    emit(state.copyWith(selectionStatus: HomeSelectionStatus.inProgress));
+    emit(state.copyWith(selectionStatus: AsyncStatus.inProgress));
 
     try {
       await _selectActiveStarNyxUseCase(event.id, now: today);
-      final data = await _loadHomeData(viewedYear: state.viewedYear, today: today);
+      final data = await _loadHomeData(
+        viewedYear: state.viewedYear,
+        today: today,
+      );
       if (!_isLatestDataRequest(requestId) || emit.isDone) {
         return;
       }
       emit(
         state.copyWith(
           status: HomeStatus.success,
-          selectionStatus: HomeSelectionStatus.success,
+          selectionStatus: AsyncStatus.success,
           starnyxs: data.starnyxs,
           activeStarnyxId: data.activeStarnyx?.id,
           progressStats: data.progressStats,
@@ -138,7 +141,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
       emit(
         state.copyWith(
-          selectionStatus: HomeSelectionStatus.failure,
+          selectionStatus: AsyncStatus.failure,
           selectionFeedbackCount: state.selectionFeedbackCount + 1,
         ),
       );
@@ -178,14 +181,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     add(HomeDaySelected(DateUtils.nowDate(_nowBuilder())));
   }
 
-  Future<void> _onYearChanged(HomeYearChanged event, Emitter<HomeState> emit) async {
+  Future<void> _onYearChanged(
+    HomeYearChanged event,
+    Emitter<HomeState> emit,
+  ) async {
     final normalizedToday = DateUtils.nowDate(_nowBuilder());
     final requestId = _nextDataRequestId();
     final nextSelectedDate = _sameMonthDayInYear(
       date: state.selectedDate,
       year: event.year,
     );
-    emit(state.copyWith(viewedYear: event.year, selectedDate: nextSelectedDate));
+    emit(
+      state.copyWith(viewedYear: event.year, selectedDate: nextSelectedDate),
+    );
 
     final activeId = state.activeStarnyxId;
     if (activeId == null) {
@@ -240,7 +248,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
     final today = DateUtils.nowDate(_nowBuilder());
     final requestId = _nextDataRequestId();
-    emit(state.copyWith(completionStatus: HomeCompletionStatus.inProgress));
+    emit(state.copyWith(completionStatus: AsyncStatus.inProgress));
 
     try {
       await _toggleCompletionUseCase(
@@ -249,13 +257,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         today: today,
       );
 
-      final data = await _loadHomeData(viewedYear: state.viewedYear, today: today);
+      final data = await _loadHomeData(
+        viewedYear: state.viewedYear,
+        today: today,
+      );
       if (!_isLatestDataRequest(requestId) || emit.isDone) {
         return;
       }
       emit(
         state.copyWith(
-          completionStatus: HomeCompletionStatus.success,
+          completionStatus: AsyncStatus.success,
           completionFeedbackCount: state.completionFeedbackCount + 1,
           progressStats: data.progressStats,
           completedDatesForViewedYear: data.completedDatesForViewedYear,
@@ -269,7 +280,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
       emit(
         state.copyWith(
-          completionStatus: HomeCompletionStatus.failure,
+          completionStatus: AsyncStatus.failure,
           completionFeedbackCount: state.completionFeedbackCount + 1,
         ),
       );
