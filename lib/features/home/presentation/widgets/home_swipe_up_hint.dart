@@ -15,10 +15,7 @@ class HomeSwipeUpHint extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadius.pill),
       onTap: isBusy ? null : onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
+        padding: const EdgeInsets.only(top: AppSpacing.sm),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[

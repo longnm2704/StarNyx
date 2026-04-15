@@ -55,7 +55,7 @@ void main() {
       expect(find.text('Drink water'), findsOneWidget);
       expect(find.text('2026'), findsOneWidget);
       expect(find.text('257 days left'), findsOneWidget);
-      expect(find.text('Reset to current date'), findsOneWidget);
+      expect(find.text('Today'), findsOneWidget);
       expect(find.text('Sunday, 19 Apr'), findsOneWidget);
       expect(find.text('Total: 2 · Streak: 0'), findsOneWidget);
       expect(

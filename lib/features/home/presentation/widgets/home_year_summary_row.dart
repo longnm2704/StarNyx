@@ -6,13 +6,17 @@ class HomeYearSummaryRow extends StatelessWidget {
   const HomeYearSummaryRow({
     required this.viewedYear,
     required this.daysLeft,
+    required this.accentColor,
     required this.onYearPressed,
+    required this.onJumpToTodayPressed,
     super.key,
   });
 
   final int viewedYear;
   final int daysLeft;
+  final Color accentColor;
   final VoidCallback? onYearPressed;
+  final VoidCallback? onJumpToTodayPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -50,12 +54,38 @@ class HomeYearSummaryRow extends StatelessWidget {
             ),
           ),
         ),
-        const Spacer(),
-        Text(
-          'home.days_left'.tr(args: <String>[daysLeft.toString()]),
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textPrimary.withValues(alpha: 0.7),
-            fontWeight: FontWeight.w700,
+        Expanded(
+          child: Center(
+            child: GestureDetector(
+              onTap: onJumpToTodayPressed,
+              child: Text(
+                'home.reset_current_date'.tr(),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: accentColor.withValues(alpha: 0.95),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Text.rich(
+          TextSpan(
+            children: <TextSpan>[
+              TextSpan(
+                text: '$daysLeft ',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: accentColor.withValues(alpha: 0.95),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              TextSpan(
+                text: 'home.days_left_suffix'.tr(),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textPrimary.withValues(alpha: 0.7),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
         ),
       ],
