@@ -68,7 +68,20 @@ void main() {
       );
       expect(find.byKey(const Key('home-selected-star-cell')), findsOneWidget);
       expect(
+        find.byKey(const Key('home-before-start-star-cell-98')),
+        findsOneWidget,
+      );
+      expect(
         find.byKey(const Key('home-completed-star-cell-99')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('home-missed-star-cell-100')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('home-today-star-cell-108')), findsOneWidget);
+      expect(
+        find.byKey(const Key('home-future-star-cell-109')),
         findsOneWidget,
       );
       expect(_findSvg('assets/icons/ic_star_active.svg'), findsWidgets);
