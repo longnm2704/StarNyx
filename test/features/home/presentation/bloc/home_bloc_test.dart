@@ -541,6 +541,100 @@ void main() {
     },
   );
 
+  test('toggle completion is blocked for dates before start date', () async {
+    final starnyxs = <StarNyx>[_starnyx(id: '1', title: 'Hydrate')];
+    when(() => loadStarnyxsUseCase()).thenAnswer((_) async => starnyxs);
+    when(
+      () => loadActiveStarNyxUseCase(now: any(named: 'now')),
+    ).thenAnswer((_) async => starnyxs.first);
+    when(
+      () => loadStarNyxProgressStatsUseCase(
+        starnyxId: '1',
+        year: 2026,
+        today: any(named: 'today'),
+      ),
+    ).thenAnswer((_) async => _stats());
+    when(
+      () =>
+          loadStarNyxCompletionDatesForYearUseCase(starnyxId: '1', year: 2026),
+    ).thenAnswer((_) async => <DateTime>[DateTime(2026, 4, 13)]);
+    final bloc = HomeBloc(
+      loadStarnyxsUseCase: loadStarnyxsUseCase,
+      loadActiveStarNyxUseCase: loadActiveStarNyxUseCase,
+      selectActiveStarNyxUseCase: selectActiveStarNyxUseCase,
+      loadStarNyxProgressStatsUseCase: loadStarNyxProgressStatsUseCase,
+      loadStarNyxCompletionDatesForYearUseCase:
+          loadStarNyxCompletionDatesForYearUseCase,
+      toggleCompletionUseCase: toggleCompletionUseCase,
+      nowBuilder: () => DateTime(2026, 4, 14),
+    );
+
+    bloc.add(const HomeLoadRequested());
+    await pumpEventQueue(times: 10);
+    bloc.add(HomeDaySelected(DateTime(2026, 4, 9)));
+    await pumpEventQueue(times: 10);
+
+    bloc.add(const HomeCompletionToggled());
+    await pumpEventQueue(times: 10);
+
+    expect(bloc.state.completionStatus, AsyncStatus.failure);
+    expect(bloc.state.completionFeedbackCount, 1);
+    verifyNever(
+      () => toggleCompletionUseCase(
+        starnyxId: any(named: 'starnyxId'),
+        date: any(named: 'date'),
+        today: any(named: 'today'),
+      ),
+    );
+  });
+
+  test('toggle completion is blocked for future dates', () async {
+    final starnyxs = <StarNyx>[_starnyx(id: '1', title: 'Hydrate')];
+    when(() => loadStarnyxsUseCase()).thenAnswer((_) async => starnyxs);
+    when(
+      () => loadActiveStarNyxUseCase(now: any(named: 'now')),
+    ).thenAnswer((_) async => starnyxs.first);
+    when(
+      () => loadStarNyxProgressStatsUseCase(
+        starnyxId: '1',
+        year: 2026,
+        today: any(named: 'today'),
+      ),
+    ).thenAnswer((_) async => _stats());
+    when(
+      () =>
+          loadStarNyxCompletionDatesForYearUseCase(starnyxId: '1', year: 2026),
+    ).thenAnswer((_) async => <DateTime>[DateTime(2026, 4, 13)]);
+    final bloc = HomeBloc(
+      loadStarnyxsUseCase: loadStarnyxsUseCase,
+      loadActiveStarNyxUseCase: loadActiveStarNyxUseCase,
+      selectActiveStarNyxUseCase: selectActiveStarNyxUseCase,
+      loadStarNyxProgressStatsUseCase: loadStarNyxProgressStatsUseCase,
+      loadStarNyxCompletionDatesForYearUseCase:
+          loadStarNyxCompletionDatesForYearUseCase,
+      toggleCompletionUseCase: toggleCompletionUseCase,
+      nowBuilder: () => DateTime(2026, 4, 14),
+    );
+
+    bloc.add(const HomeLoadRequested());
+    await pumpEventQueue(times: 10);
+    bloc.add(HomeDaySelected(DateTime(2026, 4, 15)));
+    await pumpEventQueue(times: 10);
+
+    bloc.add(const HomeCompletionToggled());
+    await pumpEventQueue(times: 10);
+
+    expect(bloc.state.completionStatus, AsyncStatus.failure);
+    expect(bloc.state.completionFeedbackCount, 1);
+    verifyNever(
+      () => toggleCompletionUseCase(
+        starnyxId: any(named: 'starnyxId'),
+        date: any(named: 'date'),
+        today: any(named: 'today'),
+      ),
+    );
+  });
+
   test('toggle completion emits failure feedback on 7-day lock', () async {
     final starnyxs = <StarNyx>[_starnyx(id: '1', title: 'Hydrate')];
     when(() => loadStarnyxsUseCase()).thenAnswer((_) async => starnyxs);

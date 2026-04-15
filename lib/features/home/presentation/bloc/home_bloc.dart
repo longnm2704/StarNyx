@@ -247,6 +247,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       return;
     }
     final today = DateUtils.nowDate(_nowBuilder());
+    final activeStarnyx = _findActiveStarnyxById(activeId);
+    if (_isInvalidCheckInDate(
+      selectedDate: state.selectedDate,
+      activeStarnyx: activeStarnyx,
+      today: today,
+    )) {
+      emit(
+        state.copyWith(
+          completionStatus: AsyncStatus.failure,
+          completionFeedbackCount: state.completionFeedbackCount + 1,
+        ),
+      );
+      return;
+    }
     final requestId = _nextDataRequestId();
     emit(state.copyWith(completionStatus: AsyncStatus.inProgress));
 
@@ -344,6 +358,32 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   int _nextDataRequestId() => ++_latestDataRequestId;
 
   bool _isLatestDataRequest(int requestId) => requestId == _latestDataRequestId;
+
+  StarNyx? _findActiveStarnyxById(String activeId) {
+    for (final starnyx in state.starnyxs) {
+      if (starnyx.id == activeId) {
+        return starnyx;
+      }
+    }
+    return null;
+  }
+
+  bool _isInvalidCheckInDate({
+    required DateTime selectedDate,
+    required StarNyx? activeStarnyx,
+    required DateTime today,
+  }) {
+    if (DateUtils.isFutureDate(selectedDate, today: today)) {
+      return true;
+    }
+    if (activeStarnyx == null) {
+      return false;
+    }
+    return DateUtils.isBeforeStartDate(
+      selectedDate,
+      startDate: activeStarnyx.startDate,
+    );
+  }
 }
 
 class _HomeData {

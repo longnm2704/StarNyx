@@ -148,11 +148,21 @@ class _HomePageState extends State<HomePage> {
       value: _homeBloc,
       child: BlocListener<HomeBloc, HomeState>(
         listenWhen: (HomeState previous, HomeState current) =>
-            previous.selectionFeedbackCount != current.selectionFeedbackCount,
+            previous.selectionFeedbackCount != current.selectionFeedbackCount ||
+            previous.completionFeedbackCount != current.completionFeedbackCount,
         listener: (BuildContext context, HomeState state) {
           if (state.selectionStatus == AsyncStatus.failure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('home.switch_error_message'.tr())),
+            );
+          }
+          if (state.completionStatus == AsyncStatus.success) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('home.checkin_success_message'.tr())),
+            );
+          } else if (state.completionStatus == AsyncStatus.failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('home.checkin_error_message'.tr())),
             );
           }
         },
@@ -185,6 +195,10 @@ class _HomePageState extends State<HomePage> {
                   _homeBloc.add(HomeDaySelected(date));
                 },
                 onSelectPressed: _onSelectPressed,
+                onToggleCompletionPressed: () {
+                  _homeBloc.add(const HomeCompletionToggled());
+                },
+                isCheckingIn: state.completionStatus == AsyncStatus.inProgress,
                 progressStats: state.progressStats,
               );
             },

@@ -28,6 +28,8 @@
     "selected_constellation_button": "Currently Selected",
     "days_left": "{} days left",
     "reset_current_date": "Reset to current date",
+    "checkin_success_message": "Check-in updated.",
+    "checkin_error_message": "Unable to check in for the selected day.",
     "summary_stats": "Total: {} · Streak: {}",
     "start_date_chip": "Start: {}",
     "reminder_enabled_chip": "Reminder: {}",
