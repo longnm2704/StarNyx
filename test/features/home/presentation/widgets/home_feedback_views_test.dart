@@ -78,7 +78,7 @@ void main() {
       expect(find.text('Drink water'), findsOneWidget);
       expect(find.text('Swipe up'), findsOneWidget);
       expect(find.text('2025'), findsOneWidget);
-      expect(find.text('Reset to current date'), findsOneWidget);
+      expect(find.text('Today'), findsOneWidget);
       expect(
         find.byKey(const Key('home-star-grid-placeholder')),
         findsOneWidget,

@@ -116,7 +116,7 @@ class HomeShellView extends StatelessWidget {
                     AppSpacing.pageHorizontal,
                     AppSpacing.sm,
                     AppSpacing.pageHorizontal,
-                    AppSpacing.sm,
+                    0,
                   ),
                   child: Column(
                     children: <Widget>[
@@ -124,6 +124,8 @@ class HomeShellView extends StatelessWidget {
                       Text(
                         activeStarnyx.title,
                         textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.w800,
                           fontSize: 24,
@@ -137,6 +139,8 @@ class HomeShellView extends StatelessWidget {
                         Text(
                           activeStarnyx.description!,
                           textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: AppColors.textPrimary.withValues(
                               alpha: 0.62,
@@ -162,18 +166,9 @@ class HomeShellView extends StatelessWidget {
                       HomeYearSummaryRow(
                         viewedYear: viewedYear,
                         daysLeft: daysLeft,
+                        accentColor: accentColor,
                         onYearPressed: onYearPressed,
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      GestureDetector(
-                        onTap: onJumpToTodayPressed,
-                        child: Text(
-                          'home.reset_current_date'.tr(),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: accentColor.withValues(alpha: 0.95),
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                        onJumpToTodayPressed: onJumpToTodayPressed,
                       ),
                       const SizedBox(height: AppSpacing.md),
                       SelectedDateBar(
