@@ -92,10 +92,10 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
         titleError: null,
         startDateError: null,
         reminderTimeError: null,
-        submissionStatus: StarnyxFormSubmissionStatus.idle,
+        submissionStatus: AsyncStatus.idle,
         savedStarnyx: null,
         submissionErrorMessage: null,
-        deletionStatus: StarnyxFormDeletionStatus.idle,
+        deletionStatus: AsyncStatus.idle,
         deletedStarnyxId: null,
         deletionErrorMessage: null,
       );
@@ -115,10 +115,10 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
       titleError: StarnyxFormTitleError.empty,
       startDateError: null,
       reminderTimeError: null,
-      submissionStatus: StarnyxFormSubmissionStatus.idle,
+      submissionStatus: AsyncStatus.idle,
       savedStarnyx: null,
       submissionErrorMessage: null,
-      deletionStatus: StarnyxFormDeletionStatus.idle,
+      deletionStatus: AsyncStatus.idle,
       deletedStarnyxId: null,
       deletionErrorMessage: null,
     );
@@ -221,7 +221,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
 
     emit(
       validated.copyWith(
-        submissionStatus: StarnyxFormSubmissionStatus.inProgress,
+        submissionStatus: AsyncStatus.inProgress,
         submissionErrorMessage: null,
         savedStarnyx: null,
         deletionErrorMessage: null,
@@ -260,7 +260,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
 
       emit(
         validated.copyWith(
-          submissionStatus: StarnyxFormSubmissionStatus.success,
+          submissionStatus: AsyncStatus.success,
           savedStarnyx: saved,
           submissionErrorMessage: null,
           deletionErrorMessage: null,
@@ -269,7 +269,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     } on UseCaseValidationException catch (error) {
       emit(
         _applyUseCaseValidation(validated, error).copyWith(
-          submissionStatus: StarnyxFormSubmissionStatus.failure,
+          submissionStatus: AsyncStatus.failure,
           submissionErrorMessage: error.message,
           savedStarnyx: null,
           deletionErrorMessage: null,
@@ -278,7 +278,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     } catch (_) {
       emit(
         validated.copyWith(
-          submissionStatus: StarnyxFormSubmissionStatus.failure,
+          submissionStatus: AsyncStatus.failure,
           submissionErrorMessage:
               'Unable to save the StarNyx right now. Please try again.',
           savedStarnyx: null,
@@ -298,7 +298,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
 
     emit(
       state.copyWith(
-        deletionStatus: StarnyxFormDeletionStatus.inProgress,
+        deletionStatus: AsyncStatus.inProgress,
         deletionErrorMessage: null,
         deletedStarnyxId: null,
         submissionErrorMessage: null,
@@ -310,7 +310,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
       await _deleteStarNyxUseCase(_initialStarnyx.id, now: _nowBuilder());
       emit(
         state.copyWith(
-          deletionStatus: StarnyxFormDeletionStatus.success,
+          deletionStatus: AsyncStatus.success,
           deletedStarnyxId: _initialStarnyx.id,
           deletionErrorMessage: null,
         ),
@@ -318,7 +318,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     } catch (_) {
       emit(
         state.copyWith(
-          deletionStatus: StarnyxFormDeletionStatus.failure,
+          deletionStatus: AsyncStatus.failure,
           deletionErrorMessage:
               'Unable to delete the StarNyx right now. Please try again.',
         ),
@@ -341,10 +341,10 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
   /// Clears success/failure state so the submit button can be re-engaged.
   StarnyxFormState _resetSubmissionState(StarnyxFormState candidate) {
     return candidate.copyWith(
-      submissionStatus: StarnyxFormSubmissionStatus.idle,
+      submissionStatus: AsyncStatus.idle,
       submissionErrorMessage: null,
       savedStarnyx: null,
-      deletionStatus: StarnyxFormDeletionStatus.idle,
+      deletionStatus: AsyncStatus.idle,
       deletedStarnyxId: null,
       deletionErrorMessage: null,
     );

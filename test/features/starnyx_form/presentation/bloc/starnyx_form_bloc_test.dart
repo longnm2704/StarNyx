@@ -5,7 +5,6 @@ import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_bloc.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_event.dart';
-import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_state.dart';
 
 /// Tests for StarnyxFormBloc covering:
 /// - Create and edit mode initialization
@@ -197,7 +196,7 @@ void main() {
     bloc.add(const StarnyxFormSubmitted());
     await pumpEventQueue(times: 10);
 
-    expect(bloc.state.submissionStatus, StarnyxFormSubmissionStatus.success);
+    expect(bloc.state.submissionStatus, AsyncStatus.success);
     expect(bloc.state.savedStarnyx, isNotNull);
     expect(bloc.state.savedStarnyx?.title, 'Read 20 pages');
     expect(bloc.state.savedStarnyx?.description, 'Before bed');
@@ -223,7 +222,7 @@ void main() {
       bloc.add(const StarnyxFormSubmitted());
       await pumpEventQueue(times: 10);
 
-      expect(bloc.state.submissionStatus, StarnyxFormSubmissionStatus.success);
+      expect(bloc.state.submissionStatus, AsyncStatus.success);
       expect(bloc.state.savedStarnyx?.reminderTime, '21:20');
     },
   );
@@ -260,7 +259,7 @@ void main() {
     bloc.add(const StarnyxFormSubmitted());
     await pumpEventQueue(times: 10);
 
-    expect(bloc.state.submissionStatus, StarnyxFormSubmissionStatus.success);
+    expect(bloc.state.submissionStatus, AsyncStatus.success);
     expect(bloc.state.savedStarnyx?.id, 'habit-1');
     expect(bloc.state.savedStarnyx?.title, 'Hydrate Daily');
   });
@@ -279,7 +278,7 @@ void main() {
     bloc.add(const StarnyxFormSubmitted());
     await pumpEventQueue(times: 10);
 
-    expect(bloc.state.submissionStatus, StarnyxFormSubmissionStatus.success);
+    expect(bloc.state.submissionStatus, AsyncStatus.success);
     expect(bloc.state.savedStarnyx?.reminderEnabled, isFalse);
     expect(bloc.state.savedStarnyx?.reminderTime, isNull);
   });
@@ -302,7 +301,7 @@ void main() {
       bloc.add(const StarnyxFormSubmitted());
       await pumpEventQueue();
 
-      expect(bloc.state.submissionStatus, StarnyxFormSubmissionStatus.idle);
+      expect(bloc.state.submissionStatus, AsyncStatus.idle);
       expect(bloc.state.titleError, StarnyxFormTitleError.empty);
       expect(await repository.getAllStarnyxs(), isEmpty);
     },
@@ -326,7 +325,7 @@ void main() {
     bloc.add(const StarnyxFormSubmitted());
     await pumpEventQueue(times: 10);
 
-    expect(bloc.state.submissionStatus, StarnyxFormSubmissionStatus.idle);
+    expect(bloc.state.submissionStatus, AsyncStatus.idle);
     expect(bloc.state.startDateError, StarnyxFormStartDateError.inFuture);
   });
 
@@ -344,7 +343,7 @@ void main() {
     bloc.add(const StarnyxFormSubmitted());
     await pumpEventQueue(times: 10);
 
-    expect(bloc.state.submissionStatus, StarnyxFormSubmissionStatus.idle);
+    expect(bloc.state.submissionStatus, AsyncStatus.idle);
     expect(bloc.state.startDateError, StarnyxFormStartDateError.tooFarInPast);
   });
 
@@ -379,7 +378,7 @@ void main() {
     bloc.add(const StarnyxFormDeleted());
     await pumpEventQueue(times: 10);
 
-    expect(bloc.state.deletionStatus, StarnyxFormDeletionStatus.success);
+    expect(bloc.state.deletionStatus, AsyncStatus.success);
     expect(bloc.state.deletedStarnyxId, 'habit-1');
     expect(await repository.getStarnyxById('habit-1'), isNull);
     expect(
@@ -399,7 +398,7 @@ void main() {
     bloc.add(const StarnyxFormDeleted());
     await pumpEventQueue();
 
-    expect(bloc.state.deletionStatus, StarnyxFormDeletionStatus.idle);
+    expect(bloc.state.deletionStatus, AsyncStatus.idle);
   });
 }
 

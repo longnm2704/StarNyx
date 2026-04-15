@@ -1,25 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:starnyx/core/constants/enums.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
-
-/// Determines whether the form is in create mode (new StarNyx) or edit mode (existing StarNyx).
-/// Used to display appropriate UI labels, error messages, and behavior.
-enum StarnyxFormMode { create, edit }
-
-/// Tracks the progress of form submission (idle → inProgress → success/failure).
-/// UI uses this to show loading spinners, disable buttons, or display success/error messages.
-enum StarnyxFormSubmissionStatus { idle, inProgress, success, failure }
-
-/// Tracks the progress of delete action in edit mode.
-enum StarnyxFormDeletionStatus { idle, inProgress, success, failure }
-
-/// Indicates validation errors for the title field.
-enum StarnyxFormTitleError { empty }
-
-/// Indicates validation errors for the start date field.
-enum StarnyxFormStartDateError { inFuture, tooFarInPast }
-
-/// Indicates validation errors for the reminder time field.
-enum StarnyxFormReminderTimeError { missing, invalid }
 
 /// Sentinel object used in copyWith() to distinguish null values from unmodified fields.
 const Object _unset = Object();
@@ -82,7 +63,7 @@ class StarnyxFormState extends Equatable {
   final StarnyxFormReminderTimeError? reminderTimeError;
 
   /// Current stage of the form submission process.
-  final StarnyxFormSubmissionStatus submissionStatus;
+  final AsyncStatus submissionStatus;
 
   /// The successfully saved StarNyx entity (only populated after successful submission).
   final StarNyx? savedStarnyx;
@@ -91,7 +72,7 @@ class StarnyxFormState extends Equatable {
   final String? submissionErrorMessage;
 
   /// Current stage of the delete process.
-  final StarnyxFormDeletionStatus deletionStatus;
+  final AsyncStatus deletionStatus;
 
   /// Deleted StarNyx id when the delete action succeeds.
   final String? deletedStarnyxId;
@@ -110,14 +91,13 @@ class StarnyxFormState extends Equatable {
   /// Convenience getter: true if the form can be submitted (all validations pass and no request in flight).
   /// UI uses this to enable/disable the submit button.
   bool get canSubmit =>
-      submissionStatus != StarnyxFormSubmissionStatus.inProgress &&
-      deletionStatus != StarnyxFormDeletionStatus.inProgress &&
+      submissionStatus != AsyncStatus.inProgress &&
+      deletionStatus != AsyncStatus.inProgress &&
       !hasValidationErrors &&
       title.trim().isNotEmpty;
 
   /// Convenience getter: true if delete action can run.
-  bool get canDelete =>
-      isEditing && deletionStatus != StarnyxFormDeletionStatus.inProgress;
+  bool get canDelete => isEditing && deletionStatus != AsyncStatus.inProgress;
 
   /// Creates a new state with specified fields replaced.
   /// Uses [_unset] sentinel to distinguish null from unmodified, enabling nullable fields to be explicitly set to null.
@@ -133,10 +113,10 @@ class StarnyxFormState extends Equatable {
     Object? titleError = _unset,
     Object? startDateError = _unset,
     Object? reminderTimeError = _unset,
-    StarnyxFormSubmissionStatus? submissionStatus,
+    AsyncStatus? submissionStatus,
     Object? savedStarnyx = _unset,
     Object? submissionErrorMessage = _unset,
-    StarnyxFormDeletionStatus? deletionStatus,
+    AsyncStatus? deletionStatus,
     Object? deletedStarnyxId = _unset,
     Object? deletionErrorMessage = _unset,
   }) {

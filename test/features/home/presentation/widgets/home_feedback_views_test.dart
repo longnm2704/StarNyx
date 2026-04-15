@@ -52,9 +52,7 @@ void main() {
             selectedDate: DateTime(2025, 12, 31),
             todayDate: DateTime(2026, 4, 19),
             viewedYear: 2025,
-            completedDatesForViewedYear: <DateTime>[
-              DateTime(2025, 12, 30),
-            ],
+            completedDatesForViewedYear: <DateTime>[DateTime(2025, 12, 30)],
             onCreatePressed: () {
               createPressed = true;
             },

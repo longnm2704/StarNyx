@@ -150,7 +150,7 @@ class _HomePageState extends State<HomePage> {
         listenWhen: (HomeState previous, HomeState current) =>
             previous.selectionFeedbackCount != current.selectionFeedbackCount,
         listener: (BuildContext context, HomeState state) {
-          if (state.selectionStatus == HomeSelectionStatus.failure) {
+          if (state.selectionStatus == AsyncStatus.failure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('home.switch_error_message'.tr())),
             );

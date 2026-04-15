@@ -14,12 +14,16 @@ class LoadStarNyxCompletionDatesForYearUseCase {
     final completions = await _completionRepository.getCompletionsForStarnyx(
       starnyxId,
     );
-    final uniqueDates = completions
-        .where((completion) => completion.completed && completion.date.year == year)
-        .map((completion) => DateUtils.dateOnly(completion.date))
-        .toSet()
-        .toList(growable: false)
-      ..sort((left, right) => left.compareTo(right));
+    final uniqueDates =
+        completions
+            .where(
+              (completion) =>
+                  completion.completed && completion.date.year == year,
+            )
+            .map((completion) => DateUtils.dateOnly(completion.date))
+            .toSet()
+            .toList(growable: false)
+          ..sort((left, right) => left.compareTo(right));
 
     return uniqueDates;
   }

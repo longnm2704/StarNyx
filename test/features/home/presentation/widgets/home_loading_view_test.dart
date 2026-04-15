@@ -15,22 +15,21 @@ void main() {
     },
   );
 
-  testWidgets(
-    'home loading stars drift over time instead of staying fixed',
-    (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: HomeLoadingView())),
-      );
+  testWidgets('home loading stars drift over time instead of staying fixed', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: HomeLoadingView())),
+    );
 
-      final starFinder = _findStarImageBySize(48);
-      final before = tester.getCenter(starFinder);
+    final starFinder = _findStarImageBySize(48);
+    final before = tester.getCenter(starFinder);
 
-      await tester.pump(const Duration(milliseconds: 700));
+    await tester.pump(const Duration(milliseconds: 700));
 
-      final after = tester.getCenter(starFinder);
-      expect(after, isNot(before));
-    },
-  );
+    final after = tester.getCenter(starFinder);
+    expect(after, isNot(before));
+  });
 }
 
 Finder _findStarImage() {
