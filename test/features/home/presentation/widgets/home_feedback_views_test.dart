@@ -4,7 +4,7 @@ import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:starnyx/features/home/presentation/widgets/returning_placeholder_view.dart';
+import 'package:starnyx/features/home/presentation/widgets/active_starnyx_home_view.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -46,15 +46,22 @@ void main() {
 
       await tester.pumpWidget(
         _buildLocalizedApp(
-          ReturningPlaceholderView(
+          ActiveStarnyxHomeView(
             starnyxs: starnyxs,
             activeStarnyxId: '1',
+            selectedDate: DateTime(2025, 12, 31),
+            todayDate: DateTime(2026, 4, 19),
+            viewedYear: 2025,
+            completedDatesForViewedYear: <DateTime>[
+              DateTime(2025, 12, 30),
+            ],
             onCreatePressed: () {
               createPressed = true;
             },
             onEditPressed: (starnyx) {
               edited = starnyx;
             },
+            onDateSelected: (_) {},
             onSelectPressed: (starnyx) {
               edited = starnyx;
             },
@@ -67,6 +74,7 @@ void main() {
       expect(find.text('Hydrate'), findsOneWidget);
       expect(find.text('Drink water'), findsOneWidget);
       expect(find.text('Swipe up'), findsOneWidget);
+      expect(find.text('2025'), findsOneWidget);
       expect(find.text('Reset to current date'), findsOneWidget);
       expect(
         find.byKey(const Key('home-star-grid-placeholder')),

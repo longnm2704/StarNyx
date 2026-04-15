@@ -1,12 +1,14 @@
 import 'dart:math' as math;
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:starnyx/core/constants/core_constants.dart';
-import 'package:starnyx/core/widgets/app_svg_icon.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
+import 'package:starnyx/core/widgets/app_svg_icon.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
+
+const int homeGridColumnCount = 18;
 
 int homeGridDayCountForYear(int year) {
   return DateTime.utc(
@@ -14,6 +16,10 @@ int homeGridDayCountForYear(int year) {
     1,
     1,
   ).difference(DateTime.utc(year, 1, 1)).inDays;
+}
+
+DateTime homeGridDateForIndex(int year, int index) {
+  return DateTime.utc(year, 1, 1).add(Duration(days: index));
 }
 
 List<Color> homeShellGradientColors(String starnyxHex) {
@@ -41,6 +47,7 @@ class HomeShellView extends StatelessWidget {
     required this.onPreviousDayPressed,
     required this.onNextDayPressed,
     required this.onJumpToTodayPressed,
+    required this.onDateSelected,
     required this.onYearPressed,
     required this.onQuickActionsPressed,
     this.footer,
@@ -56,6 +63,7 @@ class HomeShellView extends StatelessWidget {
   final VoidCallback? onPreviousDayPressed;
   final VoidCallback? onNextDayPressed;
   final VoidCallback? onJumpToTodayPressed;
+  final ValueChanged<DateTime>? onDateSelected;
   final VoidCallback? onYearPressed;
   final VoidCallback? onQuickActionsPressed;
   final Widget? footer;
@@ -152,6 +160,7 @@ class HomeShellView extends StatelessWidget {
                           completedDatesForViewedYear:
                               completedDatesForViewedYear,
                           accentColor: accentColor,
+                          onDateSelected: onDateSelected,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.md),
@@ -214,6 +223,7 @@ class _HomeStarGridPlaceholder extends StatelessWidget {
     required this.todayDate,
     required this.completedDatesForViewedYear,
     required this.accentColor,
+    required this.onDateSelected,
   });
 
   final int viewedYear;
@@ -221,8 +231,8 @@ class _HomeStarGridPlaceholder extends StatelessWidget {
   final DateTime todayDate;
   final List<DateTime> completedDatesForViewedYear;
   final Color accentColor;
+  final ValueChanged<DateTime>? onDateSelected;
 
-  static const int _columnCount = 18;
   static const double _gridSpacing = 4;
 
   @override
@@ -244,27 +254,24 @@ class _HomeStarGridPlaceholder extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final double horizontalSpacing = (_columnCount - 1) * _gridSpacing;
+        final double horizontalSpacing =
+            (homeGridColumnCount - 1) * _gridSpacing;
         final double cellExtent =
-            (constraints.maxWidth - horizontalSpacing) / _columnCount;
+            (constraints.maxWidth - horizontalSpacing) / homeGridColumnCount;
         final double effectiveCellExtent = math.max(8, cellExtent);
 
         return GridView.builder(
           key: const Key('home-star-grid-placeholder'),
           padding: EdgeInsets.zero,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: _columnCount,
+            crossAxisCount: homeGridColumnCount,
             crossAxisSpacing: _gridSpacing,
             mainAxisSpacing: _gridSpacing,
             mainAxisExtent: effectiveCellExtent,
           ),
           itemCount: daysInYear,
           itemBuilder: (BuildContext context, int index) {
-            final DateTime date = DateTime.utc(
-              viewedYear,
-              1,
-              1,
-            ).add(Duration(days: index));
+            final DateTime date = homeGridDateForIndex(viewedYear, index);
             final bool isSelected = _isSameDate(date, normalizedSelectedDate);
             final bool isToday = _isSameDate(date, normalizedTodayDate);
             final bool isCompleted = completedDayIndexes.contains(index);
@@ -280,6 +287,9 @@ class _HomeStarGridPlaceholder extends StatelessWidget {
                 isSelected: isSelected,
                 isToday: isToday,
                 accentColor: accentColor,
+                onTap: onDateSelected == null
+                    ? null
+                    : () => onDateSelected!(date),
                 selectedKey: isSelected
                     ? const Key('home-selected-star-cell')
                     : null,
@@ -317,6 +327,7 @@ class _GridStarCell extends StatelessWidget {
     required this.isSelected,
     required this.isToday,
     required this.accentColor,
+    required this.onTap,
     super.key,
     this.selectedKey,
     this.completedKey,
@@ -327,6 +338,7 @@ class _GridStarCell extends StatelessWidget {
   final bool isSelected;
   final bool isToday;
   final Color accentColor;
+  final VoidCallback? onTap;
   final Key? selectedKey;
   final Key? completedKey;
 
@@ -342,19 +354,26 @@ class _GridStarCell extends StatelessWidget {
       width: size,
       height: size,
       key: selectedKey,
-      child: Container(
-        key: completedKey,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(4)),
-        child: Center(
-          child: AppSvgIcon(
-            assetPath: isCompleted || isSelected
-                ? 'assets/icons/ic_star_active.svg'
-                : 'assets/icons/ic_star.svg',
-            size: iconSize,
-            color: isCompleted || isSelected
-                ? accentColor.withValues(alpha: isSelected ? 0.98 : 0.88)
-                : AppColors.white.withValues(alpha: 0.28),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(4),
+          onTap: onTap,
+          child: Container(
+            key: completedKey,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(4)),
+            child: Center(
+              child: AppSvgIcon(
+                assetPath: isCompleted || isSelected
+                    ? 'assets/icons/ic_star_active.svg'
+                    : 'assets/icons/ic_star.svg',
+                size: iconSize,
+                color: isCompleted || isSelected
+                    ? accentColor.withValues(alpha: isSelected ? 0.98 : 0.88)
+                    : AppColors.white.withValues(alpha: 0.28),
+              ),
+            ),
           ),
         ),
       ),

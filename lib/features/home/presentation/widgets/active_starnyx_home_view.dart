@@ -3,33 +3,45 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 
+import 'home_shell_view.dart';
 import 'home_swipe_up_hint.dart';
 import 'constellation_switcher_sheet.dart';
-import 'home_shell_view.dart';
 
-class ReturningPlaceholderView extends StatefulWidget {
-  const ReturningPlaceholderView({
+class ActiveStarnyxHomeView extends StatefulWidget {
+  const ActiveStarnyxHomeView({
     required this.starnyxs,
     required this.activeStarnyxId,
+    required this.selectedDate,
+    required this.todayDate,
+    required this.viewedYear,
+    required this.completedDatesForViewedYear,
     required this.onCreatePressed,
     required this.onEditPressed,
+    required this.onDateSelected,
     required this.onSelectPressed,
+    this.progressStats,
     super.key,
   });
 
   final List<StarNyx> starnyxs;
   final String? activeStarnyxId;
+  final DateTime selectedDate;
+  final DateTime todayDate;
+  final int viewedYear;
+  final List<DateTime> completedDatesForViewedYear;
   final FutureOr<void> Function() onCreatePressed;
   final FutureOr<void> Function(StarNyx) onEditPressed;
+  final ValueChanged<DateTime> onDateSelected;
   final ValueChanged<StarNyx> onSelectPressed;
+  final StarNyxProgressStats? progressStats;
 
   @override
-  State<ReturningPlaceholderView> createState() =>
-      _ReturningPlaceholderViewState();
+  State<ActiveStarnyxHomeView> createState() => _ActiveStarnyxHomeViewState();
 }
 
-class _ReturningPlaceholderViewState extends State<ReturningPlaceholderView> {
+class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
   bool _isOpeningSheet = false;
 
   Future<void> _waitForSheetTransition() {
@@ -118,14 +130,15 @@ class _ReturningPlaceholderViewState extends State<ReturningPlaceholderView> {
       onVerticalDragEnd: _handleVerticalDragEnd,
       child: HomeShellView(
         activeStarnyx: activeStarnyx,
-        selectedDate: DateTime.now(),
-        todayDate: DateTime.now(),
-        viewedYear: DateTime.now().year,
-        completedDatesForViewedYear: const <DateTime>[],
-        progressStats: null,
+        selectedDate: widget.selectedDate,
+        todayDate: widget.todayDate,
+        viewedYear: widget.viewedYear,
+        completedDatesForViewedYear: widget.completedDatesForViewedYear,
+        progressStats: widget.progressStats,
         onPreviousDayPressed: null,
         onNextDayPressed: null,
         onJumpToTodayPressed: null,
+        onDateSelected: widget.onDateSelected,
         onYearPressed: null,
         onQuickActionsPressed: _openConstellationSheet,
         footer: Center(

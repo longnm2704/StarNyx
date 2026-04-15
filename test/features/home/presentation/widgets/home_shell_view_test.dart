@@ -1,10 +1,10 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:starnyx/domain/entities/starnyx.dart';
+import 'package:starnyx/core/widgets/app_svg_icon.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
-import 'package:starnyx/core/widgets/app_svg_icon.dart';
-import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 import 'package:starnyx/features/home/presentation/widgets/home_shell_view.dart';
 
@@ -42,6 +42,7 @@ void main() {
             onPreviousDayPressed: () {},
             onNextDayPressed: () {},
             onJumpToTodayPressed: () {},
+            onDateSelected: (_) {},
             onYearPressed: null,
             onQuickActionsPressed: null,
           ),
@@ -91,6 +92,17 @@ void main() {
   test('home shell accent color follows the active starnyx color', () {
     expect(homeShellAccentColor('#2360E9'), const Color(0xFF2360E9));
     expect(homeShellAccentColor('#DE7B30'), const Color(0xFFDE7B30));
+  });
+
+  test('home grid keeps the yearly layout fixed at 18 columns', () {
+    expect(homeGridColumnCount, 18);
+  });
+
+  test('home grid date mapping follows the viewed year day indexes', () {
+    expect(homeGridDateForIndex(2026, 0), DateTime.utc(2026, 1, 1));
+    expect(homeGridDateForIndex(2026, 99), DateTime.utc(2026, 4, 10));
+    expect(homeGridDateForIndex(2026, 364), DateTime.utc(2026, 12, 31));
+    expect(homeGridDateForIndex(2024, 365), DateTime.utc(2024, 12, 31));
   });
 }
 
