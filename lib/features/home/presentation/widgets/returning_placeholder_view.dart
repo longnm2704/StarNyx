@@ -2,13 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
-import 'package:starnyx/core/widgets/core_widgets.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
 import 'home_swipe_up_hint.dart';
-import 'active_starnyx_spotlight.dart';
 import 'constellation_switcher_sheet.dart';
+import 'home_shell_view.dart';
 
 class ReturningPlaceholderView extends StatefulWidget {
   const ReturningPlaceholderView({
@@ -118,51 +116,22 @@ class _ReturningPlaceholderViewState extends State<ReturningPlaceholderView> {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onVerticalDragEnd: _handleVerticalDragEnd,
-      child: CosmicBackground(
-        bottomGlowColor: AppColors.accentOrange,
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              return Align(
-                alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.pageHorizontal,
-                    AppSpacing.pageVertical,
-                    AppSpacing.pageHorizontal,
-                    0,
-                  ),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight:
-                          constraints.maxHeight - AppSpacing.pageVertical,
-                      maxWidth: AppLayout.contentMaxWidth,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        AppSectionTitle(
-                          title: 'home.returning_title'.tr(),
-                          subtitle: 'home.returning_subtitle'.tr(
-                            args: <String>[widget.starnyxs.length.toString()],
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xxl),
-                        ActiveStarnyxSpotlight(activeStarnyx: activeStarnyx),
-                        const Spacer(),
-                        Center(
-                          child: HomeSwipeUpHint(
-                            onTap: _openConstellationSheet,
-                            isBusy: _isOpeningSheet,
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
+      child: HomeShellView(
+        activeStarnyx: activeStarnyx,
+        selectedDate: DateTime.now(),
+        todayDate: DateTime.now(),
+        viewedYear: DateTime.now().year,
+        completedDatesForViewedYear: const <DateTime>[],
+        progressStats: null,
+        onPreviousDayPressed: null,
+        onNextDayPressed: null,
+        onJumpToTodayPressed: null,
+        onYearPressed: null,
+        onQuickActionsPressed: _openConstellationSheet,
+        footer: Center(
+          child: HomeSwipeUpHint(
+            onTap: _openConstellationSheet,
+            isBusy: _isOpeningSheet,
           ),
         ),
       ),

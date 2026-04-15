@@ -64,10 +64,14 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 200));
 
-      expect(find.text('Active Constellation'), findsOneWidget);
-      expect(find.text('Hydrate'), findsWidgets);
+      expect(find.text('Hydrate'), findsOneWidget);
+      expect(find.text('Drink water'), findsOneWidget);
       expect(find.text('Swipe up'), findsOneWidget);
-      expect(find.text('New'), findsNothing);
+      expect(find.text('Reset to current date'), findsOneWidget);
+      expect(
+        find.byKey(const Key('home-star-grid-placeholder')),
+        findsOneWidget,
+      );
 
       await tester.tap(find.text('Swipe up'));
       await tester.pump(const Duration(milliseconds: 220));

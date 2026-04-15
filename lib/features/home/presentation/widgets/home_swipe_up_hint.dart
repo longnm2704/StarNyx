@@ -23,12 +23,12 @@ class HomeSwipeUpHint extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Transform.translate(
-              offset: const Offset(0, -10),
+              offset: const Offset(0, -4),
               child: AppSvgIcon(
                 assetPath: 'assets/icons/ic_chevron_up.svg',
                 color: AppColors.textMuted.withValues(alpha: 0.48),
                 size: 20,
-                semanticsLabel: 'Swipe up',
+                semanticsLabel: 'home.swipe_hint'.tr(),
               ),
             ),
             Text(
