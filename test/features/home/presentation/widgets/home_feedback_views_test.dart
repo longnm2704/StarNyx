@@ -43,6 +43,7 @@ void main() {
       ];
       StarNyx? edited;
       var createPressed = false;
+      var checkInPressed = false;
 
       await tester.pumpWidget(
         _buildLocalizedApp(
@@ -63,6 +64,10 @@ void main() {
             onSelectPressed: (starnyx) {
               edited = starnyx;
             },
+            onToggleCompletionPressed: () {
+              checkInPressed = true;
+            },
+            isCheckingIn: false,
           ),
         ),
       );
@@ -78,6 +83,9 @@ void main() {
         find.byKey(const Key('home-star-grid-placeholder')),
         findsOneWidget,
       );
+      await tester.tap(find.byKey(const Key('home-selected-date-button')));
+      await tester.pump();
+      expect(checkInPressed, isTrue);
 
       await tester.tap(find.text('Swipe up'));
       await tester.pump(const Duration(milliseconds: 220));

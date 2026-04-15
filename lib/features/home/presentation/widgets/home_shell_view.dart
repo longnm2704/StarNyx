@@ -40,6 +40,8 @@ class HomeShellView extends StatelessWidget {
     required this.onDateSelected,
     required this.onYearPressed,
     required this.onQuickActionsPressed,
+    this.onToggleCompletionPressed,
+    this.isCheckingIn = false,
     this.footer,
     super.key,
   });
@@ -56,6 +58,8 @@ class HomeShellView extends StatelessWidget {
   final ValueChanged<DateTime>? onDateSelected;
   final VoidCallback? onYearPressed;
   final VoidCallback? onQuickActionsPressed;
+  final VoidCallback? onToggleCompletionPressed;
+  final bool isCheckingIn;
   final Widget? footer;
 
   @override
@@ -177,6 +181,8 @@ class HomeShellView extends StatelessWidget {
                         onPreviousDayPressed: onPreviousDayPressed,
                         onNextDayPressed: onNextDayPressed,
                         accentColor: accentColor,
+                        onSelectedDatePressed: onToggleCompletionPressed,
+                        isCheckingIn: isCheckingIn,
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(

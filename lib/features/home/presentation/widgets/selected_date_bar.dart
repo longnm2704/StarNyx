@@ -7,6 +7,8 @@ class SelectedDateBar extends StatelessWidget {
     required this.onPreviousDayPressed,
     required this.onNextDayPressed,
     required this.accentColor,
+    this.onSelectedDatePressed,
+    this.isCheckingIn = false,
     super.key,
   });
 
@@ -14,6 +16,8 @@ class SelectedDateBar extends StatelessWidget {
   final VoidCallback? onPreviousDayPressed;
   final VoidCallback? onNextDayPressed;
   final Color accentColor;
+  final VoidCallback? onSelectedDatePressed;
+  final bool isCheckingIn;
 
   @override
   Widget build(BuildContext context) {
@@ -28,19 +32,29 @@ class SelectedDateBar extends StatelessWidget {
         ),
         const SizedBox(width: AppSpacing.md),
         Expanded(
-          child: Container(
-            height: 44,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Color.lerp(accentColor, AppColors.black, 0.82),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              key: const Key('home-selected-date-button'),
+              onTap: isCheckingIn ? null : onSelectedDatePressed,
               borderRadius: BorderRadius.circular(AppRadius.pill),
-              border: Border.all(color: accentColor.withValues(alpha: 0.22)),
-            ),
-            child: Text(
-              selectedDateLabel,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: accentColor.withValues(alpha: 0.58),
-                fontWeight: FontWeight.w700,
+              child: Container(
+                height: 44,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Color.lerp(accentColor, AppColors.black, 0.82),
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                  border: Border.all(
+                    color: accentColor.withValues(alpha: 0.22),
+                  ),
+                ),
+                child: Text(
+                  selectedDateLabel,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: accentColor.withValues(alpha: 0.58),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
             ),
           ),

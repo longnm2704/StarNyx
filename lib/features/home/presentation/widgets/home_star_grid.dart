@@ -78,9 +78,6 @@ class HomeStarGrid extends StatelessWidget {
               todayDate: normalizedTodayDate,
               isCompleted: completedDayIndexes.contains(index),
             );
-            final bool canSelectDay =
-                dayState != HomeGridStarDayState.beforeStart &&
-                dayState != HomeGridStarDayState.future;
 
             return KeyedSubtree(
               key: index == 0
@@ -93,7 +90,7 @@ class HomeStarGrid extends StatelessWidget {
                 isSelected: isSelected,
                 isToday: isToday,
                 accentColor: accentColor,
-                onTap: onDateSelected == null || !canSelectDay
+                onTap: onDateSelected == null
                     ? null
                     : () => onDateSelected!(date),
                 selectedKey: isSelected
@@ -186,11 +183,12 @@ class _GridStarCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double iconSize = isToday
-        ? size * 0.94
-        : isSelected
-        ? size * 0.84
-        : size * 0.72;
+    final double sizeMultiplier = isToday
+        ? 1.5
+        : dayState == HomeGridStarDayState.completed
+        ? 1.2
+        : 1.0;
+    final double iconSize = (size * 0.62 * sizeMultiplier).toDouble();
 
     return SizedBox(
       width: size,
@@ -207,29 +205,17 @@ class _GridStarCell extends StatelessWidget {
             decoration: BoxDecoration(
               color: isSelected ? accentColor.withValues(alpha: 0.14) : null,
               borderRadius: BorderRadius.circular(4),
-              border: isSelected
+              border: isSelected && !isToday
                   ? Border.all(color: accentColor.withValues(alpha: 0.32))
                   : null,
             ),
             child: Center(
-              child: DecoratedBox(
+              child: SizedBox(
                 key: todayKey,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: isToday
-                      ? Border.all(
-                          color: accentColor.withValues(alpha: 0.8),
-                          width: 1.4,
-                        )
-                      : null,
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(isToday ? 1.2 : 0),
-                  child: AppSvgIcon(
-                    assetPath: _starAssetPath(),
-                    size: iconSize,
-                    color: _starColor(),
-                  ),
+                child: AppSvgIcon(
+                  assetPath: _starAssetPath(),
+                  size: iconSize,
+                  color: _starColor(),
                 ),
               ),
             ),

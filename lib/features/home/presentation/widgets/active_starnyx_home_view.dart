@@ -21,6 +21,8 @@ class ActiveStarnyxHomeView extends StatefulWidget {
     required this.onEditPressed,
     required this.onDateSelected,
     required this.onSelectPressed,
+    required this.onToggleCompletionPressed,
+    required this.isCheckingIn,
     this.progressStats,
     super.key,
   });
@@ -35,6 +37,8 @@ class ActiveStarnyxHomeView extends StatefulWidget {
   final FutureOr<void> Function(StarNyx) onEditPressed;
   final ValueChanged<DateTime> onDateSelected;
   final ValueChanged<StarNyx> onSelectPressed;
+  final VoidCallback onToggleCompletionPressed;
+  final bool isCheckingIn;
   final StarNyxProgressStats? progressStats;
 
   @override
@@ -141,6 +145,8 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
         onDateSelected: widget.onDateSelected,
         onYearPressed: null,
         onQuickActionsPressed: _openConstellationSheet,
+        onToggleCompletionPressed: widget.onToggleCompletionPressed,
+        isCheckingIn: widget.isCheckingIn,
         footer: Center(
           child: HomeSwipeUpHint(
             onTap: _openConstellationSheet,
