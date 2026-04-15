@@ -5,16 +5,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:starnyx/domain/usecases/load_starnyx_completion_dates_for_year_use_case.dart';
-import 'package:starnyx/domain/usecases/load_starnyx_progress_stats_use_case.dart';
 import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
-import 'package:starnyx/domain/usecases/toggle_completion_use_case.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
+import 'package:starnyx/domain/usecases/toggle_completion_use_case.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_event.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_state.dart';
 import 'package:starnyx/domain/usecases/load_active_starnyx_use_case.dart';
 import 'package:starnyx/domain/usecases/select_active_starnyx_use_case.dart';
 import 'package:starnyx/features/home/presentation/widgets/home_widgets.dart';
+import 'package:starnyx/domain/usecases/load_starnyx_progress_stats_use_case.dart';
+import 'package:starnyx/domain/usecases/load_starnyx_completion_dates_for_year_use_case.dart';
 import 'package:starnyx/features/starnyx_form/presentation/pages/create_starnyx_bottom_sheet.dart';
 
 // Root screen that shows the first-run welcome state until the real home flow lands.
@@ -172,12 +172,20 @@ class _HomePageState extends State<HomePage> {
                 return FirstRunWelcomeView(onCreatePressed: _onCreatePressed);
               }
 
-              return ReturningPlaceholderView(
+              return ActiveStarnyxHomeView(
                 starnyxs: state.starnyxs,
                 activeStarnyxId: state.activeStarnyxId,
+                selectedDate: state.selectedDate,
+                todayDate: DateTime.now(),
+                viewedYear: state.viewedYear,
+                completedDatesForViewedYear: state.completedDatesForViewedYear,
                 onCreatePressed: _onCreatePressed,
                 onEditPressed: _onEditPressed,
+                onDateSelected: (DateTime date) {
+                  _homeBloc.add(HomeDaySelected(date));
+                },
                 onSelectPressed: _onSelectPressed,
+                progressStats: state.progressStats,
               );
             },
           ),
