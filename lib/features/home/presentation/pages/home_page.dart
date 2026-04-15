@@ -36,20 +36,20 @@ class HomePage extends StatefulWidget {
        _loadActiveStarNyxUseCase =
            loadActiveStarNyxUseCase ??
            serviceLocator<LoadActiveStarNyxUseCase>(),
-        _selectActiveStarNyxUseCase =
-            selectActiveStarNyxUseCase ??
-            serviceLocator<SelectActiveStarNyxUseCase>(),
-        _loadStarNyxProgressStatsUseCase =
-            loadStarNyxProgressStatsUseCase ??
-            serviceLocator<LoadStarNyxProgressStatsUseCase>(),
-        _loadStarNyxCompletionDatesForYearUseCase =
-            loadStarNyxCompletionDatesForYearUseCase ??
-            serviceLocator<LoadStarNyxCompletionDatesForYearUseCase>(),
-        _toggleCompletionUseCase =
-            toggleCompletionUseCase ?? serviceLocator<ToggleCompletionUseCase>(),
-        _onCreatePressed = onCreatePressed,
-        _onEditPressed = onEditPressed,
-        _onSelectPressed = onSelectPressed;
+       _selectActiveStarNyxUseCase =
+           selectActiveStarNyxUseCase ??
+           serviceLocator<SelectActiveStarNyxUseCase>(),
+       _loadStarNyxProgressStatsUseCase =
+           loadStarNyxProgressStatsUseCase ??
+           serviceLocator<LoadStarNyxProgressStatsUseCase>(),
+       _loadStarNyxCompletionDatesForYearUseCase =
+           loadStarNyxCompletionDatesForYearUseCase ??
+           serviceLocator<LoadStarNyxCompletionDatesForYearUseCase>(),
+       _toggleCompletionUseCase =
+           toggleCompletionUseCase ?? serviceLocator<ToggleCompletionUseCase>(),
+       _onCreatePressed = onCreatePressed,
+       _onEditPressed = onEditPressed,
+       _onSelectPressed = onSelectPressed;
 
   final LoadStarnyxsUseCase _loadStarnyxsUseCase;
   final LoadActiveStarNyxUseCase _loadActiveStarNyxUseCase;
