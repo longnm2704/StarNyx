@@ -1,26 +1,16 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
-import 'package:starnyx/core/widgets/app_svg_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
-const int homeGridColumnCount = 18;
+import 'home_star_grid.dart';
+import 'selected_date_bar.dart';
+import 'home_year_summary_row.dart';
 
-int homeGridDayCountForYear(int year) {
-  return DateTime.utc(
-    year + 1,
-    1,
-    1,
-  ).difference(DateTime.utc(year, 1, 1)).inDays;
-}
-
-DateTime homeGridDateForIndex(int year, int index) {
-  return DateTime.utc(year, 1, 1).add(Duration(days: index));
-}
+export 'home_grid_utils.dart'
+    show homeGridColumnCount, homeGridDateForIndex, homeGridDayCountForYear;
 
 List<Color> homeShellGradientColors(String starnyxHex) {
   final Color accent = starnyxColorFromHex(starnyxHex);
@@ -92,7 +82,7 @@ class HomeShellView extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: gradientColors,
-          stops: <double>[0.0, 0.26, 0.54, 1.0],
+          stops: const <double>[0.0, 0.26, 0.54, 1.0],
         ),
       ),
       child: Stack(
@@ -153,10 +143,11 @@ class HomeShellView extends StatelessWidget {
                       ],
                       const SizedBox(height: AppSpacing.lg),
                       Expanded(
-                        child: _HomeStarGridPlaceholder(
+                        child: HomeStarGrid(
                           viewedYear: viewedYear,
                           selectedDate: selectedDate,
                           todayDate: todayDate,
+                          startDate: activeStarnyx.startDate,
                           completedDatesForViewedYear:
                               completedDatesForViewedYear,
                           accentColor: accentColor,
@@ -164,7 +155,7 @@ class HomeShellView extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      _HomeYearSummaryRow(
+                      HomeYearSummaryRow(
                         viewedYear: viewedYear,
                         daysLeft: daysLeft,
                         onYearPressed: onYearPressed,
@@ -181,7 +172,7 @@ class HomeShellView extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      _SelectedDateBar(
+                      SelectedDateBar(
                         selectedDateLabel: selectedDateLabel,
                         onPreviousDayPressed: onPreviousDayPressed,
                         onNextDayPressed: onNextDayPressed,
@@ -211,312 +202,6 @@ class HomeShellView extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _HomeStarGridPlaceholder extends StatelessWidget {
-  const _HomeStarGridPlaceholder({
-    required this.viewedYear,
-    required this.selectedDate,
-    required this.todayDate,
-    required this.completedDatesForViewedYear,
-    required this.accentColor,
-    required this.onDateSelected,
-  });
-
-  final int viewedYear;
-  final DateTime selectedDate;
-  final DateTime todayDate;
-  final List<DateTime> completedDatesForViewedYear;
-  final Color accentColor;
-  final ValueChanged<DateTime>? onDateSelected;
-
-  static const double _gridSpacing = 4;
-
-  @override
-  Widget build(BuildContext context) {
-    final int daysInYear = homeGridDayCountForYear(viewedYear);
-    final DateTime normalizedSelectedDate = DateTime.utc(
-      selectedDate.year,
-      selectedDate.month,
-      selectedDate.day,
-    );
-    final DateTime normalizedTodayDate = DateTime.utc(
-      todayDate.year,
-      todayDate.month,
-      todayDate.day,
-    );
-    final Set<int> completedDayIndexes = completedDatesForViewedYear
-        .map((DateTime date) => _dayOfYear(date) - 1)
-        .toSet();
-
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final double horizontalSpacing =
-            (homeGridColumnCount - 1) * _gridSpacing;
-        final double cellExtent =
-            (constraints.maxWidth - horizontalSpacing) / homeGridColumnCount;
-        final double effectiveCellExtent = math.max(8, cellExtent);
-
-        return GridView.builder(
-          key: const Key('home-star-grid-placeholder'),
-          padding: EdgeInsets.zero,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: homeGridColumnCount,
-            crossAxisSpacing: _gridSpacing,
-            mainAxisSpacing: _gridSpacing,
-            mainAxisExtent: effectiveCellExtent,
-          ),
-          itemCount: daysInYear,
-          itemBuilder: (BuildContext context, int index) {
-            final DateTime date = homeGridDateForIndex(viewedYear, index);
-            final bool isSelected = _isSameDate(date, normalizedSelectedDate);
-            final bool isToday = _isSameDate(date, normalizedTodayDate);
-            final bool isCompleted = completedDayIndexes.contains(index);
-
-            return KeyedSubtree(
-              key: index == 0
-                  ? ValueKey<String>('home-star-grid-day-count-$daysInYear')
-                  : null,
-              child: _GridStarCell(
-                key: ValueKey<String>('home-star-cell-$index'),
-                size: effectiveCellExtent,
-                isCompleted: isCompleted,
-                isSelected: isSelected,
-                isToday: isToday,
-                accentColor: accentColor,
-                onTap: onDateSelected == null
-                    ? null
-                    : () => onDateSelected!(date),
-                selectedKey: isSelected
-                    ? const Key('home-selected-star-cell')
-                    : null,
-                completedKey: isCompleted
-                    ? Key('home-completed-star-cell-$index')
-                    : null,
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  int _dayOfYear(DateTime date) {
-    return DateTime.utc(
-          date.year,
-          date.month,
-          date.day,
-        ).difference(DateTime.utc(date.year, 1, 1)).inDays +
-        1;
-  }
-
-  bool _isSameDate(DateTime left, DateTime right) {
-    return left.year == right.year &&
-        left.month == right.month &&
-        left.day == right.day;
-  }
-}
-
-class _GridStarCell extends StatelessWidget {
-  const _GridStarCell({
-    required this.size,
-    required this.isCompleted,
-    required this.isSelected,
-    required this.isToday,
-    required this.accentColor,
-    required this.onTap,
-    super.key,
-    this.selectedKey,
-    this.completedKey,
-  });
-
-  final double size;
-  final bool isCompleted;
-  final bool isSelected;
-  final bool isToday;
-  final Color accentColor;
-  final VoidCallback? onTap;
-  final Key? selectedKey;
-  final Key? completedKey;
-
-  @override
-  Widget build(BuildContext context) {
-    final double iconSize = isToday
-        ? size * 0.94
-        : isSelected
-        ? size * 0.84
-        : size * 0.72;
-
-    return SizedBox(
-      width: size,
-      height: size,
-      key: selectedKey,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(4),
-          onTap: onTap,
-          child: Container(
-            key: completedKey,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(4)),
-            child: Center(
-              child: AppSvgIcon(
-                assetPath: isCompleted || isSelected
-                    ? 'assets/icons/ic_star_active.svg'
-                    : 'assets/icons/ic_star.svg',
-                size: iconSize,
-                color: isCompleted || isSelected
-                    ? accentColor.withValues(alpha: isSelected ? 0.98 : 0.88)
-                    : AppColors.white.withValues(alpha: 0.28),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HomeYearSummaryRow extends StatelessWidget {
-  const _HomeYearSummaryRow({
-    required this.viewedYear,
-    required this.daysLeft,
-    required this.onYearPressed,
-  });
-
-  final int viewedYear;
-  final int daysLeft;
-  final VoidCallback? onYearPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Row(
-      children: <Widget>[
-        InkWell(
-          onTap: onYearPressed,
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            child: Row(
-              children: <Widget>[
-                Icon(
-                  Icons.chevron_left_rounded,
-                  size: 18,
-                  color: AppColors.textPrimary.withValues(alpha: 0.6),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Text(
-                  viewedYear.toString(),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textPrimary.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Icon(
-                  Icons.chevron_right_rounded,
-                  size: 18,
-                  color: AppColors.textPrimary.withValues(alpha: 0.6),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const Spacer(),
-        Text(
-          'home.days_left'.tr(args: <String>[daysLeft.toString()]),
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textPrimary.withValues(alpha: 0.7),
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SelectedDateBar extends StatelessWidget {
-  const _SelectedDateBar({
-    required this.selectedDateLabel,
-    required this.onPreviousDayPressed,
-    required this.onNextDayPressed,
-    required this.accentColor,
-  });
-
-  final String selectedDateLabel;
-  final VoidCallback? onPreviousDayPressed;
-  final VoidCallback? onNextDayPressed;
-  final Color accentColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Row(
-      children: <Widget>[
-        _DayChevronButton(
-          icon: Icons.chevron_left_rounded,
-          buttonKey: const Key('home-previous-day-button'),
-          onPressed: onPreviousDayPressed,
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Container(
-            height: 44,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Color.lerp(accentColor, AppColors.black, 0.82),
-              borderRadius: BorderRadius.circular(AppRadius.pill),
-              border: Border.all(color: accentColor.withValues(alpha: 0.22)),
-            ),
-            child: Text(
-              selectedDateLabel,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: accentColor.withValues(alpha: 0.58),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        _DayChevronButton(
-          icon: Icons.chevron_right_rounded,
-          buttonKey: const Key('home-next-day-button'),
-          onPressed: onNextDayPressed,
-        ),
-      ],
-    );
-  }
-}
-
-class _DayChevronButton extends StatelessWidget {
-  const _DayChevronButton({
-    required this.icon,
-    required this.buttonKey,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final Key buttonKey;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      key: buttonKey,
-      onPressed: onPressed,
-      icon: Icon(
-        icon,
-        color: AppColors.textPrimary.withValues(
-          alpha: onPressed == null ? 0.3 : 0.6,
-        ),
-        size: 26,
       ),
     );
   }
