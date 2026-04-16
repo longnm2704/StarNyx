@@ -14,6 +14,9 @@ class ConstellationSwitcherSheetAction {
   const ConstellationSwitcherSheetAction.editRequested(StarNyx starnyx)
     : this._(ConstellationSwitcherSheetActionType.editRequested, starnyx);
 
+  const ConstellationSwitcherSheetAction.journalRequested()
+    : this._(ConstellationSwitcherSheetActionType.journalRequested);
+
   final ConstellationSwitcherSheetActionType type;
   final StarNyx? starnyx;
 }
@@ -186,9 +189,12 @@ class _ConstellationSwitcherSheetState
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
-                      const Expanded(
+                      Expanded(
                         child: _SheetActionPill(
                           assetPath: 'assets/icons/ic_book.svg',
+                          onPressed: () => Navigator.of(context).pop(
+                            const ConstellationSwitcherSheetAction.journalRequested(),
+                          ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),

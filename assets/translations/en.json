@@ -73,5 +73,21 @@
     "delete_cancel": "Cancel",
     "delete_confirm": "Delete",
     "delete_error": "Unable to delete the StarNyx right now. Please try again."
+  },
+  "journal": {
+    "title": "Journal",
+    "today_hint": "Today's reflection...",
+    "save_button": "Add Note",
+    "empty_state": "No journal entries yet.",
+    "delete_confirm_title": "Delete this note?",
+    "delete_confirm_message": "This will permanently remove this journal entry.",
+    "delete_cancel": "Cancel",
+    "delete_confirm": "Delete",
+    "save_error_message": "Journal content is required.",
+    "save_general_error": "Unable to save the journal entry right now. Please try again.",
+    "delete_general_error": "Unable to delete the journal entry right now. Please try again.",
+    "no_entries": "No entries yet.",
+    "load_error_title": "Observation interrupted",
+    "load_error_message": "Unable to load journal entries right now."
   }
 }

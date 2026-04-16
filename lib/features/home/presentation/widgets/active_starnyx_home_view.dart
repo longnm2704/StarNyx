@@ -8,6 +8,7 @@ import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_state.dart';
+import 'package:starnyx/features/journal/presentation/pages/journal_bottom_sheet.dart';
 
 import 'home_shell_view.dart';
 import 'home_swipe_up_hint.dart';
@@ -162,6 +163,10 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
             break;
           }
           await Future.sync(() => widget.onEditPressed(starnyx));
+        case ConstellationSwitcherSheetActionType.journalRequested:
+          if (widget.activeStarnyxId != null) {
+            await showJournalBottomSheet(context, widget.activeStarnyxId!);
+          }
       }
       if (!mounted) {
         break;
