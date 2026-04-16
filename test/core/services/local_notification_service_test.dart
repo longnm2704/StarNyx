@@ -77,6 +77,13 @@ void main() {
     await service.cancelReminder('habit-1');
     expect(client.cancelled[0], client.cancelled[1]);
   });
+
+  test('cancel all reminders delegates to the client', () async {
+    await service.initialize();
+    await service.cancelAllReminders();
+
+    expect(client.cancelAllCount, 1);
+  });
 }
 
 StarNyx _sampleStarNyx({
@@ -101,6 +108,7 @@ class _FakeNotificationClient implements NotificationClient {
   int createChannelCount = 0;
   final List<_ScheduledRequest> scheduled = <_ScheduledRequest>[];
   final List<int> cancelled = <int>[];
+  int cancelAllCount = 0;
 
   @override
   Future<void> initialize(InitializationSettings settings) async {
@@ -136,6 +144,11 @@ class _FakeNotificationClient implements NotificationClient {
   @override
   Future<void> cancel(int id) async {
     cancelled.add(id);
+  }
+
+  @override
+  Future<void> cancelAll() async {
+    cancelAllCount += 1;
   }
 }
 

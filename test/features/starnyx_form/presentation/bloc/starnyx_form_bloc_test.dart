@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/domain/entities/domain_entities.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
@@ -18,6 +19,7 @@ void main() {
   late CreateStarNyxUseCase createUseCase;
   late UpdateStarNyxUseCase updateUseCase;
   late DeleteStarNyxUseCase deleteUseCase;
+  late SyncNotificationsUseCase syncNotificationsUseCase;
 
   /// Sets up mock repository and use cases before each test.
   /// This ensures each test starts with a clean state.
@@ -27,6 +29,10 @@ void main() {
     createUseCase = CreateStarNyxUseCase(repository, const Uuid());
     updateUseCase = UpdateStarNyxUseCase(repository);
     deleteUseCase = DeleteStarNyxUseCase(repository, appSettingsRepository);
+    syncNotificationsUseCase = SyncNotificationsUseCase(
+      _FakeNotificationService(),
+      repository,
+    );
   });
 
   test(
@@ -41,6 +47,7 @@ void main() {
         createStarNyxUseCase: createUseCase,
         updateStarNyxUseCase: updateUseCase,
         deleteStarNyxUseCase: deleteUseCase,
+        syncNotificationsUseCase: syncNotificationsUseCase,
         nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
       );
 
@@ -72,6 +79,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       initialStarnyx: existing,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
@@ -101,6 +109,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       initialStarnyx: existing,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
@@ -118,6 +127,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -141,6 +151,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -161,6 +172,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -176,6 +188,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -193,6 +206,7 @@ void main() {
         createStarNyxUseCase: createUseCase,
         updateStarNyxUseCase: updateUseCase,
         deleteStarNyxUseCase: deleteUseCase,
+        syncNotificationsUseCase: syncNotificationsUseCase,
         nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
       );
 
@@ -212,6 +226,7 @@ void main() {
         createStarNyxUseCase: createUseCase,
         updateStarNyxUseCase: updateUseCase,
         deleteStarNyxUseCase: deleteUseCase,
+        syncNotificationsUseCase: syncNotificationsUseCase,
         nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
       );
 
@@ -244,6 +259,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -272,6 +288,7 @@ void main() {
         createStarNyxUseCase: createUseCase,
         updateStarNyxUseCase: updateUseCase,
         deleteStarNyxUseCase: deleteUseCase,
+        syncNotificationsUseCase: syncNotificationsUseCase,
         nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
       );
 
@@ -311,6 +328,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       initialStarnyx: existing,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
@@ -330,6 +348,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -356,6 +375,7 @@ void main() {
         createStarNyxUseCase: createUseCase,
         updateStarNyxUseCase: updateUseCase,
         deleteStarNyxUseCase: deleteUseCase,
+        syncNotificationsUseCase: syncNotificationsUseCase,
         nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
       );
 
@@ -375,6 +395,7 @@ void main() {
         createStarNyxUseCase: createUseCase,
         updateStarNyxUseCase: updateUseCase,
         deleteStarNyxUseCase: deleteUseCase,
+        syncNotificationsUseCase: syncNotificationsUseCase,
         nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
       );
 
@@ -400,6 +421,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -418,6 +440,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -455,6 +478,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       initialStarnyx: existing,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
@@ -476,6 +500,7 @@ void main() {
       createStarNyxUseCase: createUseCase,
       updateStarNyxUseCase: updateUseCase,
       deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
       nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
     );
 
@@ -538,4 +563,21 @@ class _InMemoryAppSettingsRepository implements AppSettingsRepository {
   Stream<AppSettings?> watchAppSettings() async* {
     yield _settings;
   }
+}
+
+class _FakeNotificationService implements NotificationService {
+  @override
+  Future<void> initialize() async {}
+
+  @override
+  Future<void> createReminder(StarNyx starnyx) async {}
+
+  @override
+  Future<void> updateReminder(StarNyx starnyx) async {}
+
+  @override
+  Future<void> cancelReminder(String starnyxId) async {}
+
+  @override
+  Future<void> cancelAllReminders() async {}
 }

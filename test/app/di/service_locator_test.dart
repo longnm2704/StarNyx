@@ -48,6 +48,7 @@ void main() {
     expect(serviceLocator.isRegistered<SaveJournalEntryUseCase>(), isTrue);
     expect(serviceLocator.isRegistered<ExportDataUseCase>(), isTrue);
     expect(serviceLocator.isRegistered<ImportDataUseCase>(), isTrue);
+    expect(serviceLocator.isRegistered<SyncNotificationsUseCase>(), isTrue);
     expect(serviceLocator.isRegistered<HomeBloc>(), isTrue);
     expect(serviceLocator.isRegistered<StarnyxFormBloc>(), isTrue);
   });
