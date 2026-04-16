@@ -222,7 +222,7 @@ Issue checklist:
 - [x] `STX-030` Tạo cụm action bên dưới cho ngày đang chọn, previous / next / today
 - [ ] `STX-031` Hiển thị thống kê: current streak, longest streak, total completed, completion rate => Loại khỏi spec
 - [x] `STX-032` Hỗ trợ đổi năm đang xem và tính lại completion rate đúng theo năm đó
-- [ ] `STX-033` Tạo bottom sheet hoặc quick actions bám theo UI `docs/ui/starnyx_bottom_sheet.PNG`
+- [x] `STX-033` Tạo bottom sheet hoặc quick actions bám theo UI `docs/ui/starnyx_bottom_sheet.PNG`
 
 Definition of done:
 
