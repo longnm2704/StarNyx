@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/data/db/app_database.dart';
 import 'package:starnyx/app/router/app_router.dart';
+import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/domain/entities/starnyx.dart' as domain;
@@ -24,6 +25,7 @@ void main() {
     expect(serviceLocator.isRegistered<Uuid>(), isTrue);
     expect(serviceLocator.isRegistered<AppRouter>(), isTrue);
     expect(serviceLocator.isRegistered<AppDatabase>(), isTrue);
+    expect(serviceLocator.isRegistered<NotificationService>(), isTrue);
     expect(serviceLocator.isRegistered<StarNyxRepository>(), isTrue);
     expect(serviceLocator.isRegistered<CompletionRepository>(), isTrue);
     expect(serviceLocator.isRegistered<JournalEntryRepository>(), isTrue);
