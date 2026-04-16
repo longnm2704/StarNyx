@@ -247,8 +247,8 @@ Issue checklist:
 - [x] `STX-036` Chỉ cho tạo 1 note mỗi ngày cho ngày hiện tại
 - [x] `STX-037` Không cho sửa note đã tạo; chỉ hỗ trợ xoá rồi tạo lại
 - [x] `STX-038` Hiển thị danh sách journal entries theo thứ tự mới nhất trước
-- [ ] `STX-039` Tạo `SettingsBloc` và màn settings bám theo `docs/ui/starnyx_settings.PNG`
-- [ ] `STX-040` Tạo màn general settings bám theo `docs/ui/starnyx_settings_general.PNG`
+- [x] `STX-039` Tạo `SettingsBloc` và màn settings bám theo `docs/ui/starnyx_settings.PNG`
+- [x] `STX-040` Tạo màn general settings bám theo `docs/ui/starnyx_settings_general.PNG`
 - [ ] `STX-041` Implement notification service: create, update, cancel theo rule trong spec
 - [ ] `STX-042` Đồng bộ notification khi tạo, sửa, xoá, import dữ liệu
 
