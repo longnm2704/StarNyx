@@ -1,31 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
-import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_header.dart';
 
-const LinearGradient _sheetTopDownGradient = LinearGradient(
-  begin: Alignment.topCenter,
-  end: Alignment.bottomCenter,
-  colors: <Color>[AppColors.sheetTop, AppColors.sheetMid, AppColors.background],
-  stops: <double>[0.0, 0.48, 1.0],
-);
-
-Future<void> showGeneralSettingsSheet(BuildContext context) {
-  return showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: false,
-    backgroundColor: Colors.transparent,
-    barrierColor: AppColors.black.withValues(alpha: 0.72),
-    builder: (BuildContext context) {
-      return const GeneralSettingsSheet();
-    },
-  );
-}
-
 class GeneralSettingsSheet extends StatelessWidget {
-  const GeneralSettingsSheet({super.key});
+  const GeneralSettingsSheet({required this.onBack, super.key});
+
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -33,74 +14,44 @@ class GeneralSettingsSheet extends StatelessWidget {
     final topInset = mediaQuery.viewPadding.top > 0 ? mediaQuery.viewPadding.top : mediaQuery.padding.top;
     final headerTopPadding = (topInset < 24 ? 24.0 : topInset) + AppSpacing.lg;
 
-    return FractionallySizedBox(
-      heightFactor: 1.0,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: _sheetTopDownGradient,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.5)),
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.pageHorizontal,
+            headerTopPadding,
+            AppSpacing.pageHorizontal,
+            AppSpacing.md,
+          ),
+          child: StarnyxFormHeader(
+            title: 'settings.general_title'.tr(),
+            onClosePressed: onBack,
+          ),
         ),
-        child: SafeArea(
-          top: false,
-          bottom: false,
-          child: Stack(
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.pageHorizontal,
+              AppSpacing.md,
+              AppSpacing.pageHorizontal,
+              AppSpacing.xl,
+            ),
             children: [
-              const Positioned.fill(child: CosmicBackground(child: SizedBox.expand())),
-              Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.pageHorizontal,
-                      headerTopPadding,
-                      AppSpacing.pageHorizontal,
-                      AppSpacing.md,
-                    ),
-                    child: StarnyxFormHeader(
-                      title: 'settings.general_title'.tr(),
-                      onClosePressed: () => Navigator.of(context).pop(),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.pageHorizontal,
-                        AppSpacing.md,
-                        AppSpacing.pageHorizontal,
-                        AppSpacing.xl,
-                      ),
-                      children: [
-                        _GeneralSettingTile(
-                          title: 'settings.language_label'.tr(),
-                          value: 'English', // Current language display
-                          onTap: () {
-                            // Logic to change language
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        _GeneralSettingTile(
-                          title: 'settings.appearance_label'.tr(),
-                          value: 'settings.theme_dark'.tr(),
-                          onTap: () {
-                            // Logic to change theme
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        _GeneralSettingTile(
-                          title: 'settings.time_format_label'.tr(),
-                          value: 'settings.time_format_24h'.tr(),
-                          onTap: () {
-                            // Logic to change time format
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              _GeneralSettingTile(
+                title: 'settings.language_label'.tr(),
+                value: 'English',
+                onTap: () {},
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _GeneralSettingTile(
+                title: 'settings.time_format_label'.tr(),
+                value: 'settings.time_format_24h'.tr(),
+                onTap: () {},
               ),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 }
