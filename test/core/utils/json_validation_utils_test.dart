@@ -81,5 +81,71 @@ void main() {
       expect(result.isValid, isFalse);
       expect(result.errors, isNotEmpty);
     });
+
+    test('requires reminderTime when reminderEnabled is true', () {
+      final result = JsonValidationUtils.validateImportJson(<String, dynamic>{
+        'schemaVersion': 1,
+        'starnyxs': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'id': 'stx-1',
+            'title': 'Read',
+            'description': null,
+            'color': '#123456',
+            'startDate': '2026-04-01',
+            'reminderEnabled': true,
+            'reminderTime': null,
+            'createdAt': '2026-04-01T00:00:00.000Z',
+            'updatedAt': '2026-04-01T00:00:00.000Z',
+          },
+        ],
+        'completions': <Map<String, dynamic>>[],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': null,
+          'updatedAt': '2026-04-10T00:00:00.000Z',
+        },
+      });
+
+      expect(result.isValid, isFalse);
+      expect(
+        result.errors,
+        contains(
+          'starnyxs[0].reminderTime is required when reminderEnabled is true.',
+        ),
+      );
+    });
+
+    test('rejects reminderTime when reminderEnabled is false', () {
+      final result = JsonValidationUtils.validateImportJson(<String, dynamic>{
+        'schemaVersion': 1,
+        'starnyxs': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'id': 'stx-1',
+            'title': 'Read',
+            'description': null,
+            'color': '#123456',
+            'startDate': '2026-04-01',
+            'reminderEnabled': false,
+            'reminderTime': '10:30',
+            'createdAt': '2026-04-01T00:00:00.000Z',
+            'updatedAt': '2026-04-01T00:00:00.000Z',
+          },
+        ],
+        'completions': <Map<String, dynamic>>[],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': null,
+          'updatedAt': '2026-04-10T00:00:00.000Z',
+        },
+      });
+
+      expect(result.isValid, isFalse);
+      expect(
+        result.errors,
+        contains(
+          'starnyxs[0].reminderTime must be null when reminderEnabled is false.',
+        ),
+      );
+    });
   });
 }

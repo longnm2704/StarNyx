@@ -617,6 +617,58 @@ void main() {
       );
     },
   );
+
+  test('import use case rejects unsupported schema version', () async {
+    final useCase = ImportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    );
+
+    expect(
+      () => useCase(<String, dynamic>{
+        'schemaVersion': 2,
+        'starnyxs': <Map<String, dynamic>>[],
+        'completions': <Map<String, dynamic>>[],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': null,
+          'updatedAt': '2026-04-10T08:30:00.000',
+        },
+      }),
+      throwsA(
+        isA<ImportDataException>().having(
+          (e) => e.errors,
+          'errors',
+          contains('schemaVersion must be 1.'),
+        ),
+      ),
+    );
+  });
+
+  test(
+    'import use case parses JSON text and rejects malformed content',
+    () async {
+      final useCase = ImportDataUseCase(
+        starNyxRepository,
+        completionRepository,
+        journalEntryRepository,
+        appSettingsRepository,
+      );
+
+      expect(
+        () => useCase.callFromJsonText('{not-json'),
+        throwsA(
+          isA<ImportDataException>().having(
+            (e) => e.errors,
+            'errors',
+            contains('Import JSON is malformed.'),
+          ),
+        ),
+      );
+    },
+  );
 }
 
 class _InMemoryStarNyxRepository implements StarNyxRepository {

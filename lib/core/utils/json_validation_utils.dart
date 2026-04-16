@@ -143,15 +143,26 @@ abstract final class JsonValidationUtils {
     _requireString(entry, 'title', 'starnyxs[$index]', errors);
     _requireString(entry, 'color', 'starnyxs[$index]', errors);
     _requireDateString(entry, 'startDate', 'starnyxs[$index]', errors);
-    _requireBool(entry, 'reminderEnabled', 'starnyxs[$index]', errors);
+    final reminderEnabled = _requireBool(
+      entry,
+      'reminderEnabled',
+      'starnyxs[$index]',
+      errors,
+    );
     _requireIsoDateTime(entry, 'createdAt', 'starnyxs[$index]', errors);
     _requireIsoDateTime(entry, 'updatedAt', 'starnyxs[$index]', errors);
     _optionalNullableString(entry, 'description', 'starnyxs[$index]', errors);
-    _optionalNullableReminderTime(
+    final reminderTime = _optionalNullableReminderTime(
       entry,
       'reminderTime',
       'starnyxs[$index]',
       errors,
+    );
+    _validateReminderConsistency(
+      reminderEnabled: reminderEnabled,
+      reminderTime: reminderTime,
+      path: 'starnyxs[$index]',
+      errors: errors,
     );
     return id;
   }
@@ -249,7 +260,7 @@ abstract final class JsonValidationUtils {
     errors.add('$path.$key must be a string or null.');
   }
 
-  static void _optionalNullableReminderTime(
+  static String? _optionalNullableReminderTime(
     Map<String, dynamic> entry,
     String key,
     String path,
@@ -257,25 +268,53 @@ abstract final class JsonValidationUtils {
   ) {
     final value = entry[key];
     if (value == null) {
-      return;
+      return null;
     }
 
     if (value is! String || !ReminderTimeUtils.isValidTimeString(value)) {
       errors.add('$path.$key must be a valid HH:mm string or null.');
+      return null;
     }
+
+    return value;
   }
 
-  static void _requireBool(
+  static bool? _requireBool(
     Map<String, dynamic> entry,
     String key,
     String path,
     List<String> errors,
   ) {
     if (entry[key] is bool) {
-      return;
+      return entry[key] as bool;
     }
 
     errors.add('$path.$key must be a boolean.');
+    return null;
+  }
+
+  static void _validateReminderConsistency({
+    required bool? reminderEnabled,
+    required String? reminderTime,
+    required String path,
+    required List<String> errors,
+  }) {
+    if (reminderEnabled == null) {
+      return;
+    }
+
+    if (reminderEnabled && reminderTime == null) {
+      errors.add(
+        '$path.reminderTime is required when reminderEnabled is true.',
+      );
+      return;
+    }
+
+    if (!reminderEnabled && reminderTime != null) {
+      errors.add(
+        '$path.reminderTime must be null when reminderEnabled is false.',
+      );
+    }
   }
 
   static void _requireDateString(
