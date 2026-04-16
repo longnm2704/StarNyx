@@ -201,7 +201,7 @@ class _SettingsMainViewState extends State<SettingsMainView> {
                   title: 'settings.general_section'.tr(),
                   children: [
                     _SettingsTile(
-                      iconPath: 'assets/icons/ic_settings.svg',
+                      iconPath: 'assets/icons/ic_general.svg',
                       title: 'settings.general_label'.tr(),
                       onTap: widget.onGeneralTap,
                     ),
@@ -212,12 +212,12 @@ class _SettingsMainViewState extends State<SettingsMainView> {
                   title: 'settings.data_section'.tr(),
                   children: [
                     _SettingsTile(
-                      iconPath: 'assets/icons/ic_sparkles.svg',
+                      iconPath: 'assets/icons/ic_export.svg',
                       title: 'settings.export_label'.tr(),
                       onTap: () => context.read<SettingsBloc>().add(const SettingsExportRequested()),
                     ),
                     _SettingsTile(
-                      iconPath: 'assets/icons/ic_plus.svg',
+                      iconPath: 'assets/icons/ic_import.svg',
                       title: 'settings.import_label'.tr(),
                       onTap: () {},
                     ),
@@ -228,12 +228,12 @@ class _SettingsMainViewState extends State<SettingsMainView> {
                   title: 'settings.about_section'.tr(),
                   children: [
                     _SettingsTile(
-                      iconPath: 'assets/icons/ic_heart.svg',
+                      iconPath: 'assets/icons/ic_about.svg',
                       title: 'settings.about_label'.tr(),
                       onTap: widget.onAboutTap,
                     ),
                     _SettingsTile(
-                      iconPath: 'assets/icons/ic_cursor.svg',
+                      iconPath: 'assets/icons/ic_version.svg',
                       title: 'Version $_appVersion',
                       onTap: null,
                     ),

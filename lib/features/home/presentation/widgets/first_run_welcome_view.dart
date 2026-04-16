@@ -6,9 +6,14 @@ import 'package:starnyx/features/home/presentation/widgets/top_circle_asset_icon
 import 'package:starnyx/features/home/presentation/widgets/welcome_hero_icon.dart';
 
 class FirstRunWelcomeView extends StatelessWidget {
-  const FirstRunWelcomeView({super.key, this.onCreatePressed});
+  const FirstRunWelcomeView({
+    super.key,
+    this.onCreatePressed,
+    this.onSettingsPressed,
+  });
 
   final VoidCallback? onCreatePressed;
+  final VoidCallback? onSettingsPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +36,7 @@ class FirstRunWelcomeView extends StatelessWidget {
                 child: TopCircleAssetIconButton(
                   assetPath: 'assets/icons/ic_settings.svg',
                   tooltip: 'welcome.settings'.tr(),
-                  onPressed: () {},
+                  onPressed: () => onSettingsPressed?.call(),
                 ),
               ),
               const Spacer(),
