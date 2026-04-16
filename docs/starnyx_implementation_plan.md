@@ -243,10 +243,10 @@ Mục tiêu:
 Issue checklist:
 
 - [x] `STX-034` Tạo `JournalBloc` hoặc state flow tương đương cho journal
-- [ ] `STX-035` Tạo màn journal bám theo UI `docs/ui/starnyx_journal.PNG`
-- [ ] `STX-036` Chỉ cho tạo 1 note mỗi ngày cho ngày hiện tại
-- [ ] `STX-037` Không cho sửa note đã tạo; chỉ hỗ trợ xoá rồi tạo lại
-- [ ] `STX-038` Hiển thị danh sách journal entries theo thứ tự mới nhất trước
+- [x] `STX-035` Tạo màn journal bám theo UI `docs/ui/starnyx_journal.PNG`
+- [x] `STX-036` Chỉ cho tạo 1 note mỗi ngày cho ngày hiện tại
+- [x] `STX-037` Không cho sửa note đã tạo; chỉ hỗ trợ xoá rồi tạo lại
+- [x] `STX-038` Hiển thị danh sách journal entries theo thứ tự mới nhất trước
 - [ ] `STX-039` Tạo `SettingsBloc` và màn settings bám theo `docs/ui/starnyx_settings.PNG`
 - [ ] `STX-040` Tạo màn general settings bám theo `docs/ui/starnyx_settings_general.PNG`
 - [ ] `STX-041` Implement notification service: create, update, cancel theo rule trong spec
