@@ -618,6 +618,119 @@ void main() {
     },
   );
 
+  test(
+    'import use case replaces existing child data instead of merging',
+    () async {
+      await starNyxRepository.saveStarnyx(
+        StarNyx(
+          id: 'habit-1',
+          title: 'Old',
+          description: null,
+          color: '#000000',
+          startDate: DateTime(2026, 1, 1),
+          reminderEnabled: false,
+          reminderTime: null,
+          createdAt: DateTime(2026, 1, 1, 8),
+          updatedAt: DateTime(2026, 1, 1, 8),
+        ),
+      );
+      await completionRepository.saveCompletion(
+        Completion(
+          starnyxId: 'habit-1',
+          date: DateTime(2026, 4, 1),
+          completed: true,
+        ),
+      );
+      await journalEntryRepository.saveJournalEntry(
+        JournalEntry(
+          id: 1,
+          starnyxId: 'habit-1',
+          date: DateTime(2026, 4, 1),
+          content: 'legacy entry',
+          createdAt: DateTime(2026, 4, 1, 8),
+        ),
+      );
+
+      final useCase = ImportDataUseCase(
+        starNyxRepository,
+        completionRepository,
+        journalEntryRepository,
+        appSettingsRepository,
+      );
+
+      await useCase(<String, dynamic>{
+        'schemaVersion': 1,
+        'starnyxs': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'id': 'habit-1',
+            'title': 'Hydrate',
+            'description': null,
+            'color': '#102030',
+            'startDate': '2026-04-01',
+            'reminderEnabled': false,
+            'reminderTime': null,
+            'createdAt': '2026-04-01T08:00:00.000',
+            'updatedAt': '2026-04-02T09:00:00.000',
+          },
+        ],
+        'completions': <Map<String, dynamic>>[],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': 'habit-1',
+          'updatedAt': '2026-04-10T08:30:00.000',
+        },
+      });
+
+      expect(
+        await completionRepository.getCompletionsForStarnyx('habit-1'),
+        isEmpty,
+      );
+      expect(
+        await journalEntryRepository.getJournalEntriesForStarnyx('habit-1'),
+        isEmpty,
+      );
+    },
+  );
+
+  test('import use case keeps current data when validation fails', () async {
+    await starNyxRepository.saveStarnyx(
+      StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 1, 8),
+      ),
+    );
+
+    final useCase = ImportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    );
+
+    expect(
+      () => useCase(<String, dynamic>{
+        'schemaVersion': 2,
+        'starnyxs': <Map<String, dynamic>>[],
+        'completions': <Map<String, dynamic>>[],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': null,
+          'updatedAt': '2026-04-10T08:30:00.000',
+        },
+      }),
+      throwsA(isA<ImportDataException>()),
+    );
+
+    expect(await starNyxRepository.getStarnyxById('habit-1'), isNotNull);
+  });
+
   test('import use case rejects unsupported schema version', () async {
     final useCase = ImportDataUseCase(
       starNyxRepository,

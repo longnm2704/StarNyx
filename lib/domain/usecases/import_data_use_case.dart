@@ -66,11 +66,30 @@ class ImportDataUseCase {
       json['appSettings'] as Map<String, dynamic>,
     );
 
+    await _clearCurrentData();
+    await _saveImportedData(
+      starnyxs: starnyxs,
+      completions: completions,
+      journalEntries: journalEntries,
+      appSettings: appSettings,
+    );
+  }
+
+  Future<void> _clearCurrentData() async {
     final currentStarnyxs = await _starnyxRepository.getAllStarnyxs();
     for (final starnyx in currentStarnyxs) {
+      await _completionRepository.deleteCompletionsForStarnyx(starnyx.id);
+      await _journalEntryRepository.deleteJournalEntriesForStarnyx(starnyx.id);
       await _starnyxRepository.deleteStarnyxById(starnyx.id);
     }
+  }
 
+  Future<void> _saveImportedData({
+    required List<StarNyx> starnyxs,
+    required List<Completion> completions,
+    required List<JournalEntry> journalEntries,
+    required AppSettings appSettings,
+  }) async {
     for (final starnyx in starnyxs) {
       await _starnyxRepository.saveStarnyx(starnyx);
     }
