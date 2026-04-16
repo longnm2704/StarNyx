@@ -242,7 +242,7 @@ Mục tiêu:
 
 Issue checklist:
 
-- [ ] `STX-034` Tạo `JournalBloc` hoặc state flow tương đương cho journal
+- [x] `STX-034` Tạo `JournalBloc` hoặc state flow tương đương cho journal
 - [ ] `STX-035` Tạo màn journal bám theo UI `docs/ui/starnyx_journal.PNG`
 - [ ] `STX-036` Chỉ cho tạo 1 note mỗi ngày cho ngày hiện tại
 - [ ] `STX-037` Không cho sửa note đã tạo; chỉ hỗ trợ xoá rồi tạo lại
