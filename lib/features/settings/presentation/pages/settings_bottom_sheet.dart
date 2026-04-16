@@ -4,9 +4,11 @@ import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_event.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_state.dart';
+import 'package:starnyx/features/settings/presentation/pages/about_starnyx_sheet.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_header.dart';
 
 const LinearGradient _sheetTopDownGradient = LinearGradient(
@@ -38,11 +40,22 @@ class SettingsBottomSheet extends StatefulWidget {
 
 class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
   late final SettingsBloc _settingsBloc;
+  String _appVersion = '';
 
   @override
   void initState() {
     super.initState();
     _settingsBloc = serviceLocator<SettingsBloc>();
+    _loadPackageInfo();
+  }
+
+  Future<void> _loadPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() {
+        _appVersion = '${info.version} (${info.buildNumber})';
+      });
+    }
   }
 
   @override
@@ -150,11 +163,11 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
                                 _SettingsTile(
                                   iconPath: 'assets/icons/ic_heart.svg',
                                   title: 'settings.about_label'.tr(),
-                                  onTap: () {},
+                                  onTap: () => showAboutStarnyxSheet(context),
                                 ),
                                 _SettingsTile(
                                   iconPath: 'assets/icons/ic_cursor.svg',
-                                  title: 'Version 1.0.0',
+                                  title: 'Version $_appVersion',
                                   onTap: null,
                                 ),
                               ],
