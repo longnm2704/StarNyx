@@ -16,7 +16,7 @@ Future<void> showJournalBottomSheet(BuildContext context, String starnyxId) {
     isScrollControlled: true,
     useSafeArea: false,
     backgroundColor: Colors.transparent,
-    barrierColor: AppColors.black.withValues(alpha: 0.72),
+    barrierColor: AppColors.black.withValues(alpha: 0.8),
     builder: (BuildContext context) {
       return JournalBottomSheet(starnyxId: starnyxId);
     },
@@ -98,90 +98,116 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
           }
         },
         child: FractionallySizedBox(
-          heightFactor: 0.92,
-          child: DecoratedBox(
+          heightFactor: 0.94,
+          child: Container(
+            clipBehavior: Clip.antiAlias,
             decoration: const BoxDecoration(
               color: AppColors.background,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.25)),
             ),
-            child: Column(
+            child: Stack(
               children: [
-                _JournalHeader(topInset: topInset),
-                Expanded(
-                  child: BlocBuilder<JournalBloc, JournalState>(
-                    builder: (context, state) {
-                      if (state.status == JournalStatus.loading) {
-                        return const Center(child: AppLoadingIndicator());
-                      }
+                const Positioned.fill(child: CosmicBackground()),
+                Column(
+                  children: [
+                    const SizedBox(height: AppSpacing.sm),
+                    Center(
+                      child: Container(
+                        width: 48,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppColors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(AppRadius.pill),
+                        ),
+                      ),
+                    ),
+                    _JournalHeader(topInset: topInset),
+                    Expanded(
+                      child: BlocBuilder<JournalBloc, JournalState>(
+                        builder: (context, state) {
+                          if (state.status == JournalStatus.loading) {
+                            return const Center(child: AppLoadingIndicator());
+                          }
 
-                      if (state.status == JournalStatus.failure) {
-                        return Center(
-                          child: AppErrorState(
-                            title: 'journal.load_error_title'.tr(),
-                            message: state.errorMessage ?? 'journal.load_error_message'.tr(),
-                            retryLabel: 'home.retry'.tr(),
-                            onRetry: () => _journalBloc.add(JournalStarted(widget.starnyxId)),
-                          ),
-                        );
-                      }
+                          if (state.status == JournalStatus.failure) {
+                            return Center(
+                              child: AppErrorState(
+                                title: 'journal.load_error_title'.tr(),
+                                message: state.errorMessage ?? 'journal.load_error_message'.tr(),
+                                retryLabel: 'home.retry'.tr(),
+                                onRetry: () => _journalBloc.add(JournalStarted(widget.starnyxId)),
+                              ),
+                            );
+                          }
 
-                      final today = core_date_utils.DateUtils.nowDate();
-                      final hasEntryForToday = state.entries.any(
-                        (entry) => core_date_utils.DateUtils.isSameDate(entry.date, today),
-                      );
+                          final today = core_date_utils.DateUtils.nowDate();
+                          final hasEntryForToday = state.entries.any(
+                            (entry) => core_date_utils.DateUtils.isSameDate(entry.date, today),
+                          );
 
-                      return CustomScrollView(
-                        slivers: [
-                          if (!hasEntryForToday)
-                            SliverToBoxAdapter(
-                              child: Padding(
-                                padding: const EdgeInsets.all(AppSpacing.pageHorizontal),
-                                child: _TodayEntryInput(
-                                  controller: _controller,
-                                  onChanged: (value) =>
-                                      _journalBloc.add(JournalDraftChanged(value)),
-                                  onSavePressed: _onSavePressed,
-                                  isSaving: state.saveStatus == AsyncStatus.inProgress,
-                                  isEnabled: state.canSaveDraft,
+                          return CustomScrollView(
+                            physics: const BouncingScrollPhysics(),
+                            slivers: [
+                              if (!hasEntryForToday)
+                                SliverToBoxAdapter(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.pageHorizontal,
+                                      vertical: AppSpacing.lg,
+                                    ),
+                                    child: _TodayEntryInput(
+                                      controller: _controller,
+                                      onChanged: (value) =>
+                                          _journalBloc.add(JournalDraftChanged(value)),
+                                      onSavePressed: _onSavePressed,
+                                      isSaving: state.saveStatus == AsyncStatus.inProgress,
+                                      isEnabled: state.canSaveDraft,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          if (state.entries.isEmpty)
-                            SliverFillRemaining(
-                              hasScrollBody: false,
-                              child: Center(
-                                child: AppEmptyState(
-                                  title: 'journal.title'.tr(),
-                                  message: 'journal.no_entries'.tr(),
-                                ),
-                              ),
-                            )
-                          else
-                            SliverPadding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.pageHorizontal,
-                                vertical: AppSpacing.md,
-                              ),
-                              sliver: SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
-                                    final entry = state.entries[index];
-                                    return Padding(
-                                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                                      child: _JournalEntryCard(
-                                        entry: entry,
-                                        onDeletePressed: () => _onDeletePressed(entry),
+                              if (state.entries.isEmpty)
+                                SliverFillRemaining(
+                                  hasScrollBody: false,
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 64),
+                                      child: AppEmptyState(
+                                        title: 'journal.title'.tr(),
+                                        message: 'journal.no_entries'.tr(),
                                       ),
-                                    );
-                                  },
-                                  childCount: state.entries.length,
+                                    ),
+                                  ),
+                                )
+                              else
+                                SliverPadding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    AppSpacing.pageHorizontal,
+                                    0,
+                                    AppSpacing.pageHorizontal,
+                                    AppSpacing.xl * 2,
+                                  ),
+                                  sliver: SliverList(
+                                    delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                        final entry = state.entries[index];
+                                        return Padding(
+                                          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                                          child: _JournalEntryCard(
+                                            entry: entry,
+                                            onDeletePressed: () => _onDeletePressed(entry),
+                                          ),
+                                        );
+                                      },
+                                      childCount: state.entries.length,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -200,33 +226,56 @@ class _JournalHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(
+      padding: const EdgeInsets.fromLTRB(
         AppSpacing.pageHorizontal,
-        (topInset < 16 ? 16.0 : topInset * 0.5) + AppSpacing.sm,
         AppSpacing.md,
         AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.4),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+        AppSpacing.md,
       ),
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              'journal.title'.tr(),
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w900,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'journal.title'.tr(),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                      ),
+                ),
+                const SizedBox(height: 2),
+                Container(
+                  width: 32,
+                  height: 3,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.accentGradient,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
                   ),
+                ),
+              ],
             ),
           ),
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const AppSvgIcon(
-              assetPath: 'assets/icons/ic_close.svg',
-              color: AppColors.textSecondary,
-              size: 24,
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onPressed: () => Navigator.of(context).pop(),
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: AppColors.white.withValues(alpha: 0.05),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.white.withValues(alpha: 0.1)),
+                ),
+                child: const AppSvgIcon(
+                  assetPath: 'assets/icons/ic_close.svg',
+                  color: AppColors.textSecondary,
+                  size: 20,
+                ),
+              ),
             ),
           ),
         ],
@@ -253,11 +302,18 @@ class _TodayEntryInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surfaceElevated.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.outline.withValues(alpha: 0.3)),
+        color: AppColors.surfaceElevated.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.08)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -265,9 +321,10 @@ class _TodayEntryInput extends StatelessWidget {
           TextField(
             controller: controller,
             onChanged: onChanged,
-            maxLines: 4,
+            maxLines: 5,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: AppColors.textPrimary,
+                  height: 1.5,
                 ),
             decoration: InputDecoration(
               hintText: 'journal.today_hint'.tr(),
@@ -275,26 +332,50 @@ class _TodayEntryInput extends StatelessWidget {
                     color: AppColors.textMuted,
                   ),
               border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          Align(
-            alignment: Alignment.centerRight,
-            child: isSaving
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : TextButton(
-                    onPressed: isEnabled ? onSavePressed : null,
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppColors.accentPink,
-                      disabledForegroundColor: AppColors.textMuted,
-                      textStyle: const TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                    child: Text('journal.save_button'.tr()),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (isSaving)
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.accentPink),
                   ),
+                )
+              else
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onPressed: isEnabled ? onSavePressed : null,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    child: AnimatedContainer(
+                      duration: AppDurations.fast,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.sm,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: isEnabled ? AppColors.accentGradient : null,
+                        color: isEnabled ? null : AppColors.white.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                      child: Text(
+                        'journal.save_button'.tr(),
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              color: isEnabled ? AppColors.white : AppColors.textMuted,
+                              fontWeight: FontWeight.w800,
+                            ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ],
       ),
@@ -317,12 +398,13 @@ class _JournalEntryCard extends StatelessWidget {
     );
 
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
+        color: AppColors.surface.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
-          color: isToday ? AppColors.accentPink.withValues(alpha: 0.3) : AppColors.outline.withValues(alpha: 0.2),
+          color: isToday ? AppColors.accentPink.withValues(alpha: 0.25) : AppColors.white.withValues(alpha: 0.05),
+          width: isToday ? 1.5 : 1,
         ),
       ),
       child: Column(
@@ -330,31 +412,55 @@ class _JournalEntryCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isToday ? AppColors.accentPink.withValues(alpha: 0.15) : AppColors.white.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                ),
                 child: Text(
-                  isToday ? '$formattedDate (Today)' : formattedDate,
+                  isToday ? 'Today' : formattedDate,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: isToday ? AppColors.accentPink : AppColors.textMuted,
-                        fontWeight: FontWeight.w700,
+                        color: isToday ? AppColors.accentPink : AppColors.textSecondary,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
                       ),
                 ),
               ),
-              IconButton(
-                onPressed: onDeletePressed,
-                icon: const AppSvgIcon(
-                  assetPath: 'assets/icons/ic_trash.svg',
-                  color: AppColors.textMuted,
-                  size: 16,
+              if (!isToday) ...[
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  formattedDate,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.textMuted,
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
-                visualDensity: VisualDensity.compact,
+              ],
+              const Spacer(),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onPressed: onDeletePressed,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    child: AppSvgIcon(
+                      assetPath: 'assets/icons/ic_trash.svg',
+                      color: AppColors.textMuted.withValues(alpha: 0.6),
+                      size: 16,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: AppSpacing.md),
           Text(
             entry.content,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: AppColors.textSecondary,
+                  height: 1.6,
                 ),
           ),
         ],
