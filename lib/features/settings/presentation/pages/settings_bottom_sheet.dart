@@ -9,6 +9,7 @@ import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_event.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_state.dart';
 import 'package:starnyx/features/settings/presentation/pages/about_starnyx_sheet.dart';
+import 'package:starnyx/features/settings/presentation/pages/general_settings_sheet.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_header.dart';
 
 const LinearGradient _sheetTopDownGradient = LinearGradient(
@@ -140,9 +141,7 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
                                 _SettingsTile(
                                   iconPath: 'assets/icons/ic_settings.svg',
                                   title: 'settings.general_label'.tr(),
-                                  onTap: () {
-                                    // Navigate to general settings (STX-040)
-                                  },
+                                  onTap: () => showGeneralSettingsSheet(context),
                                 ),
                               ],
                             ),
