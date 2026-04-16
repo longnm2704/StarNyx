@@ -11,13 +11,6 @@ import 'package:starnyx/features/journal/presentation/bloc/journal_state.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_header.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_pill_text_field.dart';
 
-const LinearGradient _sheetTopDownGradient = LinearGradient(
-  begin: Alignment.topCenter,
-  end: Alignment.bottomCenter,
-  colors: <Color>[AppColors.sheetTop, AppColors.sheetMid, AppColors.background],
-  stops: <double>[0.0, 0.48, 1.0],
-);
-
 Future<void> showJournalBottomSheet(BuildContext context, String starnyxId, Color accentColor) {
   return showModalBottomSheet<void>(
     context: context,
@@ -122,9 +115,18 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
         child: FractionallySizedBox(
           heightFactor: 1.0,
           child: DecoratedBox(
-            decoration: const BoxDecoration(
-              gradient: _sheetTopDownGradient,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.5)),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: <Color>[
+                  widget.accentColor.withValues(alpha: 0.18),
+                  AppColors.sheetMid.withValues(alpha: 0.6),
+                  AppColors.background,
+                ],
+                stops: const <double>[0.0, 0.4, 1.0],
+              ),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.5)),
             ),
             child: SafeArea(
               top: false,
