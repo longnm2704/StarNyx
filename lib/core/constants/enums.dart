@@ -24,6 +24,6 @@ enum HomeStatus { initial, loading, success, failure }
 
 enum JournalStatus { initial, loading, success, failure }
 
-enum ConstellationSwitcherSheetActionType { createRequested, editRequested, journalRequested }
+enum ConstellationSwitcherSheetActionType { createRequested, editRequested, journalRequested, settingsRequested }
 
 enum HomeGridStarDayState { beforeStart, completed, missed, future }

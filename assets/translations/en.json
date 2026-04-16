@@ -89,5 +89,15 @@
     "no_entries": "No entries yet.",
     "load_error_title": "Observation interrupted",
     "load_error_message": "Unable to load journal entries right now."
+  },
+  "settings": {
+    "title": "Settings",
+    "general_section": "General",
+    "general_label": "General Preferences",
+    "data_section": "Data Management",
+    "export_label": "Export Data (JSON)",
+    "import_label": "Import Data (JSON)",
+    "about_section": "About",
+    "about_label": "About StarNyx"
   }
 }
