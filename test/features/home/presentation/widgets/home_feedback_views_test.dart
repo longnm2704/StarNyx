@@ -50,10 +50,10 @@ void main() {
           ActiveStarnyxHomeView(
             starnyxs: starnyxs,
             activeStarnyxId: '1',
-            selectedDate: DateTime(2025, 12, 31),
+            selectedDate: DateTime(2026, 4, 18),
             todayDate: DateTime(2026, 4, 19),
-            viewedYear: 2025,
-            completedDatesForViewedYear: <DateTime>[DateTime(2025, 12, 30)],
+            viewedYear: 2026,
+            completedDatesForViewedYear: <DateTime>[DateTime(2026, 4, 18)],
             onCreatePressed: () {
               createPressed = true;
             },
@@ -77,7 +77,7 @@ void main() {
       expect(find.text('Hydrate'), findsOneWidget);
       expect(find.text('Drink water'), findsOneWidget);
       expect(find.text('Swipe up'), findsOneWidget);
-      expect(find.text('2025'), findsOneWidget);
+      expect(find.text('2026'), findsOneWidget);
       expect(find.text('Today'), findsOneWidget);
       expect(
         find.byKey(const Key('home-star-grid-placeholder')),
@@ -150,6 +150,43 @@ void main() {
       expect(find.text('Observation Deck'), findsOneWidget);
     },
   );
+
+  testWidgets('selected date button is disabled outside 7-day edit window', (
+    tester,
+  ) async {
+    expect(
+      canToggleCompletionForSelectedDate(
+        selectedDate: DateTime(2026, 4, 3),
+        todayDate: DateTime(2026, 4, 10),
+        startDate: DateTime(2026, 4, 1),
+      ),
+      isFalse,
+    );
+    expect(
+      canToggleCompletionForSelectedDate(
+        selectedDate: DateTime(2026, 4, 4),
+        todayDate: DateTime(2026, 4, 10),
+        startDate: DateTime(2026, 4, 1),
+      ),
+      isTrue,
+    );
+    expect(
+      canToggleCompletionForSelectedDate(
+        selectedDate: DateTime(2026, 3, 31),
+        todayDate: DateTime(2026, 4, 10),
+        startDate: DateTime(2026, 4, 1),
+      ),
+      isFalse,
+    );
+    expect(
+      canToggleCompletionForSelectedDate(
+        selectedDate: DateTime(2026, 4, 11),
+        todayDate: DateTime(2026, 4, 10),
+        startDate: DateTime(2026, 4, 1),
+      ),
+      isFalse,
+    );
+  });
 }
 
 Finder _findSvg(String assetPath) {

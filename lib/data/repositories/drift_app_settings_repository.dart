@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:starnyx/data/db/app_database.dart';
-import 'package:starnyx/data/repositories/drift_repository_mappers.dart';
 import 'package:starnyx/domain/entities/app_settings.dart' as domain;
+import 'package:starnyx/data/repositories/drift_repository_mappers.dart';
 import 'package:starnyx/domain/repositories/app_settings_repository.dart';
 
 // Drift-backed implementation of the app settings repository contract.

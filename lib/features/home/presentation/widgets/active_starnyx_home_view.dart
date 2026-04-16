@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
@@ -8,6 +9,27 @@ import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 import 'home_shell_view.dart';
 import 'home_swipe_up_hint.dart';
 import 'constellation_switcher_sheet.dart';
+
+bool canToggleCompletionForSelectedDate({
+  required DateTime selectedDate,
+  required DateTime todayDate,
+  required DateTime startDate,
+}) {
+  if (core_date_utils.DateUtils.isFutureDate(selectedDate, today: todayDate)) {
+    return false;
+  }
+  if (core_date_utils.DateUtils.isBeforeStartDate(
+    selectedDate,
+    startDate: startDate,
+  )) {
+    return false;
+  }
+  return core_date_utils.DateUtils.isEditableWithinDays(
+    selectedDate,
+    days: 7,
+    today: todayDate,
+  );
+}
 
 class ActiveStarnyxHomeView extends StatefulWidget {
   const ActiveStarnyxHomeView({
@@ -128,6 +150,11 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
       (StarNyx item) => item.id == widget.activeStarnyxId,
       orElse: () => widget.starnyxs.first,
     );
+    final canToggleCompletion = canToggleCompletionForSelectedDate(
+      selectedDate: widget.selectedDate,
+      todayDate: widget.todayDate,
+      startDate: activeStarnyx.startDate,
+    );
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -145,7 +172,9 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
         onDateSelected: widget.onDateSelected,
         onYearPressed: null,
         onQuickActionsPressed: _openConstellationSheet,
-        onToggleCompletionPressed: widget.onToggleCompletionPressed,
+        onToggleCompletionPressed: canToggleCompletion
+            ? widget.onToggleCompletionPressed
+            : null,
         isCheckingIn: widget.isCheckingIn,
         footer: Center(
           child: HomeSwipeUpHint(
