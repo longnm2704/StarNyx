@@ -10,7 +10,7 @@ import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_event.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_state.dart';
 
-Future<void> showJournalBottomSheet(BuildContext context, String starnyxId) {
+Future<void> showJournalBottomSheet(BuildContext context, String starnyxId, Color accentColor) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -18,15 +18,16 @@ Future<void> showJournalBottomSheet(BuildContext context, String starnyxId) {
     backgroundColor: Colors.transparent,
     barrierColor: AppColors.black.withValues(alpha: 0.8),
     builder: (BuildContext context) {
-      return JournalBottomSheet(starnyxId: starnyxId);
+      return JournalBottomSheet(starnyxId: starnyxId, accentColor: accentColor);
     },
   );
 }
 
 class JournalBottomSheet extends StatefulWidget {
-  const JournalBottomSheet({required this.starnyxId, super.key});
+  const JournalBottomSheet({required this.starnyxId, required this.accentColor, super.key});
 
   final String starnyxId;
+  final Color accentColor;
 
   @override
   State<JournalBottomSheet> createState() => _JournalBottomSheetState();
@@ -90,6 +91,9 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
         listener: (context, state) {
           if (state.saveStatus == AsyncStatus.success) {
             _controller.clear();
+            // Close keyboard after success
+            FocusScope.of(context).unfocus();
+            
             // Ensure the list is updated and attached before scrolling
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (_scrollController.hasClients) {
@@ -112,7 +116,7 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
             clipBehavior: Clip.antiAlias,
             decoration: const BoxDecoration(
               color: AppColors.background,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.25)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.5)),
             ),
             child: CosmicBackground(
               child: Column(
@@ -128,7 +132,7 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
                       ),
                     ),
                   ),
-                  _JournalHeader(),
+                  _JournalHeader(accentColor: widget.accentColor),
                   Expanded(
                     child: BlocBuilder<JournalBloc, JournalState>(
                       builder: (context, state) {
@@ -161,7 +165,7 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
 
                         return ListView.builder(
                           controller: _scrollController,
-                          reverse: true, // Newest at the bottom of the list view (above input)
+                          reverse: true, // Newest at the bottom (above input)
                           padding: const EdgeInsets.fromLTRB(
                             AppSpacing.pageHorizontal,
                             AppSpacing.md,
@@ -178,13 +182,14 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
                                 );
 
                             return Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 if (showDateHeader) _DateHeader(date: entry.date),
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                                  child: _JournalChatBubble(
+                                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                                  child: _JournalEntryCard(
                                     entry: entry,
+                                    accentColor: widget.accentColor,
                                     onDeletePressed: () => _onDeletePressed(entry),
                                   ),
                                 ),
@@ -199,7 +204,7 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
                     controller: _controller,
                     onChanged: (value) => _journalBloc.add(JournalDraftChanged(value)),
                     onSavePressed: _onSavePressed,
-                    isSaving: false, // Handled by BLoC state in listener/builder
+                    accentColor: widget.accentColor,
                     bottomPadding: bottomPadding,
                   ),
                 ],
@@ -213,6 +218,10 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
 }
 
 class _JournalHeader extends StatelessWidget {
+  const _JournalHeader({required this.accentColor});
+
+  final Color accentColor;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -220,25 +229,59 @@ class _JournalHeader extends StatelessWidget {
         AppSpacing.pageHorizontal,
         AppSpacing.md,
         AppSpacing.md,
-        AppSpacing.md,
+        AppSpacing.sm,
       ),
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              'journal.title'.tr(),
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w900,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'journal.title'.tr(),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  width: 40,
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: accentColor,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    boxShadow: [
+                      BoxShadow(
+                        color: accentColor.withValues(alpha: 0.4),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
+                ),
+              ],
             ),
           ),
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const AppSvgIcon(
-              assetPath: 'assets/icons/ic_close.svg',
-              color: AppColors.textSecondary,
-              size: 20,
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => Navigator.of(context).pop(),
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: AppColors.white.withValues(alpha: 0.05),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.white.withValues(alpha: 0.1)),
+                ),
+                child: const AppSvgIcon(
+                  assetPath: 'assets/icons/ic_close.svg',
+                  color: AppColors.textSecondary,
+                  size: 20,
+                ),
+              ),
             ),
           ),
         ],
@@ -261,86 +304,99 @@ class _DateHeader extends StatelessWidget {
         ? 'Today'
         : core_date_utils.DateUtils.formatDdMmYyyy(date);
 
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        decoration: BoxDecoration(
-          color: AppColors.white.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(AppRadius.sm),
-        ),
-        child: Text(
-          formattedDate,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: AppColors.textMuted,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-              ),
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.white.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+            ),
+            child: Text(
+              formattedDate.toUpperCase(),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: AppColors.textMuted,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.2,
+                  ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Container(
+              height: 1,
+              color: AppColors.white.withValues(alpha: 0.05),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _JournalChatBubble extends StatelessWidget {
-  const _JournalChatBubble({required this.entry, required this.onDeletePressed});
+class _JournalEntryCard extends StatelessWidget {
+  const _JournalEntryCard({
+    required this.entry,
+    required this.accentColor,
+    required this.onDeletePressed,
+  });
 
   final JournalEntry entry;
+  final Color accentColor;
   final VoidCallback onDeletePressed;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: onDeletePressed,
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: Container(
-          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF8E5BFF), Color(0xFFD875FF)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(4),
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.accentViolet.withValues(alpha: 0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(
+          color: AppColors.white.withValues(alpha: 0.05),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
               Text(
-                entry.content,
-                style: const TextStyle(
-                  color: AppColors.white,
-                  fontSize: 15,
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
                 DateFormat('HH:mm').format(entry.createdAt),
-                style: TextStyle(
-                  color: AppColors.white.withValues(alpha: 0.7),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: accentColor.withValues(alpha: 0.8),
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              const Spacer(),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onDeletePressed,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    child: AppSvgIcon(
+                      assetPath: 'assets/icons/ic_trash.svg',
+                      color: AppColors.textMuted.withValues(alpha: 0.4),
+                      size: 14,
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            entry.content,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: AppColors.textPrimary.withValues(alpha: 0.9),
+                  height: 1.5,
+                ),
+          ),
+        ],
       ),
     );
   }
@@ -351,14 +407,14 @@ class _JournalInputArea extends StatelessWidget {
     required this.controller,
     required this.onChanged,
     required this.onSavePressed,
-    required this.isSaving,
+    required this.accentColor,
     required this.bottomPadding,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final VoidCallback onSavePressed;
-  final bool isSaving;
+  final Color accentColor;
   final double bottomPadding;
 
   @override
@@ -369,54 +425,63 @@ class _JournalInputArea extends StatelessWidget {
 
         return Container(
           padding: EdgeInsets.fromLTRB(
+            AppSpacing.pageHorizontal,
             AppSpacing.md,
-            AppSpacing.sm,
-            AppSpacing.md,
-            AppSpacing.md + bottomPadding,
+            AppSpacing.pageHorizontal,
+            AppSpacing.lg + bottomPadding,
           ),
           decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.95),
-            border: Border(top: BorderSide(color: AppColors.white.withValues(alpha: 0.08))),
+            color: AppColors.background.withValues(alpha: 0.8),
+            border: Border(top: BorderSide(color: AppColors.white.withValues(alpha: 0.05))),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   decoration: BoxDecoration(
-                    color: AppColors.background.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: AppColors.white.withValues(alpha: 0.1)),
+                    color: AppColors.surfaceElevated.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
+                    border: Border.all(
+                      color: canSave ? accentColor.withValues(alpha: 0.3) : AppColors.white.withValues(alpha: 0.1),
+                    ),
                   ),
                   child: TextField(
                     controller: controller,
                     onChanged: onChanged,
-                    maxLines: 4,
+                    maxLines: 5,
                     minLines: 1,
-                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
                     decoration: InputDecoration(
                       hintText: 'journal.today_hint'.tr(),
-                      hintStyle: const TextStyle(color: AppColors.textMuted),
+                      hintStyle: TextStyle(color: AppColors.textMuted.withValues(alpha: 0.6)),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: AppSpacing.sm),
+              const SizedBox(width: AppSpacing.md),
               Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: canSave ? onSavePressed : null,
                   borderRadius: BorderRadius.circular(AppRadius.pill),
-                  child: Container(
-                    height: 44,
-                    width: 44,
+                  child: AnimatedContainer(
+                    duration: AppDurations.fast,
+                    height: 48,
+                    width: 48,
                     decoration: BoxDecoration(
-                      gradient: canSave ? AppColors.accentGradient : null,
-                      color: canSave ? null : AppColors.white.withValues(alpha: 0.1),
+                      color: canSave ? accentColor : AppColors.white.withValues(alpha: 0.05),
                       shape: BoxShape.circle,
+                      boxShadow: canSave ? [
+                        BoxShadow(
+                          color: accentColor.withValues(alpha: 0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        )
+                      ] : null,
                     ),
                     child: Center(
                       child: state.saveStatus == AsyncStatus.inProgress
@@ -428,10 +493,10 @@ class _JournalInputArea extends StatelessWidget {
                                 valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
                               ),
                             )
-                          : Icon(
+                          : const Icon(
                               Icons.send_rounded,
-                              size: 20,
-                              color: canSave ? AppColors.white : AppColors.textMuted,
+                              size: 22,
+                              color: AppColors.white,
                             ),
                     ),
                   ),
