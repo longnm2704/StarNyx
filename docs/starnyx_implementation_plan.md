@@ -276,7 +276,7 @@ Issue checklist:
 - [x] `STX-046` Khi import: ghi đè toàn bộ dữ liệu hiện tại
 - [x] `STX-047` Có rollback nếu import lỗi giữa chừng
 - [x] `STX-048` Rebuild reminder schedule sau import thành công
-- [ ] `STX-049` Viết unit test cho JSON parser, import validator, rollback path
+- [x] `STX-049` Viết unit test cho JSON parser, import validator, rollback path
 - [ ] `STX-050` Viết bloc test hoặc widget test cho form, home, journal
 - [ ] `STX-051` Tạo manual QA checklist cho toàn bộ MVP
 
