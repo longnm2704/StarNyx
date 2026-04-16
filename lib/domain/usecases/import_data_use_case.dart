@@ -66,12 +66,52 @@ class ImportDataUseCase {
       json['appSettings'] as Map<String, dynamic>,
     );
 
-    await _clearCurrentData();
-    await _saveImportedData(
+    final snapshot = await _captureCurrentData();
+
+    try {
+      await _clearCurrentData();
+      await _saveImportedData(
+        starnyxs: starnyxs,
+        completions: completions,
+        journalEntries: journalEntries,
+        appSettings: appSettings,
+      );
+    } catch (error) {
+      try {
+        await _restoreFromSnapshot(snapshot);
+      } catch (rollbackError) {
+        throw ImportDataException(<String>[
+          'Import failed while writing local data.',
+          'Rollback failed: $rollbackError',
+        ]);
+      }
+
+      throw ImportDataException(<String>[
+        'Import failed while writing local data. Previous data was restored.',
+        '$error',
+      ]);
+    }
+  }
+
+  Future<_ImportSnapshot> _captureCurrentData() async {
+    final starnyxs = await _starnyxRepository.getAllStarnyxs();
+    final completions = <Completion>[];
+    final journalEntries = <JournalEntry>[];
+
+    for (final starnyx in starnyxs) {
+      completions.addAll(
+        await _completionRepository.getCompletionsForStarnyx(starnyx.id),
+      );
+      journalEntries.addAll(
+        await _journalEntryRepository.getJournalEntriesForStarnyx(starnyx.id),
+      );
+    }
+
+    return _ImportSnapshot(
       starnyxs: starnyxs,
       completions: completions,
       journalEntries: journalEntries,
-      appSettings: appSettings,
+      appSettings: await _appSettingsRepository.getAppSettings(),
     );
   }
 
@@ -103,6 +143,27 @@ class ImportDataUseCase {
     }
 
     await _appSettingsRepository.saveAppSettings(appSettings);
+  }
+
+  Future<void> _restoreFromSnapshot(_ImportSnapshot snapshot) async {
+    await _clearCurrentData();
+
+    for (final starnyx in snapshot.starnyxs) {
+      await _starnyxRepository.saveStarnyx(starnyx);
+    }
+
+    for (final completion in snapshot.completions) {
+      await _completionRepository.saveCompletion(completion);
+    }
+
+    for (final entry in snapshot.journalEntries) {
+      await _journalEntryRepository.saveJournalEntry(entry);
+    }
+
+    final appSettings = snapshot.appSettings;
+    if (appSettings != null) {
+      await _appSettingsRepository.saveAppSettings(appSettings);
+    }
   }
 }
 
@@ -156,4 +217,18 @@ AppSettings _appSettingsFromJson(Map<String, dynamic> json) {
     lastSelectedStarnyxId: json['lastSelectedStarnyxId'] as String?,
     updatedAt: DateTime.parse(json['updatedAt'] as String),
   );
+}
+
+class _ImportSnapshot {
+  const _ImportSnapshot({
+    required this.starnyxs,
+    required this.completions,
+    required this.journalEntries,
+    required this.appSettings,
+  });
+
+  final List<StarNyx> starnyxs;
+  final List<Completion> completions;
+  final List<JournalEntry> journalEntries;
+  final AppSettings? appSettings;
 }
