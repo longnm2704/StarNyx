@@ -6,9 +6,9 @@ import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
-import 'package:starnyx/features/settings/presentation/bloc/settings_event.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_state.dart';
 import 'package:starnyx/features/settings/presentation/pages/about_starnyx_sheet.dart';
+import 'package:starnyx/features/settings/presentation/pages/backup_settings_sheet.dart';
 import 'package:starnyx/features/settings/presentation/pages/general_settings_sheet.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_header.dart';
 
@@ -62,23 +62,36 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
         switch (settings.name) {
           case '/':
             page = SettingsMainView(
-              onGeneralTap: () => _navigatorKey.currentState?.pushNamed('/general'),
+              onGeneralTap: () =>
+                  _navigatorKey.currentState?.pushNamed('/general'),
+              onBackupTap: () =>
+                  _navigatorKey.currentState?.pushNamed('/backup'),
               onAboutTap: () => _navigatorKey.currentState?.pushNamed('/about'),
               onClose: () => Navigator.of(context, rootNavigator: true).pop(),
             );
           case '/general':
-            page = GeneralSettingsSheet(onBack: () => _navigatorKey.currentState?.pop());
+            page = GeneralSettingsSheet(
+              onBack: () => _navigatorKey.currentState?.pop(),
+            );
+          case '/backup':
+            page = BackupSettingsSheet(
+              onBack: () => _navigatorKey.currentState?.pop(),
+            );
           case '/about':
-            page = AboutStarnyxSheet(onBack: () => _navigatorKey.currentState?.pop());
+            page = AboutStarnyxSheet(
+              onBack: () => _navigatorKey.currentState?.pop(),
+            );
           default:
             page = const SizedBox.shrink();
         }
-        
+
         return Container(
           clipBehavior: Clip.antiAlias,
           decoration: const BoxDecoration(
             gradient: _sheetTopDownGradient,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.5)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppRadius.xl * 1.5),
+            ),
           ),
           child: CosmicBackground(child: page),
         );
@@ -87,12 +100,12 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
         const begin = Offset(1.0, 0.0);
         const end = Offset.zero;
         const curve = Curves.easeOutCubic;
-        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var tween = Tween(
+          begin: begin,
+          end: end,
+        ).chain(CurveTween(curve: curve));
 
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
+        return SlideTransition(position: animation.drive(tween), child: child);
       },
     );
   }
@@ -116,12 +129,14 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
 class SettingsMainView extends StatefulWidget {
   const SettingsMainView({
     required this.onGeneralTap,
+    required this.onBackupTap,
     required this.onAboutTap,
     required this.onClose,
     super.key,
   });
 
   final VoidCallback onGeneralTap;
+  final VoidCallback onBackupTap;
   final VoidCallback onAboutTap;
   final VoidCallback onClose;
 
@@ -158,7 +173,9 @@ class _SettingsMainViewState extends State<SettingsMainView> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final topInset = mediaQuery.viewPadding.top > 0 ? mediaQuery.viewPadding.top : mediaQuery.padding.top;
+    final topInset = mediaQuery.viewPadding.top > 0
+        ? mediaQuery.viewPadding.top
+        : mediaQuery.padding.top;
     final headerTopPadding = (topInset < 24 ? 24.0 : topInset) + AppSpacing.lg;
 
     return BlocListener<SettingsBloc, SettingsState>(
@@ -169,9 +186,9 @@ class _SettingsMainViewState extends State<SettingsMainView> {
           );
         }
         if (state.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.errorMessage!)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
         }
       },
       child: Column(
@@ -209,17 +226,12 @@ class _SettingsMainViewState extends State<SettingsMainView> {
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 _SettingsSection(
-                  title: 'settings.data_section'.tr(),
+                  title: 'settings.backup_section'.tr(),
                   children: [
                     _SettingsTile(
-                      iconPath: 'assets/icons/ic_export.svg',
-                      title: 'settings.export_label'.tr(),
-                      onTap: () => context.read<SettingsBloc>().add(const SettingsExportRequested()),
-                    ),
-                    _SettingsTile(
-                      iconPath: 'assets/icons/ic_import.svg',
-                      title: 'settings.import_label'.tr(),
-                      onTap: () {},
+                      iconPath: 'assets/icons/ic_book.svg',
+                      title: 'settings.backup_label'.tr(),
+                      onTap: widget.onBackupTap,
                     ),
                   ],
                 ),
@@ -260,14 +272,17 @@ class _SettingsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: AppSpacing.md, bottom: AppSpacing.sm),
+          padding: const EdgeInsets.only(
+            left: AppSpacing.md,
+            bottom: AppSpacing.sm,
+          ),
           child: Text(
             title.toUpperCase(),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.5,
-                ),
+              color: AppColors.textMuted,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.5,
+            ),
           ),
         ),
         Container(
@@ -340,9 +355,9 @@ class _SettingsTile extends StatelessWidget {
                 child: Text(
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               if (onTap != null)
