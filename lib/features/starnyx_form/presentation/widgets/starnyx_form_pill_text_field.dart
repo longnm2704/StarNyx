@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
 class StarnyxFormPillTextField extends StatefulWidget {
@@ -10,6 +11,7 @@ class StarnyxFormPillTextField extends StatefulWidget {
     super.key,
     this.hasError = false,
     this.height = AppSize.inputMinHeight,
+    this.inputFormatters,
   });
 
   final String initialValue;
@@ -17,6 +19,7 @@ class StarnyxFormPillTextField extends StatefulWidget {
   final int maxLines;
   final bool hasError;
   final double height;
+  final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<String> onChanged;
 
   @override
@@ -73,6 +76,7 @@ class _StarnyxFormPillTextFieldState extends State<StarnyxFormPillTextField> {
           ? TextField(
               controller: _controller,
               onChanged: widget.onChanged,
+              inputFormatters: widget.inputFormatters,
               minLines: widget.maxLines,
               maxLines: widget.maxLines,
               onTapOutside: (_) {
@@ -107,6 +111,7 @@ class _StarnyxFormPillTextFieldState extends State<StarnyxFormPillTextField> {
                   child: TextField(
                     controller: _controller,
                     onChanged: widget.onChanged,
+                    inputFormatters: widget.inputFormatters,
                     maxLines: 1,
                     minLines: 1,
                     onTapOutside: (_) {

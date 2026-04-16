@@ -13,7 +13,9 @@ enum StarnyxFormMode { create, edit }
 
 enum AsyncStatus { idle, inProgress, success, failure }
 
-enum StarnyxFormTitleError { empty }
+enum StarnyxFormTitleError { empty, tooLong }
+
+enum StarnyxFormDescriptionError { tooLong }
 
 enum StarnyxFormStartDateError { inFuture, tooFarInPast }
 

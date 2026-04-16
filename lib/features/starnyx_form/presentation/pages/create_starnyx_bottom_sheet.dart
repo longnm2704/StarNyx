@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -199,6 +200,8 @@ class _StarnyxFormBottomSheetViewState
               buildWhen: (StarnyxFormState previous, StarnyxFormState current) {
                 return previous.submissionStatus != current.submissionStatus ||
                     previous.deletionStatus != current.deletionStatus ||
+                    previous.title != current.title ||
+                    previous.description != current.description ||
                     previous.titleError != current.titleError ||
                     previous.color != current.color ||
                     previous.reminderEnabled != current.reminderEnabled ||
@@ -209,6 +212,8 @@ class _StarnyxFormBottomSheetViewState
                 final bloc = context.read<StarnyxFormBloc>();
                 final titleHasError =
                     _showValidationErrors && state.titleError != null;
+                final descriptionHasError =
+                    _showValidationErrors && state.descriptionError != null;
                 final isSaving =
                     state.submissionStatus == AsyncStatus.inProgress;
                 final isDeleting =
@@ -258,6 +263,11 @@ class _StarnyxFormBottomSheetViewState
                             children: <Widget>[
                               StarnyxFormFieldLabel(
                                 label: 'starnyx_form.title_label'.tr(),
+                                trailing: _CharacterCounter(
+                                  currentLength: state.title.characters.length,
+                                  maxLength: StarnyxFormBloc.maxTitleLength,
+                                  hasError: titleHasError,
+                                ),
                               ),
                               const SizedBox(height: AppSpacing.sm),
                               StarnyxFormPillTextField(
@@ -266,6 +276,11 @@ class _StarnyxFormBottomSheetViewState
                                 maxLines: 1,
                                 height: AppSize.inputMinHeight,
                                 hasError: titleHasError,
+                                inputFormatters: <TextInputFormatter>[
+                                  LengthLimitingTextInputFormatter(
+                                    StarnyxFormBloc.maxTitleLength,
+                                  ),
+                                ],
                                 onChanged: (String value) {
                                   bloc.add(StarnyxFormTitleChanged(value));
                                 },
@@ -277,7 +292,15 @@ class _StarnyxFormBottomSheetViewState
                                     horizontal: AppSpacing.md,
                                   ),
                                   child: Text(
-                                    'starnyx_form.title_error_required'.tr(),
+                                    switch (state.titleError) {
+                                      StarnyxFormTitleError.empty =>
+                                        'starnyx_form.title_error_required'
+                                            .tr(),
+                                      StarnyxFormTitleError.tooLong =>
+                                        'starnyx_form.title_error_too_long'
+                                            .tr(),
+                                      null => '',
+                                    },
                                     style: Theme.of(context).textTheme.bodySmall
                                         ?.copyWith(color: AppColors.accentPink),
                                   ),
@@ -286,13 +309,26 @@ class _StarnyxFormBottomSheetViewState
                               const SizedBox(height: AppSpacing.lg),
                               StarnyxFormFieldLabel(
                                 label: 'starnyx_form.description_label'.tr(),
+                                trailing: _CharacterCounter(
+                                  currentLength:
+                                      state.description.characters.length,
+                                  maxLength:
+                                      StarnyxFormBloc.maxDescriptionLength,
+                                  hasError: descriptionHasError,
+                                ),
                               ),
                               const SizedBox(height: AppSpacing.sm),
                               StarnyxFormPillTextField(
                                 initialValue: state.description,
                                 hintText: 'starnyx_form.description_hint'.tr(),
-                                maxLines: 3,
+                                maxLines: 5,
                                 height: 118,
+                                hasError: descriptionHasError,
+                                inputFormatters: <TextInputFormatter>[
+                                  LengthLimitingTextInputFormatter(
+                                    StarnyxFormBloc.maxDescriptionLength,
+                                  ),
+                                ],
                                 onChanged: (String value) {
                                   bloc.add(
                                     StarnyxFormDescriptionChanged(value),
@@ -374,6 +410,29 @@ class _StarnyxFormBottomSheetViewState
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _CharacterCounter extends StatelessWidget {
+  const _CharacterCounter({
+    required this.currentLength,
+    required this.maxLength,
+    this.hasError = false,
+  });
+
+  final int currentLength;
+  final int maxLength;
+  final bool hasError;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      '$currentLength/$maxLength',
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+        color: hasError ? AppColors.accentPink : AppColors.textMuted,
+        fontWeight: FontWeight.w600,
       ),
     );
   }

@@ -22,6 +22,7 @@ class StarnyxFormState extends Equatable {
     required this.reminderEnabled,
     required this.reminderTime,
     required this.titleError,
+    required this.descriptionError,
     required this.startDateError,
     required this.reminderTimeError,
     required this.submissionStatus,
@@ -56,6 +57,9 @@ class StarnyxFormState extends Equatable {
   /// Validation error for title (non-null if invalid).
   final StarnyxFormTitleError? titleError;
 
+  /// Validation error for description (non-null if invalid).
+  final StarnyxFormDescriptionError? descriptionError;
+
   /// Validation error for start date (non-null if invalid).
   final StarnyxFormStartDateError? startDateError;
 
@@ -86,7 +90,10 @@ class StarnyxFormState extends Equatable {
   /// Convenience getter: true if any field has a validation error.
   /// Used to disable the submit button.
   bool get hasValidationErrors =>
-      titleError != null || startDateError != null || reminderTimeError != null;
+      titleError != null ||
+      descriptionError != null ||
+      startDateError != null ||
+      reminderTimeError != null;
 
   /// Convenience getter: true if the form can be submitted (all validations pass and no request in flight).
   /// UI uses this to enable/disable the submit button.
@@ -111,6 +118,7 @@ class StarnyxFormState extends Equatable {
     bool? reminderEnabled,
     String? reminderTime,
     Object? titleError = _unset,
+    Object? descriptionError = _unset,
     Object? startDateError = _unset,
     Object? reminderTimeError = _unset,
     AsyncStatus? submissionStatus,
@@ -131,6 +139,9 @@ class StarnyxFormState extends Equatable {
       titleError: identical(titleError, _unset)
           ? this.titleError
           : titleError as StarnyxFormTitleError?,
+      descriptionError: identical(descriptionError, _unset)
+          ? this.descriptionError
+          : descriptionError as StarnyxFormDescriptionError?,
       startDateError: identical(startDateError, _unset)
           ? this.startDateError
           : startDateError as StarnyxFormStartDateError?,
@@ -167,6 +178,7 @@ class StarnyxFormState extends Equatable {
     reminderEnabled,
     reminderTime,
     titleError,
+    descriptionError,
     startDateError,
     reminderTimeError,
     submissionStatus,

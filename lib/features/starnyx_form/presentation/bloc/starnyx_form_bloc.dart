@@ -7,6 +7,9 @@ import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'starnyx_form_event.dart';
 import 'starnyx_form_state.dart';
 
+const int _maxStarnyxTitleLength = 60;
+const int _maxStarnyxDescriptionLength = 160;
+
 /// BLoC that manages the state and business logic for creating and editing StarNyx entities.
 ///
 /// The BLoC handles:
@@ -20,6 +23,9 @@ import 'starnyx_form_state.dart';
 /// 2. **Edit mode**: StarNyx provided, prefills all fields from the entity
 ///
 class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
+  static const int maxTitleLength = _maxStarnyxTitleLength;
+  static const int maxDescriptionLength = _maxStarnyxDescriptionLength;
+
   /// Creates a new StarnyxFormBloc instance.
   ///
   /// Parameters:
@@ -90,6 +96,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
         reminderEnabled: initialStarnyx.reminderEnabled,
         reminderTime: initialStarnyx.reminderTime ?? '',
         titleError: null,
+        descriptionError: null,
         startDateError: null,
         reminderTimeError: null,
         submissionStatus: AsyncStatus.idle,
@@ -113,6 +120,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
       reminderEnabled: false,
       reminderTime: defaultReminder,
       titleError: StarnyxFormTitleError.empty,
+      descriptionError: null,
       startDateError: null,
       reminderTimeError: null,
       submissionStatus: AsyncStatus.idle,
@@ -141,12 +149,16 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
   }
 
   /// Handles description field changes.
-  /// Description is optional, so no revalidation needed.
+  /// Description is optional, but still has a max-length validation.
   void _onDescriptionChanged(
     StarnyxFormDescriptionChanged event,
     Emitter<StarnyxFormState> emit,
   ) {
-    _emitFieldChange(emit, state.copyWith(description: event.description));
+    _emitFieldChange(
+      emit,
+      state.copyWith(description: event.description),
+      revalidate: true,
+    );
   }
 
   /// Handles color field changes.
@@ -354,11 +366,21 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
   ///
   /// Validation rules:
   /// - **Title**: Required (cannot be empty after trim)
+  /// - **Title**: Maximum 60 characters after trim
+  /// - **Description**: Optional, maximum 160 characters after trim
   /// - **Start date**: Must be within the last 7 days and not in the future
   /// - **Reminder time**: Required if reminder is enabled, must be valid HH:mm format
   StarnyxFormState _validatedState(StarnyxFormState candidate) {
-    final titleError = candidate.title.trim().isEmpty
+    final trimmedTitle = candidate.title.trim();
+    final trimmedDescription = candidate.description.trim();
+    final titleError = trimmedTitle.isEmpty
         ? StarnyxFormTitleError.empty
+        : trimmedTitle.length > _maxStarnyxTitleLength
+        ? StarnyxFormTitleError.tooLong
+        : null;
+    final descriptionError =
+        trimmedDescription.length > _maxStarnyxDescriptionLength
+        ? StarnyxFormDescriptionError.tooLong
         : null;
     final today = DateUtils.nowDate(_nowBuilder());
     final earliestAllowedDate = today.subtract(const Duration(days: 7));
@@ -372,6 +394,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
 
     return candidate.copyWith(
       titleError: titleError,
+      descriptionError: descriptionError,
       startDateError: startDateError,
       reminderTimeError: reminderTimeError,
     );
