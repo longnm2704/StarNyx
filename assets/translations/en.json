@@ -55,6 +55,7 @@
     "title_label": "Title",
     "title_hint": "Required",
     "title_error_required": "Title is required",
+    "title_error_too_long": "Title must be 60 characters or fewer",
     "description_label": "Description",
     "description_hint": "Optional",
     "color_label": "Color",

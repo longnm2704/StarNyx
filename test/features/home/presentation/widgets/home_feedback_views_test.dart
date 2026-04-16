@@ -145,8 +145,7 @@ void main() {
       await tester.tap(find.text('Edit'));
       await tester.pump();
       expect(find.text('Done'), findsOneWidget);
-      expect(find.text('1'), findsWidgets);
-      expect(find.text('2'), findsWidgets);
+      expect(_findSvg('assets/icons/ic_cursor.svg'), findsWidgets);
 
       await tester.tap(find.text('Done'));
       await tester.pump();
@@ -161,7 +160,11 @@ void main() {
       createPressed = false;
       expect(find.text('Observation Deck'), findsOneWidget);
 
-      await tester.ensureVisible(find.text('Stretch'));
+      await tester.scrollUntilVisible(
+        find.text('Stretch'),
+        200,
+        scrollable: find.byType(Scrollable).last,
+      );
       await tester.pump();
       await tester.tap(find.text('Stretch'));
       await tester.pump();
@@ -173,7 +176,11 @@ void main() {
       await tester.pump(const Duration(milliseconds: 220));
       await tester.pump(const Duration(milliseconds: 220));
 
-      await tester.ensureVisible(_findSvg('assets/icons/ic_edit.svg').last);
+      await tester.scrollUntilVisible(
+        _findSvg('assets/icons/ic_edit.svg').last,
+        200,
+        scrollable: find.byType(Scrollable).last,
+      );
       await tester.pump();
       await tester.tap(_findSvg('assets/icons/ic_edit.svg').last);
       await tester.pump();

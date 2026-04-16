@@ -171,6 +171,67 @@ void main() {
     expect(bloc.state.startDateError, StarnyxFormStartDateError.tooFarInPast);
   });
 
+  test('title longer than 60 characters surfaces a form error', () async {
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    bloc.add(StarnyxFormTitleChanged('a' * 61));
+    await pumpEventQueue();
+
+    expect(bloc.state.titleError, StarnyxFormTitleError.tooLong);
+    expect(bloc.state.canSubmit, isFalse);
+  });
+
+  test(
+    'description longer than 160 characters surfaces a form error',
+    () async {
+      final bloc = StarnyxFormBloc(
+        createStarNyxUseCase: createUseCase,
+        updateStarNyxUseCase: updateUseCase,
+        deleteStarNyxUseCase: deleteUseCase,
+        nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+      );
+
+      bloc.add(const StarnyxFormTitleChanged('Hydrate'));
+      bloc.add(StarnyxFormDescriptionChanged('a' * 161));
+      await pumpEventQueue();
+
+      expect(bloc.state.descriptionError, StarnyxFormDescriptionError.tooLong);
+      expect(bloc.state.canSubmit, isFalse);
+    },
+  );
+
+  test(
+    'correcting long title and description clears their form errors',
+    () async {
+      final bloc = StarnyxFormBloc(
+        createStarNyxUseCase: createUseCase,
+        updateStarNyxUseCase: updateUseCase,
+        deleteStarNyxUseCase: deleteUseCase,
+        nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+      );
+
+      bloc.add(StarnyxFormTitleChanged('a' * 61));
+      bloc.add(StarnyxFormDescriptionChanged('a' * 161));
+      await pumpEventQueue();
+
+      expect(bloc.state.titleError, StarnyxFormTitleError.tooLong);
+      expect(bloc.state.descriptionError, StarnyxFormDescriptionError.tooLong);
+
+      bloc.add(const StarnyxFormTitleChanged('Hydrate'));
+      bloc.add(const StarnyxFormDescriptionChanged('Daily check-in'));
+      await pumpEventQueue();
+
+      expect(bloc.state.titleError, isNull);
+      expect(bloc.state.descriptionError, isNull);
+      expect(bloc.state.canSubmit, isTrue);
+    },
+  );
+
   test('submit creates a new StarNyx when the form is valid', () async {
     /// Verifies the complete submit flow:
     /// - Valid form → inProgress → success state
@@ -303,6 +364,29 @@ void main() {
 
       expect(bloc.state.submissionStatus, AsyncStatus.idle);
       expect(bloc.state.titleError, StarnyxFormTitleError.empty);
+      expect(await repository.getAllStarnyxs(), isEmpty);
+    },
+  );
+
+  test(
+    'submit is blocked when description is longer than 160 characters',
+    () async {
+      final bloc = StarnyxFormBloc(
+        createStarNyxUseCase: createUseCase,
+        updateStarNyxUseCase: updateUseCase,
+        deleteStarNyxUseCase: deleteUseCase,
+        nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+      );
+
+      bloc.add(const StarnyxFormTitleChanged('Hydrate'));
+      bloc.add(StarnyxFormDescriptionChanged('a' * 161));
+      await pumpEventQueue();
+
+      bloc.add(const StarnyxFormSubmitted());
+      await pumpEventQueue();
+
+      expect(bloc.state.submissionStatus, AsyncStatus.idle);
+      expect(bloc.state.descriptionError, StarnyxFormDescriptionError.tooLong);
       expect(await repository.getAllStarnyxs(), isEmpty);
     },
   );

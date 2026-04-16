@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
+import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
+import 'package:starnyx/features/home/presentation/bloc/home_state.dart';
 
 import 'home_shell_view.dart';
 import 'home_swipe_up_hint.dart';
@@ -85,6 +88,13 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
   }
 
   Future<ConstellationSwitcherSheetAction?> _showConstellationSheet() {
+    HomeBloc? homeBloc;
+    try {
+      homeBloc = context.read<HomeBloc>();
+    } catch (_) {
+      homeBloc = null;
+    }
+
     return showModalBottomSheet<ConstellationSwitcherSheetAction>(
       context: context,
       isScrollControlled: true,
@@ -92,10 +102,31 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
       backgroundColor: Colors.transparent,
       barrierColor: AppColors.black.withValues(alpha: 0.72),
       builder: (_) {
-        return ConstellationSwitcherSheet(
-          starnyxs: widget.starnyxs,
-          activeStarnyxId: widget.activeStarnyxId,
-          onSelectPressed: widget.onSelectPressed,
+        if (homeBloc == null) {
+          return ConstellationSwitcherSheet(
+            starnyxs: widget.starnyxs,
+            activeStarnyxId: widget.activeStarnyxId,
+            onSelectPressed: widget.onSelectPressed,
+          );
+        }
+
+        return BlocProvider<HomeBloc>.value(
+          value: homeBloc,
+          child: BlocBuilder<HomeBloc, HomeState>(
+            buildWhen: (HomeState previous, HomeState current) =>
+                previous.starnyxs != current.starnyxs ||
+                previous.activeStarnyxId != current.activeStarnyxId,
+            builder: (BuildContext context, HomeState state) {
+              return ConstellationSwitcherSheet(
+                starnyxs: state.starnyxs.isEmpty
+                    ? widget.starnyxs
+                    : state.starnyxs,
+                activeStarnyxId:
+                    state.activeStarnyxId ?? widget.activeStarnyxId,
+                onSelectPressed: widget.onSelectPressed,
+              );
+            },
+          ),
         );
       },
     );

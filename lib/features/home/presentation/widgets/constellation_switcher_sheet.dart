@@ -280,7 +280,7 @@ class _ConstellationSwitcherSheetState
                                   starnyx: starnyx,
                                   isActive:
                                       starnyx.id == widget.activeStarnyxId,
-                                  orderIndex: index + 1,
+                                  reorderIndex: index,
                                   isReorderMode: true,
                                   onEditPressed: () {},
                                   onSelectPressed: () {},
@@ -298,7 +298,7 @@ class _ConstellationSwitcherSheetState
                               return _ConstellationSwitcherCard(
                                 starnyx: starnyx,
                                 isActive: starnyx.id == widget.activeStarnyxId,
-                                orderIndex: index + 1,
+                                reorderIndex: index,
                                 isReorderMode: false,
                                 onEditPressed: () => Navigator.of(context).pop(
                                   ConstellationSwitcherSheetAction.editRequested(
@@ -424,10 +424,13 @@ class _SheetActionPill extends StatelessWidget {
 }
 
 class _ConstellationSwitcherCard extends StatelessWidget {
+  static const double _minCardHeight = 68;
+  static const double _trailingSlotWidth = 40;
+
   const _ConstellationSwitcherCard({
     required this.starnyx,
     required this.isActive,
-    required this.orderIndex,
+    required this.reorderIndex,
     required this.isReorderMode,
     required this.onEditPressed,
     required this.onSelectPressed,
@@ -435,7 +438,7 @@ class _ConstellationSwitcherCard extends StatelessWidget {
 
   final StarNyx starnyx;
   final bool isActive;
-  final int orderIndex;
+  final int reorderIndex;
   final bool isReorderMode;
   final VoidCallback onEditPressed;
   final VoidCallback onSelectPressed;
@@ -456,8 +459,9 @@ class _ConstellationSwitcherCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.pill),
         onTap: isReorderMode || isActive ? null : onSelectPressed,
         child: Container(
+          constraints: const BoxConstraints(minHeight: _minCardHeight),
           padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
+            horizontal: AppSpacing.lg,
             vertical: 11,
           ),
           decoration: BoxDecoration(
@@ -475,76 +479,47 @@ class _ConstellationSwitcherCard extends StatelessWidget {
                 : null,
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              _OrderBadge(index: orderIndex, color: itemColor),
-              const SizedBox(width: AppSpacing.sm),
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: itemColor,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   starnyx.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: itemColor,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
-              if (isReorderMode)
-                ReorderableDragStartListener(
-                  index: orderIndex - 1,
-                  child: Icon(
-                    Icons.drag_indicator_rounded,
-                    color: itemColor.withValues(alpha: 0.92),
-                  ),
-                )
-              else
-                IconButton(
-                  onPressed: onEditPressed,
-                  icon: AppSvgIcon(
-                    assetPath: 'assets/icons/ic_edit.svg',
-                    color: itemColor,
-                    size: 18,
-                    semanticsLabel: 'Edit ${starnyx.title}',
-                  ),
-                  visualDensity: VisualDensity.compact,
-                ),
+              const SizedBox(width: AppSpacing.sm),
+              SizedBox(
+                width: _trailingSlotWidth,
+                child: isReorderMode
+                    ? ReorderableDragStartListener(
+                        index: reorderIndex,
+                        child: Center(
+                          child: AppSvgIcon(
+                            assetPath: 'assets/icons/ic_cursor.svg',
+                            color: itemColor.withValues(alpha: 0.92),
+                            size: 18,
+                            semanticsLabel: 'Reorder ${starnyx.title}',
+                          ),
+                        ),
+                      )
+                    : IconButton(
+                        onPressed: onEditPressed,
+                        icon: AppSvgIcon(
+                          assetPath: 'assets/icons/ic_edit.svg',
+                          color: itemColor,
+                          size: 18,
+                          semanticsLabel: 'Edit ${starnyx.title}',
+                        ),
+                        visualDensity: VisualDensity.compact,
+                      ),
+              ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OrderBadge extends StatelessWidget {
-  const _OrderBadge({required this.index, required this.color});
-
-  final int index;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 28,
-      height: 28,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-        border: Border.all(color: color.withValues(alpha: 0.58)),
-      ),
-      child: Text(
-        '$index',
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          color: color,
-          fontWeight: FontWeight.w800,
         ),
       ),
     );
