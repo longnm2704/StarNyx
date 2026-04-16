@@ -115,25 +115,21 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
         child: FractionallySizedBox(
           heightFactor: 1.0,
           child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-                colors: <Color>[
-                  widget.accentColor.withValues(alpha: 0.22),
-                  widget.accentColor.withValues(alpha: 0.08),
-                  AppColors.background,
-                ],
-                stops: const <double>[0.0, 0.45, 1.0],
-              ),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.5)),
+            decoration: const BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.5)),
             ),
             child: SafeArea(
               top: false,
               bottom: false,
               child: Stack(
                 children: [
-                  const Positioned.fill(child: CosmicBackground(child: SizedBox.expand())),
+                  Positioned.fill(
+                    child: CosmicBackground(
+                      bottomGlowColor: widget.accentColor,
+                      child: const SizedBox.expand(),
+                    ),
+                  ),
                   Column(
                     children: [
                       Padding(
