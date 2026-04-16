@@ -248,7 +248,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
     final today = DateUtils.nowDate(_nowBuilder());
     final activeStarnyx = _findActiveStarnyxById(activeId);
-    if (_isInvalidCheckInDate(
+    if (_isBlockedCompletionDate(
       selectedDate: state.selectedDate,
       activeStarnyx: activeStarnyx,
       today: today,
@@ -368,7 +368,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     return null;
   }
 
-  bool _isInvalidCheckInDate({
+  bool _isBlockedCompletionDate({
     required DateTime selectedDate,
     required StarNyx? activeStarnyx,
     required DateTime today,
@@ -379,10 +379,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if (activeStarnyx == null) {
       return false;
     }
-    return DateUtils.isBeforeStartDate(
+    if (DateUtils.isBeforeStartDate(
       selectedDate,
       startDate: activeStarnyx.startDate,
-    );
+    )) {
+      return true;
+    }
+
+    return !DateUtils.isEditableWithinDays(selectedDate, days: 7, today: today);
   }
 }
 

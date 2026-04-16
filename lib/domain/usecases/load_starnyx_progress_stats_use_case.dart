@@ -1,7 +1,7 @@
 import 'package:starnyx/core/utils/streak_utils.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
-import 'package:starnyx/domain/repositories/completion_repository.dart';
 import 'package:starnyx/domain/repositories/starnyx_repository.dart';
+import 'package:starnyx/domain/repositories/completion_repository.dart';
 
 // Loads progress metrics for one StarNyx using the finalized streak rules.
 class LoadStarNyxProgressStatsUseCase {
