@@ -884,6 +884,140 @@ void main() {
       );
     },
   );
+
+  test('import use case parses valid JSON text payload', () async {
+    final useCase = ImportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    );
+
+    await useCase.callFromJsonText('''
+{
+  "schemaVersion": 1,
+  "starnyxs": [
+    {
+      "id": "habit-1",
+      "title": "Hydrate",
+      "description": null,
+      "color": "#102030",
+      "startDate": "2026-04-01",
+      "reminderEnabled": false,
+      "reminderTime": null,
+      "createdAt": "2026-04-01T08:00:00.000",
+      "updatedAt": "2026-04-02T09:00:00.000"
+    }
+  ],
+  "completions": [],
+  "journalEntries": [],
+  "appSettings": {
+    "lastSelectedStarnyxId": "habit-1",
+    "updatedAt": "2026-04-10T08:30:00.000"
+  }
+}
+''');
+
+    expect(await starNyxRepository.getStarnyxById('habit-1'), isNotNull);
+    expect(
+      (await appSettingsRepository.getAppSettings())?.lastSelectedStarnyxId,
+      'habit-1',
+    );
+  });
+
+  test('import use case rejects JSON text root when not object', () async {
+    final useCase = ImportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    );
+
+    expect(
+      () => useCase.callFromJsonText('[]'),
+      throwsA(
+        isA<ImportDataException>().having(
+          (e) => e.errors,
+          'errors',
+          contains('Import JSON root must be an object.'),
+        ),
+      ),
+    );
+  });
+
+  test(
+    'import use case surfaces rollback failure when restore also fails',
+    () async {
+      await starNyxRepository.saveStarnyx(
+        StarNyx(
+          id: 'habit-old',
+          title: 'Legacy Habit',
+          description: null,
+          color: '#111111',
+          startDate: DateTime(2026, 4, 1),
+          reminderEnabled: false,
+          reminderTime: null,
+          createdAt: DateTime(2026, 4, 1, 8),
+          updatedAt: DateTime(2026, 4, 1, 8),
+        ),
+      );
+      await completionRepository.saveCompletion(
+        Completion(
+          starnyxId: 'habit-old',
+          date: DateTime(2026, 4, 2),
+          completed: true,
+        ),
+      );
+
+      final failingCompletionRepository = _AlwaysFailingCompletionRepository(
+        completionRepository,
+      );
+      final useCase = ImportDataUseCase(
+        starNyxRepository,
+        failingCompletionRepository,
+        journalEntryRepository,
+        appSettingsRepository,
+      );
+
+      expect(
+        () => useCase(<String, dynamic>{
+          'schemaVersion': 1,
+          'starnyxs': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'id': 'habit-new',
+              'title': 'Imported Habit',
+              'description': null,
+              'color': '#102030',
+              'startDate': '2026-04-10',
+              'reminderEnabled': false,
+              'reminderTime': null,
+              'createdAt': '2026-04-10T08:00:00.000',
+              'updatedAt': '2026-04-10T08:00:00.000',
+            },
+          ],
+          'completions': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'starnyxId': 'habit-new',
+              'date': '2026-04-10',
+              'completed': true,
+            },
+          ],
+          'journalEntries': <Map<String, dynamic>>[],
+          'appSettings': <String, dynamic>{
+            'lastSelectedStarnyxId': 'habit-new',
+            'updatedAt': '2026-04-10T08:00:00.000',
+          },
+        }),
+        throwsA(
+          isA<ImportDataException>().having(
+            (e) => e.errors.join(' | '),
+            'errors',
+            contains('Rollback failed'),
+          ),
+        ),
+      );
+    },
+  );
 }
 
 class _InMemoryStarNyxRepository implements StarNyxRepository {
@@ -997,6 +1131,48 @@ class _FailingCompletionRepository implements CompletionRepository {
       throw StateError('Simulated completion write failure.');
     }
     return _delegate.saveCompletion(completion);
+  }
+
+  @override
+  Stream<List<Completion>> watchCompletionsForStarnyx(String starnyxId) {
+    return _delegate.watchCompletionsForStarnyx(starnyxId);
+  }
+}
+
+class _AlwaysFailingCompletionRepository implements CompletionRepository {
+  _AlwaysFailingCompletionRepository(this._delegate);
+
+  final CompletionRepository _delegate;
+
+  @override
+  Future<void> deleteCompletionByDate({
+    required String starnyxId,
+    required DateTime date,
+  }) {
+    return _delegate.deleteCompletionByDate(starnyxId: starnyxId, date: date);
+  }
+
+  @override
+  Future<void> deleteCompletionsForStarnyx(String starnyxId) {
+    return _delegate.deleteCompletionsForStarnyx(starnyxId);
+  }
+
+  @override
+  Future<Completion?> getCompletionByDate({
+    required String starnyxId,
+    required DateTime date,
+  }) {
+    return _delegate.getCompletionByDate(starnyxId: starnyxId, date: date);
+  }
+
+  @override
+  Future<List<Completion>> getCompletionsForStarnyx(String starnyxId) {
+    return _delegate.getCompletionsForStarnyx(starnyxId);
+  }
+
+  @override
+  Future<void> saveCompletion(Completion completion) {
+    throw StateError('Simulated completion write failure for rollback test.');
   }
 
   @override
