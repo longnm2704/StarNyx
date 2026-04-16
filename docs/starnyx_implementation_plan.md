@@ -272,7 +272,7 @@ Issue checklist:
 
 - [x] `STX-043` Tạo màn backup hoặc section backup trong settings
 - [x] `STX-044` Export toàn bộ dữ liệu ra file JSON theo schema trong spec
-- [ ] `STX-045` Import JSON với validate schema version và dữ liệu bắt buộc
+- [x] `STX-045` Import JSON với validate schema version và dữ liệu bắt buộc
 - [ ] `STX-046` Khi import: ghi đè toàn bộ dữ liệu hiện tại
 - [ ] `STX-047` Có rollback nếu import lỗi giữa chừng
 - [ ] `STX-048` Rebuild reminder schedule sau import thành công
