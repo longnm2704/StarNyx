@@ -90,13 +90,16 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
         listener: (context, state) {
           if (state.saveStatus == AsyncStatus.success) {
             _controller.clear();
-            // Scroll to bottom when new message is added.
-            // Since entries are DESC, top is newest.
-            _scrollController.animateTo(
-              0,
-              duration: AppDurations.medium,
-              curve: Curves.easeOut,
-            );
+            // Ensure the list is updated and attached before scrolling
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (_scrollController.hasClients) {
+                _scrollController.animateTo(
+                  0,
+                  duration: AppDurations.medium,
+                  curve: Curves.easeOut,
+                );
+              }
+            });
           } else if (state.saveStatus == AsyncStatus.failure && state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.errorMessage!)),
