@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/entities/completion.dart';
 import 'package:starnyx/domain/entities/app_settings.dart';
@@ -21,6 +23,26 @@ class ImportDataUseCase {
   final CompletionRepository _completionRepository;
   final JournalEntryRepository _journalEntryRepository;
   final AppSettingsRepository _appSettingsRepository;
+
+  Future<void> callFromJsonText(String jsonText) async {
+    final dynamic decoded;
+    try {
+      decoded = jsonDecode(jsonText);
+    } on FormatException {
+      throw const ImportDataException(<String>['Import JSON is malformed.']);
+    }
+
+    if (decoded is! Map) {
+      throw const ImportDataException(<String>[
+        'Import JSON root must be an object.',
+      ]);
+    }
+
+    final json = decoded.map<String, dynamic>(
+      (key, value) => MapEntry(key.toString(), value),
+    );
+    await call(json);
+  }
 
   Future<void> call(Map<String, dynamic> json) async {
     final validation = JsonValidationUtils.validateImportJson(json);
