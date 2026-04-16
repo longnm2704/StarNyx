@@ -31,12 +31,12 @@ class JournalSaveRequested extends JournalEvent {
 }
 
 class JournalDeleteRequested extends JournalEvent {
-  const JournalDeleteRequested(this.date);
+  const JournalDeleteRequested(this.id);
 
-  final DateTime date;
+  final int id;
 
   @override
-  List<Object?> get props => <Object?>[date];
+  List<Object?> get props => <Object?>[id];
 }
 
 class JournalEntriesChanged extends JournalEvent {

@@ -98,10 +98,15 @@ Completion _completionFromJson(Map<String, dynamic> json) {
 }
 
 JournalEntry _journalEntryFromJson(Map<String, dynamic> json) {
+  final date = DateTime.parse(json['date'] as String);
   return JournalEntry(
+    id: 0,
     starnyxId: json['starnyxId'] as String,
-    date: DateTime.parse(json['date'] as String),
+    date: date,
     content: json['content'] as String,
+    createdAt: json.containsKey('createdAt')
+        ? DateTime.parse(json['createdAt'] as String)
+        : date,
   );
 }
 

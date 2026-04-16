@@ -144,11 +144,12 @@ Mở app → hiển thị StarNyx gần nhất → thao tác
 
 ## 6.4 Ghi chú
 
-- 1 ghi chú / ngày
-- Hiển thị dạng danh sách
-- Luôn ghi cho **ngày hiện tại**
-- Không cho sửa:
-  → muốn thay đổi thì xoá và tạo lại
+- **Giao diện**: Trải nghiệm như một trình nhắn tin (Messaging Interface). 
+- **Quy tắc**:
+  - Không giới hạn số lượng ghi chú trong một ngày.
+  - Mỗi ghi chú được gán với một ngày cụ thể (mặc định là ngày hiện tại).
+  - Ghi chú không thể chỉnh sửa, chỉ hỗ trợ xóa.
+  - Hiển thị theo dòng thời gian (mới nhất hiển thị ở cuối luồng chat của ngày đó).
 
 ---
 

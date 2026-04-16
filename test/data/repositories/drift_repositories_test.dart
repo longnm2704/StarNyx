@@ -75,7 +75,7 @@ void main() {
     expect(saved, equals(entity));
   });
 
-  test('saves and loads journal entry domain entities by date', () async {
+  test('saves and loads journal entry domain entities', () async {
     await starNyxRepository.saveStarnyx(
       domain.StarNyx(
         id: 'habit-1',
@@ -91,19 +91,20 @@ void main() {
     );
 
     final entry = domain.JournalEntry(
+      id: 0,
       starnyxId: 'habit-1',
       date: DateTime(2026, 4, 10),
       content: 'Stayed consistent today.',
+      createdAt: DateTime(2026, 4, 10, 10, 0),
     );
 
     await journalEntryRepository.saveJournalEntry(entry);
 
-    final saved = await journalEntryRepository.getJournalEntryByDate(
-      starnyxId: 'habit-1',
-      date: DateTime(2026, 4, 10),
-    );
+    final saved = await journalEntryRepository.getJournalEntriesForStarnyx('habit-1');
 
-    expect(saved, equals(entry));
+    expect(saved, hasLength(1));
+    expect(saved.first.content, equals(entry.content));
+    expect(saved.first.id, isNot(0));
   });
 
   test(
@@ -131,9 +132,11 @@ void main() {
       );
       await journalEntryRepository.saveJournalEntry(
         domain.JournalEntry(
+          id: 0,
           starnyxId: 'habit-1',
           date: DateTime(2026, 4, 10),
           content: 'Stayed consistent today.',
+          createdAt: DateTime(2026, 4, 10, 10, 0),
         ),
       );
 
@@ -148,11 +151,8 @@ void main() {
         isNull,
       );
       expect(
-        await journalEntryRepository.getJournalEntryByDate(
-          starnyxId: 'habit-1',
-          date: DateTime(2026, 4, 10),
-        ),
-        isNull,
+        await journalEntryRepository.getJournalEntriesForStarnyx('habit-1'),
+        isEmpty,
       );
     },
   );

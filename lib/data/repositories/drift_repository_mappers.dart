@@ -48,9 +48,11 @@ extension DriftCompletionMapper on db.Completion {
 extension DriftJournalEntryMapper on db.JournalEntry {
   domain.JournalEntry toDomain() {
     return domain.JournalEntry(
+      id: id,
       starnyxId: starnyxId,
       date: dateTimeFromDateKey(date),
       content: content,
+      createdAt: createdAt,
     );
   }
 }

@@ -32,37 +32,32 @@ class DriftJournalEntryRepository implements JournalEntryRepository {
   }
 
   @override
-  Future<domain.JournalEntry?> getJournalEntryByDate({
+  Future<List<domain.JournalEntry>> getJournalEntriesForDate({
     required String starnyxId,
     required DateTime date,
   }) async {
-    final row = await _database.journalEntriesDao.getJournalEntry(
+    final rows = await _database.journalEntriesDao.getJournalEntriesForDate(
       starnyxId: starnyxId,
       date: dateKeyFromDateTime(date),
     );
-    return row?.toDomain();
+    return rows.map((row) => row.toDomain()).toList(growable: false);
   }
 
   @override
   Future<void> saveJournalEntry(domain.JournalEntry entry) {
-    return _database.journalEntriesDao.upsertJournalEntry(
-      JournalEntriesCompanion(
-        starnyxId: Value(entry.starnyxId),
-        date: Value(dateKeyFromDateTime(entry.date)),
-        content: Value(entry.content),
+    return _database.journalEntriesDao.insertJournalEntry(
+      JournalEntriesCompanion.insert(
+        starnyxId: entry.starnyxId,
+        date: dateKeyFromDateTime(entry.date),
+        content: entry.content,
+        createdAt: Value(entry.createdAt),
       ),
     );
   }
 
   @override
-  Future<void> deleteJournalEntryByDate({
-    required String starnyxId,
-    required DateTime date,
-  }) async {
-    await _database.journalEntriesDao.deleteJournalEntry(
-      starnyxId: starnyxId,
-      date: dateKeyFromDateTime(date),
-    );
+  Future<void> deleteJournalEntryById(int id) async {
+    await _database.journalEntriesDao.deleteJournalEntryById(id);
   }
 
   @override
