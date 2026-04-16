@@ -10,7 +10,7 @@ class JournalEntriesDao extends DatabaseAccessor<AppDatabase>
   Future<List<JournalEntry>> getJournalEntriesForStarnyx(String starnyxId) {
     return (select(journalEntries)
           ..where((table) => table.starnyxId.equals(starnyxId))
-          ..orderBy([(table) => OrderingTerm.desc(table.date)]))
+          ..orderBy([(table) => OrderingTerm.desc(table.createdAt)]))
         .get();
   }
 
@@ -18,37 +18,30 @@ class JournalEntriesDao extends DatabaseAccessor<AppDatabase>
   Stream<List<JournalEntry>> watchJournalEntriesForStarnyx(String starnyxId) {
     return (select(journalEntries)
           ..where((table) => table.starnyxId.equals(starnyxId))
-          ..orderBy([(table) => OrderingTerm.desc(table.date)]))
+          ..orderBy([(table) => OrderingTerm.desc(table.createdAt)]))
         .watch();
   }
 
-  // Save-note flows often need to inspect one journal entry for one date.
-  Future<JournalEntry?> getJournalEntry({
+  // Fetching entries for a specific day.
+  Future<List<JournalEntry>> getJournalEntriesForDate({
     required String starnyxId,
     required String date,
   }) {
     return (select(journalEntries)..where(
           (table) =>
               table.starnyxId.equals(starnyxId) & table.date.equals(date),
-        ))
-        .getSingleOrNull();
+        )..orderBy([(table) => OrderingTerm.desc(table.createdAt)]))
+        .get();
   }
 
-  // Composite key upsert keeps one journal entry per StarNyx per date.
-  Future<void> upsertJournalEntry(JournalEntriesCompanion companion) {
-    return into(journalEntries).insertOnConflictUpdate(companion);
+  // Insert a new journal entry.
+  Future<int> insertJournalEntry(JournalEntriesCompanion companion) {
+    return into(journalEntries).insert(companion);
   }
 
-  // Targeted deletes are used when a single entry is cleared by date.
-  Future<int> deleteJournalEntry({
-    required String starnyxId,
-    required String date,
-  }) {
-    return (delete(journalEntries)..where(
-          (table) =>
-              table.starnyxId.equals(starnyxId) & table.date.equals(date),
-        ))
-        .go();
+  // Delete a specific entry by its primary key ID.
+  Future<int> deleteJournalEntryById(int id) {
+    return (delete(journalEntries)..where((table) => table.id.equals(id))).go();
   }
 
   // Bulk cleanup is useful for imports and StarNyx deletion.

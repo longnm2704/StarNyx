@@ -1,7 +1,6 @@
 import 'package:starnyx/core/constants/enums.dart';
 export 'package:starnyx/core/constants/enums.dart';
 import 'package:starnyx/core/utils/date_utils.dart';
-import 'package:starnyx/domain/repositories/journal_entry_repository.dart';
 
 // Domain use cases throw this when business rules reject an action.
 class UseCaseValidationException implements Exception {
@@ -70,25 +69,5 @@ abstract final class UseCaseValidation {
         message: 'Completion can only be edited within the last 7 days.',
       );
     }
-  }
-
-  static Future<void> validateJournalEntryCreation({
-    required JournalEntryRepository repository,
-    required String starnyxId,
-    required DateTime date,
-  }) async {
-    final existing = await repository.getJournalEntryByDate(
-      starnyxId: starnyxId,
-      date: DateUtils.dateOnly(date),
-    );
-
-    if (existing == null) {
-      return;
-    }
-
-    throw const UseCaseValidationException(
-      code: UseCaseValidationCode.journalEntryAlreadyExists,
-      message: 'Only one journal entry is allowed per day.',
-    );
   }
 }

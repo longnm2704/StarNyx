@@ -6,7 +6,6 @@ enum UseCaseValidationCode {
   dateInFuture,
   dateBeforeStartDate,
   completionEditWindowExpired,
-  journalEntryAlreadyExists,
 }
 
 enum StarnyxFormMode { create, edit }

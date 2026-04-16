@@ -448,34 +448,6 @@ void main() {
     );
   });
 
-  test(
-    'save journal entry use case rejects a second note on the same day',
-    () async {
-      final useCase = SaveJournalEntryUseCase(journalEntryRepository);
-
-      await useCase(
-        starnyxId: 'habit-1',
-        date: DateTime(2026, 4, 10, 8),
-        content: 'First note',
-      );
-
-      expect(
-        () => useCase(
-          starnyxId: 'habit-1',
-          date: DateTime(2026, 4, 10, 20),
-          content: 'Second note',
-        ),
-        throwsA(
-          isA<UseCaseValidationException>().having(
-            (error) => error.code,
-            'code',
-            UseCaseValidationCode.journalEntryAlreadyExists,
-          ),
-        ),
-      );
-    },
-  );
-
   test('export use case builds the expected backup payload', () async {
     final starnyx = StarNyx(
       id: 'habit-1',
@@ -498,9 +470,11 @@ void main() {
     );
     await journalEntryRepository.saveJournalEntry(
       JournalEntry(
+        id: 1,
         starnyxId: 'habit-1',
         date: DateTime(2026, 4, 10),
         content: 'Stayed consistent today.',
+        createdAt: DateTime(2026, 4, 10, 10, 0),
       ),
     );
     await appSettingsRepository.saveAppSettings(
@@ -598,11 +572,9 @@ void main() {
         isNotNull,
       );
       expect(
-        await journalEntryRepository.getJournalEntryByDate(
-          starnyxId: 'habit-1',
-          date: DateTime(2026, 4, 10),
-        ),
-        isNotNull,
+        (await journalEntryRepository.getJournalEntriesForStarnyx('habit-1'))
+            .isNotEmpty,
+        isTrue,
       );
       expect(
         (await appSettingsRepository.getAppSettings())?.lastSelectedStarnyxId,
@@ -686,43 +658,38 @@ class _InMemoryCompletionRepository implements CompletionRepository {
 }
 
 class _InMemoryJournalEntryRepository implements JournalEntryRepository {
-  final Map<String, JournalEntry> _items = <String, JournalEntry>{};
+  final List<JournalEntry> _entries = <JournalEntry>[];
 
   @override
   Future<void> deleteJournalEntriesForStarnyx(String starnyxId) async {
-    _items.removeWhere((key, value) => value.starnyxId == starnyxId);
+    _entries.removeWhere((e) => e.starnyxId == starnyxId);
   }
 
   @override
-  Future<void> deleteJournalEntryByDate({
-    required String starnyxId,
-    required DateTime date,
-  }) async {
-    _items.remove(_key(starnyxId, date));
+  Future<void> deleteJournalEntryById(int id) async {
+    _entries.removeWhere((e) => e.id == id);
   }
 
   @override
-  Future<JournalEntry?> getJournalEntryByDate({
+  Future<List<JournalEntry>> getJournalEntriesForDate({
     required String starnyxId,
     required DateTime date,
   }) async {
-    return _items[_key(starnyxId, date)];
+    return _entries
+        .where((e) => e.starnyxId == starnyxId && e.date == date)
+        .toList();
   }
 
   @override
   Future<List<JournalEntry>> getJournalEntriesForStarnyx(
     String starnyxId,
   ) async {
-    final items = _items.values
-        .where((item) => item.starnyxId == starnyxId)
-        .toList(growable: false);
-    items.sort((left, right) => right.date.compareTo(left.date));
-    return items;
+    return _entries.where((e) => e.starnyxId == starnyxId).toList();
   }
 
   @override
   Future<void> saveJournalEntry(JournalEntry entry) async {
-    _items[_key(entry.starnyxId, entry.date)] = entry;
+    _entries.add(entry);
   }
 
   @override

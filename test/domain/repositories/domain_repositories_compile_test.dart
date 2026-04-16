@@ -74,16 +74,13 @@ class _FakeJournalEntryRepository implements JournalEntryRepository {
   Future<void> deleteJournalEntriesForStarnyx(String starnyxId) async {}
 
   @override
-  Future<void> deleteJournalEntryByDate({
-    required String starnyxId,
-    required DateTime date,
-  }) async {}
+  Future<void> deleteJournalEntryById(int id) async {}
 
   @override
-  Future<JournalEntry?> getJournalEntryByDate({
+  Future<List<JournalEntry>> getJournalEntriesForDate({
     required String starnyxId,
     required DateTime date,
-  }) async => null;
+  }) async => const <JournalEntry>[];
 
   @override
   Future<List<JournalEntry>> getJournalEntriesForStarnyx(

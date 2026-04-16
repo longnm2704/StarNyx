@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:starnyx/core/constants/enums.dart';
 import 'package:starnyx/core/utils/date_utils.dart';
 import 'package:starnyx/domain/entities/journal_entry.dart';
-import 'package:starnyx/domain/usecases/use_case_validation.dart';
 import 'package:starnyx/domain/usecases/save_journal_entry_use_case.dart';
 import 'package:starnyx/domain/usecases/delete_journal_entry_use_case.dart';
 import 'package:starnyx/domain/usecases/watch_journal_entries_for_starnyx_use_case.dart';
@@ -83,13 +83,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     }
     final trimmed = state.draftContent.trim();
     if (trimmed.isEmpty) {
-      emit(
-        state.copyWith(
-          saveStatus: AsyncStatus.failure,
-          errorMessage: 'Journal content is required.',
-          feedbackCount: state.feedbackCount + 1,
-        ),
-      );
       return;
     }
 
@@ -115,14 +108,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
           errorMessage: null,
         ),
       );
-    } on UseCaseValidationException catch (error) {
-      emit(
-        state.copyWith(
-          saveStatus: AsyncStatus.failure,
-          feedbackCount: state.feedbackCount + 1,
-          errorMessage: error.message,
-        ),
-      );
     } catch (_) {
       emit(
         state.copyWith(
@@ -139,11 +124,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     JournalDeleteRequested event,
     Emitter<JournalState> emit,
   ) async {
-    final starnyxId = state.starnyxId;
-    if (starnyxId == null) {
-      return;
-    }
-
     emit(
       state.copyWith(
         deleteStatus: AsyncStatus.inProgress,
@@ -153,7 +133,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     );
 
     try {
-      await _deleteJournalEntryUseCase(starnyxId: starnyxId, date: event.date);
+      await _deleteJournalEntryUseCase(id: event.id);
       emit(
         state.copyWith(
           deleteStatus: AsyncStatus.success,
