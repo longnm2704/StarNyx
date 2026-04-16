@@ -75,6 +75,7 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
       confirmLabel: 'journal.delete_confirm'.tr(),
       cancelLabel: 'journal.delete_cancel'.tr(),
       actionStyle: AppConfirmActionStyle.destructive,
+      accentColor: widget.accentColor,
     );
 
     if (confirmed == true && mounted) {
