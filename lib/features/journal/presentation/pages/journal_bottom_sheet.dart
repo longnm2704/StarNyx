@@ -229,58 +229,38 @@ class _JournalEntryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final formattedFullDate = DateFormat('dd/MM/yyyy HH:mm').format(entry.createdAt);
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(
-          color: AppColors.white.withValues(alpha: 0.1),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  entry.content,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textPrimary.withValues(alpha: 0.9),
-                        height: 1.5,
-                      ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: onDeletePressed,
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    child: AppSvgIcon(
-                      assetPath: 'assets/icons/ic_trash.svg',
-                      color: AppColors.textMuted.withValues(alpha: 0.4),
-                      size: 14,
-                    ),
+    return GestureDetector(
+      onLongPress: onDeletePressed,
+      behavior: HitTestBehavior.translucent,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              entry.content,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppColors.textPrimary.withValues(alpha: 0.9),
+                    height: 1.5,
                   ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            formattedFullDate,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppColors.textMuted.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                ),
-          ),
-        ],
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              formattedFullDate,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: AppColors.textMuted.withValues(alpha: 0.6),
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Container(
+              height: 1,
+              width: 40,
+              color: AppColors.white.withValues(alpha: 0.05),
+            ),
+          ],
+        ),
       ),
     );
   }
