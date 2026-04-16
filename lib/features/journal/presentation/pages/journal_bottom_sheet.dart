@@ -54,6 +54,9 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
   }
 
   void _onSavePressed() {
+    if (_journalBloc.state.saveStatus == AsyncStatus.inProgress) {
+      return;
+    }
     _journalBloc.add(const JournalSaveRequested());
   }
 

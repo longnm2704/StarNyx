@@ -20,16 +20,22 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  // Schema version 1 matches the first persisted MVP database shape.
-  int get schemaVersion => 1;
+  // Schema version 2: Changed journal_entries to support multiple notes per day.
+  int get schemaVersion => 2;
 
   @override
-  // Versioned migrations start here even though v1 only needs table creation.
+  // Versioned migrations handle structural changes between schema releases.
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (Migrator migrator) async {
       await migrator.createAll();
     },
-    onUpgrade: (Migrator migrator, int from, int to) async {},
+    onUpgrade: (Migrator migrator, int from, int to) async {
+      if (from < 2) {
+        // Drop and recreate journal_entries due to primary key and structural changes.
+        await migrator.deleteTable('journal_entries');
+        await migrator.createTable(journalEntries);
+      }
+    },
     beforeOpen: (OpeningDetails details) async {
       // Foreign keys stay enabled so cascade and set-null rules are enforced.
       await customStatement('PRAGMA foreign_keys = ON');
