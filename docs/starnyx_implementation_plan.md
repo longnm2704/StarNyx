@@ -219,7 +219,7 @@ Issue checklist:
 - [x] `STX-027` Render đầy đủ các trạng thái: before start, completed, missed, future, selected, today
 - [x] `STX-028` Chặn check-in cho ngày tương lai và ngày trước start date
 - [x] `STX-029` Cho phép sửa completion chỉ trong 7 ngày gần nhất
-- [ ] `STX-030` Tạo cụm action bên dưới cho ngày đang chọn, previous / next / today
+- [x] `STX-030` Tạo cụm action bên dưới cho ngày đang chọn, previous / next / today
 - [ ] `STX-031` Hiển thị thống kê: current streak, longest streak, total completed, completion rate
 - [ ] `STX-032` Hỗ trợ đổi năm đang xem và tính lại completion rate đúng theo năm đó
 - [ ] `STX-033` Tạo bottom sheet hoặc quick actions bám theo UI `docs/ui/starnyx_bottom_sheet.PNG`
