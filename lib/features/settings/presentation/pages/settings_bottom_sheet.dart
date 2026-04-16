@@ -58,23 +58,41 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) {
+        Widget page;
         switch (settings.name) {
           case '/':
-            return SettingsMainView(
+            page = SettingsMainView(
               onGeneralTap: () => _navigatorKey.currentState?.pushNamed('/general'),
               onAboutTap: () => _navigatorKey.currentState?.pushNamed('/about'),
               onClose: () => Navigator.of(context, rootNavigator: true).pop(),
             );
           case '/general':
-            return GeneralSettingsSheet(onBack: () => _navigatorKey.currentState?.pop());
+            page = GeneralSettingsSheet(onBack: () => _navigatorKey.currentState?.pop());
           case '/about':
-            return AboutStarnyxSheet(onBack: () => _navigatorKey.currentState?.pop());
+            page = AboutStarnyxSheet(onBack: () => _navigatorKey.currentState?.pop());
           default:
-            return const SizedBox.shrink();
+            page = const SizedBox.shrink();
         }
+        
+        return Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: const BoxDecoration(
+            gradient: _sheetTopDownGradient,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.5)),
+          ),
+          child: CosmicBackground(child: page),
+        );
       },
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return child;
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOutCubic;
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
       },
     );
   }
@@ -85,21 +103,10 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
       value: _settingsBloc,
       child: FractionallySizedBox(
         heightFactor: 1.0,
-        child: DecoratedBox(
-          decoration: const BoxDecoration(
-            gradient: _sheetTopDownGradient,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.5)),
-          ),
-          child: Stack(
-            children: [
-              const Positioned.fill(child: CosmicBackground(child: SizedBox.expand())),
-              Navigator(
-                key: _navigatorKey,
-                initialRoute: '/',
-                onGenerateRoute: _onGenerateRoute,
-              ),
-            ],
-          ),
+        child: Navigator(
+          key: _navigatorKey,
+          initialRoute: '/',
+          onGenerateRoute: _onGenerateRoute,
         ),
       ),
     );
@@ -159,11 +166,6 @@ class _SettingsMainViewState extends State<SettingsMainView> {
         if (state.exportStatus == AsyncStatus.success) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Data exported successfully')),
-          );
-        }
-        if (state.importStatus == AsyncStatus.success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Data imported successfully. App will restart.')),
           );
         }
         if (state.errorMessage != null) {
