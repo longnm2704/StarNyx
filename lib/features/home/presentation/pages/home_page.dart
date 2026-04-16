@@ -195,6 +195,21 @@ class _HomePageState extends State<HomePage> {
                   _homeBloc.add(HomeDaySelected(date));
                 },
                 onSelectPressed: _onSelectPressed,
+                onPreviousDayPressed: () {
+                  _homeBloc.add(const HomePreviousDayRequested());
+                },
+                onNextDayPressed: () {
+                  _homeBloc.add(const HomeNextDayRequested());
+                },
+                onJumpToTodayPressed: () {
+                  _homeBloc.add(const HomeJumpToTodayRequested());
+                },
+                onPreviousYearPressed: () {
+                  _homeBloc.add(HomeYearChanged(state.viewedYear - 1));
+                },
+                onNextYearPressed: () {
+                  _homeBloc.add(HomeYearChanged(state.viewedYear + 1));
+                },
                 onToggleCompletionPressed: () {
                   _homeBloc.add(const HomeCompletionToggled());
                 },

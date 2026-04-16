@@ -43,6 +43,11 @@ class ActiveStarnyxHomeView extends StatefulWidget {
     required this.onEditPressed,
     required this.onDateSelected,
     required this.onSelectPressed,
+    required this.onPreviousDayPressed,
+    required this.onNextDayPressed,
+    required this.onJumpToTodayPressed,
+    required this.onPreviousYearPressed,
+    required this.onNextYearPressed,
     required this.onToggleCompletionPressed,
     required this.isCheckingIn,
     this.progressStats,
@@ -59,6 +64,11 @@ class ActiveStarnyxHomeView extends StatefulWidget {
   final FutureOr<void> Function(StarNyx) onEditPressed;
   final ValueChanged<DateTime> onDateSelected;
   final ValueChanged<StarNyx> onSelectPressed;
+  final VoidCallback onPreviousDayPressed;
+  final VoidCallback onNextDayPressed;
+  final VoidCallback onJumpToTodayPressed;
+  final VoidCallback onPreviousYearPressed;
+  final VoidCallback onNextYearPressed;
   final VoidCallback onToggleCompletionPressed;
   final bool isCheckingIn;
   final StarNyxProgressStats? progressStats;
@@ -155,6 +165,7 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
       todayDate: widget.todayDate,
       startDate: activeStarnyx.startDate,
     );
+    final canMoveToNextYear = widget.viewedYear < widget.todayDate.year;
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -166,11 +177,12 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
         viewedYear: widget.viewedYear,
         completedDatesForViewedYear: widget.completedDatesForViewedYear,
         progressStats: widget.progressStats,
-        onPreviousDayPressed: null,
-        onNextDayPressed: null,
-        onJumpToTodayPressed: null,
+        onPreviousDayPressed: widget.onPreviousDayPressed,
+        onNextDayPressed: widget.onNextDayPressed,
+        onJumpToTodayPressed: widget.onJumpToTodayPressed,
         onDateSelected: widget.onDateSelected,
-        onYearPressed: null,
+        onPreviousYearPressed: widget.onPreviousYearPressed,
+        onNextYearPressed: canMoveToNextYear ? widget.onNextYearPressed : null,
         onQuickActionsPressed: _openConstellationSheet,
         onToggleCompletionPressed: canToggleCompletion
             ? widget.onToggleCompletionPressed
