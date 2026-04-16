@@ -85,126 +85,119 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    final topInset = mediaQuery.viewPadding.top > 0 ? mediaQuery.viewPadding.top : mediaQuery.padding.top;
     final bottomPadding = mediaQuery.viewInsets.bottom;
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.94,
-      minChildSize: 0.6,
-      maxChildSize: 0.94,
-      snap: true,
-      builder: (context, scrollController) {
-        return BlocProvider<JournalBloc>.value(
-          value: _journalBloc,
-          child: BlocListener<JournalBloc, JournalState>(
-            listenWhen: (previous, current) =>
-                previous.saveStatus != current.saveStatus ||
-                previous.deleteStatus != current.deleteStatus ||
-                previous.feedbackCount != current.feedbackCount,
-            listener: (context, state) {
-              if (state.saveStatus == AsyncStatus.success) {
-                setState(() {
-                  _draftContent = '';
-                });
-                FocusScope.of(context).unfocus();
-                
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (_scrollController.hasClients) {
-                    _scrollController.animateTo(
-                      0,
-                      duration: AppDurations.medium,
-                      curve: Curves.easeOut,
-                    );
-                  }
-                });
-              } else if (state.saveStatus == AsyncStatus.failure && state.errorMessage != null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.errorMessage!)),
+    return BlocProvider<JournalBloc>.value(
+      value: _journalBloc,
+      child: BlocListener<JournalBloc, JournalState>(
+        listenWhen: (previous, current) =>
+            previous.saveStatus != current.saveStatus ||
+            previous.deleteStatus != current.deleteStatus ||
+            previous.feedbackCount != current.feedbackCount,
+        listener: (context, state) {
+          if (state.saveStatus == AsyncStatus.success) {
+            setState(() {
+              _draftContent = '';
+            });
+            FocusScope.of(context).unfocus();
+            
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (_scrollController.hasClients) {
+                _scrollController.animateTo(
+                  0,
+                  duration: AppDurations.medium,
+                  curve: Curves.easeOut,
                 );
               }
-            },
-            child: Container(
-              clipBehavior: Clip.antiAlias,
-              decoration: const BoxDecoration(
-                gradient: _sheetTopDownGradient,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.5)),
-              ),
-              child: Stack(
-                children: [
-                  const Positioned.fill(child: CosmicBackground(child: SizedBox.expand())),
-                  SafeArea(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: AppSpacing.sm),
-                        _JournalHeader(
-                          accentColor: widget.accentColor,
-                          onClose: () => Navigator.of(context).pop(),
-                        ),
-                        Expanded(
-                          child: BlocBuilder<JournalBloc, JournalState>(
-                            builder: (context, state) {
-                              if (state.status == JournalStatus.loading) {
-                                return const Center(child: AppLoadingIndicator());
-                              }
+            });
+          } else if (state.saveStatus == AsyncStatus.failure && state.errorMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.errorMessage!)),
+            );
+          }
+        },
+        child: SizedBox.expand(
+          child: Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: const BoxDecoration(
+              gradient: _sheetTopDownGradient,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.5)),
+            ),
+            child: Stack(
+              children: [
+                const Positioned.fill(child: CosmicBackground(child: SizedBox.expand())),
+                Column(
+                  children: [
+                    SizedBox(height: topInset + AppSpacing.sm),
+                    _JournalHeader(
+                      accentColor: widget.accentColor,
+                      onClose: () => Navigator.of(context).pop(),
+                    ),
+                    Expanded(
+                      child: BlocBuilder<JournalBloc, JournalState>(
+                        builder: (context, state) {
+                          if (state.status == JournalStatus.loading) {
+                            return const Center(child: AppLoadingIndicator());
+                          }
 
-                              if (state.status == JournalStatus.failure) {
-                                return Center(
-                                  child: AppErrorState(
-                                    title: 'journal.load_error_title'.tr(),
-                                    message: state.errorMessage ?? 'journal.load_error_message'.tr(),
-                                    retryLabel: 'home.retry'.tr(),
-                                    onRetry: () => _journalBloc.add(JournalStarted(widget.starnyxId)),
-                                  ),
-                                );
-                              }
+                          if (state.status == JournalStatus.failure) {
+                            return Center(
+                              child: AppErrorState(
+                                title: 'journal.load_error_title'.tr(),
+                                message: state.errorMessage ?? 'journal.load_error_message'.tr(),
+                                retryLabel: 'home.retry'.tr(),
+                                onRetry: () => _journalBloc.add(JournalStarted(widget.starnyxId)),
+                              ),
+                            );
+                          }
 
-                              if (state.entries.isEmpty) {
-                                return const SizedBox.expand();
-                              }
+                          if (state.entries.isEmpty) {
+                            return const SizedBox.expand();
+                          }
 
-                              return ListView.builder(
-                                controller: _scrollController,
-                                reverse: true,
-                                padding: const EdgeInsets.fromLTRB(
-                                  AppSpacing.pageHorizontal,
-                                  AppSpacing.md,
-                                  AppSpacing.pageHorizontal,
-                                  AppSpacing.xl,
+                          return ListView.builder(
+                            controller: _scrollController,
+                            reverse: true,
+                            padding: const EdgeInsets.fromLTRB(
+                              AppSpacing.pageHorizontal,
+                              AppSpacing.md,
+                              AppSpacing.pageHorizontal,
+                              AppSpacing.xl,
+                            ),
+                            itemCount: state.entries.length,
+                            itemBuilder: (context, index) {
+                              final entry = state.entries[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                                child: _JournalEntryCard(
+                                  entry: entry,
+                                  accentColor: widget.accentColor,
+                                  onDeletePressed: () => _onDeletePressed(entry),
                                 ),
-                                itemCount: state.entries.length,
-                                itemBuilder: (context, index) {
-                                  final entry = state.entries[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                                    child: _JournalEntryCard(
-                                      entry: entry,
-                                      accentColor: widget.accentColor,
-                                      onDeletePressed: () => _onDeletePressed(entry),
-                                    ),
-                                  );
-                                },
                               );
                             },
-                          ),
-                        ),
-                        _JournalInputArea(
-                          initialValue: _draftContent,
-                          onChanged: (value) {
-                            _draftContent = value;
-                            _journalBloc.add(JournalDraftChanged(value));
-                          },
-                          onSavePressed: _onSavePressed,
-                          accentColor: widget.accentColor,
-                          bottomPadding: bottomPadding,
-                        ),
-                      ],
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                    _JournalInputArea(
+                      initialValue: _draftContent,
+                      onChanged: (value) {
+                        _draftContent = value;
+                        _journalBloc.add(JournalDraftChanged(value));
+                      },
+                      onSavePressed: _onSavePressed,
+                      accentColor: widget.accentColor,
+                      bottomPadding: bottomPadding,
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
@@ -284,7 +277,7 @@ class _JournalEntryCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.md),
           Text(
             formattedFullDate,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
