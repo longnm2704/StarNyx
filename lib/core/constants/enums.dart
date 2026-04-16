@@ -23,6 +23,8 @@ enum StarnyxFormReminderTimeError { missing, invalid }
 
 enum HomeStatus { initial, loading, success, failure }
 
+enum JournalStatus { initial, loading, success, failure }
+
 enum ConstellationSwitcherSheetActionType { createRequested, editRequested }
 
 enum HomeGridStarDayState { beforeStart, completed, missed, future }

@@ -7,6 +7,7 @@ import 'package:starnyx/domain/entities/starnyx.dart' as domain;
 import 'package:starnyx/data/repositories/data_repositories.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
+import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_bloc.dart';
 
 final GetIt serviceLocator = GetIt.instance;
@@ -115,6 +116,14 @@ void _registerUseCases() {
   serviceLocator.registerLazySingleton<SaveJournalEntryUseCase>(
     () => SaveJournalEntryUseCase(serviceLocator<JournalEntryRepository>()),
   );
+  serviceLocator.registerLazySingleton<DeleteJournalEntryUseCase>(
+    () => DeleteJournalEntryUseCase(serviceLocator<JournalEntryRepository>()),
+  );
+  serviceLocator.registerLazySingleton<WatchJournalEntriesForStarnyxUseCase>(
+    () => WatchJournalEntriesForStarnyxUseCase(
+      serviceLocator<JournalEntryRepository>(),
+    ),
+  );
   serviceLocator.registerLazySingleton<ExportDataUseCase>(
     () => ExportDataUseCase(
       serviceLocator<StarNyxRepository>(),
@@ -144,6 +153,14 @@ void _registerBlocFactories() {
       loadStarNyxCompletionDatesForYearUseCase:
           serviceLocator<LoadStarNyxCompletionDatesForYearUseCase>(),
       toggleCompletionUseCase: serviceLocator<ToggleCompletionUseCase>(),
+    ),
+  );
+  serviceLocator.registerFactory<JournalBloc>(
+    () => JournalBloc(
+      saveJournalEntryUseCase: serviceLocator<SaveJournalEntryUseCase>(),
+      watchJournalEntriesForStarnyxUseCase:
+          serviceLocator<WatchJournalEntriesForStarnyxUseCase>(),
+      deleteJournalEntryUseCase: serviceLocator<DeleteJournalEntryUseCase>(),
     ),
   );
 
