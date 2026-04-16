@@ -15,6 +15,7 @@ import 'package:starnyx/domain/usecases/select_active_starnyx_use_case.dart';
 import 'package:starnyx/features/home/presentation/widgets/home_widgets.dart';
 import 'package:starnyx/domain/usecases/load_starnyx_progress_stats_use_case.dart';
 import 'package:starnyx/domain/usecases/load_starnyx_completion_dates_for_year_use_case.dart';
+import 'package:starnyx/features/settings/presentation/pages/settings_bottom_sheet.dart';
 import 'package:starnyx/features/starnyx_form/presentation/pages/create_starnyx_bottom_sheet.dart';
 
 // Root screen that shows the first-run welcome state until the real home flow lands.
@@ -102,6 +103,10 @@ class _HomePageState extends State<HomePage> {
     await _openCreateBottomSheet();
   }
 
+  Future<void> _onSettingsPressed() async {
+    await showSettingsBottomSheet(context);
+  }
+
   Future<void> _openCreateBottomSheet() async {
     final result = await showCreateStarnyxBottomSheet(context);
     if (!mounted || result == null || !result.hasChanges) {
@@ -179,7 +184,10 @@ class _HomePageState extends State<HomePage> {
               }
 
               if (state.starnyxs.isEmpty) {
-                return FirstRunWelcomeView(onCreatePressed: _onCreatePressed);
+                return FirstRunWelcomeView(
+                  onCreatePressed: _onCreatePressed,
+                  onSettingsPressed: _onSettingsPressed,
+                );
               }
 
               return ActiveStarnyxHomeView(
