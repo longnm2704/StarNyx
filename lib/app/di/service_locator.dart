@@ -145,6 +145,12 @@ void _registerUseCases() {
       serviceLocator<AppSettingsRepository>(),
     ),
   );
+  serviceLocator.registerLazySingleton<SyncNotificationsUseCase>(
+    () => SyncNotificationsUseCase(
+      serviceLocator<NotificationService>(),
+      serviceLocator<StarNyxRepository>(),
+    ),
+  );
 }
 
 void _registerBlocFactories() {
@@ -172,6 +178,7 @@ void _registerBlocFactories() {
     () => SettingsBloc(
       exportDataUseCase: serviceLocator<ExportDataUseCase>(),
       importDataUseCase: serviceLocator<ImportDataUseCase>(),
+      syncNotificationsUseCase: serviceLocator<SyncNotificationsUseCase>(),
     ),
   );
 
@@ -199,6 +206,7 @@ void _registerBlocFactories() {
       createStarNyxUseCase: serviceLocator<CreateStarNyxUseCase>(),
       updateStarNyxUseCase: serviceLocator<UpdateStarNyxUseCase>(),
       deleteStarNyxUseCase: serviceLocator<DeleteStarNyxUseCase>(),
+      syncNotificationsUseCase: serviceLocator<SyncNotificationsUseCase>(),
       initialStarnyx: initialStarnyx,
     );
   });

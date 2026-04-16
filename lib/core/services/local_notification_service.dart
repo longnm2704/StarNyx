@@ -110,6 +110,11 @@ class LocalNotificationService implements NotificationService {
     return _client.cancel(_notificationIdFor(starnyxId));
   }
 
+  @override
+  Future<void> cancelAllReminders() {
+    return _client.cancelAll();
+  }
+
   tz.TZDateTime _nextDailySchedule(DateTime reminderDateTime) {
     final now = tz.TZDateTime.from(_now(), tz.local);
     var scheduled = tz.TZDateTime(
@@ -145,6 +150,8 @@ abstract class NotificationClient {
   });
 
   Future<void> cancel(int id);
+
+  Future<void> cancelAll();
 }
 
 class FlutterLocalNotificationClient implements NotificationClient {
@@ -191,5 +198,10 @@ class FlutterLocalNotificationClient implements NotificationClient {
   @override
   Future<void> cancel(int id) {
     return _plugin.cancel(id: id);
+  }
+
+  @override
+  Future<void> cancelAll() {
+    return _plugin.cancelAll();
   }
 }

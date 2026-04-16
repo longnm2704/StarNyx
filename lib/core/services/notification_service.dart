@@ -13,4 +13,7 @@ abstract class NotificationService {
 
   /// Cancels a reminder schedule for one StarNyx.
   Future<void> cancelReminder(String starnyxId);
+
+  /// Cancels all reminder schedules managed by this app.
+  Future<void> cancelAllReminders();
 }

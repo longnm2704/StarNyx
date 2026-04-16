@@ -37,11 +37,13 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     required CreateStarNyxUseCase createStarNyxUseCase,
     required UpdateStarNyxUseCase updateStarNyxUseCase,
     required DeleteStarNyxUseCase deleteStarNyxUseCase,
+    required SyncNotificationsUseCase syncNotificationsUseCase,
     DateTime Function()? nowBuilder,
     StarNyx? initialStarnyx,
   }) : _createStarNyxUseCase = createStarNyxUseCase,
        _updateStarNyxUseCase = updateStarNyxUseCase,
        _deleteStarNyxUseCase = deleteStarNyxUseCase,
+       _syncNotificationsUseCase = syncNotificationsUseCase,
        _nowBuilder = nowBuilder ?? DateTime.now,
        _initialStarnyx = initialStarnyx,
        super(_buildInitialState(initialStarnyx, nowBuilder ?? DateTime.now)) {
@@ -64,6 +66,9 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
 
   /// Injected use case for deleting existing StarNyx entities.
   final DeleteStarNyxUseCase _deleteStarNyxUseCase;
+
+  /// Synchronizes notification schedules after StarNyx changes.
+  final SyncNotificationsUseCase _syncNotificationsUseCase;
 
   /// Callback to get current date/time (injectable for testing time-dependent logic).
   final DateTime Function() _nowBuilder;
@@ -269,6 +274,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
               reminderTime: reminderTime,
               now: now,
             );
+      await _syncNotificationsUseCase.onStarnyxSaved(saved);
 
       emit(
         validated.copyWith(
@@ -320,6 +326,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
 
     try {
       await _deleteStarNyxUseCase(_initialStarnyx.id, now: _nowBuilder());
+      await _syncNotificationsUseCase.onStarnyxDeleted(_initialStarnyx.id);
       emit(
         state.copyWith(
           deletionStatus: AsyncStatus.success,
