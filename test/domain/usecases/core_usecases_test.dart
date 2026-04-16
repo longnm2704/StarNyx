@@ -731,6 +731,108 @@ void main() {
     expect(await starNyxRepository.getStarnyxById('habit-1'), isNotNull);
   });
 
+  test('import use case rolls back data when write fails mid-import', () async {
+    await starNyxRepository.saveStarnyx(
+      StarNyx(
+        id: 'habit-old',
+        title: 'Legacy Habit',
+        description: 'old',
+        color: '#111111',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 1, 8),
+      ),
+    );
+    await completionRepository.saveCompletion(
+      Completion(
+        starnyxId: 'habit-old',
+        date: DateTime(2026, 4, 2),
+        completed: true,
+      ),
+    );
+    await journalEntryRepository.saveJournalEntry(
+      JournalEntry(
+        id: 1,
+        starnyxId: 'habit-old',
+        date: DateTime(2026, 4, 2),
+        content: 'legacy journal',
+        createdAt: DateTime(2026, 4, 2, 8),
+      ),
+    );
+    await appSettingsRepository.saveAppSettings(
+      AppSettings(
+        lastSelectedStarnyxId: 'habit-old',
+        updatedAt: DateTime(2026, 4, 2, 8),
+      ),
+    );
+
+    final failingCompletionRepository = _FailingCompletionRepository(
+      completionRepository,
+      failOnStarnyxId: 'habit-new',
+    );
+    final useCase = ImportDataUseCase(
+      starNyxRepository,
+      failingCompletionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    );
+
+    expect(
+      () => useCase(<String, dynamic>{
+        'schemaVersion': 1,
+        'starnyxs': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'id': 'habit-new',
+            'title': 'Imported Habit',
+            'description': null,
+            'color': '#102030',
+            'startDate': '2026-04-10',
+            'reminderEnabled': false,
+            'reminderTime': null,
+            'createdAt': '2026-04-10T08:00:00.000',
+            'updatedAt': '2026-04-10T08:00:00.000',
+          },
+        ],
+        'completions': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'starnyxId': 'habit-new',
+            'date': '2026-04-10',
+            'completed': true,
+          },
+        ],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': 'habit-new',
+          'updatedAt': '2026-04-10T08:00:00.000',
+        },
+      }),
+      throwsA(
+        isA<ImportDataException>().having(
+          (e) => e.errors.first,
+          'firstError',
+          contains('Previous data was restored'),
+        ),
+      ),
+    );
+
+    final starnyxs = await starNyxRepository.getAllStarnyxs();
+    expect(starnyxs.map((item) => item.id), <String>['habit-old']);
+    expect(
+      await completionRepository.getCompletionsForStarnyx('habit-old'),
+      hasLength(1),
+    );
+    expect(
+      await journalEntryRepository.getJournalEntriesForStarnyx('habit-old'),
+      hasLength(1),
+    );
+    expect(
+      (await appSettingsRepository.getAppSettings())?.lastSelectedStarnyxId,
+      'habit-old',
+    );
+  });
+
   test('import use case rejects unsupported schema version', () async {
     final useCase = ImportDataUseCase(
       starNyxRepository,
@@ -854,6 +956,52 @@ class _InMemoryCompletionRepository implements CompletionRepository {
   @override
   Stream<List<Completion>> watchCompletionsForStarnyx(String starnyxId) {
     throw UnimplementedError();
+  }
+}
+
+class _FailingCompletionRepository implements CompletionRepository {
+  _FailingCompletionRepository(this._delegate, {required this.failOnStarnyxId});
+
+  final CompletionRepository _delegate;
+  final String failOnStarnyxId;
+
+  @override
+  Future<void> deleteCompletionByDate({
+    required String starnyxId,
+    required DateTime date,
+  }) {
+    return _delegate.deleteCompletionByDate(starnyxId: starnyxId, date: date);
+  }
+
+  @override
+  Future<void> deleteCompletionsForStarnyx(String starnyxId) {
+    return _delegate.deleteCompletionsForStarnyx(starnyxId);
+  }
+
+  @override
+  Future<Completion?> getCompletionByDate({
+    required String starnyxId,
+    required DateTime date,
+  }) {
+    return _delegate.getCompletionByDate(starnyxId: starnyxId, date: date);
+  }
+
+  @override
+  Future<List<Completion>> getCompletionsForStarnyx(String starnyxId) {
+    return _delegate.getCompletionsForStarnyx(starnyxId);
+  }
+
+  @override
+  Future<void> saveCompletion(Completion completion) {
+    if (completion.starnyxId == failOnStarnyxId) {
+      throw StateError('Simulated completion write failure.');
+    }
+    return _delegate.saveCompletion(completion);
+  }
+
+  @override
+  Stream<List<Completion>> watchCompletionsForStarnyx(String starnyxId) {
+    return _delegate.watchCompletionsForStarnyx(starnyxId);
   }
 }
 
