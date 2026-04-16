@@ -105,111 +105,108 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
               color: AppColors.background,
               borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.25)),
             ),
-            child: Stack(
-              children: [
-                const Positioned.fill(child: CosmicBackground()),
-                Column(
-                  children: [
-                    const SizedBox(height: AppSpacing.sm),
-                    Center(
-                      child: Container(
-                        width: 48,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: AppColors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(AppRadius.pill),
-                        ),
+            child: CosmicBackground(
+              child: Column(
+                children: [
+                  const SizedBox(height: AppSpacing.sm),
+                  Center(
+                    child: Container(
+                      width: 48,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
                     ),
-                    _JournalHeader(topInset: topInset),
-                    Expanded(
-                      child: BlocBuilder<JournalBloc, JournalState>(
-                        builder: (context, state) {
-                          if (state.status == JournalStatus.loading) {
-                            return const Center(child: AppLoadingIndicator());
-                          }
+                  ),
+                  _JournalHeader(topInset: topInset),
+                  Expanded(
+                    child: BlocBuilder<JournalBloc, JournalState>(
+                      builder: (context, state) {
+                        if (state.status == JournalStatus.loading) {
+                          return const Center(child: AppLoadingIndicator());
+                        }
 
-                          if (state.status == JournalStatus.failure) {
-                            return Center(
-                              child: AppErrorState(
-                                title: 'journal.load_error_title'.tr(),
-                                message: state.errorMessage ?? 'journal.load_error_message'.tr(),
-                                retryLabel: 'home.retry'.tr(),
-                                onRetry: () => _journalBloc.add(JournalStarted(widget.starnyxId)),
+                        if (state.status == JournalStatus.failure) {
+                          return Center(
+                            child: AppErrorState(
+                              title: 'journal.load_error_title'.tr(),
+                              message: state.errorMessage ?? 'journal.load_error_message'.tr(),
+                              retryLabel: 'home.retry'.tr(),
+                              onRetry: () => _journalBloc.add(JournalStarted(widget.starnyxId)),
+                            ),
+                          );
+                        }
+
+                        final today = core_date_utils.DateUtils.nowDate();
+                        final hasEntryForToday = state.entries.any(
+                          (entry) => core_date_utils.DateUtils.isSameDate(entry.date, today),
+                        );
+
+                        return CustomScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          slivers: [
+                            if (!hasEntryForToday)
+                              SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.pageHorizontal,
+                                    vertical: AppSpacing.lg,
+                                  ),
+                                  child: _TodayEntryInput(
+                                    controller: _controller,
+                                    onChanged: (value) =>
+                                        _journalBloc.add(JournalDraftChanged(value)),
+                                    onSavePressed: _onSavePressed,
+                                    isSaving: state.saveStatus == AsyncStatus.inProgress,
+                                    isEnabled: state.canSaveDraft,
+                                  ),
+                                ),
                               ),
-                            );
-                          }
-
-                          final today = core_date_utils.DateUtils.nowDate();
-                          final hasEntryForToday = state.entries.any(
-                            (entry) => core_date_utils.DateUtils.isSameDate(entry.date, today),
-                          );
-
-                          return CustomScrollView(
-                            physics: const BouncingScrollPhysics(),
-                            slivers: [
-                              if (!hasEntryForToday)
-                                SliverToBoxAdapter(
+                            if (state.entries.isEmpty)
+                              SliverFillRemaining(
+                                hasScrollBody: false,
+                                child: Center(
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: AppSpacing.pageHorizontal,
-                                      vertical: AppSpacing.lg,
-                                    ),
-                                    child: _TodayEntryInput(
-                                      controller: _controller,
-                                      onChanged: (value) =>
-                                          _journalBloc.add(JournalDraftChanged(value)),
-                                      onSavePressed: _onSavePressed,
-                                      isSaving: state.saveStatus == AsyncStatus.inProgress,
-                                      isEnabled: state.canSaveDraft,
+                                    padding: const EdgeInsets.only(bottom: 64),
+                                    child: AppEmptyState(
+                                      title: 'journal.title'.tr(),
+                                      message: 'journal.no_entries'.tr(),
                                     ),
                                   ),
                                 ),
-                              if (state.entries.isEmpty)
-                                SliverFillRemaining(
-                                  hasScrollBody: false,
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(bottom: 64),
-                                      child: AppEmptyState(
-                                        title: 'journal.title'.tr(),
-                                        message: 'journal.no_entries'.tr(),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              else
-                                SliverPadding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    AppSpacing.pageHorizontal,
-                                    0,
-                                    AppSpacing.pageHorizontal,
-                                    AppSpacing.xl * 2,
-                                  ),
-                                  sliver: SliverList(
-                                    delegate: SliverChildBuilderDelegate(
-                                      (context, index) {
-                                        final entry = state.entries[index];
-                                        return Padding(
-                                          padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                                          child: _JournalEntryCard(
-                                            entry: entry,
-                                            onDeletePressed: () => _onDeletePressed(entry),
-                                          ),
-                                        );
-                                      },
-                                      childCount: state.entries.length,
-                                    ),
+                              )
+                            else
+                              SliverPadding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  AppSpacing.pageHorizontal,
+                                  0,
+                                  AppSpacing.pageHorizontal,
+                                  AppSpacing.xl * 2,
+                                ),
+                                sliver: SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, index) {
+                                      final entry = state.entries[index];
+                                      return Padding(
+                                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                                        child: _JournalEntryCard(
+                                          entry: entry,
+                                          onDeletePressed: () => _onDeletePressed(entry),
+                                        ),
+                                      );
+                                    },
+                                    childCount: state.entries.length,
                                   ),
                                 ),
-                            ],
-                          );
-                        },
-                      ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -261,7 +258,7 @@ class _JournalHeader extends StatelessWidget {
           Material(
             color: Colors.transparent,
             child: InkWell(
-              onPressed: () => Navigator.of(context).pop(),
+              onTap: () => Navigator.of(context).pop(),
               borderRadius: BorderRadius.circular(AppRadius.pill),
               child: Container(
                 padding: const EdgeInsets.all(AppSpacing.sm),
@@ -352,7 +349,7 @@ class _TodayEntryInput extends StatelessWidget {
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onPressed: isEnabled ? onSavePressed : null,
+                    onTap: isEnabled ? onSavePressed : null,
                     borderRadius: BorderRadius.circular(AppRadius.pill),
                     child: AnimatedContainer(
                       duration: AppDurations.fast,
@@ -427,8 +424,8 @@ class _JournalEntryCard extends StatelessWidget {
                       ),
                 ),
               ),
-              if (!isToday) ...[
-                const SizedBox(width: AppSpacing.sm),
+              const SizedBox(width: AppSpacing.sm),
+              if (!isToday)
                 Text(
                   formattedDate,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -436,12 +433,11 @@ class _JournalEntryCard extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                 ),
-              ],
               const Spacer(),
               Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onPressed: onDeletePressed,
+                  onTap: onDeletePressed,
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                   child: Container(
                     padding: const EdgeInsets.all(6),
