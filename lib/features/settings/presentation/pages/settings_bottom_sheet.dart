@@ -50,11 +50,19 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
   }
 
   Future<void> _loadPackageInfo() async {
-    final info = await PackageInfo.fromPlatform();
-    if (mounted) {
-      setState(() {
-        _appVersion = '${info.version} (${info.buildNumber})';
-      });
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() {
+          _appVersion = '${info.version} (${info.buildNumber})';
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _appVersion = '1.0.0'; // Fallback version
+        });
+      }
     }
   }
 
