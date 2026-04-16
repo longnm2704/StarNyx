@@ -8,6 +8,7 @@ import 'package:starnyx/data/repositories/data_repositories.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
+import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_bloc.dart';
 
 final GetIt serviceLocator = GetIt.instance;
@@ -161,6 +162,12 @@ void _registerBlocFactories() {
       watchJournalEntriesForStarnyxUseCase:
           serviceLocator<WatchJournalEntriesForStarnyxUseCase>(),
       deleteJournalEntryUseCase: serviceLocator<DeleteJournalEntryUseCase>(),
+    ),
+  );
+  serviceLocator.registerFactory<SettingsBloc>(
+    () => SettingsBloc(
+      exportDataUseCase: serviceLocator<ExportDataUseCase>(),
+      importDataUseCase: serviceLocator<ImportDataUseCase>(),
     ),
   );
 

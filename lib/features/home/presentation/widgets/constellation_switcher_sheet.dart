@@ -17,6 +17,9 @@ class ConstellationSwitcherSheetAction {
   const ConstellationSwitcherSheetAction.journalRequested()
     : this._(ConstellationSwitcherSheetActionType.journalRequested);
 
+  const ConstellationSwitcherSheetAction.settingsRequested()
+    : this._(ConstellationSwitcherSheetActionType.settingsRequested);
+
   final ConstellationSwitcherSheetActionType type;
   final StarNyx? starnyx;
 }
@@ -183,9 +186,12 @@ class _ConstellationSwitcherSheetState
                   const SizedBox(height: AppSpacing.md),
                   Row(
                     children: <Widget>[
-                      const Expanded(
+                      Expanded(
                         child: _SheetActionPill(
                           assetPath: 'assets/icons/ic_settings.svg',
+                          onPressed: () => Navigator.of(context).pop(
+                            const ConstellationSwitcherSheetAction.settingsRequested(),
+                          ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),

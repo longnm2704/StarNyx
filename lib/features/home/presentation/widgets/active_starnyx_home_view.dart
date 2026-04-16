@@ -9,6 +9,7 @@ import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_state.dart';
 import 'package:starnyx/features/journal/presentation/pages/journal_bottom_sheet.dart';
+import 'package:starnyx/features/settings/presentation/pages/settings_bottom_sheet.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
 import 'home_shell_view.dart';
@@ -173,6 +174,8 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
             final activeColor = starnyxColorFromHex(activeStarnyx.color);
             await showJournalBottomSheet(context, widget.activeStarnyxId!, activeColor);
           }
+        case ConstellationSwitcherSheetActionType.settingsRequested:
+          await showSettingsBottomSheet(context);
       }
       if (!mounted) {
         break;
