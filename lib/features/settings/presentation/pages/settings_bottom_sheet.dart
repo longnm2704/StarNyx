@@ -78,6 +78,7 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
         const end = Offset.zero;
         const curve = Curves.easeOutCubic;
         var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
         return SlideTransition(
           position: animation.drive(tween),
           child: child,
