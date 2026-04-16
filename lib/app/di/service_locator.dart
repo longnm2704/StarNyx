@@ -2,6 +2,7 @@ import 'package:uuid/uuid.dart';
 import 'package:get_it/get_it.dart';
 import 'package:starnyx/data/db/app_database.dart';
 import 'package:starnyx/app/router/app_router.dart';
+import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/domain/entities/starnyx.dart' as domain;
 import 'package:starnyx/data/repositories/data_repositories.dart';
@@ -45,8 +46,11 @@ void _registerCoreDependencies() {
   serviceLocator.registerLazySingleton<AppRouter>(AppRouter.new);
 }
 
-// These empty sections keep future registrations organized by layer.
-void _registerServices() {}
+void _registerServices() {
+  serviceLocator.registerLazySingleton<NotificationService>(
+    LocalNotificationService.new,
+  );
+}
 
 void _registerRepositories() {
   // Domain code depends on abstractions while DI wires the Drift implementations.
