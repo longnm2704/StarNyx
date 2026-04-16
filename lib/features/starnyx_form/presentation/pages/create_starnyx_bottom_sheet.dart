@@ -11,6 +11,7 @@ import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_bloc.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_event.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_state.dart';
+import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_widgets.dart';
 
 const LinearGradient _sheetTopDownGradient = LinearGradient(
@@ -125,6 +126,9 @@ class _StarnyxFormBottomSheetViewState
   }
 
   Future<void> _confirmDelete() async {
+    final state = context.read<StarnyxFormBloc>().state;
+    final accentColor = starnyxColorFromHex(state.color);
+
     final confirmed = await showAppConfirmDialog(
       context: context,
       title: 'starnyx_form.delete_confirm_title'.tr(),
@@ -133,6 +137,7 @@ class _StarnyxFormBottomSheetViewState
       confirmLabel: 'starnyx_form.delete_confirm'.tr(),
       iconAssetPath: 'assets/icons/ic_trash.svg',
       actionStyle: AppConfirmActionStyle.destructive,
+      accentColor: accentColor,
     );
 
     if (confirmed != true || !mounted) {

@@ -17,6 +17,7 @@ Future<bool?> showAppConfirmDialog({
   required String confirmLabel,
   String iconAssetPath = 'assets/icons/ic_trash.svg',
   AppConfirmActionStyle actionStyle = AppConfirmActionStyle.neutral,
+  Color? accentColor,
 }) {
   return showGeneralDialog<bool>(
     context: context,
@@ -32,6 +33,7 @@ Future<bool?> showAppConfirmDialog({
         confirmLabel: confirmLabel,
         iconAssetPath: iconAssetPath,
         actionStyle: actionStyle,
+        accentColor: accentColor,
       );
     },
     transitionBuilder:
@@ -67,6 +69,7 @@ class AppConfirmDialog extends StatelessWidget {
     super.key,
     this.iconAssetPath = 'assets/icons/ic_trash.svg',
     this.actionStyle = AppConfirmActionStyle.neutral,
+    this.accentColor,
   });
 
   final String title;
@@ -75,10 +78,12 @@ class AppConfirmDialog extends StatelessWidget {
   final String confirmLabel;
   final String iconAssetPath;
   final AppConfirmActionStyle actionStyle;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final effectiveAccentColor = accentColor ?? _defaultAccentColor;
 
     return SafeArea(
       child: Center(
@@ -100,7 +105,7 @@ class AppConfirmDialog extends StatelessWidget {
                     offset: const Offset(0, 20),
                   ),
                   BoxShadow(
-                    color: _accentColor.withValues(alpha: 0.12),
+                    color: effectiveAccentColor.withValues(alpha: 0.12),
                     blurRadius: 28,
                     offset: const Offset(0, 8),
                   ),
@@ -113,20 +118,22 @@ class AppConfirmDialog extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      width: 56,
-                      height: 56,
+                      width: 48,
+                      height: 48,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _accentColor.withValues(alpha: 0.12),
+                        color: effectiveAccentColor.withValues(alpha: 0.12),
                         border: Border.all(
-                          color: _accentColor.withValues(alpha: 0.36),
+                          color: effectiveAccentColor.withValues(alpha: 0.36),
                         ),
                       ),
-                      child: AppSvgIcon(
-                        assetPath: iconAssetPath,
-                        color: _iconColor,
-                        size: 28,
-                        semanticsLabel: title,
+                      child: Center(
+                        child: AppSvgIcon(
+                          assetPath: iconAssetPath,
+                          color: effectiveAccentColor,
+                          size: 22,
+                          semanticsLabel: title,
+                        ),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -160,6 +167,7 @@ class AppConfirmDialog extends StatelessWidget {
                             label: confirmLabel,
                             onPressed: () => Navigator.of(context).pop(true),
                             actionStyle: actionStyle,
+                            accentColor: accentColor,
                           ),
                         ),
                       ],
@@ -174,14 +182,9 @@ class AppConfirmDialog extends StatelessWidget {
     );
   }
 
-  Color get _accentColor => switch (actionStyle) {
+  Color get _defaultAccentColor => switch (actionStyle) {
     AppConfirmActionStyle.neutral => AppColors.accentLavender,
     AppConfirmActionStyle.destructive => AppColors.accentPink,
-  };
-
-  Color get _iconColor => switch (actionStyle) {
-    AppConfirmActionStyle.neutral => AppColors.accentLavender,
-    AppConfirmActionStyle.destructive => AppColors.accentLavender,
   };
 }
 
@@ -225,21 +228,25 @@ class _AppDialogActionButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     required this.actionStyle,
+    this.accentColor,
   });
 
   final String label;
   final VoidCallback onPressed;
   final AppConfirmActionStyle actionStyle;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
+    final effectiveShadowColor = accentColor ?? _shadowColor;
+
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: _gradient,
         borderRadius: BorderRadius.circular(AppRadius.pill),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: _shadowColor.withValues(alpha: 0.22),
+            color: effectiveShadowColor.withValues(alpha: 0.22),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -267,18 +274,31 @@ class _AppDialogActionButton extends StatelessWidget {
     );
   }
 
-  LinearGradient get _gradient => switch (actionStyle) {
-    AppConfirmActionStyle.neutral => const LinearGradient(
-      begin: Alignment.centerLeft,
-      end: Alignment.centerRight,
-      colors: <Color>[AppColors.accentBlue, AppColors.accentViolet],
-    ),
-    AppConfirmActionStyle.destructive => const LinearGradient(
-      begin: Alignment.centerLeft,
-      end: Alignment.centerRight,
-      colors: <Color>[Color(0xFFFF7E9D), AppColors.accentPink],
-    ),
-  };
+  LinearGradient get _gradient {
+    if (accentColor != null) {
+      return LinearGradient(
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+        colors: <Color>[
+          accentColor!.withValues(alpha: 0.8),
+          accentColor!,
+        ],
+      );
+    }
+
+    return switch (actionStyle) {
+      AppConfirmActionStyle.neutral => const LinearGradient(
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+        colors: <Color>[AppColors.accentBlue, AppColors.accentViolet],
+      ),
+      AppConfirmActionStyle.destructive => const LinearGradient(
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+        colors: <Color>[Color(0xFFFF7E9D), AppColors.accentPink],
+      ),
+    };
+  }
 
   Color get _shadowColor => switch (actionStyle) {
     AppConfirmActionStyle.neutral => AppColors.accentViolet,
