@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:uuid/uuid.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/domain/entities/domain_entities.dart';
@@ -490,12 +492,44 @@ void main() {
       journalEntryRepository,
       appSettingsRepository,
     );
-    final payload = await useCase();
+    final exportedJson = await useCase();
+    final payload = jsonDecode(exportedJson) as Map<String, dynamic>;
 
     expect(payload['schemaVersion'], 1);
     expect((payload['starnyxs'] as List<dynamic>).length, 1);
     expect((payload['completions'] as List<dynamic>).length, 1);
     expect((payload['journalEntries'] as List<dynamic>).length, 1);
+    expect(
+      (payload['starnyxs'] as List<dynamic>).first as Map<String, dynamic>,
+      <String, dynamic>{
+        'id': 'habit-1',
+        'title': 'Hydrate',
+        'description': 'Drink enough water',
+        'color': '#102030',
+        'startDate': '2026-04-01',
+        'reminderEnabled': true,
+        'reminderTime': '09:30',
+        'createdAt': '2026-04-01T08:00:00.000',
+        'updatedAt': '2026-04-02T09:00:00.000',
+      },
+    );
+    expect(
+      (payload['completions'] as List<dynamic>).first as Map<String, dynamic>,
+      <String, dynamic>{
+        'starnyxId': 'habit-1',
+        'date': '2026-04-10',
+        'completed': true,
+      },
+    );
+    expect(
+      (payload['journalEntries'] as List<dynamic>).first
+          as Map<String, dynamic>,
+      <String, dynamic>{
+        'starnyxId': 'habit-1',
+        'date': '2026-04-10',
+        'content': 'Stayed consistent today.',
+      },
+    );
     expect(
       (payload['appSettings'] as Map<String, dynamic>)['lastSelectedStarnyxId'],
       'habit-1',
@@ -572,8 +606,9 @@ void main() {
         isNotNull,
       );
       expect(
-        (await journalEntryRepository.getJournalEntriesForStarnyx('habit-1'))
-            .isNotEmpty,
+        (await journalEntryRepository.getJournalEntriesForStarnyx(
+          'habit-1',
+        )).isNotEmpty,
         isTrue,
       );
       expect(

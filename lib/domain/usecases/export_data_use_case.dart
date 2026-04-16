@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:starnyx/core/utils/date_utils.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/entities/completion.dart';
@@ -22,7 +24,14 @@ class ExportDataUseCase {
   final JournalEntryRepository _journalEntryRepository;
   final AppSettingsRepository _appSettingsRepository;
 
-  Future<Map<String, dynamic>> call({DateTime? now}) async {
+  /// Returns the backup payload serialized as JSON text.
+  Future<String> call({DateTime? now}) async {
+    final payload = await buildPayload(now: now);
+    return const JsonEncoder.withIndent('  ').convert(payload);
+  }
+
+  /// Builds a schema-stable JSON-compatible map for backup export.
+  Future<Map<String, dynamic>> buildPayload({DateTime? now}) async {
     final starnyxs = await _starnyxRepository.getAllStarnyxs();
     final completions = <Completion>[];
     final journalEntries = <JournalEntry>[];
