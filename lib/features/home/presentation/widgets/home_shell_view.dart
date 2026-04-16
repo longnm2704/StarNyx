@@ -26,6 +26,20 @@ Color homeShellAccentColor(String starnyxHex) {
   return starnyxColorFromHex(starnyxHex);
 }
 
+int homeShellDaysLeftInViewedYear({
+  required int viewedYear,
+  required DateTime todayDate,
+}) {
+  final normalizedToday = DateTime.utc(
+    todayDate.year,
+    todayDate.month,
+    todayDate.day,
+  );
+  final yearEnd = DateTime.utc(viewedYear + 1, 1, 1);
+  final diff = yearEnd.difference(normalizedToday).inDays;
+  return diff < 0 ? 0 : diff;
+}
+
 class HomeShellView extends StatelessWidget {
   const HomeShellView({
     required this.activeStarnyx,
@@ -38,7 +52,8 @@ class HomeShellView extends StatelessWidget {
     required this.onNextDayPressed,
     required this.onJumpToTodayPressed,
     required this.onDateSelected,
-    required this.onYearPressed,
+    required this.onPreviousYearPressed,
+    required this.onNextYearPressed,
     required this.onQuickActionsPressed,
     this.onToggleCompletionPressed,
     this.isCheckingIn = false,
@@ -56,7 +71,8 @@ class HomeShellView extends StatelessWidget {
   final VoidCallback? onNextDayPressed;
   final VoidCallback? onJumpToTodayPressed;
   final ValueChanged<DateTime>? onDateSelected;
-  final VoidCallback? onYearPressed;
+  final VoidCallback? onPreviousYearPressed;
+  final VoidCallback? onNextYearPressed;
   final VoidCallback? onQuickActionsPressed;
   final VoidCallback? onToggleCompletionPressed;
   final bool isCheckingIn;
@@ -70,11 +86,10 @@ class HomeShellView extends StatelessWidget {
       'EEEE, d MMM',
       localeTag,
     ).format(selectedDate);
-    final daysLeft = DateTime.utc(viewedYear + 1, 1, 1)
-        .difference(
-          DateTime.utc(selectedDate.year, selectedDate.month, selectedDate.day),
-        )
-        .inDays;
+    final daysLeft = homeShellDaysLeftInViewedYear(
+      viewedYear: viewedYear,
+      todayDate: todayDate,
+    );
     final totalCompleted = progressStats?.totalCompletedCount ?? 0;
     final currentStreak = progressStats?.currentStreak ?? 0;
     final gradientColors = homeShellGradientColors(activeStarnyx.color);
@@ -167,7 +182,8 @@ class HomeShellView extends StatelessWidget {
                         viewedYear: viewedYear,
                         daysLeft: daysLeft,
                         accentColor: accentColor,
-                        onYearPressed: onYearPressed,
+                        onPreviousYearPressed: onPreviousYearPressed,
+                        onNextYearPressed: onNextYearPressed,
                         onJumpToTodayPressed: onJumpToTodayPressed,
                       ),
                       const SizedBox(height: AppSpacing.md),

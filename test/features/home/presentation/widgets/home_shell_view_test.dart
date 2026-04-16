@@ -43,7 +43,8 @@ void main() {
             onNextDayPressed: () {},
             onJumpToTodayPressed: () {},
             onDateSelected: (_) {},
-            onYearPressed: null,
+            onPreviousYearPressed: () {},
+            onNextYearPressed: () {},
             onQuickActionsPressed: null,
           ),
         ),
@@ -117,6 +118,36 @@ void main() {
     expect(homeGridDateForIndex(2026, 364), DateTime.utc(2026, 12, 31));
     expect(homeGridDateForIndex(2024, 365), DateTime.utc(2024, 12, 31));
   });
+
+  test(
+    'days left uses today date and stays fixed within the same viewed year',
+    () {
+      expect(
+        homeShellDaysLeftInViewedYear(
+          viewedYear: 2026,
+          todayDate: DateTime(2026, 4, 19),
+        ),
+        257,
+      );
+      expect(
+        homeShellDaysLeftInViewedYear(
+          viewedYear: 2026,
+          todayDate: DateTime(2026, 4, 19),
+        ),
+        homeShellDaysLeftInViewedYear(
+          viewedYear: 2026,
+          todayDate: DateTime(2026, 4, 19, 23, 59),
+        ),
+      );
+      expect(
+        homeShellDaysLeftInViewedYear(
+          viewedYear: 2025,
+          todayDate: DateTime(2026, 4, 19),
+        ),
+        0,
+      );
+    },
+  );
 }
 
 Finder _findSvg(String assetPath) {

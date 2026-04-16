@@ -44,6 +44,11 @@ void main() {
       StarNyx? edited;
       var createPressed = false;
       var checkInPressed = false;
+      var previousPressed = false;
+      var nextPressed = false;
+      var jumpTodayPressed = false;
+      var previousYearPressed = false;
+      var nextYearPressed = false;
 
       await tester.pumpWidget(
         _buildLocalizedApp(
@@ -63,6 +68,21 @@ void main() {
             onDateSelected: (_) {},
             onSelectPressed: (starnyx) {
               edited = starnyx;
+            },
+            onPreviousDayPressed: () {
+              previousPressed = true;
+            },
+            onNextDayPressed: () {
+              nextPressed = true;
+            },
+            onJumpToTodayPressed: () {
+              jumpTodayPressed = true;
+            },
+            onPreviousYearPressed: () {
+              previousYearPressed = true;
+            },
+            onNextYearPressed: () {
+              nextYearPressed = true;
             },
             onToggleCompletionPressed: () {
               checkInPressed = true;
@@ -86,6 +106,21 @@ void main() {
       await tester.tap(find.byKey(const Key('home-selected-date-button')));
       await tester.pump();
       expect(checkInPressed, isTrue);
+      await tester.tap(find.byKey(const Key('home-previous-day-button')));
+      await tester.pump();
+      expect(previousPressed, isTrue);
+      await tester.tap(find.byKey(const Key('home-next-day-button')));
+      await tester.pump();
+      expect(nextPressed, isTrue);
+      await tester.tap(find.byKey(const Key('home-jump-today-button')));
+      await tester.pump();
+      expect(jumpTodayPressed, isTrue);
+      await tester.tap(find.byKey(const Key('home-previous-year-button')));
+      await tester.pump();
+      expect(previousYearPressed, isTrue);
+      await tester.tap(find.byKey(const Key('home-next-year-button')));
+      await tester.pump();
+      expect(nextYearPressed, isFalse);
 
       await tester.tap(find.text('Swipe up'));
       await tester.pump(const Duration(milliseconds: 220));

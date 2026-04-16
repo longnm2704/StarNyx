@@ -7,7 +7,8 @@ class HomeYearSummaryRow extends StatelessWidget {
     required this.viewedYear,
     required this.daysLeft,
     required this.accentColor,
-    required this.onYearPressed,
+    required this.onPreviousYearPressed,
+    required this.onNextYearPressed,
     required this.onJumpToTodayPressed,
     super.key,
   });
@@ -15,7 +16,8 @@ class HomeYearSummaryRow extends StatelessWidget {
   final int viewedYear;
   final int daysLeft;
   final Color accentColor;
-  final VoidCallback? onYearPressed;
+  final VoidCallback? onPreviousYearPressed;
+  final VoidCallback? onNextYearPressed;
   final VoidCallback? onJumpToTodayPressed;
 
   @override
@@ -24,31 +26,31 @@ class HomeYearSummaryRow extends StatelessWidget {
 
     return Row(
       children: <Widget>[
-        InkWell(
-          onTap: onYearPressed,
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerLeft,
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Icon(
-                  Icons.chevron_left_rounded,
-                  size: 18,
-                  color: AppColors.textPrimary.withValues(alpha: 0.6),
+                _YearChevronButton(
+                  buttonKey: const Key('home-previous-year-button'),
+                  icon: Icons.chevron_left_rounded,
+                  onPressed: onPreviousYearPressed,
                 ),
-                const SizedBox(width: AppSpacing.xs),
-                Text(
-                  viewedYear.toString(),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textPrimary.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w700,
+                Flexible(
+                  child: Text(
+                    viewedYear.toString(),
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textPrimary.withValues(alpha: 0.7),
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.xs),
-                Icon(
-                  Icons.chevron_right_rounded,
-                  size: 18,
-                  color: AppColors.textPrimary.withValues(alpha: 0.6),
+                _YearChevronButton(
+                  buttonKey: const Key('home-next-year-button'),
+                  icon: Icons.chevron_right_rounded,
+                  onPressed: onNextYearPressed,
                 ),
               ],
             ),
@@ -57,6 +59,7 @@ class HomeYearSummaryRow extends StatelessWidget {
         Expanded(
           child: Center(
             child: GestureDetector(
+              key: const Key('home-jump-today-button'),
               onTap: onJumpToTodayPressed,
               child: Text(
                 'home.reset_current_date'.tr(),
@@ -68,27 +71,68 @@ class HomeYearSummaryRow extends StatelessWidget {
             ),
           ),
         ),
-        Text.rich(
-          TextSpan(
-            children: <TextSpan>[
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Text.rich(
+              textAlign: TextAlign.right,
               TextSpan(
-                text: '$daysLeft ',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: accentColor.withValues(alpha: 0.95),
-                  fontWeight: FontWeight.w700,
-                ),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: '$daysLeft ',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: accentColor.withValues(alpha: 0.95),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  TextSpan(
+                    text: 'home.days_left_suffix'.tr(),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textPrimary.withValues(alpha: 0.7),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
-              TextSpan(
-                text: 'home.days_left_suffix'.tr(),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textPrimary.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _YearChevronButton extends StatelessWidget {
+  static const double _buttonSize = 36;
+
+  const _YearChevronButton({
+    required this.buttonKey,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final Key buttonKey;
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = AppColors.textPrimary.withValues(
+      alpha: onPressed == null ? 0.3 : 0.6,
+    );
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        key: buttonKey,
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        child: SizedBox(
+          width: _buttonSize,
+          height: _buttonSize,
+          child: Icon(icon, size: 18, color: color),
+        ),
+      ),
     );
   }
 }
