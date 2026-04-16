@@ -106,6 +106,14 @@
     "about_privacy_content": "Your data is yours alone. StarNyx is 100% offline, meaning no accounts, no tracking, and no cloud syncing. All your progress is stored only on your device.",
     "about_experience_title": "Cosmic Minimalism",
     "about_experience_content": "Inspired by the stars, our interface aims to reduce noise and keep you focused on what matters most: your daily journey towards a better version of yourself.",
-    "about_made_with": "Made with ❤️ for a better self."
+    "about_made_with": "Made with ❤️ for a better self.",
+    "general_title": "General",
+    "language_label": "Language",
+    "appearance_label": "Appearance",
+    "theme_dark": "Dark (Cosmic)",
+    "theme_light": "Light (Solar)",
+    "time_format_label": "Time Format",
+    "time_format_24h": "24-hour",
+    "time_format_12h": "12-hour"
   }
 }
