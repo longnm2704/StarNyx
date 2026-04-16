@@ -98,6 +98,14 @@
     "export_label": "Export Data (JSON)",
     "import_label": "Import Data (JSON)",
     "about_section": "About",
-    "about_label": "About StarNyx"
+    "about_label": "About StarNyx",
+    "about_title": "About StarNyx",
+    "about_mission_title": "Our Mission",
+    "about_mission_content": "StarNyx is designed to help you build lasting habits through a minimal, focused, and visually rewarding experience. We believe that progress should feel like watching a beautiful night sky grow brighter every day.",
+    "about_privacy_title": "Privacy First",
+    "about_privacy_content": "Your data is yours alone. StarNyx is 100% offline, meaning no accounts, no tracking, and no cloud syncing. All your progress is stored only on your device.",
+    "about_experience_title": "Cosmic Minimalism",
+    "about_experience_content": "Inspired by the stars, our interface aims to reduce noise and keep you focused on what matters most: your daily journey towards a better version of yourself.",
+    "about_made_with": "Made with ❤️ for a better self."
   }
 }
