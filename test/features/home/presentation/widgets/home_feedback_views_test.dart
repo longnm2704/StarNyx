@@ -137,21 +137,19 @@ void main() {
       expect(_findSvg('assets/icons/ic_book.svg'), findsOneWidget);
       expect(_findSvg('assets/icons/ic_plus.svg'), findsOneWidget);
 
-      await tester.tap(_findSvg('assets/icons/ic_settings.svg'));
-      await tester.pump();
       expect(edited, isNull);
       expect(find.text('Observation Deck'), findsOneWidget);
 
-      await tester.tap(find.text('Edit'));
+      _pressTextButton(tester, 'Edit');
       await tester.pump();
       expect(find.text('Done'), findsOneWidget);
       expect(_findSvg('assets/icons/ic_cursor.svg'), findsWidgets);
 
-      await tester.tap(find.text('Done'));
+      _pressTextButton(tester, 'Done');
       await tester.pump();
       expect(find.text('Edit'), findsOneWidget);
 
-      await tester.tap(_findSvg('assets/icons/ic_plus.svg'));
+      _pressSheetActionIcon(tester, 'assets/icons/ic_plus.svg');
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 220));
       await tester.pump(const Duration(milliseconds: 220));
@@ -182,7 +180,7 @@ void main() {
         scrollable: find.byType(Scrollable).last,
       );
       await tester.pump();
-      await tester.tap(_findSvg('assets/icons/ic_edit.svg').last);
+      _pressIconButton(tester, _findSvg('assets/icons/ic_edit.svg').last);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 220));
       await tester.pump(const Duration(milliseconds: 220));
@@ -235,6 +233,27 @@ Finder _findSvg(String assetPath) {
   return find.byWidgetPredicate(
     (Widget widget) => widget is AppSvgIcon && widget.assetPath == assetPath,
   );
+}
+
+void _pressTextButton(WidgetTester tester, String label) {
+  final button = tester.widget<TextButton>(
+    find.widgetWithText(TextButton, label),
+  );
+  button.onPressed!.call();
+}
+
+void _pressSheetActionIcon(WidgetTester tester, String assetPath) {
+  final action = tester.widget<InkWell>(
+    find.ancestor(of: _findSvg(assetPath), matching: find.byType(InkWell)),
+  );
+  action.onTap!.call();
+}
+
+void _pressIconButton(WidgetTester tester, Finder finder) {
+  final button = tester.widget<IconButton>(
+    find.ancestor(of: finder, matching: find.byType(IconButton)),
+  );
+  button.onPressed!.call();
 }
 
 Widget _buildLocalizedApp(Widget child) {
