@@ -11,7 +11,9 @@ class GeneralSettingsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final topInset = mediaQuery.viewPadding.top > 0 ? mediaQuery.viewPadding.top : mediaQuery.padding.top;
+    final topInset = mediaQuery.viewPadding.top > 0
+        ? mediaQuery.viewPadding.top
+        : mediaQuery.padding.top;
     final headerTopPadding = (topInset < 24 ? 24.0 : topInset) + AppSpacing.lg;
 
     return Column(
@@ -39,7 +41,7 @@ class GeneralSettingsSheet extends StatelessWidget {
             children: [
               _GeneralSettingTile(
                 title: 'settings.language_label'.tr(),
-                value: 'English',
+                value: 'settings.language_value'.tr(),
                 onTap: () {},
               ),
               const SizedBox(height: AppSpacing.md),
@@ -90,17 +92,17 @@ class _GeneralSettingTile extends StatelessWidget {
                     Text(
                       title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       value,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.accentLavender,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        color: AppColors.accentLavender,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),

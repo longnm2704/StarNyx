@@ -11,7 +11,11 @@ import 'package:starnyx/features/journal/presentation/bloc/journal_state.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_header.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_pill_text_field.dart';
 
-Future<void> showJournalBottomSheet(BuildContext context, String starnyxId, Color accentColor) {
+Future<void> showJournalBottomSheet(
+  BuildContext context,
+  String starnyxId,
+  Color accentColor,
+) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -25,7 +29,11 @@ Future<void> showJournalBottomSheet(BuildContext context, String starnyxId, Colo
 }
 
 class JournalBottomSheet extends StatefulWidget {
-  const JournalBottomSheet({required this.starnyxId, required this.accentColor, super.key});
+  const JournalBottomSheet({
+    required this.starnyxId,
+    required this.accentColor,
+    super.key,
+  });
 
   final String starnyxId;
   final Color accentColor;
@@ -42,7 +50,8 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
   @override
   void initState() {
     super.initState();
-    _journalBloc = serviceLocator<JournalBloc>()..add(JournalStarted(widget.starnyxId));
+    _journalBloc = serviceLocator<JournalBloc>()
+      ..add(JournalStarted(widget.starnyxId));
     _scrollController = ScrollController();
   }
 
@@ -79,7 +88,9 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final topInset = mediaQuery.viewPadding.top > 0 ? mediaQuery.viewPadding.top : mediaQuery.padding.top;
+    final topInset = mediaQuery.viewPadding.top > 0
+        ? mediaQuery.viewPadding.top
+        : mediaQuery.padding.top;
     final headerTopPadding = (topInset < 24 ? 24.0 : topInset) + AppSpacing.lg;
     final bottomPadding = mediaQuery.viewInsets.bottom;
 
@@ -96,7 +107,7 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
               _draftContent = '';
             });
             FocusScope.of(context).unfocus();
-            
+
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (_scrollController.hasClients) {
                 _scrollController.animateTo(
@@ -106,10 +117,11 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
                 );
               }
             });
-          } else if (state.saveStatus == AsyncStatus.failure && state.errorMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage!)),
-            );
+          } else if (state.saveStatus == AsyncStatus.failure &&
+              state.errorMessage != null) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
           }
         },
         child: FractionallySizedBox(
@@ -117,7 +129,9 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
           child: DecoratedBox(
             decoration: const BoxDecoration(
               color: AppColors.background,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl * 1.5)),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AppRadius.xl * 1.5),
+              ),
             ),
             child: SafeArea(
               top: false,
@@ -155,15 +169,19 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
                               return Center(
                                 child: AppErrorState(
                                   title: 'journal.load_error_title'.tr(),
-                                  message: state.errorMessage ?? 'journal.load_error_message'.tr(),
+                                  message:
+                                      state.errorMessage ??
+                                      'journal.load_error_message'.tr(),
                                   retryLabel: 'home.retry'.tr(),
-                                  onRetry: () => _journalBloc.add(JournalStarted(widget.starnyxId)),
+                                  onRetry: () => _journalBloc.add(
+                                    JournalStarted(widget.starnyxId),
+                                  ),
                                 ),
                               );
                             }
 
                             if (state.entries.isEmpty) {
-                              return const SizedBox.expand();
+                              return const _JournalEmptyState();
                             }
 
                             return ListView.builder(
@@ -179,11 +197,14 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
                               itemBuilder: (context, index) {
                                 final entry = state.entries[index];
                                 return Padding(
-                                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                                  padding: const EdgeInsets.only(
+                                    bottom: AppSpacing.md,
+                                  ),
                                   child: _JournalEntryCard(
                                     entry: entry,
                                     accentColor: widget.accentColor,
-                                    onDeletePressed: () => _onDeletePressed(entry),
+                                    onDeletePressed: () =>
+                                        _onDeletePressed(entry),
                                   ),
                                 );
                               },
@@ -213,6 +234,52 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
   }
 }
 
+class _JournalEmptyState extends StatelessWidget {
+  const _JournalEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.pageHorizontal,
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              AppSvgIcon(
+                assetPath: 'assets/icons/ic_book.svg',
+                size: 36,
+                color: AppColors.textMuted.withValues(alpha: 0.9),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                'journal.empty_title'.tr(),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'journal.empty_message'.tr(),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textMuted,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _JournalEntryCard extends StatelessWidget {
   const _JournalEntryCard({
     required this.entry,
@@ -226,7 +293,9 @@ class _JournalEntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formattedFullDate = DateFormat('dd/MM/yyyy HH:mm').format(entry.createdAt);
+    final formattedFullDate = DateFormat(
+      'dd/MM/yyyy HH:mm',
+    ).format(entry.createdAt);
 
     return GestureDetector(
       onLongPress: onDeletePressed,
@@ -239,18 +308,18 @@ class _JournalEntryCard extends StatelessWidget {
             Text(
               entry.content,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppColors.textPrimary.withValues(alpha: 0.9),
-                    height: 1.5,
-                  ),
+                color: AppColors.textPrimary.withValues(alpha: 0.9),
+                height: 1.5,
+              ),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               formattedFullDate,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: AppColors.textMuted.withValues(alpha: 0.6),
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
+                color: AppColors.textMuted.withValues(alpha: 0.6),
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Container(
@@ -295,7 +364,9 @@ class _JournalInputArea extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: Colors.transparent,
-            border: Border(top: BorderSide(color: AppColors.white.withValues(alpha: 0.05))),
+            border: Border(
+              top: BorderSide(color: AppColors.white.withValues(alpha: 0.05)),
+            ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -319,15 +390,19 @@ class _JournalInputArea extends StatelessWidget {
                     height: 48,
                     width: 48,
                     decoration: BoxDecoration(
-                      color: canSave ? accentColor : AppColors.white.withValues(alpha: 0.05),
+                      color: canSave
+                          ? accentColor
+                          : AppColors.white.withValues(alpha: 0.05),
                       shape: BoxShape.circle,
-                      boxShadow: canSave ? [
-                        BoxShadow(
-                          color: accentColor.withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        )
-                      ] : null,
+                      boxShadow: canSave
+                          ? [
+                              BoxShadow(
+                                color: accentColor.withValues(alpha: 0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                          : null,
                     ),
                     child: Center(
                       child: state.saveStatus == AsyncStatus.inProgress
@@ -336,7 +411,9 @@ class _JournalInputArea extends StatelessWidget {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.white,
+                                ),
                               ),
                             )
                           : const Icon(

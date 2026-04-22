@@ -96,7 +96,7 @@ void main() {
 
       expect(find.text('Hydrate'), findsOneWidget);
       expect(find.text('Drink water'), findsOneWidget);
-      expect(find.text('Swipe up'), findsOneWidget);
+      expect(find.text('Swipe up for tools'), findsOneWidget);
       expect(find.text('2026'), findsOneWidget);
       expect(find.text('Today'), findsOneWidget);
       expect(
@@ -122,23 +122,23 @@ void main() {
       await tester.pump();
       expect(nextYearPressed, isFalse);
 
-      await tester.tap(find.text('Swipe up'));
+      await tester.tap(find.text('Swipe up for tools'));
       await tester.pump(const Duration(milliseconds: 220));
       await tester.pump(const Duration(milliseconds: 220));
       await tester.pump(const Duration(milliseconds: 220));
 
-      expect(find.text('Observation Deck'), findsOneWidget);
-      expect(find.text('Manage'), findsOneWidget);
-      expect(find.text('StarNyx Plus'), findsOneWidget);
-      expect(find.text('Constellations'), findsOneWidget);
-      expect(find.text('(Tap Edit to reorder)'), findsOneWidget);
+      expect(find.text('Constellation Deck'), findsOneWidget);
+      expect(find.text('Switch, write, or adjust'), findsOneWidget);
+      expect(find.text('Current focus'), findsOneWidget);
+      expect(find.text('Your constellations'), findsOneWidget);
+      expect(find.text('Edit to reorder'), findsOneWidget);
       expect(find.text('Stretch'), findsOneWidget);
       expect(_findSvg('assets/icons/ic_settings.svg'), findsOneWidget);
       expect(_findSvg('assets/icons/ic_book.svg'), findsOneWidget);
       expect(_findSvg('assets/icons/ic_plus.svg'), findsOneWidget);
 
       expect(edited, isNull);
-      expect(find.text('Observation Deck'), findsOneWidget);
+      expect(find.text('Constellation Deck'), findsOneWidget);
 
       _pressTextButton(tester, 'Edit');
       await tester.pump();
@@ -156,7 +156,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 220));
       expect(createPressed, isTrue);
       createPressed = false;
-      expect(find.text('Observation Deck'), findsOneWidget);
+      expect(find.text('Constellation Deck'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.text('Stretch'),
@@ -169,7 +169,7 @@ void main() {
       expect(edited, starnyxs[1]);
       edited = null;
 
-      await tester.tap(find.text('Swipe up'));
+      await tester.tap(find.text('Swipe up for tools'));
       await tester.pump(const Duration(milliseconds: 220));
       await tester.pump(const Duration(milliseconds: 220));
       await tester.pump(const Duration(milliseconds: 220));
@@ -187,7 +187,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 220));
       expect(edited, starnyxs[1]);
       edited = null;
-      expect(find.text('Observation Deck'), findsOneWidget);
+      expect(find.text('Constellation Deck'), findsOneWidget);
     },
   );
 
