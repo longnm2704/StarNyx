@@ -55,6 +55,24 @@ void main() {
     expect(find.byType(FirstRunWelcomeView), findsOneWidget);
     expect(find.text('New Constellation'), findsOneWidget);
   });
+
+  testWidgets('welcome state stays usable on small screens', (tester) async {
+    await tester.pumpWidget(
+      _buildLocalizedApp(
+        const MediaQuery(
+          data: MediaQueryData(size: Size(320, 568)),
+          child: SizedBox(
+            width: 320,
+            height: 568,
+            child: FirstRunWelcomeView(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Widget _buildLocalizedApp(Widget child) {

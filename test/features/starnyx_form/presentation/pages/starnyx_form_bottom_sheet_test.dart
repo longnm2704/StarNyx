@@ -28,25 +28,7 @@ void main() {
     (tester) async {
       _registerFormTestDependencies();
 
-      await tester.pumpWidget(
-        _buildLocalizedApp(
-          Builder(
-            builder: (context) {
-              return Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    showCreateStarnyxBottomSheet(context);
-                  },
-                  child: const Text('Open Form'),
-                ),
-              );
-            },
-          ),
-        ),
-      );
-      await tester.pump(const Duration(milliseconds: 300));
-
-      await tester.tap(find.byType(ElevatedButton));
+      await tester.pumpWidget(_buildLocalizedApp(const _AutoOpenFormHost()));
       await tester.pumpAndSettle();
 
       expect(find.text('New Constellation'), findsOneWidget);
@@ -64,6 +46,51 @@ void main() {
       expect(find.text('Title is required'), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'create starnyx bottom sheet remains scrollable on small screens',
+    (tester) async {
+      tester.view.physicalSize = const Size(320, 568);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      _registerFormTestDependencies();
+
+      await tester.pumpWidget(_buildLocalizedApp(const _AutoOpenFormHost()));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    },
+  );
+}
+
+class _AutoOpenFormHost extends StatefulWidget {
+  const _AutoOpenFormHost();
+
+  @override
+  State<_AutoOpenFormHost> createState() => _AutoOpenFormHostState();
+}
+
+class _AutoOpenFormHostState extends State<_AutoOpenFormHost> {
+  bool _didOpen = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didOpen) {
+      return;
+    }
+    _didOpen = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        showCreateStarnyxBottomSheet(context);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 void _registerFormTestDependencies() {

@@ -176,6 +176,9 @@ class _SettingsMainViewState extends State<SettingsMainView> {
     final topInset = mediaQuery.viewPadding.top > 0
         ? mediaQuery.viewPadding.top
         : mediaQuery.padding.top;
+    final bottomSafeInset = mediaQuery.viewPadding.bottom > 0
+        ? mediaQuery.viewPadding.bottom
+        : mediaQuery.padding.bottom;
     final headerTopPadding = (topInset < 24 ? 24.0 : topInset) + AppSpacing.lg;
 
     return BlocListener<SettingsBloc, SettingsState>(
@@ -212,11 +215,11 @@ class _SettingsMainViewState extends State<SettingsMainView> {
           ),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(
+              padding: EdgeInsets.fromLTRB(
                 AppSpacing.pageHorizontal,
                 AppSpacing.md,
                 AppSpacing.pageHorizontal,
-                AppSpacing.xl,
+                AppSpacing.xl + bottomSafeInset,
               ),
               children: [
                 _SettingsSection(
