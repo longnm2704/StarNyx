@@ -53,7 +53,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.text('Journal'), findsOneWidget);
-    expect(find.text('Today\'s reflection...'), findsOneWidget);
+    expect(find.text('Write a quick note about today...'), findsOneWidget);
 
     await tester.enterText(
       find.byType(EditableText).first,

@@ -182,7 +182,12 @@ class _SettingsMainViewState extends State<SettingsMainView> {
       listener: (context, state) {
         if (state.exportStatus == AsyncStatus.success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Data exported successfully')),
+            SnackBar(content: Text('settings.export_success'.tr())),
+          );
+        }
+        if (state.importStatus == AsyncStatus.success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('settings.import_success'.tr())),
           );
         }
         if (state.errorMessage != null) {
@@ -246,7 +251,9 @@ class _SettingsMainViewState extends State<SettingsMainView> {
                     ),
                     _SettingsTile(
                       iconPath: 'assets/icons/ic_version.svg',
-                      title: 'Version $_appVersion',
+                      title: 'settings.version_label'.tr(
+                        args: <String>[_appVersion],
+                      ),
                       onTap: null,
                     ),
                   ],

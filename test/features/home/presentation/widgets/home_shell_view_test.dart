@@ -17,7 +17,7 @@ void main() {
   });
 
   testWidgets(
-    'home shell view renders the STX-025 shell with bound title and footer data',
+    'home shell view renders the active constellation shell with bound title and footer data',
     (WidgetTester tester) async {
       await tester.pumpWidget(
         _buildLocalizedApp(
@@ -58,7 +58,7 @@ void main() {
       expect(find.text('257 days left'), findsOneWidget);
       expect(find.text('Today'), findsOneWidget);
       expect(find.text('Sunday, 19 Apr'), findsOneWidget);
-      expect(find.text('Total: 2 · Streak: 0'), findsOneWidget);
+      expect(find.text('Completed: 2 · Streak: 0'), findsOneWidget);
       expect(
         find.byKey(const Key('home-star-grid-placeholder')),
         findsOneWidget,
