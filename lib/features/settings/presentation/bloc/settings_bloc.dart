@@ -28,11 +28,15 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsExportRequested event,
     Emitter<SettingsState> emit,
   ) async {
-    emit(state.copyWith(exportStatus: AsyncStatus.inProgress));
+    emit(
+      state.copyWith(exportStatus: AsyncStatus.inProgress, errorMessage: null),
+    );
     try {
       // Logic for sharing/saving the exported JSON will be handled in UI or a service
       await _exportDataUseCase();
-      emit(state.copyWith(exportStatus: AsyncStatus.success));
+      emit(
+        state.copyWith(exportStatus: AsyncStatus.success, errorMessage: null),
+      );
     } catch (e) {
       emit(
         state.copyWith(
@@ -47,11 +51,15 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsImportRequested event,
     Emitter<SettingsState> emit,
   ) async {
-    emit(state.copyWith(importStatus: AsyncStatus.inProgress));
+    emit(
+      state.copyWith(importStatus: AsyncStatus.inProgress, errorMessage: null),
+    );
     try {
       await _importDataUseCase(event.jsonPayload);
       await _syncNotificationsUseCase.rebuildAllFromLocalData();
-      emit(state.copyWith(importStatus: AsyncStatus.success));
+      emit(
+        state.copyWith(importStatus: AsyncStatus.success, errorMessage: null),
+      );
     } catch (e) {
       emit(
         state.copyWith(

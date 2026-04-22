@@ -113,7 +113,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     final today = DateUtils.nowDate(_nowBuilder());
     final requestId = _nextDataRequestId();
-    emit(state.copyWith(selectionStatus: AsyncStatus.inProgress));
+    emit(
+      state.copyWith(
+        selectionStatus: AsyncStatus.inProgress,
+        lastSelectionRequestedId: event.id,
+      ),
+    );
 
     try {
       await _selectActiveStarNyxUseCase(event.id, now: today);
@@ -132,6 +137,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           activeStarnyxId: data.activeStarnyx?.id,
           progressStats: data.progressStats,
           completedDatesForViewedYear: data.completedDatesForViewedYear,
+          lastSelectionRequestedId: null,
           selectionFeedbackCount: state.selectionFeedbackCount + 1,
         ),
       );

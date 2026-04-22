@@ -5,6 +5,7 @@ import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_event.dart';
+import 'package:starnyx/features/settings/presentation/bloc/settings_state.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_header.dart';
 
 class BackupSettingsSheet extends StatelessWidget {
@@ -38,36 +39,72 @@ class BackupSettingsSheet extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: ListView(
-            padding: EdgeInsets.fromLTRB(
-              AppSpacing.pageHorizontal,
-              AppSpacing.md,
-              AppSpacing.pageHorizontal,
-              AppSpacing.xl + bottomSafeInset,
-            ),
-            children: [
-              _BackupTile(
-                iconPath: 'assets/icons/ic_export.svg',
-                title: 'settings.export_label'.tr(),
-                subtitle: 'settings.export_hint'.tr(),
-                onTap: () {
-                  context.read<SettingsBloc>().add(
-                    const SettingsExportRequested(),
-                  );
-                },
-              ),
-              const SizedBox(height: AppSpacing.md),
-              _BackupTile(
-                iconPath: 'assets/icons/ic_import.svg',
-                title: 'settings.import_label'.tr(),
-                subtitle: 'settings.import_hint'.tr(),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('settings.import_pending'.tr())),
-                  );
-                },
-              ),
-            ],
+          child: BlocBuilder<SettingsBloc, SettingsState>(
+            builder: (BuildContext context, SettingsState state) {
+              return ListView(
+                padding: EdgeInsets.fromLTRB(
+                  AppSpacing.pageHorizontal,
+                  AppSpacing.md,
+                  AppSpacing.pageHorizontal,
+                  AppSpacing.xl + bottomSafeInset,
+                ),
+                children: [
+                  AnimatedSwitcher(
+                    duration: AppDurations.fast,
+                    child: state.isExporting
+                        ? _BackupStatusCard(
+                            key: const ValueKey<String>('export-loading'),
+                            child: AppLoadingIndicator(
+                              label: 'settings.export_loading_message'.tr(),
+                            ),
+                          )
+                        : state.hasExportFailure
+                        ? _BackupStatusCard(
+                            key: const ValueKey<String>('export-error'),
+                            child: AppErrorState(
+                              title: 'settings.export_error_title'.tr(),
+                              message:
+                                  state.errorMessage ??
+                                  'settings.export_loading_message'.tr(),
+                              retryLabel: 'home.retry'.tr(),
+                              onRetry: () {
+                                context.read<SettingsBloc>().add(
+                                  const SettingsExportRequested(),
+                                );
+                              },
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                  if (state.isExporting || state.hasExportFailure)
+                    const SizedBox(height: AppSpacing.md),
+                  _BackupTile(
+                    iconPath: 'assets/icons/ic_export.svg',
+                    title: 'settings.export_label'.tr(),
+                    subtitle: 'settings.export_hint'.tr(),
+                    isLoading: state.isExporting,
+                    onTap: state.isExporting
+                        ? null
+                        : () {
+                            context.read<SettingsBloc>().add(
+                              const SettingsExportRequested(),
+                            );
+                          },
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _BackupTile(
+                    iconPath: 'assets/icons/ic_import.svg',
+                    title: 'settings.import_label'.tr(),
+                    subtitle: 'settings.import_hint'.tr(),
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('settings.import_pending'.tr())),
+                      );
+                    },
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ],
@@ -81,12 +118,14 @@ class _BackupTile extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.isLoading = false,
   });
 
   final String iconPath;
   final String title;
   final String subtitle;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -154,13 +193,43 @@ class _BackupTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
-                Icons.chevron_right_rounded,
-                color: AppColors.textMuted,
-              ),
+              if (isLoading)
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.textMuted,
+                ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _BackupStatusCard extends StatelessWidget {
+  const _BackupStatusCard({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceGlass.withValues(alpha: 0.82),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(
+          color: AppColors.outlineSoft.withValues(alpha: 0.16),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.sm),
+        child: child,
       ),
     );
   }

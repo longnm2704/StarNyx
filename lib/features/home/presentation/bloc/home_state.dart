@@ -15,6 +15,7 @@ class HomeState extends Equatable {
     required this.selectedDate,
     required this.viewedYear,
     required this.completedDatesForViewedYear,
+    this.lastSelectionRequestedId,
     this.activeStarnyxId,
     this.progressStats,
   });
@@ -42,6 +43,7 @@ class HomeState extends Equatable {
   final DateTime selectedDate;
   final int viewedYear;
   final List<DateTime> completedDatesForViewedYear;
+  final String? lastSelectionRequestedId;
   final StarNyxProgressStats? progressStats;
 
   bool get hasData => starnyxs.isNotEmpty;
@@ -57,6 +59,7 @@ class HomeState extends Equatable {
     DateTime? selectedDate,
     int? viewedYear,
     List<DateTime>? completedDatesForViewedYear,
+    Object? lastSelectionRequestedId = _unset,
     Object? progressStats = _unset,
   }) {
     return HomeState(
@@ -75,6 +78,9 @@ class HomeState extends Equatable {
       viewedYear: viewedYear ?? this.viewedYear,
       completedDatesForViewedYear:
           completedDatesForViewedYear ?? this.completedDatesForViewedYear,
+      lastSelectionRequestedId: identical(lastSelectionRequestedId, _unset)
+          ? this.lastSelectionRequestedId
+          : lastSelectionRequestedId as String?,
       progressStats: identical(progressStats, _unset)
           ? this.progressStats
           : progressStats as StarNyxProgressStats?,
@@ -93,6 +99,7 @@ class HomeState extends Equatable {
     selectedDate,
     viewedYear,
     completedDatesForViewedYear,
+    lastSelectionRequestedId,
     progressStats,
   ];
 }
