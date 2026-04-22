@@ -39,35 +39,50 @@ abstract final class AppTheme {
         fontWeight: FontWeight.w800,
         letterSpacing: -0.8,
       ),
+      headlineSmall: baseTheme.textTheme.headlineSmall?.copyWith(
+        color: AppColors.textPrimary,
+        fontSize: 29,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.6,
+      ),
       titleLarge: baseTheme.textTheme.titleLarge?.copyWith(
         color: AppColors.textPrimary,
         fontSize: 24,
         fontWeight: FontWeight.w700,
+        letterSpacing: -0.4,
       ),
       titleMedium: baseTheme.textTheme.titleMedium?.copyWith(
         color: AppColors.textPrimary,
         fontSize: 18,
         fontWeight: FontWeight.w600,
+        letterSpacing: -0.2,
       ),
       bodyLarge: baseTheme.textTheme.bodyLarge?.copyWith(
         color: AppColors.textSecondary,
         fontSize: 17,
-        height: 1.45,
+        height: 1.5,
       ),
       bodyMedium: baseTheme.textTheme.bodyMedium?.copyWith(
         color: AppColors.textSecondary,
         fontSize: 15,
-        height: 1.42,
+        height: 1.48,
       ),
       bodySmall: baseTheme.textTheme.bodySmall?.copyWith(
         color: AppColors.textMuted,
         fontSize: 13,
         height: 1.36,
       ),
+      labelSmall: baseTheme.textTheme.labelSmall?.copyWith(
+        color: AppColors.textMuted,
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.8,
+      ),
       labelLarge: baseTheme.textTheme.labelLarge?.copyWith(
         color: AppColors.textPrimary,
         fontSize: 14,
         fontWeight: FontWeight.w700,
+        letterSpacing: 0.2,
       ),
     );
 
@@ -76,6 +91,8 @@ abstract final class AppTheme {
       brightness: Brightness.dark,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
+      canvasColor: AppColors.background,
+      shadowColor: AppColors.black.withValues(alpha: 0.28),
       textTheme: textTheme,
       appBarTheme: const AppBarTheme(
         centerTitle: true,
@@ -99,12 +116,13 @@ abstract final class AppTheme {
       iconTheme: const IconThemeData(color: AppColors.textPrimary),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.surfaceElevated,
+        backgroundColor: AppColors.surfaceGlass,
         contentTextStyle: textTheme.bodyMedium?.copyWith(
           color: AppColors.textPrimary,
+          fontWeight: FontWeight.w600,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(

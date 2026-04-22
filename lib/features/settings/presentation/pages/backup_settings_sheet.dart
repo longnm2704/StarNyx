@@ -93,20 +93,32 @@ class _BackupTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(24),
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
           decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.5),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: <Color>[
+                AppColors.surfaceGlass.withValues(alpha: 0.84),
+                AppColors.surface.withValues(alpha: 0.74),
+              ],
+            ),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.white.withValues(alpha: 0.05)),
+            border: Border.all(
+              color: AppColors.outlineSoft.withValues(alpha: 0.16),
+            ),
           ),
           child: Row(
             children: [
               Container(
-                width: 36,
-                height: 36,
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
                   color: AppColors.white.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.outlineSoft.withValues(alpha: 0.12),
+                  ),
                 ),
                 child: Center(
                   child: AppSvgIcon(
@@ -133,7 +145,7 @@ class _BackupTile extends StatelessWidget {
                       subtitle,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppColors.textMuted,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],

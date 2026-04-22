@@ -24,9 +24,9 @@ class GradientOutlineButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.pill),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.accentPink.withValues(alpha: 0.16),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
+            color: AppColors.accentPink.withValues(alpha: 0.22),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -51,6 +51,7 @@ class GradientOutlineButton extends StatelessWidget {
                     style: textTheme.titleMedium?.copyWith(
                       color: AppColors.accentLavender,
                       fontWeight: FontWeight.w700,
+                      letterSpacing: 0.15,
                     ),
                   ),
                 ),

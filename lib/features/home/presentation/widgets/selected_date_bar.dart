@@ -39,20 +39,35 @@ class SelectedDateBar extends StatelessWidget {
               onTap: isCheckingIn ? null : onSelectedDatePressed,
               borderRadius: BorderRadius.circular(AppRadius.pill),
               child: Container(
-                height: 44,
+                height: 52,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Color.lerp(accentColor, AppColors.black, 0.82),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: <Color>[
+                      Color.lerp(accentColor, AppColors.surfaceGlass, 0.72)!,
+                      Color.lerp(accentColor, AppColors.black, 0.88)!,
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                   border: Border.all(
-                    color: accentColor.withValues(alpha: 0.22),
+                    color: accentColor.withValues(alpha: 0.28),
                   ),
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                      color: AppColors.black.withValues(alpha: 0.24),
+                      blurRadius: 18,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
                 child: Text(
                   selectedDateLabel,
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: accentColor.withValues(alpha: 0.58),
-                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary.withValues(alpha: 0.88),
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ),
@@ -83,15 +98,32 @@ class _DayChevronButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      key: buttonKey,
-      onPressed: onPressed,
-      icon: Icon(
-        icon,
-        color: AppColors.textPrimary.withValues(
-          alpha: onPressed == null ? 0.3 : 0.6,
+    final foreground = AppColors.textPrimary.withValues(
+      alpha: onPressed == null ? 0.22 : 0.72,
+    );
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        key: buttonKey,
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: AppColors.surfaceMuted.withValues(
+              alpha: onPressed == null ? 0.28 : 0.58,
+            ),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.outlineSoft.withValues(
+                alpha: onPressed == null ? 0.08 : 0.18,
+              ),
+            ),
+          ),
+          child: Icon(icon, color: foreground, size: 24),
         ),
-        size: 26,
       ),
     );
   }

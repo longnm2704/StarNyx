@@ -29,7 +29,8 @@ class StarnyxFormHeader extends StatelessWidget {
             title,
             style: textTheme.titleLarge?.copyWith(
               color: AppColors.textPrimary,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.35,
             ),
           ),
         ],
@@ -50,10 +51,15 @@ class _CloseButton extends StatelessWidget {
       height: 48,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.accentViolet.withValues(alpha: 0.18),
-        border: Border.all(
-          color: AppColors.accentViolet.withValues(alpha: 0.7),
-        ),
+        color: AppColors.surfaceMuted.withValues(alpha: 0.92),
+        border: Border.all(color: AppColors.outlineSoft.withValues(alpha: 0.4)),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.22),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: IconButton(
         onPressed: onPressed,

@@ -15,7 +15,10 @@ class HomeSwipeUpHint extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadius.pill),
       onTap: isBusy ? null : onTap,
       child: Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.sm),
+        padding: const EdgeInsets.only(
+          top: AppSpacing.sm,
+          bottom: AppSpacing.xs,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -23,7 +26,7 @@ class HomeSwipeUpHint extends StatelessWidget {
               offset: const Offset(0, -4),
               child: AppSvgIcon(
                 assetPath: 'assets/icons/ic_chevron_up.svg',
-                color: AppColors.textMuted.withValues(alpha: 0.48),
+                color: AppColors.textMuted.withValues(alpha: 0.44),
                 size: 20,
                 semanticsLabel: 'home.swipe_hint'.tr(),
               ),
@@ -31,8 +34,9 @@ class HomeSwipeUpHint extends StatelessWidget {
             Text(
               'home.swipe_hint'.tr(),
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: AppColors.textMuted,
+                color: AppColors.textMuted.withValues(alpha: 0.92),
                 fontWeight: FontWeight.w600,
+                letterSpacing: 0.18,
               ),
             ),
           ],

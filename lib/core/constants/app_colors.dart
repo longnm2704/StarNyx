@@ -11,7 +11,10 @@ abstract final class AppColors {
 
   static const surface = Color(0xFF26222E);
   static const surfaceElevated = Color(0xFF332E3D);
+  static const surfaceMuted = Color(0xFF1D1826);
+  static const surfaceGlass = Color(0xFF231D31);
   static const outline = Color(0xFF5E5470);
+  static const outlineSoft = Color(0xFF7B6E93);
 
   static const textPrimary = Color(0xFFF4ECFF);
   static const textSecondary = Color(0xFFCDBAE3);
