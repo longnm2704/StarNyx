@@ -175,7 +175,17 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
             await showJournalBottomSheet(context, widget.activeStarnyxId!, activeColor);
           }
         case ConstellationSwitcherSheetActionType.settingsRequested:
-          await showSettingsBottomSheet(context);
+          Color? activeColor;
+          if (widget.activeStarnyxId != null) {
+            try {
+              final activeStarnyx = widget.starnyxs.firstWhere(
+                (StarNyx item) => item.id == widget.activeStarnyxId,
+                orElse: () => widget.starnyxs.first,
+              );
+              activeColor = starnyxColorFromHex(activeStarnyx.color);
+            } catch (_) {}
+          }
+          await showSettingsBottomSheet(context, accentColor: activeColor);
       }
       if (!mounted) {
         break;

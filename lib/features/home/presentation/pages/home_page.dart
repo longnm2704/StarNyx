@@ -14,8 +14,9 @@ import 'package:starnyx/domain/usecases/load_active_starnyx_use_case.dart';
 import 'package:starnyx/domain/usecases/select_active_starnyx_use_case.dart';
 import 'package:starnyx/features/home/presentation/widgets/home_widgets.dart';
 import 'package:starnyx/domain/usecases/load_starnyx_progress_stats_use_case.dart';
-import 'package:starnyx/domain/usecases/load_starnyx_completion_dates_for_year_use_case.dart';
 import 'package:starnyx/features/settings/presentation/pages/settings_bottom_sheet.dart';
+import 'package:starnyx/domain/usecases/load_starnyx_completion_dates_for_year_use_case.dart';
+import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 import 'package:starnyx/features/starnyx_form/presentation/pages/create_starnyx_bottom_sheet.dart';
 
 // Root screen that shows the first-run welcome state until the real home flow lands.
@@ -104,11 +105,37 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _onSettingsPressed() async {
-    await showSettingsBottomSheet(context);
+    Color? accentColor;
+    final state = _homeBloc.state;
+    if (state.activeStarnyxId != null && state.starnyxs.isNotEmpty) {
+      try {
+        final activeStarnyx = state.starnyxs.firstWhere(
+          (s) => s.id == state.activeStarnyxId,
+          orElse: () => state.starnyxs.first,
+        );
+        accentColor = starnyxColorFromHex(activeStarnyx.color);
+      } catch (_) {}
+    }
+    await showSettingsBottomSheet(context, accentColor: accentColor);
   }
 
   Future<void> _openCreateBottomSheet() async {
-    final result = await showCreateStarnyxBottomSheet(context);
+    String? activeColorHex;
+    final state = _homeBloc.state;
+    if (state.activeStarnyxId != null && state.starnyxs.isNotEmpty) {
+      try {
+        final activeStarnyx = state.starnyxs.firstWhere(
+          (s) => s.id == state.activeStarnyxId,
+          orElse: () => state.starnyxs.first,
+        );
+        activeColorHex = activeStarnyx.color;
+      } catch (_) {}
+    }
+
+    final result = await showCreateStarnyxBottomSheet(
+      context,
+      initialColor: activeColorHex,
+    );
     if (!mounted || result == null || !result.hasChanges) {
       return;
     }
@@ -188,13 +215,29 @@ class _HomePageState extends State<HomePage> {
         child: Scaffold(
           body: BlocBuilder<HomeBloc, HomeState>(
             builder: (BuildContext context, HomeState state) {
+              Color? accentColor;
+              if (state.activeStarnyxId != null && state.starnyxs.isNotEmpty) {
+                try {
+                  final activeStarnyx = state.starnyxs.firstWhere(
+                    (s) => s.id == state.activeStarnyxId,
+                    orElse: () => state.starnyxs.first,
+                  );
+                  accentColor = starnyxColorFromHex(activeStarnyx.color);
+                } catch (_) {
+                  // Fallback to default
+                }
+              }
+
               if (state.status == HomeStatus.initial ||
                   state.status == HomeStatus.loading) {
-                return const HomeLoadingView();
+                return HomeLoadingView(accentColor: accentColor);
               }
 
               if (state.status == HomeStatus.failure) {
-                return HomeErrorView(onRetry: _retryLoad);
+                return HomeErrorView(
+                  onRetry: _retryLoad,
+                  accentColor: accentColor,
+                );
               }
 
               if (state.starnyxs.isEmpty) {

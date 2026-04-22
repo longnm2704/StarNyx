@@ -1,16 +1,18 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
 
 class HomeErrorView extends StatelessWidget {
-  const HomeErrorView({required this.onRetry, super.key});
+  const HomeErrorView({required this.onRetry, this.accentColor, super.key});
 
   final VoidCallback onRetry;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
     return CosmicBackground(
+      accentColor: accentColor,
       child: SafeArea(
         child: Center(
           child: ConstrainedBox(

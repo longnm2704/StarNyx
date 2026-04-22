@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
-import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/domain/entities/journal_entry.dart';
+import 'package:starnyx/core/widgets/app_sheet_background.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_event.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_state.dart';
@@ -140,103 +141,87 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
         },
         child: FractionallySizedBox(
           heightFactor: 1.0,
-          child: DecoratedBox(
-            decoration: const BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(AppRadius.xl * 1.5),
-              ),
-            ),
+          child: AppSheetBackground(
+            accentColor: widget.accentColor,
             child: SafeArea(
               top: false,
               bottom: false,
-              child: Stack(
+              child: Column(
                 children: [
-                  Positioned.fill(
-                    child: CosmicBackground(
-                      bottomGlowColor: widget.accentColor,
-                      child: const SizedBox.expand(),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      AppSpacing.pageHorizontal,
+                      headerTopPadding,
+                      AppSpacing.pageHorizontal,
+                      AppSpacing.md,
+                    ),
+                    child: StarnyxFormHeader(
+                      title: 'journal.title'.tr(),
+                      onClosePressed: () => Navigator.of(context).pop(),
                     ),
                   ),
-                  Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(
-                          AppSpacing.pageHorizontal,
-                          headerTopPadding,
-                          AppSpacing.pageHorizontal,
-                          AppSpacing.md,
-                        ),
-                        child: StarnyxFormHeader(
-                          title: 'journal.title'.tr(),
-                          onClosePressed: () => Navigator.of(context).pop(),
-                        ),
-                      ),
-                      Expanded(
-                        child: BlocBuilder<JournalBloc, JournalState>(
-                          builder: (context, state) {
-                            if (state.status == JournalStatus.loading) {
-                              return const Center(child: AppLoadingIndicator());
-                            }
+                  Expanded(
+                    child: BlocBuilder<JournalBloc, JournalState>(
+                      builder: (context, state) {
+                        if (state.status == JournalStatus.loading) {
+                          return const Center(child: AppLoadingIndicator());
+                        }
 
-                            if (state.status == JournalStatus.failure) {
-                              return Center(
-                                child: AppErrorState(
-                                  title: 'journal.load_error_title'.tr(),
-                                  message:
-                                      state.errorMessage ??
-                                      'journal.load_error_message'.tr(),
-                                  retryLabel: 'home.retry'.tr(),
-                                  onRetry: () => _journalBloc.add(
-                                    JournalStarted(widget.starnyxId),
-                                  ),
-                                ),
-                              );
-                            }
-
-                            if (state.entries.isEmpty) {
-                              return const _JournalEmptyState();
-                            }
-
-                            return ListView.builder(
-                              controller: _scrollController,
-                              reverse: true,
-                              padding: const EdgeInsets.fromLTRB(
-                                AppSpacing.pageHorizontal,
-                                AppSpacing.md,
-                                AppSpacing.pageHorizontal,
-                                AppSpacing.xl,
+                        if (state.status == JournalStatus.failure) {
+                          return Center(
+                            child: AppErrorState(
+                              title: 'journal.load_error_title'.tr(),
+                              message:
+                                  state.errorMessage ??
+                                  'journal.load_error_message'.tr(),
+                              retryLabel: 'home.retry'.tr(),
+                              onRetry: () => _journalBloc.add(
+                                JournalStarted(widget.starnyxId),
                               ),
-                              itemCount: state.entries.length,
-                              itemBuilder: (context, index) {
-                                final entry = state.entries[index];
-                                return Padding(
-                                  padding: const EdgeInsets.only(
-                                    bottom: AppSpacing.md,
-                                  ),
-                                  child: _JournalEntryCard(
-                                    entry: entry,
-                                    accentColor: widget.accentColor,
-                                    onDeletePressed: () =>
-                                        _onDeletePressed(entry),
-                                  ),
-                                );
-                              },
+                            ),
+                          );
+                        }
+
+                        if (state.entries.isEmpty) {
+                          return const _JournalEmptyState();
+                        }
+
+                        return ListView.builder(
+                          controller: _scrollController,
+                          reverse: true,
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.pageHorizontal,
+                            AppSpacing.md,
+                            AppSpacing.pageHorizontal,
+                            AppSpacing.xl,
+                          ),
+                          itemCount: state.entries.length,
+                          itemBuilder: (context, index) {
+                            final entry = state.entries[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppSpacing.md,
+                              ),
+                              child: _JournalEntryCard(
+                                entry: entry,
+                                accentColor: widget.accentColor,
+                                onDeletePressed: () => _onDeletePressed(entry),
+                              ),
                             );
                           },
-                        ),
-                      ),
-                      _JournalInputArea(
-                        initialValue: _draftContent,
-                        onChanged: (value) {
-                          _draftContent = value;
-                          _journalBloc.add(JournalDraftChanged(value));
-                        },
-                        onSavePressed: _onSavePressed,
-                        accentColor: widget.accentColor,
-                        bottomPadding: bottomPadding,
-                      ),
-                    ],
+                        );
+                      },
+                    ),
+                  ),
+                  _JournalInputArea(
+                    initialValue: _draftContent,
+                    onChanged: (value) {
+                      _draftContent = value;
+                      _journalBloc.add(JournalDraftChanged(value));
+                    },
+                    onSavePressed: _onSavePressed,
+                    accentColor: widget.accentColor,
+                    bottomPadding: bottomPadding,
                   ),
                 ],
               ),

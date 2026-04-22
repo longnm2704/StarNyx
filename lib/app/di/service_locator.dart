@@ -198,9 +198,9 @@ void _registerBlocFactories() {
   /// ```
   ///
   /// The factory automatically injects use cases from the service locator.
-  serviceLocator.registerFactoryParam<StarnyxFormBloc, domain.StarNyx?, void>((
+  serviceLocator.registerFactoryParam<StarnyxFormBloc, domain.StarNyx?, String?>((
     initialStarnyx,
-    _,
+    initialColor,
   ) {
     return StarnyxFormBloc(
       createStarNyxUseCase: serviceLocator<CreateStarNyxUseCase>(),
@@ -208,6 +208,7 @@ void _registerBlocFactories() {
       deleteStarNyxUseCase: serviceLocator<DeleteStarNyxUseCase>(),
       syncNotificationsUseCase: serviceLocator<SyncNotificationsUseCase>(),
       initialStarnyx: initialStarnyx,
+      initialColor: initialColor,
     );
   });
 }

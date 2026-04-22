@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
-import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_state.dart';
 import 'package:starnyx/features/settings/presentation/pages/about_starnyx_sheet.dart';
 import 'package:starnyx/features/settings/presentation/pages/backup_settings_sheet.dart';
 import 'package:starnyx/features/settings/presentation/pages/general_settings_sheet.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_header.dart';
+import 'package:starnyx/core/widgets/app_sheet_background.dart';
 
-const LinearGradient _sheetTopDownGradient = LinearGradient(
-  begin: Alignment.topCenter,
-  end: Alignment.bottomCenter,
-  colors: <Color>[AppColors.sheetTop, AppColors.sheetMid, AppColors.background],
-  stops: <double>[0.0, 0.48, 1.0],
-);
-
-Future<void> showSettingsBottomSheet(BuildContext context) {
+Future<void> showSettingsBottomSheet(
+  BuildContext context, {
+  Color? accentColor,
+}) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -27,13 +24,15 @@ Future<void> showSettingsBottomSheet(BuildContext context) {
     backgroundColor: Colors.transparent,
     barrierColor: AppColors.black.withValues(alpha: 0.72),
     builder: (BuildContext context) {
-      return const SettingsBottomSheet();
+      return SettingsBottomSheet(accentColor: accentColor);
     },
   );
 }
 
 class SettingsBottomSheet extends StatefulWidget {
-  const SettingsBottomSheet({super.key});
+  const SettingsBottomSheet({this.accentColor, super.key});
+
+  final Color? accentColor;
 
   @override
   State<SettingsBottomSheet> createState() => _SettingsBottomSheetState();
@@ -55,7 +54,7 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
     super.dispose();
   }
 
-  Route<dynamic> _onGenerateRoute(RouteSettings settings) {
+  Route<dynamic> _onGenerateRoute(RouteSettings settings, Color? accentColor) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) {
         Widget page;
@@ -85,16 +84,7 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
             page = const SizedBox.shrink();
         }
 
-        return Container(
-          clipBehavior: Clip.antiAlias,
-          decoration: const BoxDecoration(
-            gradient: _sheetTopDownGradient,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(AppRadius.xl * 1.5),
-            ),
-          ),
-          child: CosmicBackground(child: page),
-        );
+        return AppSheetBackground(accentColor: accentColor, child: page);
       },
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(1.0, 0.0);
@@ -119,7 +109,8 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
         child: Navigator(
           key: _navigatorKey,
           initialRoute: '/',
-          onGenerateRoute: _onGenerateRoute,
+          onGenerateRoute: (settings) =>
+              _onGenerateRoute(settings, widget.accentColor),
         ),
       ),
     );

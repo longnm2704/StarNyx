@@ -40,13 +40,14 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     required SyncNotificationsUseCase syncNotificationsUseCase,
     DateTime Function()? nowBuilder,
     StarNyx? initialStarnyx,
+    String? initialColor,
   }) : _createStarNyxUseCase = createStarNyxUseCase,
        _updateStarNyxUseCase = updateStarNyxUseCase,
        _deleteStarNyxUseCase = deleteStarNyxUseCase,
        _syncNotificationsUseCase = syncNotificationsUseCase,
        _nowBuilder = nowBuilder ?? DateTime.now,
        _initialStarnyx = initialStarnyx,
-       super(_buildInitialState(initialStarnyx, nowBuilder ?? DateTime.now)) {
+       super(_buildInitialState(initialStarnyx, (nowBuilder ?? DateTime.now)(), initialColor)) {
     // Register event handlers for each event type using on<T>() pattern
     on<StarnyxFormTitleChanged>(_onTitleChanged);
     on<StarnyxFormDescriptionChanged>(_onDescriptionChanged);
@@ -89,7 +90,8 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
   /// - Shows title validation error (empty) to prompt user input
   static StarnyxFormState _buildInitialState(
     StarNyx? initialStarnyx,
-    DateTime Function() nowBuilder,
+    DateTime now,
+    String? initialColor,
   ) {
     if (initialStarnyx != null) {
       return StarnyxFormState(
@@ -113,14 +115,13 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
       );
     }
 
-    final now = nowBuilder();
     final defaultReminder = ReminderTimeUtils.formatTime(now);
 
     return StarnyxFormState(
       mode: StarnyxFormMode.create,
       title: '',
       description: '',
-      color: AppColors.starnyxPresetColorHexes.first,
+      color: initialColor ?? AppColors.starnyxPresetColorHexes.first,
       startDate: DateUtils.nowDate(now),
       reminderEnabled: false,
       reminderTime: defaultReminder,

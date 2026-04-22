@@ -7,12 +7,14 @@ class CosmicBackground extends StatelessWidget {
   const CosmicBackground({
     required this.child,
     super.key,
-    this.bottomGlowColor = AppColors.backgroundBottom,
+    this.bottomGlowColor,
+    this.accentColor,
     this.showStars = true,
   });
 
   final Widget child;
-  final Color bottomGlowColor;
+  final Color? bottomGlowColor;
+  final Color? accentColor;
   final bool showStars;
 
   @override
@@ -20,8 +22,24 @@ class CosmicBackground extends StatelessWidget {
     final disableAnimations =
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;
 
+    final Color effectiveBottomGlow = accentColor ?? bottomGlowColor ?? AppColors.backgroundBottom;
+
+    final Gradient backgroundGradient = accentColor != null
+        ? LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: <Color>[
+              AppColors.background,
+              AppColors.background,
+              Color.lerp(accentColor, AppColors.background, 0.64)!,
+              Color.lerp(accentColor, AppColors.background, 0.32)!,
+            ],
+            stops: const <double>[0.0, 0.34, 0.74, 1.0],
+          )
+        : AppColors.screenGradient;
+
     return DecoratedBox(
-      decoration: const BoxDecoration(gradient: AppColors.screenGradient),
+      decoration: BoxDecoration(gradient: backgroundGradient),
       child: Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -32,7 +50,7 @@ class CosmicBackground extends StatelessWidget {
                   center: const Alignment(0, 0.92),
                   radius: 1.05,
                   colors: <Color>[
-                    bottomGlowColor.withValues(alpha: 0.58),
+                    effectiveBottomGlow.withValues(alpha: 0.58),
                     Colors.transparent,
                   ],
                   stops: const <double>[0, 1],
