@@ -277,7 +277,7 @@ Issue checklist:
 - [x] `STX-047` Có rollback nếu import lỗi giữa chừng
 - [x] `STX-048` Rebuild reminder schedule sau import thành công
 - [x] `STX-049` Viết unit test cho JSON parser, import validator, rollback path
-- [ ] `STX-050` Viết bloc test hoặc widget test cho form, home, journal
+- [x] `STX-050` Viết bloc test hoặc widget test cho form, home, journal
 - [ ] `STX-051` Tạo manual QA checklist cho toàn bộ MVP
 
 Definition of done:
