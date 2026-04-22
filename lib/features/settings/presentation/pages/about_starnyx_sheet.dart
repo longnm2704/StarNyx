@@ -12,7 +12,12 @@ class AboutStarnyxSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final topInset = mediaQuery.viewPadding.top > 0 ? mediaQuery.viewPadding.top : mediaQuery.padding.top;
+    final topInset = mediaQuery.viewPadding.top > 0
+        ? mediaQuery.viewPadding.top
+        : mediaQuery.padding.top;
+    final bottomSafeInset = mediaQuery.viewPadding.bottom > 0
+        ? mediaQuery.viewPadding.bottom
+        : mediaQuery.padding.bottom;
     final headerTopPadding = (topInset < 24 ? 24.0 : topInset) + AppSpacing.lg;
 
     return Column(
@@ -31,7 +36,12 @@ class AboutStarnyxSheet extends StatelessWidget {
         ),
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pageHorizontal),
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.pageHorizontal,
+              0,
+              AppSpacing.pageHorizontal,
+              bottomSafeInset,
+            ),
             children: [
               const SizedBox(height: AppSpacing.xl),
               Center(
@@ -78,9 +88,9 @@ class AboutStarnyxSheet extends StatelessWidget {
                 child: Text(
                   'settings.about_made_with'.tr(),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textMuted,
-                        fontStyle: FontStyle.italic,
-                      ),
+                    color: AppColors.textMuted,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.xl),
@@ -106,17 +116,17 @@ class _AboutSection extends StatelessWidget {
         Text(
           title,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: AppColors.accentLavender,
-                fontWeight: FontWeight.w800,
-              ),
+            color: AppColors.accentLavender,
+            fontWeight: FontWeight.w800,
+          ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
           content,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppColors.textSecondary,
-                height: 1.6,
-              ),
+            color: AppColors.textSecondary,
+            height: 1.6,
+          ),
         ),
       ],
     );

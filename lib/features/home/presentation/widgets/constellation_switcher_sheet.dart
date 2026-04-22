@@ -82,6 +82,11 @@ class _ConstellationSwitcherSheetState
     final topInset = mediaQuery.viewPadding.top > 0
         ? mediaQuery.viewPadding.top
         : mediaQuery.padding.top;
+    final bottomSafeInset = mediaQuery.viewPadding.bottom > 0
+        ? mediaQuery.viewPadding.bottom
+        : mediaQuery.padding.bottom;
+    final availableHeight = mediaQuery.size.height;
+    final heightFactor = availableHeight < 700 ? 0.9 : 0.82;
     final activeStarnyx = _orderedStarnyxs.firstWhere(
       (StarNyx item) => item.id == widget.activeStarnyxId,
       orElse: () => _orderedStarnyxs.first,
@@ -98,7 +103,7 @@ class _ConstellationSwitcherSheetState
     )!;
 
     return FractionallySizedBox(
-      heightFactor: 0.82,
+      heightFactor: heightFactor,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: panelColor,
@@ -141,7 +146,7 @@ class _ConstellationSwitcherSheetState
                 AppSpacing.pageHorizontal,
                 (topInset < 16 ? 16.0 : topInset * 0.35) + AppSpacing.sm,
                 AppSpacing.pageHorizontal,
-                AppSpacing.lg + mediaQuery.viewInsets.bottom,
+                AppSpacing.lg + mediaQuery.viewInsets.bottom + bottomSafeInset,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

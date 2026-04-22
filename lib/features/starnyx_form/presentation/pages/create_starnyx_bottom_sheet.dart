@@ -187,6 +187,9 @@ class _StarnyxFormBottomSheetViewState
     final topInset = mediaQuery.viewPadding.top > 0
         ? mediaQuery.viewPadding.top
         : mediaQuery.padding.top;
+    final bottomSafeInset = mediaQuery.viewPadding.bottom > 0
+        ? mediaQuery.viewPadding.bottom
+        : mediaQuery.padding.bottom;
     final headerTopPadding = (topInset < 24 ? 24.0 : topInset) + AppSpacing.lg;
 
     return FractionallySizedBox(
@@ -261,7 +264,9 @@ class _StarnyxFormBottomSheetViewState
                             AppSpacing.pageHorizontal,
                             AppSpacing.sm,
                             AppSpacing.pageHorizontal,
-                            AppSpacing.lg + mediaQuery.viewInsets.bottom,
+                            AppSpacing.lg +
+                                mediaQuery.viewInsets.bottom +
+                                bottomSafeInset,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
