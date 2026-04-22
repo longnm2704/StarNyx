@@ -122,6 +122,17 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
             });
           } else if (state.saveStatus == AsyncStatus.failure &&
               state.errorMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.errorMessage!),
+                action: SnackBarAction(
+                  label: 'home.retry'.tr(),
+                  onPressed: _onSavePressed,
+                ),
+              ),
+            );
+          } else if (state.deleteStatus == AsyncStatus.failure &&
+              state.errorMessage != null) {
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));

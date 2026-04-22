@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:starnyx/core/constants/enums.dart';
 
+const Object _unset = Object();
+
 class SettingsState extends Equatable {
   const SettingsState({
     this.exportStatus = AsyncStatus.idle,
@@ -12,15 +14,21 @@ class SettingsState extends Equatable {
   final AsyncStatus importStatus;
   final String? errorMessage;
 
+  bool get isExporting => exportStatus == AsyncStatus.inProgress;
+  bool get hasExportFailure => exportStatus == AsyncStatus.failure;
+  bool get hasImportFailure => importStatus == AsyncStatus.failure;
+
   SettingsState copyWith({
     AsyncStatus? exportStatus,
     AsyncStatus? importStatus,
-    String? errorMessage,
+    Object? errorMessage = _unset,
   }) {
     return SettingsState(
       exportStatus: exportStatus ?? this.exportStatus,
       importStatus: importStatus ?? this.importStatus,
-      errorMessage: errorMessage ?? this.errorMessage,
+      errorMessage: identical(errorMessage, _unset)
+          ? this.errorMessage
+          : errorMessage as String?,
     );
   }
 

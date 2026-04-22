@@ -193,7 +193,8 @@ class _SettingsMainViewState extends State<SettingsMainView> {
             SnackBar(content: Text('settings.import_success'.tr())),
           );
         }
-        if (state.errorMessage != null) {
+        if (state.importStatus == AsyncStatus.failure &&
+            state.errorMessage != null) {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));

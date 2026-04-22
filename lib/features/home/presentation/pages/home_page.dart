@@ -158,7 +158,21 @@ class _HomePageState extends State<HomePage> {
         listener: (BuildContext context, HomeState state) {
           if (state.selectionStatus == AsyncStatus.failure) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('home.switch_error_message'.tr())),
+              SnackBar(
+                content: Text('home.switch_error_message'.tr()),
+                action: state.lastSelectionRequestedId == null
+                    ? null
+                    : SnackBarAction(
+                        label: 'home.retry'.tr(),
+                        onPressed: () {
+                          _homeBloc.add(
+                            HomeActiveStarnyxSelected(
+                              state.lastSelectionRequestedId!,
+                            ),
+                          );
+                        },
+                      ),
+              ),
             );
           }
           if (state.completionStatus == AsyncStatus.success) {
