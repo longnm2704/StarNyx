@@ -1,0 +1,5 @@
+interface:
+  display_name: "Starnyx Flutter Design"
+  short_description: "Flutter mobile UI for StarNyx design work"
+  brand_color: "#8E5BFF"
+  default_prompt: "Use $starnyx-flutter-design to design or refine a Flutter screen for StarNyx with cosmic-minimal styling and reusable theme tokens."
