@@ -129,42 +129,40 @@ class HomeShellView extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.pageHorizontal,
-                    AppSpacing.sm,
+                    AppSpacing.md,
                     AppSpacing.pageHorizontal,
                     0,
                   ),
                   child: Column(
                     children: <Widget>[
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       Text(
                         activeStarnyx.title,
                         textAlign: TextAlign.center,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 24,
-                          letterSpacing: -0.5,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 28,
+                          letterSpacing: -0.7,
                         ),
                       ),
                       if ((activeStarnyx.description ?? '')
                           .trim()
                           .isNotEmpty) ...<Widget>[
-                        const SizedBox(height: AppSpacing.xs),
+                        const SizedBox(height: AppSpacing.sm),
                         Text(
                           activeStarnyx.description!,
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textPrimary.withValues(
-                              alpha: 0.62,
-                            ),
+                            color: AppColors.textPrimary.withValues(alpha: 0.7),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
-                      const SizedBox(height: AppSpacing.lg),
+                      const SizedBox(height: AppSpacing.xl),
                       Expanded(
                         child: HomeStarGrid(
                           viewedYear: viewedYear,
@@ -204,8 +202,8 @@ class HomeShellView extends StatelessWidget {
                           ],
                         ),
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textPrimary.withValues(alpha: 0.58),
-                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary.withValues(alpha: 0.64),
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                       if (footer != null) ...<Widget>[

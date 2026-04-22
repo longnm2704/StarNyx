@@ -77,11 +77,20 @@ class _GeneralSettingTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(24),
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.5),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: <Color>[
+                AppColors.surfaceGlass.withValues(alpha: 0.82),
+                AppColors.surface.withValues(alpha: 0.72),
+              ],
+            ),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.white.withValues(alpha: 0.05)),
+            border: Border.all(
+              color: AppColors.outlineSoft.withValues(alpha: 0.16),
+            ),
           ),
           child: Row(
             children: [
@@ -100,8 +109,8 @@ class _GeneralSettingTile extends StatelessWidget {
                     Text(
                       value,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.accentLavender,
-                        fontWeight: FontWeight.w500,
+                        color: AppColors.accentLavender.withValues(alpha: 0.92),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],

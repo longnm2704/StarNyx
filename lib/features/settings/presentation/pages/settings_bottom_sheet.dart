@@ -280,23 +280,38 @@ class _SettingsSection extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(
-            left: AppSpacing.md,
+            left: AppSpacing.xs,
             bottom: AppSpacing.sm,
           ),
           child: Text(
-            title.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: AppColors.textMuted,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.5,
+            title,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.5),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: <Color>[
+                AppColors.surfaceGlass.withValues(alpha: 0.84),
+                AppColors.surface.withValues(alpha: 0.74),
+              ],
+            ),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.white.withValues(alpha: 0.05)),
+            border: Border.all(
+              color: AppColors.outlineSoft.withValues(alpha: 0.18),
+            ),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: AppColors.black.withValues(alpha: 0.18),
+                blurRadius: 18,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
           child: Column(
             children: List.generate(children.length, (index) {
@@ -308,7 +323,7 @@ class _SettingsSection extends StatelessWidget {
                       height: 1,
                       indent: 56,
                       endIndent: 16,
-                      color: AppColors.white.withValues(alpha: 0.05),
+                      color: AppColors.white.withValues(alpha: 0.06),
                     ),
                 ],
               );
@@ -339,15 +354,18 @@ class _SettingsTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(24),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
           child: Row(
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
-                  color: AppColors.white.withValues(alpha: 0.05),
-                  shape: BoxShape.circle,
+                  color: AppColors.white.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.outlineSoft.withValues(alpha: 0.12),
+                  ),
                 ),
                 child: Center(
                   child: AppSvgIcon(
@@ -363,7 +381,7 @@ class _SettingsTile extends StatelessWidget {
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),

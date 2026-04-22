@@ -20,14 +20,16 @@ class TopCircleAssetIconButton extends StatelessWidget {
       width: AppSize.iconButton,
       height: AppSize.iconButton,
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.78),
+        color: AppColors.surfaceMuted.withValues(alpha: 0.9),
         shape: BoxShape.circle,
-        border: Border.all(color: AppColors.outline.withValues(alpha: 0.52)),
+        border: Border.all(
+          color: AppColors.outlineSoft.withValues(alpha: 0.34),
+        ),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.22),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: AppColors.black.withValues(alpha: 0.28),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -37,7 +39,7 @@ class TopCircleAssetIconButton extends StatelessWidget {
         icon: AppSvgIcon(
           assetPath: assetPath,
           size: 22,
-          color: AppColors.textPrimary.withValues(alpha: 0.88),
+          color: AppColors.textPrimary.withValues(alpha: 0.94),
           semanticsLabel: tooltip,
         ),
       ),
