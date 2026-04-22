@@ -299,7 +299,7 @@ Issue checklist:
 
 - [x] `STX-052` Rà soát toàn bộ copy text và empty states
 - [x] `STX-053` Tối ưu spacing, color, typography cho đúng tinh thần StarNyx
-- [ ] `STX-054` Kiểm tra UX mobile nhỏ, dark/light nếu có, safe area, keyboard overlap
+- [x] `STX-054` Kiểm tra UX mobile nhỏ, dark/light nếu có, safe area, keyboard overlap
 - [ ] `STX-055` Thêm loading, error state, retry state cho các màn cần thiết
 - [ ] `STX-056` Kiểm tra icon, haptic, animation nhẹ cho check-in
 - [ ] `STX-057` Chuẩn bị app icon, splash, release config cơ bản
