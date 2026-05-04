@@ -15,13 +15,18 @@ class UseCaseValidationException implements Exception {
 
 // Shared validation helpers keep business rule checks consistent across use cases.
 abstract final class UseCaseValidation {
-  static void validateStartDate(DateTime startDate, {DateTime? today}) {
+  static void validateStartDate(
+    DateTime startDate, {
+    DateTime? today,
+    bool allowPastStartDate = false,
+  }) {
     final normalizedToday = DateUtils.nowDate(today);
     final normalizedStartDate = DateUtils.dateOnly(startDate);
 
-    if (normalizedStartDate.isBefore(
-      normalizedToday.subtract(const Duration(days: 7)),
-    )) {
+    if (!allowPastStartDate &&
+        normalizedStartDate.isBefore(
+          normalizedToday.subtract(const Duration(days: 7)),
+        )) {
       throw const UseCaseValidationException(
         code: UseCaseValidationCode.startDateTooFarInPast,
         message: 'Start date cannot be earlier than 7 days before today.',

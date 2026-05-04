@@ -208,9 +208,16 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     StarnyxFormReminderToggled event,
     Emitter<StarnyxFormState> emit,
   ) {
+    final reminderTime = event.enabled && state.reminderTime.trim().isEmpty
+        ? ReminderTimeUtils.formatTime(_nowBuilder())
+        : state.reminderTime;
+
     _emitFieldChange(
       emit,
-      state.copyWith(reminderEnabled: event.enabled),
+      state.copyWith(
+        reminderEnabled: event.enabled,
+        reminderTime: reminderTime,
+      ),
       revalidate: true,
     );
   }
@@ -294,6 +301,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
                 reminderTime: reminderTime,
               ),
               now: now,
+              allowPastStartDate: _keepsInitialStartDate(validated.startDate),
             )
           : await _createStarNyxUseCase(
               title: validated.title.trim(),
@@ -438,9 +446,11 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     final today = DateUtils.nowDate(_nowBuilder());
     final earliestAllowedDate = today.subtract(const Duration(days: 7));
     final normalizedStartDate = DateUtils.dateOnly(candidate.startDate);
+    final keepsInitialStartDate = _keepsInitialStartDate(normalizedStartDate);
     final startDateError = normalizedStartDate.isAfter(today)
         ? StarnyxFormStartDateError.inFuture
-        : normalizedStartDate.isBefore(earliestAllowedDate)
+        : normalizedStartDate.isBefore(earliestAllowedDate) &&
+              !(candidate.isEditing && keepsInitialStartDate)
         ? StarnyxFormStartDateError.tooFarInPast
         : null;
     final reminderTimeError = _reminderTimeErrorFor(candidate);
@@ -500,5 +510,14 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
   String? _normalizedDescription(String description) {
     final trimmed = description.trim();
     return trimmed.isEmpty ? null : trimmed;
+  }
+
+  bool _keepsInitialStartDate(DateTime startDate) {
+    final initial = _initialStarnyx;
+    if (initial == null) {
+      return false;
+    }
+
+    return DateUtils.isSameDate(startDate, initial.startDate);
   }
 }

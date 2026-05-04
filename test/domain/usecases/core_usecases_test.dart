@@ -160,6 +160,33 @@ void main() {
   });
 
   test(
+    'update use case allows old start date when explicitly requested',
+    () async {
+      final useCase = UpdateStarNyxUseCase(starNyxRepository);
+      final starnyx = StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 5),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 1, 8),
+      );
+
+      final updated = await useCase(
+        starnyx,
+        now: DateTime(2026, 4, 13, 8, 30),
+        allowPastStartDate: true,
+      );
+
+      expect(updated.startDate, DateTime(2026, 4, 5));
+      expect(updated.updatedAt, DateTime(2026, 4, 13, 8, 30));
+    },
+  );
+
+  test(
     'update use case clears reminder time when reminder is disabled',
     () async {
       final useCase = UpdateStarNyxUseCase(starNyxRepository);

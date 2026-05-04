@@ -167,6 +167,58 @@ void main() {
     expect(bloc.state.reminderTime, '07:45');
   });
 
+  test(
+    'enabling reminder fills current time when reminder time is empty',
+    () async {
+      final existing = StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 10),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 10, 8),
+        updatedAt: DateTime(2026, 4, 10, 8),
+      );
+      final bloc = StarnyxFormBloc(
+        createStarNyxUseCase: createUseCase,
+        updateStarNyxUseCase: updateUseCase,
+        deleteStarNyxUseCase: deleteUseCase,
+        syncNotificationsUseCase: syncNotificationsUseCase,
+        initialStarnyx: existing,
+        nowBuilder: () => DateTime(2026, 4, 13, 21, 7),
+      );
+
+      expect(bloc.state.reminderTime, isEmpty);
+
+      bloc.add(const StarnyxFormReminderToggled(true));
+      await pumpEventQueue();
+
+      expect(bloc.state.reminderEnabled, isTrue);
+      expect(bloc.state.reminderTime, '21:07');
+      expect(bloc.state.reminderTimeError, isNull);
+    },
+  );
+
+  test('enabling reminder preserves existing reminder time', () async {
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
+      nowBuilder: () => DateTime(2026, 4, 13, 21, 7),
+    );
+
+    bloc.add(const StarnyxFormReminderTimeChanged('07:45'));
+    await pumpEventQueue();
+    bloc.add(const StarnyxFormReminderToggled(true));
+    await pumpEventQueue();
+
+    expect(bloc.state.reminderEnabled, isTrue);
+    expect(bloc.state.reminderTime, '07:45');
+  });
+
   test('start date older than 7 days surfaces a form error', () async {
     final bloc = StarnyxFormBloc(
       createStarNyxUseCase: createUseCase,
@@ -342,6 +394,80 @@ void main() {
     expect(bloc.state.savedStarnyx?.id, 'habit-1');
     expect(bloc.state.savedStarnyx?.title, 'Hydrate Daily');
   });
+
+  test(
+    'submit updates an old existing StarNyx when start date is unchanged',
+    () async {
+      final existing = StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4),
+        reminderEnabled: true,
+        reminderTime: '09:30',
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 1, 8),
+      );
+      await repository.saveStarnyx(existing);
+
+      final bloc = StarnyxFormBloc(
+        createStarNyxUseCase: createUseCase,
+        updateStarNyxUseCase: updateUseCase,
+        deleteStarNyxUseCase: deleteUseCase,
+        syncNotificationsUseCase: syncNotificationsUseCase,
+        initialStarnyx: existing,
+        nowBuilder: () => DateTime(2026, 5, 4, 21),
+      );
+
+      bloc.add(const StarnyxFormTitleChanged('Hydrate Updated'));
+      await pumpEventQueue();
+      bloc.add(const StarnyxFormSubmitted());
+      await pumpEventQueue(times: 10);
+
+      expect(bloc.state.startDateError, isNull);
+      expect(bloc.state.submissionStatus, AsyncStatus.success);
+      expect(bloc.state.savedStarnyx?.id, existing.id);
+      expect(bloc.state.savedStarnyx?.title, 'Hydrate Updated');
+      expect(bloc.state.savedStarnyx?.startDate, DateTime(2026, 4));
+      expect(bloc.state.savedStarnyx?.reminderEnabled, isTrue);
+    },
+  );
+
+  test(
+    'edit mode blocks changing start date to an old different date',
+    () async {
+      final existing = StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 1, 8),
+      );
+      await repository.saveStarnyx(existing);
+
+      final bloc = StarnyxFormBloc(
+        createStarNyxUseCase: createUseCase,
+        updateStarNyxUseCase: updateUseCase,
+        deleteStarNyxUseCase: deleteUseCase,
+        syncNotificationsUseCase: syncNotificationsUseCase,
+        initialStarnyx: existing,
+        nowBuilder: () => DateTime(2026, 5, 4, 21),
+      );
+
+      bloc.add(StarnyxFormStartDateChanged(DateTime(2026, 4, 2)));
+      await pumpEventQueue();
+      bloc.add(const StarnyxFormSubmitted());
+      await pumpEventQueue(times: 10);
+
+      expect(bloc.state.submissionStatus, AsyncStatus.idle);
+      expect(bloc.state.startDateError, StarnyxFormStartDateError.tooFarInPast);
+    },
+  );
 
   test('submit drops reminder time when reminder is disabled', () async {
     final bloc = StarnyxFormBloc(

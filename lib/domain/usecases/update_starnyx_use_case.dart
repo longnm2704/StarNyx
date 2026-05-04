@@ -14,16 +14,25 @@ class UpdateStarNyxUseCase {
   final StarNyxRepository _repository;
   final AppLogService _logger;
 
-  Future<StarNyx> call(StarNyx starnyx, {DateTime? now}) async {
+  Future<StarNyx> call(
+    StarNyx starnyx, {
+    DateTime? now,
+    bool allowPastStartDate = false,
+  }) async {
     final timestamp = now ?? DateTime.now();
     _logger.debug(
       'UpdateStarNyxUseCase',
       'validate id=${starnyx.id} startDate=${starnyx.startDate} '
           'today=$timestamp title="${starnyx.title}" '
           'reminderEnabled=${starnyx.reminderEnabled} '
-          'reminderTime=${starnyx.reminderTime}',
+          'reminderTime=${starnyx.reminderTime} '
+          'allowPastStartDate=$allowPastStartDate',
     );
-    UseCaseValidation.validateStartDate(starnyx.startDate, today: timestamp);
+    UseCaseValidation.validateStartDate(
+      starnyx.startDate,
+      today: timestamp,
+      allowPastStartDate: allowPastStartDate,
+    );
     final updated = starnyx.copyWith(
       startDate: DateUtils.dateOnly(starnyx.startDate),
       reminderTime: starnyx.reminderEnabled ? starnyx.reminderTime : null,
