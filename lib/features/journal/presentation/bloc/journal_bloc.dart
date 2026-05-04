@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/core/constants/enums.dart';
 import 'package:starnyx/core/utils/date_utils.dart';
+import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/domain/entities/journal_entry.dart';
 import 'package:starnyx/domain/usecases/save_journal_entry_use_case.dart';
 import 'package:starnyx/domain/usecases/delete_journal_entry_use_case.dart';
@@ -17,11 +18,13 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     required WatchJournalEntriesForStarnyxUseCase
     watchJournalEntriesForStarnyxUseCase,
     required DeleteJournalEntryUseCase deleteJournalEntryUseCase,
+    AppLogService logger = const NoOpAppLogService(),
     DateTime Function()? nowBuilder,
   }) : _saveJournalEntryUseCase = saveJournalEntryUseCase,
        _watchJournalEntriesForStarnyxUseCase =
            watchJournalEntriesForStarnyxUseCase,
        _deleteJournalEntryUseCase = deleteJournalEntryUseCase,
+       _logger = logger,
        _nowBuilder = nowBuilder ?? DateTime.now,
        super(JournalState.initial()) {
     on<JournalStarted>(_onStarted);
@@ -36,6 +39,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
   final WatchJournalEntriesForStarnyxUseCase
   _watchJournalEntriesForStarnyxUseCase;
   final DeleteJournalEntryUseCase _deleteJournalEntryUseCase;
+  final AppLogService _logger;
   final DateTime Function() _nowBuilder;
 
   StreamSubscription<List<JournalEntry>>? _entriesSubscription;
@@ -44,6 +48,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     JournalStarted event,
     Emitter<JournalState> emit,
   ) async {
+    _logger.debug('JournalBloc', 'start starnyxId=${event.starnyxId}');
     await _entriesSubscription?.cancel();
     emit(
       state.copyWith(
@@ -57,8 +62,22 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
 
     _entriesSubscription =
         _watchJournalEntriesForStarnyxUseCase(event.starnyxId).listen(
-          (entries) => add(JournalEntriesChanged(entries)),
-          onError: (_) => add(const JournalSubscriptionFailed()),
+          (entries) {
+            _logger.debug(
+              'JournalBloc',
+              'entries update starnyxId=${event.starnyxId} count=${entries.length}',
+            );
+            add(JournalEntriesChanged(entries));
+          },
+          onError: (Object error, StackTrace stackTrace) {
+            _logger.error(
+              'JournalBloc',
+              'subscription failed starnyxId=${event.starnyxId}',
+              error: error,
+              stackTrace: stackTrace,
+            );
+            add(const JournalSubscriptionFailed());
+          },
         );
   }
 
@@ -79,12 +98,18 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
   ) async {
     final starnyxId = state.starnyxId;
     if (starnyxId == null) {
+      _logger.debug('JournalBloc', 'save ignored: no starnyxId');
       return;
     }
     final trimmed = state.draftContent.trim();
     if (trimmed.isEmpty) {
+      _logger.debug('JournalBloc', 'save ignored: empty draft');
       return;
     }
+    _logger.debug(
+      'JournalBloc',
+      'save begin starnyxId=$starnyxId contentLength=${trimmed.length}',
+    );
 
     emit(
       state.copyWith(
@@ -100,6 +125,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         date: DateUtils.nowDate(_nowBuilder()),
         content: trimmed,
       );
+      _logger.debug('JournalBloc', 'save success starnyxId=$starnyxId');
       emit(
         state.copyWith(
           saveStatus: AsyncStatus.success,
@@ -108,7 +134,13 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
           errorMessage: null,
         ),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      _logger.error(
+        'JournalBloc',
+        'save failed starnyxId=$starnyxId',
+        error: error,
+        stackTrace: stackTrace,
+      );
       emit(
         state.copyWith(
           saveStatus: AsyncStatus.failure,
@@ -124,6 +156,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     JournalDeleteRequested event,
     Emitter<JournalState> emit,
   ) async {
+    _logger.debug('JournalBloc', 'delete begin id=${event.id}');
     emit(
       state.copyWith(
         deleteStatus: AsyncStatus.inProgress,
@@ -134,6 +167,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
 
     try {
       await _deleteJournalEntryUseCase(id: event.id);
+      _logger.debug('JournalBloc', 'delete success id=${event.id}');
       emit(
         state.copyWith(
           deleteStatus: AsyncStatus.success,
@@ -141,7 +175,13 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
           errorMessage: null,
         ),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      _logger.error(
+        'JournalBloc',
+        'delete failed id=${event.id}',
+        error: error,
+        stackTrace: stackTrace,
+      );
       emit(
         state.copyWith(
           deleteStatus: AsyncStatus.failure,

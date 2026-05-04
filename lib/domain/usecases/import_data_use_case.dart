@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:starnyx/core/services/app_log_service.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/entities/completion.dart';
 import 'package:starnyx/domain/entities/app_settings.dart';
@@ -16,15 +17,18 @@ class ImportDataUseCase {
     this._starnyxRepository,
     this._completionRepository,
     this._journalEntryRepository,
-    this._appSettingsRepository,
-  );
+    this._appSettingsRepository, {
+    AppLogService logger = const NoOpAppLogService(),
+  }) : _logger = logger;
 
   final StarNyxRepository _starnyxRepository;
   final CompletionRepository _completionRepository;
   final JournalEntryRepository _journalEntryRepository;
   final AppSettingsRepository _appSettingsRepository;
+  final AppLogService _logger;
 
   Future<void> callFromJsonText(String jsonText) async {
+    _logger.debug('ImportDataUseCase', 'decode begin bytes=${jsonText.length}');
     final dynamic decoded;
     try {
       decoded = jsonDecode(jsonText);
@@ -45,8 +49,16 @@ class ImportDataUseCase {
   }
 
   Future<void> call(Map<String, dynamic> json) async {
+    _logger.debug(
+      'ImportDataUseCase',
+      'import begin keys=${json.keys.join(',')}',
+    );
     final validation = JsonValidationUtils.validateImportJson(json);
     if (!validation.isValid) {
+      _logger.debug(
+        'ImportDataUseCase',
+        'validation failed errors=${validation.errors.length}',
+      );
       throw ImportDataException(validation.errors);
     }
 
@@ -65,6 +77,11 @@ class ImportDataUseCase {
     final appSettings = _appSettingsFromJson(
       json['appSettings'] as Map<String, dynamic>,
     );
+    _logger.debug(
+      'ImportDataUseCase',
+      'parsed starnyxs=${starnyxs.length} completions=${completions.length} '
+          'journals=${journalEntries.length}',
+    );
 
     final snapshot = await _captureCurrentData();
 
@@ -76,16 +93,28 @@ class ImportDataUseCase {
         journalEntries: journalEntries,
         appSettings: appSettings,
       );
+      _logger.debug('ImportDataUseCase', 'import success');
     } catch (error) {
+      _logger.error(
+        'ImportDataUseCase',
+        'import write failed; attempting rollback',
+        error: error,
+      );
       try {
         await _restoreFromSnapshot(snapshot);
       } catch (rollbackError) {
+        _logger.error(
+          'ImportDataUseCase',
+          'rollback failed',
+          error: rollbackError,
+        );
         throw ImportDataException(<String>[
           'Import failed while writing local data.',
           'Rollback failed: $rollbackError',
         ]);
       }
 
+      _logger.debug('ImportDataUseCase', 'rollback success');
       throw ImportDataException(<String>[
         'Import failed while writing local data. Previous data was restored.',
         '$error',
@@ -107,6 +136,11 @@ class ImportDataUseCase {
       );
     }
 
+    _logger.debug(
+      'ImportDataUseCase',
+      'snapshot captured starnyxs=${starnyxs.length} '
+          'completions=${completions.length} journals=${journalEntries.length}',
+    );
     return _ImportSnapshot(
       starnyxs: starnyxs,
       completions: completions,
@@ -117,6 +151,10 @@ class ImportDataUseCase {
 
   Future<void> _clearCurrentData() async {
     final currentStarnyxs = await _starnyxRepository.getAllStarnyxs();
+    _logger.debug(
+      'ImportDataUseCase',
+      'clear current data starnyxs=${currentStarnyxs.length}',
+    );
     for (final starnyx in currentStarnyxs) {
       await _completionRepository.deleteCompletionsForStarnyx(starnyx.id);
       await _journalEntryRepository.deleteJournalEntriesForStarnyx(starnyx.id);

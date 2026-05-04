@@ -1,3 +1,4 @@
+import 'package:starnyx/core/services/app_log_service.dart';
 import 'package:starnyx/domain/entities/app_settings.dart';
 import 'package:starnyx/domain/repositories/starnyx_repository.dart';
 import 'package:starnyx/domain/repositories/app_settings_repository.dart';
@@ -6,17 +7,21 @@ import 'package:starnyx/domain/repositories/app_settings_repository.dart';
 class DeleteStarNyxUseCase {
   const DeleteStarNyxUseCase(
     this._starnyxRepository,
-    this._appSettingsRepository,
-  );
+    this._appSettingsRepository, {
+    AppLogService logger = const NoOpAppLogService(),
+  }) : _logger = logger;
 
   final StarNyxRepository _starnyxRepository;
   final AppSettingsRepository _appSettingsRepository;
+  final AppLogService _logger;
 
   Future<void> call(String id, {DateTime? now}) async {
+    _logger.debug('DeleteStarNyxUseCase', 'delete begin id=$id');
     await _starnyxRepository.deleteStarnyxById(id);
 
     final settings = await _appSettingsRepository.getAppSettings();
     if (settings?.lastSelectedStarnyxId != id) {
+      _logger.debug('DeleteStarNyxUseCase', 'delete success id=$id');
       return;
     }
 
@@ -30,6 +35,10 @@ class DeleteStarNyxUseCase {
         lastSelectedStarnyxId: fallbackId,
         updatedAt: now ?? DateTime.now(),
       ),
+    );
+    _logger.debug(
+      'DeleteStarNyxUseCase',
+      'delete success id=$id fallbackId=$fallbackId',
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/core/utils/core_utils.dart';
+import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/domain/entities/domain_entities.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
@@ -38,6 +39,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     required UpdateStarNyxUseCase updateStarNyxUseCase,
     required DeleteStarNyxUseCase deleteStarNyxUseCase,
     required SyncNotificationsUseCase syncNotificationsUseCase,
+    AppLogService logger = const NoOpAppLogService(),
     DateTime Function()? nowBuilder,
     StarNyx? initialStarnyx,
     String? initialColor,
@@ -45,9 +47,16 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
        _updateStarNyxUseCase = updateStarNyxUseCase,
        _deleteStarNyxUseCase = deleteStarNyxUseCase,
        _syncNotificationsUseCase = syncNotificationsUseCase,
+       _logger = logger,
        _nowBuilder = nowBuilder ?? DateTime.now,
        _initialStarnyx = initialStarnyx,
-       super(_buildInitialState(initialStarnyx, (nowBuilder ?? DateTime.now)(), initialColor)) {
+       super(
+         _buildInitialState(
+           initialStarnyx,
+           (nowBuilder ?? DateTime.now)(),
+           initialColor,
+         ),
+       ) {
     // Register event handlers for each event type using on<T>() pattern
     on<StarnyxFormTitleChanged>(_onTitleChanged);
     on<StarnyxFormDescriptionChanged>(_onDescriptionChanged);
@@ -70,6 +79,9 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
 
   /// Synchronizes notification schedules after StarNyx changes.
   final SyncNotificationsUseCase _syncNotificationsUseCase;
+
+  /// Emits debug traces for create/update/delete flows.
+  final AppLogService _logger;
 
   /// Callback to get current date/time (injectable for testing time-dependent logic).
   final DateTime Function() _nowBuilder;
@@ -233,6 +245,13 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
   ) async {
     final validated = _validatedState(state);
     if (!validated.canSubmit) {
+      _logger.debug(
+        'StarnyxForm',
+        'submit blocked mode=${state.mode.name} titleError=${validated.titleError} '
+            'descriptionError=${validated.descriptionError} '
+            'startDateError=${validated.startDateError} '
+            'reminderTimeError=${validated.reminderTimeError}',
+      );
       emit(validated);
       return;
     }
@@ -253,6 +272,16 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
           ? validated.reminderTime.trim()
           : null;
       final now = _nowBuilder();
+      final operation = validated.isEditing ? 'update' : 'create';
+
+      _logger.debug(
+        'StarnyxForm',
+        '$operation submit begin initialId=${_initialStarnyx?.id} '
+            'title="${validated.title.trim()}" color=${validated.color} '
+            'startDate=${validated.startDate} '
+            'reminderEnabled=${validated.reminderEnabled} '
+            'reminderTime=$reminderTime now=$now',
+      );
 
       final saved = validated.isEditing
           ? await _updateStarNyxUseCase(
@@ -275,7 +304,12 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
               reminderTime: reminderTime,
               now: now,
             );
+      _logger.debug(
+        'StarnyxForm',
+        '$operation persisted id=${saved.id}; syncing notification',
+      );
       await _syncNotificationsUseCase.onStarnyxSaved(saved);
+      _logger.debug('StarnyxForm', '$operation success id=${saved.id}');
 
       emit(
         validated.copyWith(
@@ -286,6 +320,11 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
         ),
       );
     } on UseCaseValidationException catch (error) {
+      _logger.error(
+        'StarnyxForm',
+        'submit validation failed code=${error.code}',
+        error: error,
+      );
       emit(
         _applyUseCaseValidation(validated, error).copyWith(
           submissionStatus: AsyncStatus.failure,
@@ -294,7 +333,13 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
           deletionErrorMessage: null,
         ),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      _logger.error(
+        'StarnyxForm',
+        'submit failed mode=${validated.mode.name} initialId=${_initialStarnyx?.id}',
+        error: error,
+        stackTrace: stackTrace,
+      );
       emit(
         validated.copyWith(
           submissionStatus: AsyncStatus.failure,

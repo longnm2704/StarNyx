@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:starnyx/core/constants/enums.dart';
+import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/domain/usecases/export_data_use_case.dart';
 import 'package:starnyx/domain/usecases/import_data_use_case.dart';
 import 'package:starnyx/domain/usecases/sync_notifications_use_case.dart';
@@ -17,9 +17,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     required ExportDataUseCase exportDataUseCase,
     required ImportDataUseCase importDataUseCase,
     required SyncNotificationsUseCase syncNotificationsUseCase,
+    AppLogService logger = const NoOpAppLogService(),
   }) : _exportDataUseCase = exportDataUseCase,
        _importDataUseCase = importDataUseCase,
        _syncNotificationsUseCase = syncNotificationsUseCase,
+       _logger = logger,
        super(const SettingsState()) {
     on<SettingsExportRequested>(_onExportRequested);
     on<SettingsImportRequested>(_onImportRequested);
@@ -28,12 +30,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final ExportDataUseCase _exportDataUseCase;
   final ImportDataUseCase _importDataUseCase;
   final SyncNotificationsUseCase _syncNotificationsUseCase;
+  final AppLogService _logger;
 
   Future<void> _onExportRequested(
     SettingsExportRequested event,
     Emitter<SettingsState> emit,
   ) async {
-    debugPrint('SettingsBloc: _onExportRequested started');
+    _logger.debug('SettingsBloc', 'export begin');
     emit(
       state.copyWith(
         exportStatus: AsyncStatus.inProgress,
@@ -47,7 +50,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
       final file = File('${tempDir.path}/starnyx_backup_$timestamp.json');
       await file.writeAsString(jsonText);
-      debugPrint('SettingsBloc: Export successful, saved to ${file.path}');
+      _logger.debug(
+        'SettingsBloc',
+        'export success path=${file.path} bytes=${jsonText.length}',
+      );
       emit(
         state.copyWith(
           exportStatus: AsyncStatus.success,
@@ -55,12 +61,17 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           exportedFilePath: file.path,
         ),
       );
-    } catch (e) {
-      debugPrint('SettingsBloc: Export failed with error: $e');
+    } catch (error, stackTrace) {
+      _logger.error(
+        'SettingsBloc',
+        'export failed',
+        error: error,
+        stackTrace: stackTrace,
+      );
       emit(
         state.copyWith(
           exportStatus: AsyncStatus.failure,
-          errorMessage: e.toString(),
+          errorMessage: error.toString(),
         ),
       );
     }
@@ -70,7 +81,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsImportRequested event,
     Emitter<SettingsState> emit,
   ) async {
-    debugPrint('SettingsBloc: _onImportRequested started');
+    _logger.debug(
+      'SettingsBloc',
+      'import begin keys=${event.jsonPayload.keys.join(',')}',
+    );
     emit(
       state.copyWith(
         importStatus: AsyncStatus.inProgress,
@@ -81,16 +95,21 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     try {
       await _importDataUseCase(event.jsonPayload);
       await _syncNotificationsUseCase.rebuildAllFromLocalData();
-      debugPrint('SettingsBloc: Import successful');
+      _logger.debug('SettingsBloc', 'import success');
       emit(
         state.copyWith(importStatus: AsyncStatus.success, errorMessage: null),
       );
-    } catch (e) {
-      debugPrint('SettingsBloc: Import failed with error: $e');
+    } catch (error, stackTrace) {
+      _logger.error(
+        'SettingsBloc',
+        'import failed',
+        error: error,
+        stackTrace: stackTrace,
+      );
       emit(
         state.copyWith(
           importStatus: AsyncStatus.failure,
-          errorMessage: e.toString(),
+          errorMessage: error.toString(),
         ),
       );
     }

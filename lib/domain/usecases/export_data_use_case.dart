@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:starnyx/core/utils/date_utils.dart';
+import 'package:starnyx/core/services/app_log_service.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/entities/completion.dart';
 import 'package:starnyx/domain/entities/app_settings.dart';
@@ -16,18 +17,26 @@ class ExportDataUseCase {
     this._starnyxRepository,
     this._completionRepository,
     this._journalEntryRepository,
-    this._appSettingsRepository,
-  );
+    this._appSettingsRepository, {
+    AppLogService logger = const NoOpAppLogService(),
+  }) : _logger = logger;
 
   final StarNyxRepository _starnyxRepository;
   final CompletionRepository _completionRepository;
   final JournalEntryRepository _journalEntryRepository;
   final AppSettingsRepository _appSettingsRepository;
+  final AppLogService _logger;
 
   /// Returns the backup payload serialized as JSON text.
   Future<String> call({DateTime? now}) async {
+    _logger.debug('ExportDataUseCase', 'export begin');
     final payload = await buildPayload(now: now);
-    return const JsonEncoder.withIndent('  ').convert(payload);
+    final encoded = const JsonEncoder.withIndent('  ').convert(payload);
+    _logger.debug(
+      'ExportDataUseCase',
+      'export success bytes=${encoded.length}',
+    );
+    return encoded;
   }
 
   /// Builds a schema-stable JSON-compatible map for backup export.
@@ -52,6 +61,11 @@ class ExportDataUseCase {
           updatedAt: now ?? DateTime.now(),
         );
 
+    _logger.debug(
+      'ExportDataUseCase',
+      'payload built starnyxs=${starnyxs.length} '
+          'completions=${completions.length} journals=${journalEntries.length}',
+    );
     return <String, dynamic>{
       'schemaVersion': 1,
       'starnyxs': starnyxs.map(_starnyxToJson).toList(growable: false),

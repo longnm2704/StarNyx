@@ -1,6 +1,7 @@
 import 'package:uuid/uuid.dart';
 import 'package:get_it/get_it.dart';
 import 'package:starnyx/data/db/app_database.dart';
+import 'package:starnyx/app/app_bloc_observer.dart';
 import 'package:starnyx/app/router/app_router.dart';
 import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
@@ -44,27 +45,43 @@ void _registerCoreDependencies() {
   serviceLocator.registerLazySingleton<AppDatabase>(AppDatabase.new);
   // Keeping AppRouter injectable makes later navigation changes easier.
   serviceLocator.registerLazySingleton<AppRouter>(AppRouter.new);
+  serviceLocator.registerLazySingleton<AppBlocObserver>(
+    () => AppBlocObserver(serviceLocator<AppLogService>()),
+  );
 }
 
 void _registerServices() {
+  serviceLocator.registerLazySingleton<AppLogService>(ConsoleAppLogService.new);
   serviceLocator.registerLazySingleton<NotificationService>(
-    LocalNotificationService.new,
+    () => LocalNotificationService(logger: serviceLocator<AppLogService>()),
   );
 }
 
 void _registerRepositories() {
   // Domain code depends on abstractions while DI wires the Drift implementations.
   serviceLocator.registerLazySingleton<StarNyxRepository>(
-    () => DriftStarNyxRepository(serviceLocator<AppDatabase>()),
+    () => DriftStarNyxRepository(
+      serviceLocator<AppDatabase>(),
+      logger: serviceLocator<AppLogService>(),
+    ),
   );
   serviceLocator.registerLazySingleton<CompletionRepository>(
-    () => DriftCompletionRepository(serviceLocator<AppDatabase>()),
+    () => DriftCompletionRepository(
+      serviceLocator<AppDatabase>(),
+      logger: serviceLocator<AppLogService>(),
+    ),
   );
   serviceLocator.registerLazySingleton<JournalEntryRepository>(
-    () => DriftJournalEntryRepository(serviceLocator<AppDatabase>()),
+    () => DriftJournalEntryRepository(
+      serviceLocator<AppDatabase>(),
+      logger: serviceLocator<AppLogService>(),
+    ),
   );
   serviceLocator.registerLazySingleton<AppSettingsRepository>(
-    () => DriftAppSettingsRepository(serviceLocator<AppDatabase>()),
+    () => DriftAppSettingsRepository(
+      serviceLocator<AppDatabase>(),
+      logger: serviceLocator<AppLogService>(),
+    ),
   );
 }
 
@@ -74,59 +91,79 @@ void _registerUseCases() {
     () => CreateStarNyxUseCase(
       serviceLocator<StarNyxRepository>(),
       serviceLocator<Uuid>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
   serviceLocator.registerLazySingleton<UpdateStarNyxUseCase>(
-    () => UpdateStarNyxUseCase(serviceLocator<StarNyxRepository>()),
+    () => UpdateStarNyxUseCase(
+      serviceLocator<StarNyxRepository>(),
+      logger: serviceLocator<AppLogService>(),
+    ),
   );
   serviceLocator.registerLazySingleton<DeleteStarNyxUseCase>(
     () => DeleteStarNyxUseCase(
       serviceLocator<StarNyxRepository>(),
       serviceLocator<AppSettingsRepository>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
   serviceLocator.registerLazySingleton<LoadStarnyxsUseCase>(
-    () => LoadStarnyxsUseCase(serviceLocator<StarNyxRepository>()),
+    () => LoadStarnyxsUseCase(
+      serviceLocator<StarNyxRepository>(),
+      logger: serviceLocator<AppLogService>(),
+    ),
   );
   serviceLocator.registerLazySingleton<LoadActiveStarNyxUseCase>(
     () => LoadActiveStarNyxUseCase(
       serviceLocator<StarNyxRepository>(),
       serviceLocator<AppSettingsRepository>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
   serviceLocator.registerLazySingleton<LoadStarNyxProgressStatsUseCase>(
     () => LoadStarNyxProgressStatsUseCase(
       serviceLocator<StarNyxRepository>(),
       serviceLocator<CompletionRepository>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
   serviceLocator
       .registerLazySingleton<LoadStarNyxCompletionDatesForYearUseCase>(
         () => LoadStarNyxCompletionDatesForYearUseCase(
           serviceLocator<CompletionRepository>(),
+          logger: serviceLocator<AppLogService>(),
         ),
       );
   serviceLocator.registerLazySingleton<SelectActiveStarNyxUseCase>(
     () => SelectActiveStarNyxUseCase(
       serviceLocator<StarNyxRepository>(),
       serviceLocator<AppSettingsRepository>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
   serviceLocator.registerLazySingleton<ToggleCompletionUseCase>(
     () => ToggleCompletionUseCase(
       serviceLocator<StarNyxRepository>(),
       serviceLocator<CompletionRepository>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
   serviceLocator.registerLazySingleton<SaveJournalEntryUseCase>(
-    () => SaveJournalEntryUseCase(serviceLocator<JournalEntryRepository>()),
+    () => SaveJournalEntryUseCase(
+      serviceLocator<JournalEntryRepository>(),
+      logger: serviceLocator<AppLogService>(),
+    ),
   );
   serviceLocator.registerLazySingleton<DeleteJournalEntryUseCase>(
-    () => DeleteJournalEntryUseCase(serviceLocator<JournalEntryRepository>()),
+    () => DeleteJournalEntryUseCase(
+      serviceLocator<JournalEntryRepository>(),
+      logger: serviceLocator<AppLogService>(),
+    ),
   );
   serviceLocator.registerLazySingleton<WatchJournalEntriesForStarnyxUseCase>(
     () => WatchJournalEntriesForStarnyxUseCase(
       serviceLocator<JournalEntryRepository>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
   serviceLocator.registerLazySingleton<ExportDataUseCase>(
@@ -135,6 +172,7 @@ void _registerUseCases() {
       serviceLocator<CompletionRepository>(),
       serviceLocator<JournalEntryRepository>(),
       serviceLocator<AppSettingsRepository>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
   serviceLocator.registerLazySingleton<ImportDataUseCase>(
@@ -143,12 +181,14 @@ void _registerUseCases() {
       serviceLocator<CompletionRepository>(),
       serviceLocator<JournalEntryRepository>(),
       serviceLocator<AppSettingsRepository>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
   serviceLocator.registerLazySingleton<SyncNotificationsUseCase>(
     () => SyncNotificationsUseCase(
       serviceLocator<NotificationService>(),
       serviceLocator<StarNyxRepository>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
 }
@@ -164,6 +204,7 @@ void _registerBlocFactories() {
       loadStarNyxCompletionDatesForYearUseCase:
           serviceLocator<LoadStarNyxCompletionDatesForYearUseCase>(),
       toggleCompletionUseCase: serviceLocator<ToggleCompletionUseCase>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
   serviceLocator.registerFactory<JournalBloc>(
@@ -172,6 +213,7 @@ void _registerBlocFactories() {
       watchJournalEntriesForStarnyxUseCase:
           serviceLocator<WatchJournalEntriesForStarnyxUseCase>(),
       deleteJournalEntryUseCase: serviceLocator<DeleteJournalEntryUseCase>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
   serviceLocator.registerFactory<SettingsBloc>(
@@ -179,6 +221,7 @@ void _registerBlocFactories() {
       exportDataUseCase: serviceLocator<ExportDataUseCase>(),
       importDataUseCase: serviceLocator<ImportDataUseCase>(),
       syncNotificationsUseCase: serviceLocator<SyncNotificationsUseCase>(),
+      logger: serviceLocator<AppLogService>(),
     ),
   );
 
@@ -198,17 +241,19 @@ void _registerBlocFactories() {
   /// ```
   ///
   /// The factory automatically injects use cases from the service locator.
-  serviceLocator.registerFactoryParam<StarnyxFormBloc, domain.StarNyx?, String?>((
-    initialStarnyx,
-    initialColor,
-  ) {
-    return StarnyxFormBloc(
-      createStarNyxUseCase: serviceLocator<CreateStarNyxUseCase>(),
-      updateStarNyxUseCase: serviceLocator<UpdateStarNyxUseCase>(),
-      deleteStarNyxUseCase: serviceLocator<DeleteStarNyxUseCase>(),
-      syncNotificationsUseCase: serviceLocator<SyncNotificationsUseCase>(),
-      initialStarnyx: initialStarnyx,
-      initialColor: initialColor,
-    );
-  });
+  serviceLocator
+      .registerFactoryParam<StarnyxFormBloc, domain.StarNyx?, String?>((
+        initialStarnyx,
+        initialColor,
+      ) {
+        return StarnyxFormBloc(
+          createStarNyxUseCase: serviceLocator<CreateStarNyxUseCase>(),
+          updateStarNyxUseCase: serviceLocator<UpdateStarNyxUseCase>(),
+          deleteStarNyxUseCase: serviceLocator<DeleteStarNyxUseCase>(),
+          syncNotificationsUseCase: serviceLocator<SyncNotificationsUseCase>(),
+          logger: serviceLocator<AppLogService>(),
+          initialStarnyx: initialStarnyx,
+          initialColor: initialColor,
+        );
+      });
 }

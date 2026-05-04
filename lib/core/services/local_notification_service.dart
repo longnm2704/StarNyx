@@ -2,6 +2,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:starnyx/core/services/app_log_service.dart';
 import 'package:starnyx/core/utils/reminder_time_utils.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -28,13 +29,16 @@ class LocalNotificationService implements NotificationService {
   LocalNotificationService({
     NotificationClient? client,
     LocalTimezoneProvider? timezoneProvider,
+    AppLogService logger = const NoOpAppLogService(),
     DateTime Function()? now,
   }) : _client = client ?? FlutterLocalNotificationClient(),
        _timezoneProvider = timezoneProvider ?? FlutterLocalTimezoneProvider(),
+       _logger = logger,
        _now = now ?? DateTime.now;
 
   final NotificationClient _client;
   final LocalTimezoneProvider _timezoneProvider;
+  final AppLogService _logger;
   final DateTime Function() _now;
 
   bool _initialized = false;
@@ -43,9 +47,11 @@ class LocalNotificationService implements NotificationService {
   @override
   Future<void> initialize() async {
     if (_initialized) {
+      _logger.debug('LocalNotificationService', 'initialize skipped');
       return;
     }
 
+    _logger.debug('LocalNotificationService', 'initialize begin');
     await _configureLocalTimeZone();
 
     const settings = InitializationSettings(
@@ -63,15 +69,24 @@ class LocalNotificationService implements NotificationService {
     );
 
     _initialized = true;
+    _logger.debug('LocalNotificationService', 'initialize success');
   }
 
   @override
   Future<void> createReminder(StarNyx starnyx) async {
     final reminderTime = starnyx.reminderTime;
     if (!starnyx.reminderEnabled || reminderTime == null) {
+      _logger.debug(
+        'LocalNotificationService',
+        'create skipped id=${starnyx.id} reminderEnabled=${starnyx.reminderEnabled}',
+      );
       return;
     }
 
+    _logger.debug(
+      'LocalNotificationService',
+      'create begin id=${starnyx.id} reminderTime=$reminderTime',
+    );
     await _configureLocalTimeZone();
 
     final parsed = ReminderTimeUtils.parseTimeString(
@@ -79,6 +94,10 @@ class LocalNotificationService implements NotificationService {
       anchorDate: _now(),
     );
     if (parsed == null) {
+      _logger.debug(
+        'LocalNotificationService',
+        'create skipped invalid reminderTime id=${starnyx.id} reminderTime=$reminderTime',
+      );
       return;
     }
 
@@ -104,39 +123,70 @@ class LocalNotificationService implements NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time,
     );
+    _logger.debug(
+      'LocalNotificationService',
+      'create success id=${starnyx.id} notificationId=$notificationId '
+          'scheduledAt=$scheduledAt location=${scheduledAt.location.name}',
+    );
   }
 
   @override
   Future<void> updateReminder(StarNyx starnyx) async {
+    _logger.debug('LocalNotificationService', 'update begin id=${starnyx.id}');
     await cancelReminder(starnyx.id);
     await createReminder(starnyx);
+    _logger.debug(
+      'LocalNotificationService',
+      'update success id=${starnyx.id}',
+    );
   }
 
   @override
-  Future<void> cancelReminder(String starnyxId) {
-    return _client.cancel(_notificationIdFor(starnyxId));
+  Future<void> cancelReminder(String starnyxId) async {
+    final notificationId = _notificationIdFor(starnyxId);
+    _logger.debug(
+      'LocalNotificationService',
+      'cancel begin id=$starnyxId notificationId=$notificationId',
+    );
+    await _client.cancel(notificationId);
+    _logger.debug('LocalNotificationService', 'cancel success id=$starnyxId');
   }
 
   @override
-  Future<void> cancelAllReminders() {
-    return _client.cancelAll();
+  Future<void> cancelAllReminders() async {
+    _logger.debug('LocalNotificationService', 'cancel all begin');
+    await _client.cancelAll();
+    _logger.debug('LocalNotificationService', 'cancel all success');
   }
 
   Future<void> _configureLocalTimeZone() async {
     if (!_timeZonesInitialized) {
       tz_data.initializeTimeZones();
       _timeZonesInitialized = true;
+      _logger.debug(
+        'LocalNotificationService',
+        'timezone database initialized',
+      );
     }
 
     final timezoneName = await _timezoneProvider.getLocalTimezone();
     if (timezoneName == null || timezoneName.isEmpty) {
+      _logger.debug('LocalNotificationService', 'timezone unavailable');
       return;
     }
 
     try {
       tz.setLocalLocation(tz.getLocation(timezoneName));
+      _logger.debug(
+        'LocalNotificationService',
+        'timezone configured name=$timezoneName',
+      );
     } on Object {
       // Keep timezone's default location if the platform returns an unknown id.
+      _logger.debug(
+        'LocalNotificationService',
+        'timezone ignored unknown name=$timezoneName',
+      );
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:starnyx/core/services/app_log_service.dart';
 import 'package:starnyx/core/utils/streak_utils.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 import 'package:starnyx/domain/repositories/starnyx_repository.dart';
@@ -7,17 +8,23 @@ import 'package:starnyx/domain/repositories/completion_repository.dart';
 class LoadStarNyxProgressStatsUseCase {
   const LoadStarNyxProgressStatsUseCase(
     this._starnyxRepository,
-    this._completionRepository,
-  );
+    this._completionRepository, {
+    AppLogService logger = const NoOpAppLogService(),
+  }) : _logger = logger;
 
   final StarNyxRepository _starnyxRepository;
   final CompletionRepository _completionRepository;
+  final AppLogService _logger;
 
   Future<StarNyxProgressStats> call({
     required String starnyxId,
     required int year,
     DateTime? today,
   }) async {
+    _logger.debug(
+      'LoadStarNyxProgressStatsUseCase',
+      'load begin starnyxId=$starnyxId year=$year today=$today',
+    );
     final starnyx = await _starnyxRepository.getStarnyxById(starnyxId);
     if (starnyx == null) {
       throw StateError('StarNyx with id $starnyxId was not found.');
@@ -31,7 +38,7 @@ class LoadStarNyxProgressStatsUseCase {
         .map((completion) => completion.date)
         .toList(growable: false);
 
-    return StarNyxProgressStats(
+    final stats = StarNyxProgressStats(
       currentStreak: StreakUtils.currentStreak(
         completionDates: completedDates,
         today: today,
@@ -56,5 +63,11 @@ class LoadStarNyxProgressStatsUseCase {
         today: today,
       ),
     );
+    _logger.debug(
+      'LoadStarNyxProgressStatsUseCase',
+      'load success starnyxId=$starnyxId current=${stats.currentStreak} '
+          'longest=${stats.longestStreak} total=${stats.totalCompletedCount}',
+    );
+    return stats;
   }
 }

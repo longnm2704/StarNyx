@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/core/utils/date_utils.dart';
+import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
@@ -20,6 +21,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required LoadStarNyxCompletionDatesForYearUseCase
     loadStarNyxCompletionDatesForYearUseCase,
     required ToggleCompletionUseCase toggleCompletionUseCase,
+    AppLogService logger = const NoOpAppLogService(),
     DateTime Function()? nowBuilder,
   }) : _loadStarnyxsUseCase = loadStarnyxsUseCase,
        _loadActiveStarNyxUseCase = loadActiveStarNyxUseCase,
@@ -28,6 +30,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
        _loadStarNyxCompletionDatesForYearUseCase =
            loadStarNyxCompletionDatesForYearUseCase,
        _toggleCompletionUseCase = toggleCompletionUseCase,
+       _logger = logger,
        _nowBuilder = nowBuilder ?? DateTime.now,
        super(HomeState.initial()) {
     on<HomeLoadRequested>(_onLoadRequested);
@@ -48,6 +51,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final LoadStarNyxCompletionDatesForYearUseCase
   _loadStarNyxCompletionDatesForYearUseCase;
   final ToggleCompletionUseCase _toggleCompletionUseCase;
+  final AppLogService _logger;
   final DateTime Function() _nowBuilder;
   int _latestDataRequestId = 0;
 
@@ -58,6 +62,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final today = DateUtils.nowDate(_nowBuilder());
     final context = _resolveLoadContext(event: event, today: today);
     final requestId = _nextDataRequestId();
+    _logger.debug(
+      'HomeBloc',
+      'load begin event=${event.runtimeType} requestId=$requestId '
+          'selectedDate=${context.selectedDate} viewedYear=${context.viewedYear}',
+    );
     emit(
       state.copyWith(
         status: HomeStatus.loading,
@@ -74,8 +83,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         today: today,
       );
       if (!_isLatestDataRequest(requestId) || emit.isDone) {
+        _logger.debug('HomeBloc', 'load ignored stale requestId=$requestId');
         return;
       }
+      _logger.debug(
+        'HomeBloc',
+        'load success requestId=$requestId starnyxs=${data.starnyxs.length} '
+            'activeId=${data.activeStarnyx?.id}',
+      );
       emit(
         state.copyWith(
           status: HomeStatus.success,
@@ -89,10 +104,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           completedDatesForViewedYear: data.completedDatesForViewedYear,
         ),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
       if (!_isLatestDataRequest(requestId) || emit.isDone) {
         return;
       }
+      _logger.error(
+        'HomeBloc',
+        'load failed requestId=$requestId',
+        error: error,
+        stackTrace: stackTrace,
+      );
       emit(
         state.copyWith(
           status: HomeStatus.failure,
@@ -113,6 +134,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     final today = DateUtils.nowDate(_nowBuilder());
     final requestId = _nextDataRequestId();
+    _logger.debug(
+      'HomeBloc',
+      'select active begin id=${event.id} requestId=$requestId',
+    );
     emit(
       state.copyWith(
         selectionStatus: AsyncStatus.inProgress,
@@ -129,6 +154,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       if (!_isLatestDataRequest(requestId) || emit.isDone) {
         return;
       }
+      _logger.debug('HomeBloc', 'select active success id=${event.id}');
       emit(
         state.copyWith(
           status: HomeStatus.success,
@@ -141,10 +167,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           selectionFeedbackCount: state.selectionFeedbackCount + 1,
         ),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
       if (!_isLatestDataRequest(requestId) || emit.isDone) {
         return;
       }
+      _logger.error(
+        'HomeBloc',
+        'select active failed id=${event.id}',
+        error: error,
+        stackTrace: stackTrace,
+      );
       emit(
         state.copyWith(
           selectionStatus: AsyncStatus.failure,
@@ -157,6 +189,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   void _onDaySelected(HomeDaySelected event, Emitter<HomeState> emit) {
     final selectedDate = DateUtils.dateOnly(event.date);
     final nextYear = selectedDate.year;
+    _logger.debug(
+      'HomeBloc',
+      'day selected date=$selectedDate previous=${state.selectedDate}',
+    );
     if (nextYear != state.viewedYear) {
       add(HomeYearChanged(nextYear));
       emit(state.copyWith(selectedDate: selectedDate, viewedYear: nextYear));
@@ -197,6 +233,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       date: state.selectedDate,
       year: event.year,
     );
+    _logger.debug(
+      'HomeBloc',
+      'year changed year=${event.year} requestId=$requestId',
+    );
     emit(
       state.copyWith(viewedYear: event.year, selectedDate: nextSelectedDate),
     );
@@ -231,10 +271,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           completedDatesForViewedYear: completedDates,
         ),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
       if (!_isLatestDataRequest(requestId) || emit.isDone) {
         return;
       }
+      _logger.error(
+        'HomeBloc',
+        'year load failed year=${event.year}',
+        error: error,
+        stackTrace: stackTrace,
+      );
       emit(
         state.copyWith(
           progressStats: null,
@@ -250,6 +296,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     final activeId = state.activeStarnyxId;
     if (activeId == null) {
+      _logger.debug('HomeBloc', 'completion toggle ignored: no active starnyx');
       return;
     }
     final today = DateUtils.nowDate(_nowBuilder());
@@ -259,6 +306,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       activeStarnyx: activeStarnyx,
       today: today,
     )) {
+      _logger.debug(
+        'HomeBloc',
+        'completion toggle blocked activeId=$activeId date=${state.selectedDate}',
+      );
       emit(
         state.copyWith(
           completionStatus: AsyncStatus.failure,
@@ -268,6 +319,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       return;
     }
     final requestId = _nextDataRequestId();
+    _logger.debug(
+      'HomeBloc',
+      'completion toggle begin activeId=$activeId date=${state.selectedDate} '
+          'requestId=$requestId',
+    );
     emit(state.copyWith(completionStatus: AsyncStatus.inProgress));
 
     try {
@@ -284,6 +340,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       if (!_isLatestDataRequest(requestId) || emit.isDone) {
         return;
       }
+      _logger.debug(
+        'HomeBloc',
+        'completion toggle success activeId=$activeId date=${state.selectedDate}',
+      );
       emit(
         state.copyWith(
           completionStatus: AsyncStatus.success,
@@ -294,10 +354,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           activeStarnyxId: data.activeStarnyx?.id,
         ),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
       if (!_isLatestDataRequest(requestId) || emit.isDone) {
         return;
       }
+      _logger.error(
+        'HomeBloc',
+        'completion toggle failed activeId=$activeId date=${state.selectedDate}',
+        error: error,
+        stackTrace: stackTrace,
+      );
       emit(
         state.copyWith(
           completionStatus: AsyncStatus.failure,
