@@ -1,8 +1,9 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:starnyx/core/utils/reminder_time_utils.dart';
-import 'package:starnyx/domain/entities/starnyx.dart';
-import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz_data;
+import 'package:starnyx/domain/entities/starnyx.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:starnyx/core/utils/reminder_time_utils.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'notification_service.dart';
 
@@ -26,14 +27,18 @@ int _notificationIdFor(String starnyxId) {
 class LocalNotificationService implements NotificationService {
   LocalNotificationService({
     NotificationClient? client,
+    LocalTimezoneProvider? timezoneProvider,
     DateTime Function()? now,
   }) : _client = client ?? FlutterLocalNotificationClient(),
+       _timezoneProvider = timezoneProvider ?? FlutterLocalTimezoneProvider(),
        _now = now ?? DateTime.now;
 
   final NotificationClient _client;
+  final LocalTimezoneProvider _timezoneProvider;
   final DateTime Function() _now;
 
   bool _initialized = false;
+  bool _timeZonesInitialized = false;
 
   @override
   Future<void> initialize() async {
@@ -41,7 +46,7 @@ class LocalNotificationService implements NotificationService {
       return;
     }
 
-    tz_data.initializeTimeZones();
+    await _configureLocalTimeZone();
 
     const settings = InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/ic_launcher'),
@@ -66,6 +71,8 @@ class LocalNotificationService implements NotificationService {
     if (!starnyx.reminderEnabled || reminderTime == null) {
       return;
     }
+
+    await _configureLocalTimeZone();
 
     final parsed = ReminderTimeUtils.parseTimeString(
       reminderTime,
@@ -115,6 +122,24 @@ class LocalNotificationService implements NotificationService {
     return _client.cancelAll();
   }
 
+  Future<void> _configureLocalTimeZone() async {
+    if (!_timeZonesInitialized) {
+      tz_data.initializeTimeZones();
+      _timeZonesInitialized = true;
+    }
+
+    final timezoneName = await _timezoneProvider.getLocalTimezone();
+    if (timezoneName == null || timezoneName.isEmpty) {
+      return;
+    }
+
+    try {
+      tz.setLocalLocation(tz.getLocation(timezoneName));
+    } on Object {
+      // Keep timezone's default location if the platform returns an unknown id.
+    }
+  }
+
   tz.TZDateTime _nextDailySchedule(DateTime reminderDateTime) {
     final now = tz.TZDateTime.from(_now(), tz.local);
     var scheduled = tz.TZDateTime(
@@ -130,6 +155,22 @@ class LocalNotificationService implements NotificationService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
     return scheduled;
+  }
+}
+
+/// Resolves the device timezone name, e.g. `Asia/Ho_Chi_Minh`.
+abstract class LocalTimezoneProvider {
+  Future<String?> getLocalTimezone();
+}
+
+class FlutterLocalTimezoneProvider implements LocalTimezoneProvider {
+  @override
+  Future<String?> getLocalTimezone() async {
+    try {
+      return FlutterTimezone.getLocalTimezone();
+    } on Object {
+      return null;
+    }
   }
 }
 

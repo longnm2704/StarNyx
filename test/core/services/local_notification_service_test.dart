@@ -12,6 +12,7 @@ void main() {
     client = _FakeNotificationClient();
     service = LocalNotificationService(
       client: client,
+      timezoneProvider: const _FakeTimezoneProvider('Asia/Ho_Chi_Minh'),
       now: () => DateTime(2026, 4, 16, 8, 0),
     );
   });
@@ -38,6 +39,7 @@ void main() {
     expect(request.matchDateTimeComponents, DateTimeComponents.time);
     expect(request.scheduledDate.hour, 9);
     expect(request.scheduledDate.minute, 30);
+    expect(request.scheduledDate.location.name, 'Asia/Ho_Chi_Minh');
     expect(
       request.scheduledDate.isAfter(
         tz.TZDateTime.from(DateTime(2026, 4, 16, 8), tz.local),
@@ -84,6 +86,29 @@ void main() {
 
     expect(client.cancelAllCount, 1);
   });
+
+  test(
+    'create reminder rolls to tomorrow when reminder time already passed',
+    () async {
+      service = LocalNotificationService(
+        client: client,
+        timezoneProvider: const _FakeTimezoneProvider('Asia/Ho_Chi_Minh'),
+        now: () => DateTime(2026, 4, 16, 20, 0),
+      );
+      await service.initialize();
+
+      await service.createReminder(
+        _sampleStarNyx(reminderEnabled: true, reminderTime: '09:30'),
+      );
+
+      final scheduledDate = client.scheduled.single.scheduledDate;
+      expect(scheduledDate.year, 2026);
+      expect(scheduledDate.month, 4);
+      expect(scheduledDate.day, 17);
+      expect(scheduledDate.hour, 9);
+      expect(scheduledDate.minute, 30);
+    },
+  );
 }
 
 StarNyx _sampleStarNyx({
@@ -150,6 +175,15 @@ class _FakeNotificationClient implements NotificationClient {
   Future<void> cancelAll() async {
     cancelAllCount += 1;
   }
+}
+
+class _FakeTimezoneProvider implements LocalTimezoneProvider {
+  const _FakeTimezoneProvider(this.timezoneName);
+
+  final String timezoneName;
+
+  @override
+  Future<String?> getLocalTimezone() async => timezoneName;
 }
 
 class _ScheduledRequest {
