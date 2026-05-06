@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:starnyx/app/di/service_locator.dart';
+import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/features/home/presentation/pages/home_page.dart';
 
 abstract final class AppRoutes {
@@ -13,12 +15,18 @@ class AppRouter {
     switch (settings.name) {
       case AppRoutes.home:
         return MaterialPageRoute<void>(
-          builder: (_) => HomePage(),
+          builder: (_) => HomePage(
+            initialAccentColor: serviceLocator<ActiveStarnyxColorCache>()
+                .readColor(),
+          ),
           settings: settings,
         );
       default:
         return MaterialPageRoute<void>(
-          builder: (_) => HomePage(),
+          builder: (_) => HomePage(
+            initialAccentColor: serviceLocator<ActiveStarnyxColorCache>()
+                .readColor(),
+          ),
           settings: settings,
         );
     }

@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
+import 'package:starnyx/core/services/core_services.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
 import 'package:starnyx/domain/usecases/toggle_completion_use_case.dart';
@@ -34,6 +36,7 @@ class HomePage extends StatefulWidget {
     FutureOr<void> Function()? onCreatePressed,
     FutureOr<void> Function(StarNyx)? onEditPressed,
     ValueChanged<StarNyx>? onSelectPressed,
+    Color? initialAccentColor,
   }) : _loadStarnyxsUseCase =
            loadStarnyxsUseCase ?? serviceLocator<LoadStarnyxsUseCase>(),
        _loadActiveStarNyxUseCase =
@@ -52,7 +55,8 @@ class HomePage extends StatefulWidget {
            toggleCompletionUseCase ?? serviceLocator<ToggleCompletionUseCase>(),
        _onCreatePressed = onCreatePressed,
        _onEditPressed = onEditPressed,
-       _onSelectPressed = onSelectPressed;
+       _onSelectPressed = onSelectPressed,
+       _initialAccentColor = initialAccentColor;
 
   final LoadStarnyxsUseCase _loadStarnyxsUseCase;
   final LoadActiveStarNyxUseCase _loadActiveStarNyxUseCase;
@@ -64,6 +68,7 @@ class HomePage extends StatefulWidget {
   final FutureOr<void> Function()? _onCreatePressed;
   final FutureOr<void> Function(StarNyx)? _onEditPressed;
   final ValueChanged<StarNyx>? _onSelectPressed;
+  final Color? _initialAccentColor;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -71,10 +76,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final HomeBloc _homeBloc;
+  Color? _lastActiveAccentColor;
+  Color? _lastSavedAccentColor;
 
   @override
   void initState() {
     super.initState();
+    _lastActiveAccentColor = widget._initialAccentColor;
+    _lastSavedAccentColor = widget._initialAccentColor;
     _homeBloc = HomeBloc(
       loadStarnyxsUseCase: widget._loadStarnyxsUseCase,
       loadActiveStarNyxUseCase: widget._loadActiveStarNyxUseCase,
@@ -106,17 +115,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _onSettingsPressed() async {
-    Color? accentColor;
-    final state = _homeBloc.state;
-    if (state.activeStarnyxId != null && state.starnyxs.isNotEmpty) {
-      try {
-        final activeStarnyx = state.starnyxs.firstWhere(
-          (s) => s.id == state.activeStarnyxId,
-          orElse: () => state.starnyxs.first,
-        );
-        accentColor = starnyxColorFromHex(activeStarnyx.color);
-      } catch (_) {}
-    }
+    final accentColor =
+        _resolveActiveAccentColor(_homeBloc.state) ?? _lastActiveAccentColor;
     await showSettingsBottomSheet(context, accentColor: accentColor);
   }
 
@@ -175,6 +175,32 @@ class _HomePageState extends State<HomePage> {
     _homeBloc.add(HomeActiveStarnyxSelected(starnyx.id));
   }
 
+  Color? _resolveActiveAccentColor(HomeState state) {
+    if (state.activeStarnyxId == null || state.starnyxs.isEmpty) {
+      return null;
+    }
+
+    try {
+      final activeStarnyx = state.starnyxs.firstWhere(
+        (s) => s.id == state.activeStarnyxId,
+        orElse: () => state.starnyxs.first,
+      );
+      return starnyxColorFromHex(activeStarnyx.color);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _cacheActiveAccentColor(Color color) {
+    if (_lastSavedAccentColor == color) {
+      return;
+    }
+    _lastSavedAccentColor = color;
+    if (serviceLocator.isRegistered<ActiveStarnyxColorCache>()) {
+      unawaited(serviceLocator<ActiveStarnyxColorCache>().saveColor(color));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<HomeBloc>.value(
@@ -214,75 +240,102 @@ class _HomePageState extends State<HomePage> {
         child: Scaffold(
           body: BlocBuilder<HomeBloc, HomeState>(
             builder: (BuildContext context, HomeState state) {
-              Color? accentColor;
-              if (state.activeStarnyxId != null && state.starnyxs.isNotEmpty) {
-                try {
-                  final activeStarnyx = state.starnyxs.firstWhere(
-                    (s) => s.id == state.activeStarnyxId,
-                    orElse: () => state.starnyxs.first,
-                  );
-                  accentColor = starnyxColorFromHex(activeStarnyx.color);
-                } catch (_) {
-                  // Fallback to default
-                }
+              final resolvedAccentColor = _resolveActiveAccentColor(state);
+              if (resolvedAccentColor != null) {
+                _lastActiveAccentColor = resolvedAccentColor;
+                _cacheActiveAccentColor(resolvedAccentColor);
               }
+              final accentColor = resolvedAccentColor ?? _lastActiveAccentColor;
+
+              Widget child;
 
               if (state.status == HomeStatus.initial ||
                   state.status == HomeStatus.loading) {
-                return HomeLoadingView(accentColor: accentColor);
-              }
-
-              if (state.status == HomeStatus.failure) {
-                return HomeErrorView(
+                if (accentColor == null) {
+                  child = const ColoredBox(
+                    key: ValueKey<String>('colored_box'),
+                    color: AppColors.background,
+                  );
+                } else {
+                  child = HomeLoadingView(
+                    key: const ValueKey<String>('loading_view'),
+                    accentColor: accentColor,
+                  );
+                }
+              } else if (state.status == HomeStatus.failure) {
+                child = HomeErrorView(
+                  key: const ValueKey<String>('error_view'),
                   onRetry: _retryLoad,
                   accentColor: accentColor,
                 );
-              }
-
-              if (state.starnyxs.isEmpty) {
-                return FirstRunWelcomeView(
+              } else if (state.starnyxs.isEmpty) {
+                child = FirstRunWelcomeView(
+                  key: const ValueKey<String>('first_run_view'),
                   onCreatePressed: _onCreatePressed,
                   onSettingsPressed: _onSettingsPressed,
                 );
+              } else {
+                child = ActiveStarnyxHomeView(
+                  key: const ValueKey<String>('active_view'),
+                  starnyxs: state.starnyxs,
+                  activeStarnyxId: state.activeStarnyxId,
+                  selectedDate: state.selectedDate,
+                  todayDate: DateTime.now(),
+                  viewedYear: state.viewedYear,
+                  completedDatesForViewedYear:
+                      state.completedDatesForViewedYear,
+                  onCreatePressed: _onCreatePressed,
+                  onEditPressed: _onEditPressed,
+                  onDateSelected: (DateTime date) {
+                    _homeBloc.add(HomeDaySelected(date));
+                  },
+                  onSelectPressed: _onSelectPressed,
+                  onPreviousDayPressed: () {
+                    _homeBloc.add(const HomePreviousDayRequested());
+                  },
+                  onNextDayPressed: () {
+                    _homeBloc.add(const HomeNextDayRequested());
+                  },
+                  onJumpToTodayPressed: () {
+                    _homeBloc.add(const HomeJumpToTodayRequested());
+                  },
+                  onPreviousYearPressed: () {
+                    _homeBloc.add(HomeYearChanged(state.viewedYear - 1));
+                  },
+                  onNextYearPressed: () {
+                    _homeBloc.add(HomeYearChanged(state.viewedYear + 1));
+                  },
+                  onToggleCompletionPressed: () {
+                    _homeBloc.add(const HomeCompletionToggled());
+                  },
+                  isCheckingIn:
+                      state.completionStatus == AsyncStatus.inProgress,
+                  completionSuccessAnimationToken:
+                      state.completionStatus == AsyncStatus.success
+                      ? state.completionFeedbackCount
+                      : null,
+                  progressStats: state.progressStats,
+                );
               }
 
-              return ActiveStarnyxHomeView(
-                starnyxs: state.starnyxs,
-                activeStarnyxId: state.activeStarnyxId,
-                selectedDate: state.selectedDate,
-                todayDate: DateTime.now(),
-                viewedYear: state.viewedYear,
-                completedDatesForViewedYear: state.completedDatesForViewedYear,
-                onCreatePressed: _onCreatePressed,
-                onEditPressed: _onEditPressed,
-                onDateSelected: (DateTime date) {
-                  _homeBloc.add(HomeDaySelected(date));
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 700),
+                switchInCurve: Curves.decelerate,
+                switchOutCurve: Curves.easeIn,
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return FadeTransition(opacity: animation, child: child);
                 },
-                onSelectPressed: _onSelectPressed,
-                onPreviousDayPressed: () {
-                  _homeBloc.add(const HomePreviousDayRequested());
-                },
-                onNextDayPressed: () {
-                  _homeBloc.add(const HomeNextDayRequested());
-                },
-                onJumpToTodayPressed: () {
-                  _homeBloc.add(const HomeJumpToTodayRequested());
-                },
-                onPreviousYearPressed: () {
-                  _homeBloc.add(HomeYearChanged(state.viewedYear - 1));
-                },
-                onNextYearPressed: () {
-                  _homeBloc.add(HomeYearChanged(state.viewedYear + 1));
-                },
-                onToggleCompletionPressed: () {
-                  _homeBloc.add(const HomeCompletionToggled());
-                },
-                isCheckingIn: state.completionStatus == AsyncStatus.inProgress,
-                completionSuccessAnimationToken:
-                    state.completionStatus == AsyncStatus.success
-                    ? state.completionFeedbackCount
-                    : null,
-                progressStats: state.progressStats,
+                layoutBuilder:
+                    (Widget? currentChild, List<Widget> previousChildren) {
+                      return Stack(
+                        fit: StackFit.expand,
+                        children: <Widget>[
+                          ...previousChildren,
+                          if (currentChild != null) currentChild,
+                        ],
+                      );
+                    },
+                child: child,
               );
             },
           ),
