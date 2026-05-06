@@ -78,7 +78,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
 
     try {
-      final data = await _loadHomeData(
+      final starnyxs = await _loadStarnyxsUseCase();
+      final activeStarnyx = await _loadActiveStarNyxUseCase(now: today);
+      if (!_isLatestDataRequest(requestId) || emit.isDone) {
+        _logger.debug('HomeBloc', 'load ignored stale requestId=$requestId');
+        return;
+      }
+      emit(
+        state.copyWith(
+          status: HomeStatus.loading,
+          starnyxs: starnyxs,
+          activeStarnyxId: activeStarnyx?.id,
+        ),
+      );
+
+      final data = await _loadHomeDataForActiveStarnyx(
+        starnyxs: starnyxs,
+        activeStarnyx: activeStarnyx,
         viewedYear: context.viewedYear,
         today: today,
       );
@@ -380,6 +396,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final starnyxs = await _loadStarnyxsUseCase();
     final activeStarnyx = await _loadActiveStarNyxUseCase(now: today);
 
+    return _loadHomeDataForActiveStarnyx(
+      starnyxs: starnyxs,
+      activeStarnyx: activeStarnyx,
+      viewedYear: viewedYear,
+      today: today,
+    );
+  }
+
+  Future<_HomeData> _loadHomeDataForActiveStarnyx({
+    required List<StarNyx> starnyxs,
+    required StarNyx? activeStarnyx,
+    required int viewedYear,
+    required DateTime today,
+  }) async {
     if (activeStarnyx == null) {
       return _HomeData(
         starnyxs: starnyxs,

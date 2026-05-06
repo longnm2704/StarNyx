@@ -4,8 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/data/db/app_database.dart';
 import 'package:starnyx/app/app_bloc_observer.dart';
 import 'package:starnyx/app/router/app_router.dart';
-import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/app/di/service_locator.dart';
+import 'package:starnyx/core/services/core_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/domain/entities/starnyx.dart' as domain;
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
@@ -16,6 +17,12 @@ import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_blo
 /// Tests the dependency injection setup ensures all services and factories are properly registered.
 /// Verifies that the service locator is accessible globally and behaves as a singleton.
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+  });
+
   tearDown(() async {
     await resetDependencies();
   });

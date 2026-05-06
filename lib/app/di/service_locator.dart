@@ -4,6 +4,7 @@ import 'package:starnyx/data/db/app_database.dart';
 import 'package:starnyx/app/app_bloc_observer.dart';
 import 'package:starnyx/app/router/app_router.dart';
 import 'package:starnyx/core/services/core_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/domain/entities/starnyx.dart' as domain;
 import 'package:starnyx/data/repositories/data_repositories.dart';
@@ -27,7 +28,8 @@ Future<void> configureDependencies() async {
     return;
   }
 
-  _registerCoreDependencies();
+  final preferences = await SharedPreferences.getInstance();
+  _registerCoreDependencies(preferences);
   _registerServices();
   _registerRepositories();
   _registerUseCases();
@@ -38,13 +40,16 @@ Future<void> resetDependencies() {
   return serviceLocator.reset();
 }
 
-void _registerCoreDependencies() {
+void _registerCoreDependencies(SharedPreferences preferences) {
   // Uuid is a simple utility that doesn't need to be recreated every time, so we can register it as a singleton.
   serviceLocator.registerLazySingleton<Uuid>(Uuid.new);
   // One shared database instance keeps SQLite access consistent across the app.
   serviceLocator.registerLazySingleton<AppDatabase>(AppDatabase.new);
   // Keeping AppRouter injectable makes later navigation changes easier.
   serviceLocator.registerLazySingleton<AppRouter>(AppRouter.new);
+  serviceLocator.registerLazySingleton<ActiveStarnyxColorCache>(
+    () => ActiveStarnyxColorCache(preferences),
+  );
   serviceLocator.registerLazySingleton<AppBlocObserver>(
     () => AppBlocObserver(serviceLocator<AppLogService>()),
   );
