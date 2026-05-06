@@ -57,6 +57,7 @@ class HomeShellView extends StatelessWidget {
     required this.onQuickActionsPressed,
     this.onToggleCompletionPressed,
     this.isCheckingIn = false,
+    this.completionSuccessAnimationToken,
     this.footer,
     super.key,
   });
@@ -76,6 +77,7 @@ class HomeShellView extends StatelessWidget {
   final VoidCallback? onQuickActionsPressed;
   final VoidCallback? onToggleCompletionPressed;
   final bool isCheckingIn;
+  final int? completionSuccessAnimationToken;
   final Widget? footer;
 
   @override
@@ -173,6 +175,8 @@ class HomeShellView extends StatelessWidget {
                               completedDatesForViewedYear,
                           accentColor: accentColor,
                           onDateSelected: onDateSelected,
+                          completionSuccessAnimationToken:
+                              completionSuccessAnimationToken,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.md),

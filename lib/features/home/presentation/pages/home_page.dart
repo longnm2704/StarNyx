@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
@@ -203,9 +204,7 @@ class _HomePageState extends State<HomePage> {
             );
           }
           if (state.completionStatus == AsyncStatus.success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('home.checkin_success_message'.tr())),
-            );
+            HapticFeedback.lightImpact();
           } else if (state.completionStatus == AsyncStatus.failure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('home.checkin_error_message'.tr())),
@@ -279,6 +278,10 @@ class _HomePageState extends State<HomePage> {
                   _homeBloc.add(const HomeCompletionToggled());
                 },
                 isCheckingIn: state.completionStatus == AsyncStatus.inProgress,
+                completionSuccessAnimationToken:
+                    state.completionStatus == AsyncStatus.success
+                    ? state.completionFeedbackCount
+                    : null,
                 progressStats: state.progressStats,
               );
             },

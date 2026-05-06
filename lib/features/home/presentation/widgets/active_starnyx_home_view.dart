@@ -56,6 +56,7 @@ class ActiveStarnyxHomeView extends StatefulWidget {
     required this.onNextYearPressed,
     required this.onToggleCompletionPressed,
     required this.isCheckingIn,
+    this.completionSuccessAnimationToken,
     this.progressStats,
     super.key,
   });
@@ -77,6 +78,7 @@ class ActiveStarnyxHomeView extends StatefulWidget {
   final VoidCallback onNextYearPressed;
   final VoidCallback onToggleCompletionPressed;
   final bool isCheckingIn;
+  final int? completionSuccessAnimationToken;
   final StarNyxProgressStats? progressStats;
 
   @override
@@ -172,7 +174,11 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
               orElse: () => widget.starnyxs.first,
             );
             final activeColor = starnyxColorFromHex(activeStarnyx.color);
-            await showJournalBottomSheet(context, widget.activeStarnyxId!, activeColor);
+            await showJournalBottomSheet(
+              context,
+              widget.activeStarnyxId!,
+              activeColor,
+            );
           }
         case ConstellationSwitcherSheetActionType.settingsRequested:
           Color? activeColor;
@@ -243,6 +249,7 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
             ? widget.onToggleCompletionPressed
             : null,
         isCheckingIn: widget.isCheckingIn,
+        completionSuccessAnimationToken: widget.completionSuccessAnimationToken,
         footer: Center(
           child: HomeSwipeUpHint(
             onTap: _openConstellationSheet,

@@ -15,6 +15,7 @@ class HomeStarGrid extends StatelessWidget {
     required this.completedDatesForViewedYear,
     required this.accentColor,
     required this.onDateSelected,
+    this.completionSuccessAnimationToken,
     super.key,
   });
 
@@ -25,6 +26,7 @@ class HomeStarGrid extends StatelessWidget {
   final List<DateTime> completedDatesForViewedYear;
   final Color accentColor;
   final ValueChanged<DateTime>? onDateSelected;
+  final int? completionSuccessAnimationToken;
 
   static const double _gridSpacing = 4;
 
@@ -109,6 +111,8 @@ class HomeStarGrid extends StatelessWidget {
                     ? Key('home-future-star-cell-$index')
                     : null,
                 todayKey: isToday ? Key('home-today-star-cell-$index') : null,
+                completionSuccessAnimationToken:
+                    completionSuccessAnimationToken,
               ),
             );
           },
@@ -151,7 +155,7 @@ class HomeStarGrid extends StatelessWidget {
   }
 }
 
-class _GridStarCell extends StatelessWidget {
+class _GridStarCell extends StatefulWidget {
   const _GridStarCell({
     required this.size,
     required this.dayState,
@@ -159,6 +163,7 @@ class _GridStarCell extends StatelessWidget {
     required this.isToday,
     required this.accentColor,
     required this.onTap,
+    required this.completionSuccessAnimationToken,
     super.key,
     this.selectedKey,
     this.completedKey,
@@ -174,6 +179,7 @@ class _GridStarCell extends StatelessWidget {
   final bool isToday;
   final Color accentColor;
   final VoidCallback? onTap;
+  final int? completionSuccessAnimationToken;
   final Key? selectedKey;
   final Key? completedKey;
   final Key? beforeStartKey;
@@ -182,40 +188,120 @@ class _GridStarCell extends StatelessWidget {
   final Key? todayKey;
 
   @override
+  State<_GridStarCell> createState() => _GridStarCellState();
+}
+
+class _GridStarCellState extends State<_GridStarCell>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 760),
+  );
+  late final Animation<double> _pulse =
+      TweenSequence<double>(<TweenSequenceItem<double>>[
+        TweenSequenceItem<double>(
+          tween: Tween<double>(
+            begin: 1,
+            end: 1.62,
+          ).chain(CurveTween(curve: Curves.easeOutCubic)),
+          weight: 24,
+        ),
+        TweenSequenceItem<double>(
+          tween: Tween<double>(
+            begin: 1.62,
+            end: 0.92,
+          ).chain(CurveTween(curve: Curves.easeInOutCubic)),
+          weight: 20,
+        ),
+        TweenSequenceItem<double>(
+          tween: Tween<double>(
+            begin: 0.92,
+            end: 1,
+          ).chain(CurveTween(curve: Curves.easeInOutCubic)),
+          weight: 56,
+        ),
+      ]).animate(_controller);
+
+  @override
+  void didUpdateWidget(covariant _GridStarCell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isSelected &&
+        widget.completionSuccessAnimationToken != null &&
+        widget.completionSuccessAnimationToken !=
+            oldWidget.completionSuccessAnimationToken) {
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final double sizeMultiplier = isToday
+    final double sizeMultiplier = widget.isToday
         ? 1.5
-        : dayState == HomeGridStarDayState.completed
+        : widget.dayState == HomeGridStarDayState.completed
         ? 1.2
         : 1.0;
-    final double iconSize = (size * 0.62 * sizeMultiplier).toDouble();
+    final double iconSize = (widget.size * 0.62 * sizeMultiplier).toDouble();
 
     return SizedBox(
-      width: size,
-      height: size,
-      key: selectedKey,
+      width: widget.size,
+      height: widget.size,
+      key: widget.selectedKey,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(4),
-          onTap: onTap,
+          onTap: widget.onTap,
           child: Container(
             key: _cellStateKey(),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: isSelected ? accentColor.withValues(alpha: 0.14) : null,
+              color: widget.isSelected
+                  ? widget.accentColor.withValues(alpha: 0.14)
+                  : null,
               borderRadius: BorderRadius.circular(4),
-              border: isSelected && !isToday
-                  ? Border.all(color: accentColor.withValues(alpha: 0.32))
+              border: widget.isSelected && !widget.isToday
+                  ? Border.all(
+                      color: widget.accentColor.withValues(alpha: 0.32),
+                    )
                   : null,
             ),
             child: Center(
-              child: SizedBox(
-                key: todayKey,
-                child: AppSvgIcon(
-                  assetPath: _starAssetPath(),
-                  size: iconSize,
-                  color: _starColor(),
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (BuildContext context, Widget? child) {
+                  return Stack(
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.none,
+                    children: <Widget>[
+                      if (_controller.isAnimating &&
+                          widget.dayState == HomeGridStarDayState.completed)
+                        Opacity(
+                          opacity: 1,
+                          child: CustomPaint(
+                            size: Size.square(widget.size * 3),
+                            painter: _StarFireworkPainter(
+                              color: widget.accentColor,
+                              progress: _controller.value,
+                            ),
+                          ),
+                        ),
+                      Transform.scale(scale: _pulse.value, child: child),
+                    ],
+                  );
+                },
+                child: SizedBox(
+                  key: widget.todayKey,
+                  child: AppSvgIcon(
+                    assetPath: _starAssetPath(),
+                    size: iconSize,
+                    color: _starColor(),
+                  ),
                 ),
               ),
             ),
@@ -226,7 +312,7 @@ class _GridStarCell extends StatelessWidget {
   }
 
   String _starAssetPath() {
-    switch (dayState) {
+    switch (widget.dayState) {
       case HomeGridStarDayState.beforeStart:
       case HomeGridStarDayState.future:
         return 'assets/icons/ic_star.svg';
@@ -237,34 +323,94 @@ class _GridStarCell extends StatelessWidget {
   }
 
   Color _starColor() {
-    if (isSelected) {
-      return accentColor.withValues(alpha: 0.98);
+    if (widget.isSelected) {
+      return widget.accentColor.withValues(alpha: 0.98);
     }
-    switch (dayState) {
+    switch (widget.dayState) {
       case HomeGridStarDayState.beforeStart:
         return AppColors.white.withValues(alpha: 0.1);
       case HomeGridStarDayState.completed:
-        return accentColor.withValues(alpha: 0.88);
+        return widget.accentColor.withValues(alpha: 0.88);
       case HomeGridStarDayState.missed:
-        return accentColor.withValues(alpha: 0.28);
+        return widget.accentColor.withValues(alpha: 0.28);
       case HomeGridStarDayState.future:
         return AppColors.white.withValues(alpha: 0.2);
     }
   }
 
   Key? _cellStateKey() {
-    if (completedKey != null) {
-      return completedKey;
+    if (widget.completedKey != null) {
+      return widget.completedKey;
     }
-    if (beforeStartKey != null) {
-      return beforeStartKey;
+    if (widget.beforeStartKey != null) {
+      return widget.beforeStartKey;
     }
-    if (missedKey != null) {
-      return missedKey;
+    if (widget.missedKey != null) {
+      return widget.missedKey;
     }
-    if (futureKey != null) {
-      return futureKey;
+    if (widget.futureKey != null) {
+      return widget.futureKey;
     }
     return null;
+  }
+}
+
+class _StarFireworkPainter extends CustomPainter {
+  const _StarFireworkPainter({required this.color, required this.progress});
+
+  final Color color;
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final eased = Curves.easeOutCubic.transform(progress.clamp(0, 1));
+    final fade = (1 - Curves.easeIn.transform(progress.clamp(0, 1))).clamp(
+      0.0,
+      1.0,
+    );
+    final outerRadius = size.shortestSide * (0.08 + eased * 0.34);
+    final innerRadius = size.shortestSide * (0.04 + eased * 0.16);
+    final primaryPaint = Paint()
+      ..color = color.withValues(alpha: fade * 0.78)
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
+    final secondaryPaint = Paint()
+      ..color = AppColors.white.withValues(alpha: fade * 0.72)
+      ..style = PaintingStyle.fill;
+
+    for (int index = 0; index < 12; index += 1) {
+      final angle = (math.pi * 2 / 12) * index;
+      final start = Offset(
+        center.dx + math.cos(angle) * innerRadius,
+        center.dy + math.sin(angle) * innerRadius,
+      );
+      final end = Offset(
+        center.dx + math.cos(angle) * outerRadius,
+        center.dy + math.sin(angle) * outerRadius,
+      );
+      canvas.drawLine(start, end, primaryPaint);
+
+      if (index.isEven) {
+        final dotAngle = angle + math.pi / 12;
+        final dotRadius = outerRadius * 0.82;
+        final dotCenter = Offset(
+          center.dx + math.cos(dotAngle) * dotRadius,
+          center.dy + math.sin(dotAngle) * dotRadius,
+        );
+        canvas.drawCircle(dotCenter, size.shortestSide * 0.015, secondaryPaint);
+      }
+    }
+
+    final ringPaint = Paint()
+      ..color = color.withValues(alpha: fade * 0.18)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.1;
+    canvas.drawCircle(center, outerRadius * 0.72, ringPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _StarFireworkPainter oldDelegate) {
+    return oldDelegate.color != color || oldDelegate.progress != progress;
   }
 }
