@@ -22,6 +22,14 @@ class SelectedDateBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bool canShowActiveState = onSelectedDatePressed != null;
+    final bool canTap = canShowActiveState && !isCheckingIn;
+    final Color topColor = canShowActiveState
+        ? Color.lerp(accentColor, AppColors.surfaceGlass, 0.72)!
+        : AppColors.surfaceMuted.withValues(alpha: 0.5);
+    final Color bottomColor = canShowActiveState
+        ? Color.lerp(accentColor, AppColors.black, 0.88)!
+        : AppColors.surfaceMuted.withValues(alpha: 0.28);
 
     return Row(
       children: <Widget>[
@@ -36,7 +44,7 @@ class SelectedDateBar extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               key: const Key('home-selected-date-button'),
-              onTap: isCheckingIn ? null : onSelectedDatePressed,
+              onTap: canTap ? onSelectedDatePressed : null,
               borderRadius: BorderRadius.circular(AppRadius.pill),
               child: Container(
                 height: 52,
@@ -45,27 +53,29 @@ class SelectedDateBar extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: <Color>[
-                      Color.lerp(accentColor, AppColors.surfaceGlass, 0.72)!,
-                      Color.lerp(accentColor, AppColors.black, 0.88)!,
-                    ],
+                    colors: <Color>[topColor, bottomColor],
                   ),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                   border: Border.all(
-                    color: accentColor.withValues(alpha: 0.28),
+                    color: canShowActiveState
+                        ? accentColor.withValues(alpha: 0.28)
+                        : AppColors.outlineSoft.withValues(alpha: 0.12),
                   ),
                   boxShadow: <BoxShadow>[
-                    BoxShadow(
-                      color: AppColors.black.withValues(alpha: 0.24),
-                      blurRadius: 18,
-                      offset: const Offset(0, 10),
-                    ),
+                    if (canShowActiveState)
+                      BoxShadow(
+                        color: AppColors.black.withValues(alpha: 0.24),
+                        blurRadius: 18,
+                        offset: const Offset(0, 10),
+                      ),
                   ],
                 ),
                 child: Text(
                   selectedDateLabel,
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: AppColors.textPrimary.withValues(alpha: 0.88),
+                    color: AppColors.textPrimary.withValues(
+                      alpha: canShowActiveState ? 0.88 : 0.34,
+                    ),
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.2,
                   ),
