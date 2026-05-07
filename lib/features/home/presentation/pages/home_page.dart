@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
-import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/core/services/core_services.dart';
+import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
@@ -15,14 +15,17 @@ import 'package:starnyx/features/home/presentation/bloc/home_event.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_state.dart';
 import 'package:starnyx/domain/usecases/load_active_starnyx_use_case.dart';
 import 'package:starnyx/domain/usecases/select_active_starnyx_use_case.dart';
-import 'package:starnyx/features/home/presentation/widgets/home_widgets.dart';
 import 'package:starnyx/domain/usecases/load_starnyx_progress_stats_use_case.dart';
 import 'package:starnyx/features/settings/presentation/pages/settings_bottom_sheet.dart';
 import 'package:starnyx/domain/usecases/load_starnyx_completion_dates_for_year_use_case.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 import 'package:starnyx/features/starnyx_form/presentation/pages/create_starnyx_bottom_sheet.dart';
 
-// Root screen that shows the first-run welcome state until the real home flow lands.
+import 'home_body_builder.dart';
+
+// Root screen — owns the HomeBloc lifecycle and top-level navigation callbacks.
+// Presentation details (state-to-widget mapping, transition animation) are
+// delegated to HomeBodyBuilder and HomeScreenSwitcher respectively.
 class HomePage extends StatefulWidget {
   HomePage({
     super.key,
@@ -79,6 +82,8 @@ class _HomePageState extends State<HomePage> {
   Color? _lastActiveAccentColor;
   Color? _lastSavedAccentColor;
 
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+
   @override
   void initState() {
     super.initState();
@@ -101,45 +106,59 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  void _retryLoad() {
-    _homeBloc.add(const HomeReloadRequested());
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  /// Returns the active [StarNyx] from [state], or `null` when unavailable.
+  /// Single source of truth — used by both accent-color resolution and
+  /// the create bottom-sheet so the look-up logic is never duplicated.
+  StarNyx? _resolveActiveStarnyx(HomeState state) {
+    if (state.activeStarnyxId == null || state.starnyxs.isEmpty) return null;
+    return state.starnyxs.firstWhere(
+      (s) => s.id == state.activeStarnyxId,
+      orElse: () => state.starnyxs.first,
+    );
   }
+
+  Color? _resolveActiveAccentColor(HomeState state) {
+    final starnyx = _resolveActiveStarnyx(state);
+    if (starnyx == null) return null;
+    return starnyxColorFromHex(starnyx.color);
+  }
+
+  void _cacheActiveAccentColor(Color color) {
+    if (_lastSavedAccentColor == color) return;
+    _lastSavedAccentColor = color;
+    if (serviceLocator.isRegistered<ActiveStarnyxColorCache>()) {
+      unawaited(serviceLocator<ActiveStarnyxColorCache>().saveColor(color));
+    }
+  }
+
+  // ── Navigation / callback handlers ────────────────────────────────────────
 
   Future<void> _onCreatePressed() async {
     if (widget._onCreatePressed != null) {
       await Future.sync(widget._onCreatePressed!);
       return;
     }
-
     await _openCreateBottomSheet();
   }
 
   Future<void> _onSettingsPressed() async {
-    final accentColor =
-        _resolveActiveAccentColor(_homeBloc.state) ?? _lastActiveAccentColor;
-    await showSettingsBottomSheet(context, accentColor: accentColor);
+    // _lastActiveAccentColor is always kept up-to-date by the BlocConsumer
+    // listener, so no need to re-resolve from the BLoC state here.
+    await showSettingsBottomSheet(context, accentColor: _lastActiveAccentColor);
   }
 
   Future<void> _openCreateBottomSheet() async {
-    String? activeColorHex;
-    final state = _homeBloc.state;
-    if (state.activeStarnyxId != null && state.starnyxs.isNotEmpty) {
-      try {
-        final activeStarnyx = state.starnyxs.firstWhere(
-          (s) => s.id == state.activeStarnyxId,
-          orElse: () => state.starnyxs.first,
-        );
-        activeColorHex = activeStarnyx.color;
-      } catch (_) {}
-    }
+    // Reuse _resolveActiveStarnyx to avoid duplicating the look-up logic.
+    final activeColorHex =
+        _resolveActiveStarnyx(_homeBloc.state)?.color;
 
     final result = await showCreateStarnyxBottomSheet(
       context,
       initialColor: activeColorHex,
     );
-    if (!mounted || result == null || !result.hasChanges) {
-      return;
-    }
+    if (!mounted || result == null || !result.hasChanges) return;
 
     final saved = result.savedStarnyx;
     if (saved != null) {
@@ -154,20 +173,17 @@ class _HomePageState extends State<HomePage> {
       await Future.sync(() => widget._onEditPressed!(starnyx));
       return;
     }
-
     await _openEditBottomSheet(starnyx);
   }
 
   Future<void> _openEditBottomSheet(StarNyx starnyx) async {
     final result = await showEditStarnyxBottomSheet(context, starnyx);
-    if (!mounted || result == null || !result.hasChanges) {
-      return;
-    }
-
+    if (!mounted || result == null || !result.hasChanges) return;
     _homeBloc.add(const HomeReloadRequested());
   }
 
-  Future<void> _onSelectPressed(StarNyx starnyx) async {
+  // No longer async — neither branch awaits anything.
+  void _onSelectPressed(StarNyx starnyx) {
     if (widget._onSelectPressed != null) {
       widget._onSelectPressed!(starnyx);
       return;
@@ -175,191 +191,95 @@ class _HomePageState extends State<HomePage> {
     _homeBloc.add(HomeActiveStarnyxSelected(starnyx.id));
   }
 
-  Color? _resolveActiveAccentColor(HomeState state) {
-    if (state.activeStarnyxId == null || state.starnyxs.isEmpty) {
-      return null;
-    }
-
-    try {
-      final activeStarnyx = state.starnyxs.firstWhere(
-        (s) => s.id == state.activeStarnyxId,
-        orElse: () => state.starnyxs.first,
-      );
-      return starnyxColorFromHex(activeStarnyx.color);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  void _cacheActiveAccentColor(Color color) {
-    if (_lastSavedAccentColor == color) {
-      return;
-    }
-    _lastSavedAccentColor = color;
-    if (serviceLocator.isRegistered<ActiveStarnyxColorCache>()) {
-      unawaited(serviceLocator<ActiveStarnyxColorCache>().saveColor(color));
-    }
-  }
+  // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<HomeBloc>.value(
       value: _homeBloc,
-      child: BlocListener<HomeBloc, HomeState>(
-        listenWhen: (HomeState previous, HomeState current) =>
-            previous.selectionFeedbackCount != current.selectionFeedbackCount ||
-            previous.completionFeedbackCount != current.completionFeedbackCount,
-        listener: (BuildContext context, HomeState state) {
-          if (state.selectionStatus == AsyncStatus.failure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('home.switch_error_message'.tr()),
-                action: state.lastSelectionRequestedId == null
-                    ? null
-                    : SnackBarAction(
-                        label: 'home.retry'.tr(),
-                        onPressed: () {
-                          _homeBloc.add(
-                            HomeActiveStarnyxSelected(
-                              state.lastSelectionRequestedId!,
-                            ),
-                          );
-                        },
-                      ),
-              ),
+      child: Scaffold(
+        body: BlocConsumer<HomeBloc, HomeState>(
+          // Fire the listener when:
+          //   • feedback counters increment (selection / completion events), or
+          //   • the active starnyx identity changes (accent colour may differ).
+          listenWhen: (HomeState previous, HomeState current) =>
+              previous.selectionFeedbackCount !=
+                  current.selectionFeedbackCount ||
+              previous.completionFeedbackCount !=
+                  current.completionFeedbackCount ||
+              previous.activeStarnyxId != current.activeStarnyxId ||
+              previous.starnyxs != current.starnyxs,
+          listener: _onStateChange,
+          builder: (BuildContext context, HomeState state) {
+            // Pure build — no side-effects. Accent colour is maintained by the
+            // listener above, so _lastActiveAccentColor is always fresh before
+            // this builder runs (BlocConsumer fires listener before builder).
+            return HomeBodyBuilder(
+              state: state,
+              accentColor: _lastActiveAccentColor ?? AppColors.background,
+              onRetry: () => _homeBloc.add(const HomeReloadRequested()),
+              onCreatePressed: _onCreatePressed,
+              onSettingsPressed: _onSettingsPressed,
+              onEditPressed: _onEditPressed,
+              onSelectPressed: _onSelectPressed,
+              onDateSelected: (DateTime date) =>
+                  _homeBloc.add(HomeDaySelected(date)),
+              onPreviousDayPressed: () =>
+                  _homeBloc.add(const HomePreviousDayRequested()),
+              onNextDayPressed: () =>
+                  _homeBloc.add(const HomeNextDayRequested()),
+              onJumpToTodayPressed: () =>
+                  _homeBloc.add(const HomeJumpToTodayRequested()),
+              onPreviousYearPressed: () =>
+                  _homeBloc.add(HomeYearChanged(state.viewedYear - 1)),
+              onNextYearPressed: () =>
+                  _homeBloc.add(HomeYearChanged(state.viewedYear + 1)),
+              onToggleCompletionPressed: () =>
+                  _homeBloc.add(const HomeCompletionToggled()),
             );
-          }
-          if (state.completionStatus == AsyncStatus.success) {
-            HapticFeedback.lightImpact();
-          } else if (state.completionStatus == AsyncStatus.failure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('home.checkin_error_message'.tr())),
-            );
-          }
-        },
-        child: Scaffold(
-          body: BlocBuilder<HomeBloc, HomeState>(
-            builder: (BuildContext context, HomeState state) {
-              final resolvedAccentColor = _resolveActiveAccentColor(state);
-              if (resolvedAccentColor != null) {
-                _lastActiveAccentColor = resolvedAccentColor;
-                _cacheActiveAccentColor(resolvedAccentColor);
-              }
-              final accentColor = resolvedAccentColor ?? _lastActiveAccentColor;
-
-              Widget child;
-
-              if (state.status == HomeStatus.initial ||
-                  state.status == HomeStatus.loading) {
-                // Always show HomeLoadingView (use a neutral fallback when no
-                // accent color is cached yet) to avoid an extra animated hop
-                // from ColoredBox → LoadingView → ActiveView.
-                child = HomeLoadingView(
-                  key: const ValueKey<String>('loading_view'),
-                  accentColor: accentColor ?? AppColors.background,
-                );
-              } else if (state.status == HomeStatus.failure) {
-                child = HomeErrorView(
-                  key: const ValueKey<String>('error_view'),
-                  onRetry: _retryLoad,
-                  accentColor: accentColor,
-                );
-              } else if (state.starnyxs.isEmpty) {
-                child = FirstRunWelcomeView(
-                  key: const ValueKey<String>('first_run_view'),
-                  onCreatePressed: _onCreatePressed,
-                  onSettingsPressed: _onSettingsPressed,
-                );
-              } else {
-                child = ActiveStarnyxHomeView(
-                  key: const ValueKey<String>('active_view'),
-                  starnyxs: state.starnyxs,
-                  activeStarnyxId: state.activeStarnyxId,
-                  selectedDate: state.selectedDate,
-                  todayDate: DateTime.now(),
-                  viewedYear: state.viewedYear,
-                  completedDatesForViewedYear:
-                      state.completedDatesForViewedYear,
-                  onCreatePressed: _onCreatePressed,
-                  onEditPressed: _onEditPressed,
-                  onDateSelected: (DateTime date) {
-                    _homeBloc.add(HomeDaySelected(date));
-                  },
-                  onSelectPressed: _onSelectPressed,
-                  onPreviousDayPressed: () {
-                    _homeBloc.add(const HomePreviousDayRequested());
-                  },
-                  onNextDayPressed: () {
-                    _homeBloc.add(const HomeNextDayRequested());
-                  },
-                  onJumpToTodayPressed: () {
-                    _homeBloc.add(const HomeJumpToTodayRequested());
-                  },
-                  onPreviousYearPressed: () {
-                    _homeBloc.add(HomeYearChanged(state.viewedYear - 1));
-                  },
-                  onNextYearPressed: () {
-                    _homeBloc.add(HomeYearChanged(state.viewedYear + 1));
-                  },
-                  onToggleCompletionPressed: () {
-                    _homeBloc.add(const HomeCompletionToggled());
-                  },
-                  isCheckingIn:
-                      state.completionStatus == AsyncStatus.inProgress,
-                  completionSuccessAnimationToken:
-                      state.completionStatus == AsyncStatus.success
-                      ? state.completionFeedbackCount
-                      : null,
-                  progressStats: state.progressStats,
-                );
-              }
-
-              return AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeIn,
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  // Only the incoming view slides (rises gently from below).
-                  // The outgoing view fades in-place — giving it any translation
-                  // while stacked causes the "jump-up then drop" artifact.
-                  final isIncoming =
-                      animation.status == AnimationStatus.forward ||
-                      animation.status == AnimationStatus.completed;
-
-                  if (!isIncoming) {
-                    // Outgoing: plain fade, no movement.
-                    return FadeTransition(opacity: animation, child: child);
-                  }
-
-                  // Incoming: fade + subtle rise from ~4 % below.
-                  final slideOffset = Tween<Offset>(
-                    begin: const Offset(0, 0.04),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOutCubic,
-                    ),
-                  );
-
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(position: slideOffset, child: child),
-                  );
-                },
-                layoutBuilder:
-                    (Widget? currentChild, List<Widget> previousChildren) {
-                      return Stack(
-                        fit: StackFit.expand,
-                        children: <Widget>[...previousChildren, ?currentChild],
-                      );
-                    },
-                child: child,
-              );
-            },
-          ),
+          },
         ),
       ),
     );
+  }
+
+  /// Handles side-effects triggered by state changes:
+  ///   1. Keeps [_lastActiveAccentColor] in sync (+ persists to disk cache).
+  ///   2. Shows error snackbars and triggers haptic feedback.
+  void _onStateChange(BuildContext context, HomeState state) {
+    // ── Accent colour ──────────────────────────────────────────────────────
+    final resolvedColor = _resolveActiveAccentColor(state);
+    if (resolvedColor != null) {
+      _lastActiveAccentColor = resolvedColor;
+      _cacheActiveAccentColor(resolvedColor);
+    }
+
+    // ── Selection feedback ─────────────────────────────────────────────────
+    if (state.selectionStatus == AsyncStatus.failure) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('home.switch_error_message'.tr()),
+          action: state.lastSelectionRequestedId == null
+              ? null
+              : SnackBarAction(
+                  label: 'home.retry'.tr(),
+                  onPressed: () => _homeBloc.add(
+                    HomeActiveStarnyxSelected(
+                      state.lastSelectionRequestedId!,
+                    ),
+                  ),
+                ),
+        ),
+      );
+    }
+
+    // ── Completion feedback ────────────────────────────────────────────────
+    if (state.completionStatus == AsyncStatus.success) {
+      HapticFeedback.lightImpact();
+    } else if (state.completionStatus == AsyncStatus.failure) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('home.checkin_error_message'.tr())),
+      );
+    }
   }
 }
