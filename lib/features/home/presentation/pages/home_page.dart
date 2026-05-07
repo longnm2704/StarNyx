@@ -251,17 +251,13 @@ class _HomePageState extends State<HomePage> {
 
               if (state.status == HomeStatus.initial ||
                   state.status == HomeStatus.loading) {
-                if (accentColor == null) {
-                  child = const ColoredBox(
-                    key: ValueKey<String>('colored_box'),
-                    color: AppColors.background,
-                  );
-                } else {
-                  child = HomeLoadingView(
-                    key: const ValueKey<String>('loading_view'),
-                    accentColor: accentColor,
-                  );
-                }
+                // Always show HomeLoadingView (use a neutral fallback when no
+                // accent color is cached yet) to avoid an extra animated hop
+                // from ColoredBox → LoadingView → ActiveView.
+                child = HomeLoadingView(
+                  key: const ValueKey<String>('loading_view'),
+                  accentColor: accentColor ?? AppColors.background,
+                );
               } else if (state.status == HomeStatus.failure) {
                 child = HomeErrorView(
                   key: const ValueKey<String>('error_view'),
@@ -319,20 +315,43 @@ class _HomePageState extends State<HomePage> {
               }
 
               return AnimatedSwitcher(
-                duration: const Duration(milliseconds: 700),
-                switchInCurve: Curves.decelerate,
+                duration: const Duration(milliseconds: 500),
+                switchInCurve: Curves.easeOutCubic,
                 switchOutCurve: Curves.easeIn,
                 transitionBuilder: (Widget child, Animation<double> animation) {
-                  return FadeTransition(opacity: animation, child: child);
+                  // Only the incoming view slides (rises gently from below).
+                  // The outgoing view fades in-place — giving it any translation
+                  // while stacked causes the "jump-up then drop" artifact.
+                  final isIncoming =
+                      animation.status == AnimationStatus.forward ||
+                      animation.status == AnimationStatus.completed;
+
+                  if (!isIncoming) {
+                    // Outgoing: plain fade, no movement.
+                    return FadeTransition(opacity: animation, child: child);
+                  }
+
+                  // Incoming: fade + subtle rise from ~4 % below.
+                  final slideOffset = Tween<Offset>(
+                    begin: const Offset(0, 0.04),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOutCubic,
+                    ),
+                  );
+
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(position: slideOffset, child: child),
+                  );
                 },
                 layoutBuilder:
                     (Widget? currentChild, List<Widget> previousChildren) {
                       return Stack(
                         fit: StackFit.expand,
-                        children: <Widget>[
-                          ...previousChildren,
-                          if (currentChild != null) currentChild,
-                        ],
+                        children: <Widget>[...previousChildren, ?currentChild],
                       );
                     },
                 child: child,
