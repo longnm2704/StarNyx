@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
+import 'package:starnyx/core/utils/backup_file_codec.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
@@ -17,6 +18,224 @@ class BackupSettingsSheet extends StatelessWidget {
   const BackupSettingsSheet({required this.onBack, super.key});
 
   final VoidCallback onBack;
+
+  Future<void> _handleExportTap(BuildContext context) async {
+    final passphrase = await _showExportDialog(context);
+    if (!context.mounted || passphrase == null) {
+      return;
+    }
+
+    context.read<SettingsBloc>().add(
+      SettingsExportRequested(
+        passphrase: passphrase.isEmpty ? null : passphrase,
+      ),
+    );
+  }
+
+  Future<void> _handleImportTap(BuildContext context) async {
+    final result = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: <String>['json', backupFileExtension],
+    );
+    if (result == null ||
+        result.files.single.path == null ||
+        !context.mounted) {
+      return;
+    }
+
+    try {
+      final jsonPayload = await _loadImportPayload(
+        context,
+        File(result.files.single.path!),
+      );
+      if (jsonPayload == null || !context.mounted) {
+        return;
+      }
+
+      context.read<SettingsBloc>().add(SettingsImportRequested(jsonPayload));
+    } catch (_) {
+      if (context.mounted) {
+        _showImportErrorSnackBar(context);
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>?> _loadImportPayload(
+    BuildContext context,
+    File file,
+  ) async {
+    final extension = file.path.split('.').last.toLowerCase();
+    if (extension == 'json') {
+      final jsonString = await file.readAsString();
+      return _decodeJsonMap(jsonString);
+    }
+
+    if (extension != backupFileExtension) {
+      throw const FormatException('Unsupported backup extension');
+    }
+
+    final codec = BackupFileCodec();
+    final encodedText = await file.readAsString();
+    String? errorText;
+
+    while (true) {
+      if (!context.mounted) {
+        return null;
+      }
+
+      try {
+        final passphrase = await _showImportPassphraseDialog(
+          context,
+          errorText: errorText,
+        );
+        if (passphrase == null) {
+          return null;
+        }
+
+        return await codec.decodeJsonMap(encodedText, passphrase: passphrase);
+      } on BackupFileCodecException catch (error) {
+        if (error.code == BackupFileCodecErrorCode.passphraseRequired ||
+            error.code == BackupFileCodecErrorCode.invalidPassphrase) {
+          errorText = error.code == BackupFileCodecErrorCode.invalidPassphrase
+              ? 'settings.backup_import_passphrase_error'.tr()
+              : null;
+          continue;
+        }
+        rethrow;
+      }
+    }
+  }
+
+  Future<String?> _showExportDialog(BuildContext context) {
+    final passphraseController = TextEditingController();
+    final confirmController = TextEditingController();
+
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        var validationMessage = '';
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('settings.backup_export_dialog_title'.tr()),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('settings.backup_export_dialog_message'.tr()),
+                  const SizedBox(height: AppSpacing.md),
+                  TextField(
+                    controller: passphraseController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'settings.backup_passphrase_label'.tr(),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  TextField(
+                    controller: confirmController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'settings.backup_passphrase_confirm_label'
+                          .tr(),
+                      errorText: validationMessage.isEmpty
+                          ? null
+                          : validationMessage,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: Text('settings.backup_cancel'.tr()),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    final passphrase = passphraseController.text.trim();
+                    final confirmation = confirmController.text.trim();
+                    if (passphrase.isNotEmpty && passphrase != confirmation) {
+                      setState(() {
+                        validationMessage =
+                            'settings.backup_passphrase_mismatch'.tr();
+                      });
+                      return;
+                    }
+
+                    Navigator.of(dialogContext).pop(passphrase);
+                  },
+                  child: Text('settings.backup_export_confirm'.tr()),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<String?> _showImportPassphraseDialog(
+    BuildContext context, {
+    String? errorText,
+  }) {
+    final controller = TextEditingController();
+
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text('settings.backup_import_passphrase_title'.tr()),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('settings.backup_import_passphrase_message'.tr()),
+              const SizedBox(height: AppSpacing.md),
+              TextField(
+                controller: controller,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'settings.backup_passphrase_label'.tr(),
+                  errorText: errorText,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text('settings.backup_cancel'.tr()),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(controller.text.trim());
+              },
+              child: Text('settings.backup_export_confirm'.tr()),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Map<String, dynamic> _decodeJsonMap(String jsonString) {
+    final decoded = jsonDecode(jsonString);
+    if (decoded is Map<String, dynamic>) {
+      return decoded;
+    }
+    if (decoded is Map) {
+      return decoded.cast<String, dynamic>();
+    }
+    throw const FormatException('Root is not an object');
+  }
+
+  void _showImportErrorSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('settings.import_error_title'.tr()),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,11 +368,7 @@ class BackupSettingsSheet extends StatelessWidget {
                       isLoading: state.isExporting,
                       onTap: state.isExporting
                           ? null
-                          : () {
-                              context.read<SettingsBloc>().add(
-                                const SettingsExportRequested(),
-                              );
-                            },
+                          : () => _handleExportTap(context),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     _BackupTile(
@@ -163,49 +378,7 @@ class BackupSettingsSheet extends StatelessWidget {
                       isLoading: state.importStatus == AsyncStatus.inProgress,
                       onTap: state.importStatus == AsyncStatus.inProgress
                           ? null
-                          : () async {
-                              final result = await FilePicker.pickFiles(
-                                type: FileType.custom,
-                                allowedExtensions: ['json'],
-                              );
-                              if (result != null &&
-                                  result.files.single.path != null) {
-                                try {
-                                  final file = File(result.files.single.path!);
-                                  final jsonString = await file.readAsString();
-                                  final decoded = jsonDecode(jsonString);
-                                  final Map<String, dynamic> jsonPayload;
-                                  if (decoded is Map<String, dynamic>) {
-                                    jsonPayload = decoded;
-                                  } else if (decoded is Map) {
-                                    jsonPayload = decoded
-                                        .cast<String, dynamic>();
-                                  } else {
-                                    throw const FormatException(
-                                      'Root is not an object',
-                                    );
-                                  }
-                                  if (context.mounted) {
-                                    context.read<SettingsBloc>().add(
-                                      SettingsImportRequested(jsonPayload),
-                                    );
-                                  }
-                                } catch (e) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'settings.import_error_title'.tr(),
-                                        ),
-                                        backgroundColor: Theme.of(
-                                          context,
-                                        ).colorScheme.error,
-                                      ),
-                                    );
-                                  }
-                                }
-                              }
-                            },
+                          : () => _handleImportTap(context),
                     ),
                   ],
                 );
