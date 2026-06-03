@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:starnyx/core/constants/enums.dart';
 import 'package:starnyx/core/services/core_services.dart';
+import 'package:starnyx/core/utils/backup_file_codec.dart';
 import 'package:starnyx/domain/usecases/export_data_use_case.dart';
 import 'package:starnyx/domain/usecases/import_data_use_case.dart';
 import 'package:starnyx/domain/usecases/sync_notifications_use_case.dart';
@@ -12,15 +13,24 @@ import 'package:starnyx/domain/usecases/sync_notifications_use_case.dart';
 import 'settings_event.dart';
 import 'settings_state.dart';
 
+typedef TempDirectoryProvider = Future<Directory> Function();
+typedef NowProvider = DateTime Function();
+
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   SettingsBloc({
     required ExportDataUseCase exportDataUseCase,
     required ImportDataUseCase importDataUseCase,
     required SyncNotificationsUseCase syncNotificationsUseCase,
+    BackupFileCodec? backupFileCodec,
+    TempDirectoryProvider? tempDirectoryProvider,
+    NowProvider? nowProvider,
     AppLogService logger = const NoOpAppLogService(),
   }) : _exportDataUseCase = exportDataUseCase,
        _importDataUseCase = importDataUseCase,
        _syncNotificationsUseCase = syncNotificationsUseCase,
+       _backupFileCodec = backupFileCodec ?? BackupFileCodec(),
+       _tempDirectoryProvider = tempDirectoryProvider ?? getTemporaryDirectory,
+       _nowProvider = nowProvider ?? DateTime.now,
        _logger = logger,
        super(const SettingsState()) {
     on<SettingsExportRequested>(_onExportRequested);
@@ -30,6 +40,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final ExportDataUseCase _exportDataUseCase;
   final ImportDataUseCase _importDataUseCase;
   final SyncNotificationsUseCase _syncNotificationsUseCase;
+  final BackupFileCodec _backupFileCodec;
+  final TempDirectoryProvider _tempDirectoryProvider;
+  final NowProvider _nowProvider;
   final AppLogService _logger;
 
   Future<void> _onExportRequested(
@@ -46,13 +59,19 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     );
     try {
       final jsonText = await _exportDataUseCase();
-      final tempDir = await getTemporaryDirectory();
-      final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-      final file = File('${tempDir.path}/starnyx_backup_$timestamp.json');
-      await file.writeAsString(jsonText);
+      final backupText = await _backupFileCodec.encodeJson(
+        jsonText,
+        passphrase: event.passphrase,
+      );
+      final tempDir = await _tempDirectoryProvider();
+      final timestamp = DateFormat('yyyyMMdd_HHmmss').format(_nowProvider());
+      final file = File(
+        '${tempDir.path}/starnyx_backup_$timestamp.$backupFileExtension',
+      );
+      await file.writeAsString(backupText);
       _logger.debug(
         'SettingsBloc',
-        'export success path=${file.path} bytes=${jsonText.length}',
+        'export success path=${file.path} bytes=${backupText.length}',
       );
       emit(
         state.copyWith(

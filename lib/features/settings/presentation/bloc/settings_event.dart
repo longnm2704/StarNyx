@@ -8,7 +8,12 @@ abstract class SettingsEvent extends Equatable {
 }
 
 class SettingsExportRequested extends SettingsEvent {
-  const SettingsExportRequested();
+  const SettingsExportRequested({this.passphrase});
+
+  final String? passphrase;
+
+  @override
+  List<Object?> get props => [passphrase];
 }
 
 class SettingsImportRequested extends SettingsEvent {
