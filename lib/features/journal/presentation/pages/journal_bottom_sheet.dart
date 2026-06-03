@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
@@ -141,9 +142,10 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
         },
         child: FractionallySizedBox(
           heightFactor: 1.0,
-          child: AppSheetBackground(
-            accentColor: widget.accentColor,
-            child: SafeArea(
+        child: AppSheetBackground(
+          accentColor: widget.accentColor,
+          showStars: false,
+          child: SafeArea(
               top: false,
               bottom: false,
               child: Column(
@@ -375,6 +377,9 @@ class _JournalInputArea extends StatelessWidget {
                   initialValue: initialValue,
                   hintText: 'journal.today_hint'.tr(),
                   maxLines: 1,
+                  inputFormatters: <TextInputFormatter>[
+                    LengthLimitingTextInputFormatter(4000),
+                  ],
                   onChanged: onChanged,
                 ),
               ),
