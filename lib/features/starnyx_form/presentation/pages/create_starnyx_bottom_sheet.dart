@@ -201,6 +201,7 @@ class _StarnyxFormBottomSheetViewState
           heightFactor: 1,
           child: AppSheetBackground(
             accentColor: accentColor,
+            showStars: false,
             child: SafeArea(
               top: false,
               bottom: false,

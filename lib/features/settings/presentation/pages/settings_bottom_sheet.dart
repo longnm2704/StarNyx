@@ -6,7 +6,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
-import 'package:starnyx/features/settings/presentation/bloc/settings_state.dart';
 import 'package:starnyx/features/settings/presentation/pages/about_starnyx_sheet.dart';
 import 'package:starnyx/features/settings/presentation/pages/backup_settings_sheet.dart';
 import 'package:starnyx/features/settings/presentation/pages/general_settings_sheet.dart';
@@ -84,7 +83,11 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
             page = const SizedBox.shrink();
         }
 
-        return AppSheetBackground(accentColor: accentColor, child: page);
+        return AppSheetBackground(
+          accentColor: accentColor,
+          showStars: false,
+          child: page,
+        );
       },
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(1.0, 0.0);
@@ -172,92 +175,72 @@ class _SettingsMainViewState extends State<SettingsMainView> {
         : mediaQuery.padding.bottom;
     final headerTopPadding = (topInset < 24 ? 24.0 : topInset) + AppSpacing.lg;
 
-    return BlocListener<SettingsBloc, SettingsState>(
-      listener: (context, state) {
-        if (state.exportStatus == AsyncStatus.success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('settings.export_success'.tr())),
-          );
-        }
-        if (state.importStatus == AsyncStatus.success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('settings.import_success'.tr())),
-          );
-        }
-        if (state.importStatus == AsyncStatus.failure &&
-            state.errorMessage != null) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
-        }
-      },
-      child: Column(
-        children: [
-          Padding(
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.pageHorizontal,
+            headerTopPadding,
+            AppSpacing.pageHorizontal,
+            AppSpacing.md,
+          ),
+          child: StarnyxFormHeader(
+            title: 'settings.title'.tr(),
+            onClosePressed: widget.onClose,
+          ),
+        ),
+        Expanded(
+          child: ListView(
             padding: EdgeInsets.fromLTRB(
               AppSpacing.pageHorizontal,
-              headerTopPadding,
-              AppSpacing.pageHorizontal,
               AppSpacing.md,
+              AppSpacing.pageHorizontal,
+              AppSpacing.xl + bottomSafeInset,
             ),
-            child: StarnyxFormHeader(
-              title: 'settings.title'.tr(),
-              onClosePressed: widget.onClose,
-            ),
-          ),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.fromLTRB(
-                AppSpacing.pageHorizontal,
-                AppSpacing.md,
-                AppSpacing.pageHorizontal,
-                AppSpacing.xl + bottomSafeInset,
+            children: [
+              _SettingsSection(
+                title: 'settings.general_section'.tr(),
+                children: [
+                  _SettingsTile(
+                    iconPath: 'assets/icons/ic_general.svg',
+                    title: 'settings.general_label'.tr(),
+                    onTap: widget.onGeneralTap,
+                  ),
+                ],
               ),
-              children: [
-                _SettingsSection(
-                  title: 'settings.general_section'.tr(),
-                  children: [
-                    _SettingsTile(
-                      iconPath: 'assets/icons/ic_general.svg',
-                      title: 'settings.general_label'.tr(),
-                      onTap: widget.onGeneralTap,
+              const SizedBox(height: AppSpacing.xl),
+              _SettingsSection(
+                title: 'settings.backup_section'.tr(),
+                children: [
+                  _SettingsTile(
+                    iconPath: 'assets/icons/ic_book.svg',
+                    title: 'settings.backup_label'.tr(),
+                    onTap: widget.onBackupTap,
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              _SettingsSection(
+                title: 'settings.about_section'.tr(),
+                children: [
+                  _SettingsTile(
+                    iconPath: 'assets/icons/ic_about.svg',
+                    title: 'settings.about_label'.tr(),
+                    onTap: widget.onAboutTap,
+                  ),
+                  _SettingsTile(
+                    iconPath: 'assets/icons/ic_version.svg',
+                    title: 'settings.version_label'.tr(
+                      args: <String>[_appVersion],
                     ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                _SettingsSection(
-                  title: 'settings.backup_section'.tr(),
-                  children: [
-                    _SettingsTile(
-                      iconPath: 'assets/icons/ic_book.svg',
-                      title: 'settings.backup_label'.tr(),
-                      onTap: widget.onBackupTap,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                _SettingsSection(
-                  title: 'settings.about_section'.tr(),
-                  children: [
-                    _SettingsTile(
-                      iconPath: 'assets/icons/ic_about.svg',
-                      title: 'settings.about_label'.tr(),
-                      onTap: widget.onAboutTap,
-                    ),
-                    _SettingsTile(
-                      iconPath: 'assets/icons/ic_version.svg',
-                      title: 'settings.version_label'.tr(
-                        args: <String>[_appVersion],
-                      ),
-                      onTap: null,
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                    onTap: null,
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -7,12 +7,14 @@ class AppSheetBackground extends StatelessWidget {
     required this.child,
     this.accentColor,
     this.borderRadius,
+    this.showStars = true,
     super.key,
   });
 
   final Widget child;
   final Color? accentColor;
   final BorderRadius? borderRadius;
+  final bool showStars;
 
   static LinearGradient buildGradient(Color? accentColor) {
     final Color top = accentColor != null
@@ -43,6 +45,7 @@ class AppSheetBackground extends StatelessWidget {
       ),
       child: CosmicBackground(
         accentColor: accentColor,
+        showStars: showStars,
         child: child,
       ),
     );
