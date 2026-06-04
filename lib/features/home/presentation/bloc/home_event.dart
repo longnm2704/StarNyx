@@ -57,3 +57,12 @@ class HomeYearChanged extends HomeEvent {
 class HomeCompletionToggled extends HomeEvent {
   const HomeCompletionToggled();
 }
+
+class HomeStarNyxOrderChanged extends HomeEvent {
+  const HomeStarNyxOrderChanged(this.orderedIds);
+
+  final List<String> orderedIds;
+
+  @override
+  List<Object?> get props => <Object?>[orderedIds];
+}

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:uuid/uuid.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/domain/entities/domain_entities.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
@@ -39,6 +40,70 @@ void main() {
     expect(created.createdAt, now);
     expect(created.updatedAt, now);
     expect(await starNyxRepository.getStarnyxById(created.id), created);
+  });
+
+  test('load starnyxs applies persisted user order', () async {
+    final older = StarNyx(
+      id: 'old',
+      title: 'Older',
+      description: null,
+      color: '#102030',
+      startDate: DateTime(2026, 4, 1),
+      reminderEnabled: false,
+      reminderTime: null,
+      createdAt: DateTime(2026, 4, 1, 8),
+      updatedAt: DateTime(2026, 4, 1, 8),
+    );
+    final middle = older.copyWith(
+      id: 'middle',
+      title: 'Middle',
+      updatedAt: DateTime(2026, 4, 2, 8),
+    );
+    final newest = older.copyWith(
+      id: 'newest',
+      title: 'Newest',
+      updatedAt: DateTime(2026, 4, 3, 8),
+    );
+    final orderStore = _InMemoryStarNyxOrderStore();
+    await starNyxRepository.saveStarnyx(older);
+    await starNyxRepository.saveStarnyx(middle);
+    await starNyxRepository.saveStarnyx(newest);
+
+    var loaded = await LoadStarnyxsUseCase(
+      starNyxRepository,
+      orderStore: orderStore,
+    )();
+    expect(loaded.map((item) => item.id), <String>['newest', 'middle', 'old']);
+
+    await SaveStarNyxOrderUseCase(orderStore)(<String>[
+      'middle',
+      'old',
+      'newest',
+    ]);
+
+    loaded = await LoadStarnyxsUseCase(
+      starNyxRepository,
+      orderStore: orderStore,
+    )();
+    expect(loaded.map((item) => item.id), <String>['middle', 'old', 'newest']);
+
+    final unranked = older.copyWith(
+      id: 'unranked',
+      title: 'Unranked',
+      updatedAt: DateTime(2026, 4, 4, 8),
+    );
+    await starNyxRepository.saveStarnyx(unranked);
+
+    loaded = await LoadStarnyxsUseCase(
+      starNyxRepository,
+      orderStore: orderStore,
+    )();
+    expect(loaded.map((item) => item.id), <String>[
+      'middle',
+      'old',
+      'newest',
+      'unranked',
+    ]);
   });
 
   test('create use case rejects a future start date', () async {
@@ -1176,6 +1241,18 @@ class _InMemoryStarNyxRepository implements StarNyxRepository {
   @override
   Stream<List<StarNyx>> watchAllStarnyxs() {
     throw UnimplementedError();
+  }
+}
+
+class _InMemoryStarNyxOrderStore implements StarNyxOrderStore {
+  List<String> _orderedIds = <String>[];
+
+  @override
+  Future<List<String>> loadOrder() async => List<String>.of(_orderedIds);
+
+  @override
+  Future<void> saveOrder(List<String> orderedIds) async {
+    _orderedIds = List<String>.of(orderedIds);
   }
 }
 

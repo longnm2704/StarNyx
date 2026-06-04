@@ -50,6 +50,9 @@ void _registerCoreDependencies(SharedPreferences preferences) {
   serviceLocator.registerLazySingleton<ActiveStarnyxColorCache>(
     () => ActiveStarnyxColorCache(preferences),
   );
+  serviceLocator.registerLazySingleton<StarNyxOrderStore>(
+    () => SharedPreferencesStarNyxOrderStore(preferences),
+  );
   serviceLocator.registerLazySingleton<AppBlocObserver>(
     () => AppBlocObserver(serviceLocator<AppLogService>()),
   );
@@ -115,6 +118,7 @@ void _registerUseCases() {
   serviceLocator.registerLazySingleton<LoadStarnyxsUseCase>(
     () => LoadStarnyxsUseCase(
       serviceLocator<StarNyxRepository>(),
+      orderStore: serviceLocator<StarNyxOrderStore>(),
       logger: serviceLocator<AppLogService>(),
     ),
   );
@@ -150,6 +154,12 @@ void _registerUseCases() {
     () => ToggleCompletionUseCase(
       serviceLocator<StarNyxRepository>(),
       serviceLocator<CompletionRepository>(),
+      logger: serviceLocator<AppLogService>(),
+    ),
+  );
+  serviceLocator.registerLazySingleton<SaveStarNyxOrderUseCase>(
+    () => SaveStarNyxOrderUseCase(
+      serviceLocator<StarNyxOrderStore>(),
       logger: serviceLocator<AppLogService>(),
     ),
   );
@@ -211,6 +221,7 @@ void _registerBlocFactories() {
       loadStarNyxCompletionDatesForYearUseCase:
           serviceLocator<LoadStarNyxCompletionDatesForYearUseCase>(),
       toggleCompletionUseCase: serviceLocator<ToggleCompletionUseCase>(),
+      saveStarNyxOrderUseCase: serviceLocator<SaveStarNyxOrderUseCase>(),
       logger: serviceLocator<AppLogService>(),
     ),
   );

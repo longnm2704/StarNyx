@@ -4,6 +4,7 @@ export 'export_data_use_case.dart';
 export 'import_data_use_case.dart';
 export 'sync_notifications_use_case.dart';
 export 'load_starnyxs_use_case.dart';
+export 'save_starnyx_order_use_case.dart';
 export 'create_starnyx_use_case.dart';
 export 'delete_starnyx_use_case.dart';
 export 'update_starnyx_use_case.dart';

@@ -4,6 +4,7 @@ import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
+import 'package:starnyx/domain/usecases/save_starnyx_order_use_case.dart';
 import 'package:starnyx/domain/usecases/toggle_completion_use_case.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_event.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_state.dart';
@@ -21,6 +22,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required LoadStarNyxCompletionDatesForYearUseCase
     loadStarNyxCompletionDatesForYearUseCase,
     required ToggleCompletionUseCase toggleCompletionUseCase,
+    SaveStarNyxOrderUseCase? saveStarNyxOrderUseCase,
     AppLogService logger = const NoOpAppLogService(),
     DateTime Function()? nowBuilder,
   }) : _loadStarnyxsUseCase = loadStarnyxsUseCase,
@@ -30,6 +32,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
        _loadStarNyxCompletionDatesForYearUseCase =
            loadStarNyxCompletionDatesForYearUseCase,
        _toggleCompletionUseCase = toggleCompletionUseCase,
+       _saveStarNyxOrderUseCase = saveStarNyxOrderUseCase,
        _logger = logger,
        _nowBuilder = nowBuilder ?? DateTime.now,
        super(HomeState.initial()) {
@@ -42,6 +45,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeJumpToTodayRequested>(_onJumpToTodayRequested);
     on<HomeYearChanged>(_onYearChanged);
     on<HomeCompletionToggled>(_onCompletionToggled);
+    on<HomeStarNyxOrderChanged>(_onStarNyxOrderChanged);
   }
 
   final LoadStarnyxsUseCase _loadStarnyxsUseCase;
@@ -51,6 +55,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final LoadStarNyxCompletionDatesForYearUseCase
   _loadStarNyxCompletionDatesForYearUseCase;
   final ToggleCompletionUseCase _toggleCompletionUseCase;
+  final SaveStarNyxOrderUseCase? _saveStarNyxOrderUseCase;
   final AppLogService _logger;
   final DateTime Function() _nowBuilder;
   int _latestDataRequestId = 0;
@@ -389,6 +394,40 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
+  Future<void> _onStarNyxOrderChanged(
+    HomeStarNyxOrderChanged event,
+    Emitter<HomeState> emit,
+  ) async {
+    final ordered = _orderStateStarnyxs(event.orderedIds);
+    if (ordered.isEmpty) {
+      return;
+    }
+
+    emit(state.copyWith(starnyxs: ordered));
+
+    final saveOrder = _saveStarNyxOrderUseCase;
+    if (saveOrder == null) {
+      return;
+    }
+
+    final orderedIds = ordered.map((item) => item.id).toList(growable: false);
+    try {
+      _logger.debug(
+        'HomeBloc',
+        'starnyx order save begin count=${orderedIds.length}',
+      );
+      await saveOrder(orderedIds);
+      _logger.debug('HomeBloc', 'starnyx order save success');
+    } catch (error, stackTrace) {
+      _logger.error(
+        'HomeBloc',
+        'starnyx order save failed',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   Future<_HomeData> _loadHomeData({
     required int viewedYear,
     required DateTime today,
@@ -468,6 +507,32 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
     }
     return null;
+  }
+
+  List<StarNyx> _orderStateStarnyxs(List<String> orderedIds) {
+    if (orderedIds.isEmpty || state.starnyxs.isEmpty) {
+      return state.starnyxs;
+    }
+
+    final byId = <String, StarNyx>{
+      for (final starnyx in state.starnyxs) starnyx.id: starnyx,
+    };
+    final ordered = <StarNyx>[];
+    final usedIds = <String>{};
+    for (final id in orderedIds) {
+      final starnyx = byId[id];
+      if (starnyx != null && usedIds.add(id)) {
+        ordered.add(starnyx);
+      }
+    }
+
+    for (final starnyx in state.starnyxs) {
+      if (usedIds.add(starnyx.id)) {
+        ordered.add(starnyx);
+      }
+    }
+
+    return ordered;
   }
 
   bool _isBlockedCompletionDate({

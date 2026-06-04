@@ -36,6 +36,7 @@ void main() {
     expect(serviceLocator.isRegistered<AppLogService>(), isTrue);
     expect(serviceLocator.isRegistered<AppBlocObserver>(), isTrue);
     expect(serviceLocator.isRegistered<NotificationService>(), isTrue);
+    expect(serviceLocator.isRegistered<StarNyxOrderStore>(), isTrue);
     expect(serviceLocator.isRegistered<StarNyxRepository>(), isTrue);
     expect(serviceLocator.isRegistered<CompletionRepository>(), isTrue);
     expect(serviceLocator.isRegistered<JournalEntryRepository>(), isTrue);
@@ -55,6 +56,7 @@ void main() {
     );
     expect(serviceLocator.isRegistered<SelectActiveStarNyxUseCase>(), isTrue);
     expect(serviceLocator.isRegistered<ToggleCompletionUseCase>(), isTrue);
+    expect(serviceLocator.isRegistered<SaveStarNyxOrderUseCase>(), isTrue);
     expect(serviceLocator.isRegistered<SaveJournalEntryUseCase>(), isTrue);
     expect(serviceLocator.isRegistered<ExportDataUseCase>(), isTrue);
     expect(serviceLocator.isRegistered<ImportDataUseCase>(), isTrue);

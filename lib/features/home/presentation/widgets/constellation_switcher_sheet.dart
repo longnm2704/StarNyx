@@ -29,12 +29,14 @@ class ConstellationSwitcherSheet extends StatefulWidget {
     required this.starnyxs,
     required this.activeStarnyxId,
     required this.onSelectPressed,
+    this.onOrderChanged,
     super.key,
   });
 
   final List<StarNyx> starnyxs;
   final String? activeStarnyxId;
   final ValueChanged<StarNyx> onSelectPressed;
+  final ValueChanged<List<String>>? onOrderChanged;
 
   @override
   State<ConstellationSwitcherSheet> createState() =>
@@ -61,6 +63,11 @@ class _ConstellationSwitcherSheetState
   }
 
   void _toggleReorderMode() {
+    if (_isReorderMode) {
+      widget.onOrderChanged?.call(
+        _orderedStarnyxs.map((item) => item.id).toList(growable: false),
+      );
+    }
     setState(() {
       _isReorderMode = !_isReorderMode;
     });
