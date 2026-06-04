@@ -739,9 +739,9 @@ void main() {
 
   test('reorder saves order and updates state immediately', () async {
     final starnyxs = <StarNyx>[
-      _starnyx(id: '1', title: 'One'),
-      _starnyx(id: '2', title: 'Two'),
-      _starnyx(id: '3', title: 'Three'),
+      _starnyx(id: '1', title: 'One', displayOrder: 0),
+      _starnyx(id: '2', title: 'Two', displayOrder: 1),
+      _starnyx(id: '3', title: 'Three', displayOrder: 2),
     ];
     when(() => loadStarnyxsUseCase()).thenAnswer((_) async => starnyxs);
     when(
@@ -782,10 +782,23 @@ void main() {
     ).captured.single;
     expect(capturedOrder, <String>['3', '1', '2']);
     expect(bloc.state.starnyxs.map((item) => item.id), <String>['3', '1', '2']);
+    expect(bloc.state.starnyxs.map((item) => item.displayOrder), <int>[
+      0,
+      1,
+      2,
+    ]);
+    expect(bloc.state.activeStarnyxId, '1');
+    verifyNever(
+      () => selectActiveStarNyxUseCase(any(), now: any(named: 'now')),
+    );
   });
 }
 
-StarNyx _starnyx({required String id, required String title}) {
+StarNyx _starnyx({
+  required String id,
+  required String title,
+  int displayOrder = 0,
+}) {
   return StarNyx(
     id: id,
     title: title,
@@ -796,6 +809,7 @@ StarNyx _starnyx({required String id, required String title}) {
     reminderTime: null,
     createdAt: DateTime(2026, 4, 10, 8),
     updatedAt: DateTime(2026, 4, 10, 8),
+    displayOrder: displayOrder,
   );
 }
 

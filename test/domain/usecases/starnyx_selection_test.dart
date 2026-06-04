@@ -66,6 +66,38 @@ void main() {
     expect(active?.id, 'habit-2');
   });
 
+  test('load active fallback follows reordered display order', () async {
+    await starNyxRepository.saveStarnyx(starnyx1.copyWith(displayOrder: 0));
+    await starNyxRepository.saveStarnyx(starnyx2.copyWith(displayOrder: 1));
+
+    await starNyxRepository.reorderStarnyxs(<String>['habit-2', 'habit-1']);
+
+    final active = await loadUseCase(now: DateTime(2026, 4, 14));
+    final settings = await appSettingsRepository.getAppSettings();
+
+    expect(active?.id, 'habit-2');
+    expect(settings?.lastSelectedStarnyxId, 'habit-2');
+  });
+
+  test('load active restore keeps selected entity after reorder', () async {
+    await starNyxRepository.saveStarnyx(starnyx1.copyWith(displayOrder: 0));
+    await starNyxRepository.saveStarnyx(starnyx2.copyWith(displayOrder: 1));
+    await appSettingsRepository.saveAppSettings(
+      AppSettings(
+        lastSelectedStarnyxId: 'habit-1',
+        updatedAt: DateTime(2026, 4, 10),
+      ),
+    );
+
+    await starNyxRepository.reorderStarnyxs(<String>['habit-2', 'habit-1']);
+
+    final active = await loadUseCase();
+    final settings = await appSettingsRepository.getAppSettings();
+
+    expect(active?.id, 'habit-1');
+    expect(settings?.lastSelectedStarnyxId, 'habit-1');
+  });
+
   test('load active use case returns null when no starnyxs exist', () async {
     final active = await loadUseCase();
     expect(active, isNull);
@@ -79,7 +111,17 @@ class _InMemoryStarNyxRepository implements StarNyxRepository {
   Future<void> deleteStarnyxById(String id) async => _items.remove(id);
 
   @override
-  Future<List<StarNyx>> getAllStarnyxs() async => _items.values.toList();
+  Future<List<StarNyx>> getAllStarnyxs() async {
+    final items = _items.values.toList(growable: false);
+    items.sort((left, right) {
+      final orderComparison = left.displayOrder.compareTo(right.displayOrder);
+      if (orderComparison != 0) {
+        return orderComparison;
+      }
+      return left.id.compareTo(right.id);
+    });
+    return items;
+  }
 
   @override
   Future<StarNyx?> getStarnyxById(String id) async => _items[id];
@@ -89,7 +131,14 @@ class _InMemoryStarNyxRepository implements StarNyxRepository {
       _items[starnyx.id] = starnyx;
 
   @override
-  Future<void> reorderStarnyxs(List<String> orderedIds) async {}
+  Future<void> reorderStarnyxs(List<String> orderedIds) async {
+    for (var index = 0; index < orderedIds.length; index += 1) {
+      final item = _items[orderedIds[index]];
+      if (item != null) {
+        _items[item.id] = item.copyWith(displayOrder: index);
+      }
+    }
+  }
 
   @override
   Stream<List<StarNyx>> watchAllStarnyxs() => throw UnimplementedError();

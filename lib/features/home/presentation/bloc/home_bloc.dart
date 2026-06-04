@@ -532,7 +532,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
     }
 
-    return ordered;
+    return <StarNyx>[
+      for (var index = 0; index < ordered.length; index += 1)
+        ordered[index].copyWith(displayOrder: index),
+    ];
   }
 
   bool _isBlockedCompletionDate({
