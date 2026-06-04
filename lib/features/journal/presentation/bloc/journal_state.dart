@@ -12,6 +12,8 @@ class JournalState extends Equatable {
     required this.draftContent,
     required this.saveStatus,
     required this.deleteStatus,
+    required this.undoDeleteStatus,
+    required this.recentlyDeletedEntry,
     required this.feedbackCount,
     required this.errorMessage,
   });
@@ -24,6 +26,8 @@ class JournalState extends Equatable {
       draftContent: '',
       saveStatus: AsyncStatus.idle,
       deleteStatus: AsyncStatus.idle,
+      undoDeleteStatus: AsyncStatus.idle,
+      recentlyDeletedEntry: null,
       feedbackCount: 0,
       errorMessage: null,
     );
@@ -35,6 +39,8 @@ class JournalState extends Equatable {
   final String draftContent;
   final AsyncStatus saveStatus;
   final AsyncStatus deleteStatus;
+  final AsyncStatus undoDeleteStatus;
+  final JournalEntry? recentlyDeletedEntry;
   final int feedbackCount;
   final String? errorMessage;
 
@@ -51,6 +57,8 @@ class JournalState extends Equatable {
     String? draftContent,
     AsyncStatus? saveStatus,
     AsyncStatus? deleteStatus,
+    AsyncStatus? undoDeleteStatus,
+    Object? recentlyDeletedEntry = _unset,
     int? feedbackCount,
     Object? errorMessage = _unset,
   }) {
@@ -63,6 +71,10 @@ class JournalState extends Equatable {
       draftContent: draftContent ?? this.draftContent,
       saveStatus: saveStatus ?? this.saveStatus,
       deleteStatus: deleteStatus ?? this.deleteStatus,
+      undoDeleteStatus: undoDeleteStatus ?? this.undoDeleteStatus,
+      recentlyDeletedEntry: identical(recentlyDeletedEntry, _unset)
+          ? this.recentlyDeletedEntry
+          : recentlyDeletedEntry as JournalEntry?,
       feedbackCount: feedbackCount ?? this.feedbackCount,
       errorMessage: identical(errorMessage, _unset)
           ? this.errorMessage
@@ -78,6 +90,8 @@ class JournalState extends Equatable {
     draftContent,
     saveStatus,
     deleteStatus,
+    undoDeleteStatus,
+    recentlyDeletedEntry,
     feedbackCount,
     errorMessage,
   ];
