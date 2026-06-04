@@ -20,8 +20,8 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  // Schema version 2: Changed journal_entries to support multiple notes per day.
-  int get schemaVersion => 2;
+  // Schema version 3: Adds explicit StarNyx display ordering.
+  int get schemaVersion => 3;
 
   @override
   // Versioned migrations handle structural changes between schema releases.
@@ -34,6 +34,21 @@ class AppDatabase extends _$AppDatabase {
         // Drop and recreate journal_entries due to primary key and structural changes.
         await migrator.deleteTable('journal_entries');
         await migrator.createTable(journalEntries);
+      }
+      if (from < 3) {
+        await migrator.addColumn(starNyxs, starNyxs.displayOrder);
+        await customStatement('''
+          UPDATE starnyxs
+          SET display_order = (
+            SELECT COUNT(*)
+            FROM starnyxs AS ranked
+            WHERE ranked.updated_at > starnyxs.updated_at
+              OR (
+                ranked.updated_at = starnyxs.updated_at
+                AND ranked.id < starnyxs.id
+              )
+          )
+        ''');
       }
     },
     beforeOpen: (OpeningDetails details) async {

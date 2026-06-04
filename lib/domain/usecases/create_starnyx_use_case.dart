@@ -34,6 +34,13 @@ class CreateStarNyxUseCase {
     );
     UseCaseValidation.validateStartDate(startDate, today: timestamp);
     final normalizedReminderTime = reminderEnabled ? reminderTime : null;
+    final existingStarnyxs = await _repository.getAllStarnyxs();
+    final nextDisplayOrder = existingStarnyxs.isEmpty
+        ? 0
+        : existingStarnyxs
+                  .map((item) => item.displayOrder)
+                  .reduce((left, right) => left > right ? left : right) +
+              1;
     final starnyx = StarNyx(
       id: _uuid.v4(),
       title: title,
@@ -44,6 +51,7 @@ class CreateStarNyxUseCase {
       reminderTime: normalizedReminderTime,
       createdAt: timestamp,
       updatedAt: timestamp,
+      displayOrder: nextDisplayOrder,
     );
 
     _logger.debug(

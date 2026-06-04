@@ -89,6 +89,9 @@ class _InMemoryStarNyxRepository implements StarNyxRepository {
       _items[starnyx.id] = starnyx;
 
   @override
+  Future<void> reorderStarnyxs(List<String> orderedIds) async {}
+
+  @override
   Stream<List<StarNyx>> watchAllStarnyxs() => throw UnimplementedError();
 }
 

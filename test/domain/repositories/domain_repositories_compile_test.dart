@@ -37,6 +37,9 @@ class _FakeStarNyxRepository implements StarNyxRepository {
   Future<void> saveStarnyx(StarNyx starnyx) async {}
 
   @override
+  Future<void> reorderStarnyxs(List<String> orderedIds) async {}
+
+  @override
   Stream<List<StarNyx>> watchAllStarnyxs() =>
       const Stream<List<StarNyx>>.empty();
 }

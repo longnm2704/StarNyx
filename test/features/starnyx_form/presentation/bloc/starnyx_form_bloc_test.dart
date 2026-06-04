@@ -667,6 +667,9 @@ class _InMemoryStarNyxRepository implements StarNyxRepository {
     _items[starnyx.id] = starnyx;
   }
 
+  @override
+  Future<void> reorderStarnyxs(List<String> orderedIds) async {}
+
   /// Watches all StarNyxs for real-time updates (streams the list once for testing).
   @override
   Stream<List<StarNyx>> watchAllStarnyxs() async* {
