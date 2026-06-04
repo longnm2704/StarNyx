@@ -90,7 +90,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       emit(
         state.copyWith(
           exportStatus: AsyncStatus.failure,
-          errorMessage: error.toString(),
+          errorMessage: _settingsErrorMessageFor(SettingsFailureArea.export),
         ),
       );
     }
@@ -128,9 +128,20 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       emit(
         state.copyWith(
           importStatus: AsyncStatus.failure,
-          errorMessage: error.toString(),
+          errorMessage: _settingsErrorMessageFor(SettingsFailureArea.import),
         ),
       );
     }
+  }
+}
+
+enum SettingsFailureArea { export, import }
+
+String _settingsErrorMessageFor(SettingsFailureArea area) {
+  switch (area) {
+    case SettingsFailureArea.export:
+      return 'Backup could not be created. Please try again.';
+    case SettingsFailureArea.import:
+      return 'Backup could not be imported. Check the file and try again.';
   }
 }

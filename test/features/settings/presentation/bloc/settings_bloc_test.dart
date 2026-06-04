@@ -154,6 +154,92 @@ void main() {
     expect(notificationService.cancelAllCount, 0);
     expect(notificationService.createdReminderIds, isEmpty);
   });
+
+  test('export failure uses a stable user-safe message', () async {
+    starNyxRepository.getAllError = StateError(
+      'sqlite read failed at /Users/dev/private/starnyx.db',
+    );
+
+    bloc.add(const SettingsExportRequested());
+
+    await pumpEventQueue(times: 10);
+
+    expect(bloc.state.exportStatus, AsyncStatus.failure);
+    expect(
+      bloc.state.errorMessage,
+      'Backup could not be created. Please try again.',
+    );
+    expect(bloc.state.errorMessage, isNot(contains('sqlite')));
+    expect(bloc.state.errorMessage, isNot(contains('/Users/dev/private')));
+    expect(bloc.state.errorMessage, isNot(contains('StateError')));
+  });
+
+  test('import validation failure uses a stable user-safe message', () async {
+    bloc.add(
+      SettingsImportRequested(<String, dynamic>{
+        'schemaVersion': 2,
+        'starnyxs': <Map<String, dynamic>>[],
+        'completions': <Map<String, dynamic>>[],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': null,
+          'updatedAt': '2026-04-10T08:30:00.000',
+        },
+      }),
+    );
+
+    await pumpEventQueue(times: 10);
+
+    expect(bloc.state.importStatus, AsyncStatus.failure);
+    expect(
+      bloc.state.errorMessage,
+      'Backup could not be imported. Check the file and try again.',
+    );
+    expect(bloc.state.errorMessage, isNot(contains('ImportDataException')));
+    expect(bloc.state.errorMessage, isNot(contains('Unsupported')));
+  });
+
+  test('import storage failure uses a stable user-safe message', () async {
+    starNyxRepository.saveError = StateError(
+      'insert failed for /Users/dev/private/starnyx.db',
+    );
+
+    bloc.add(
+      SettingsImportRequested(<String, dynamic>{
+        'schemaVersion': 1,
+        'starnyxs': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'id': 'habit-1',
+            'title': 'Hydrate',
+            'description': null,
+            'color': '#102030',
+            'startDate': '2026-04-01',
+            'reminderEnabled': false,
+            'reminderTime': null,
+            'createdAt': '2026-04-01T08:00:00.000',
+            'updatedAt': '2026-04-02T09:00:00.000',
+          },
+        ],
+        'completions': <Map<String, dynamic>>[],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': null,
+          'updatedAt': '2026-04-10T08:30:00.000',
+        },
+      }),
+    );
+
+    await pumpEventQueue(times: 10);
+
+    expect(bloc.state.importStatus, AsyncStatus.failure);
+    expect(
+      bloc.state.errorMessage,
+      'Backup could not be imported. Check the file and try again.',
+    );
+    expect(bloc.state.errorMessage, isNot(contains('insert failed')));
+    expect(bloc.state.errorMessage, isNot(contains('/Users/dev/private')));
+    expect(bloc.state.errorMessage, isNot(contains('StateError')));
+  });
 }
 
 class _FakeNotificationService implements NotificationService {
@@ -182,6 +268,8 @@ class _FakeNotificationService implements NotificationService {
 
 class _InMemoryStarNyxRepository implements StarNyxRepository {
   final Map<String, StarNyx> _items = <String, StarNyx>{};
+  Object? getAllError;
+  Object? saveError;
 
   @override
   Future<void> deleteStarnyxById(String id) async {
@@ -190,6 +278,10 @@ class _InMemoryStarNyxRepository implements StarNyxRepository {
 
   @override
   Future<List<StarNyx>> getAllStarnyxs() async {
+    final error = getAllError;
+    if (error != null) {
+      throw error;
+    }
     final items = _items.values.toList(growable: false);
     items.sort((left, right) => right.updatedAt.compareTo(left.updatedAt));
     return items;
@@ -200,6 +292,10 @@ class _InMemoryStarNyxRepository implements StarNyxRepository {
 
   @override
   Future<void> saveStarnyx(StarNyx starnyx) async {
+    final error = saveError;
+    if (error != null) {
+      throw error;
+    }
     _items[starnyx.id] = starnyx;
   }
 
