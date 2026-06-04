@@ -25,6 +25,11 @@ class BackupSettingsSheet extends StatelessWidget {
       return;
     }
 
+    final confirmed = await _showBackupPrivacyWarningDialog(context);
+    if (!context.mounted || !confirmed) {
+      return;
+    }
+
     context.read<SettingsBloc>().add(
       SettingsExportRequested(
         passphrase: passphrase.isEmpty ? null : passphrase,
@@ -172,6 +177,30 @@ class BackupSettingsSheet extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<bool> _showBackupPrivacyWarningDialog(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text('settings.backup_privacy_warning_title'.tr()),
+          content: Text('settings.backup_privacy_warning_message'.tr()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text('settings.backup_cancel'.tr()),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text('settings.backup_privacy_warning_confirm'.tr()),
+            ),
+          ],
+        );
+      },
+    );
+
+    return confirmed ?? false;
   }
 
   Future<String?> _showImportPassphraseDialog(
