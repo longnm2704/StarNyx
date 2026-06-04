@@ -80,10 +80,11 @@ class DriftJournalEntryRepository implements JournalEntryRepository {
           'contentLength=${entry.content.length}',
     );
     await _database.journalEntriesDao.insertJournalEntry(
-      JournalEntriesCompanion.insert(
-        starnyxId: entry.starnyxId,
-        date: dateKey,
-        content: entry.content,
+      JournalEntriesCompanion(
+        id: entry.id > 0 ? Value(entry.id) : const Value.absent(),
+        starnyxId: Value(entry.starnyxId),
+        date: Value(dateKey),
+        content: Value(entry.content),
         createdAt: Value(entry.createdAt),
       ),
     );

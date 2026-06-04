@@ -107,6 +107,19 @@ void main() {
     },
   );
 
+  test('save journal entry use case rejects content longer than 4000 chars', () {
+    final useCase = SaveJournalEntryUseCase(journalEntryRepository);
+
+    expect(
+      useCase(
+        starnyxId: 'habit-1',
+        date: DateTime(2026, 4, 13),
+        content: 'a' * 4001,
+      ),
+      throwsA(isA<FormatException>()),
+    );
+  });
+
   test('update use case rejects a future start date', () async {
     final useCase = UpdateStarNyxUseCase(starNyxRepository);
     final starnyx = StarNyx(
@@ -552,9 +565,11 @@ void main() {
       (payload['journalEntries'] as List<dynamic>).first
           as Map<String, dynamic>,
       <String, dynamic>{
+        'id': 1,
         'starnyxId': 'habit-1',
         'date': '2026-04-10',
         'content': 'Stayed consistent today.',
+        'createdAt': '2026-04-10T10:00:00.000',
       },
     );
     expect(
@@ -644,6 +659,94 @@ void main() {
       );
     },
   );
+
+  test(
+    'import use case preserves journal createdAt across export and re-import',
+    () async {
+      await starNyxRepository.saveStarnyx(
+        StarNyx(
+          id: 'habit-1',
+          title: 'Hydrate',
+          description: null,
+          color: '#102030',
+          startDate: DateTime(2026, 4, 1),
+          reminderEnabled: false,
+          reminderTime: null,
+          createdAt: DateTime(2026, 4, 1, 8),
+          updatedAt: DateTime(2026, 4, 2, 9),
+        ),
+      );
+      await journalEntryRepository.saveJournalEntry(
+        JournalEntry(
+          id: 1,
+          starnyxId: 'habit-1',
+          date: DateTime(2026, 4, 10),
+          content: 'Morning note',
+          createdAt: DateTime(2026, 4, 10, 8, 0),
+        ),
+      );
+      await journalEntryRepository.saveJournalEntry(
+        JournalEntry(
+          id: 2,
+          starnyxId: 'habit-1',
+          date: DateTime(2026, 4, 10),
+          content: 'Evening note',
+          createdAt: DateTime(2026, 4, 10, 20, 0),
+        ),
+      );
+
+      final exportUseCase = ExportDataUseCase(
+        starNyxRepository,
+        completionRepository,
+        journalEntryRepository,
+        appSettingsRepository,
+      );
+      final importUseCase = ImportDataUseCase(
+        starNyxRepository,
+        completionRepository,
+        journalEntryRepository,
+        appSettingsRepository,
+      );
+
+      final payload = await exportUseCase.buildPayload();
+
+      await importUseCase(payload);
+
+      final restoredEntries = await journalEntryRepository
+          .getJournalEntriesForStarnyx('habit-1');
+
+      expect(restoredEntries, hasLength(2));
+      expect(restoredEntries[0].createdAt, DateTime(2026, 4, 10, 8, 0));
+      expect(restoredEntries[1].createdAt, DateTime(2026, 4, 10, 20, 0));
+    },
+  );
+
+  test('import use case executes writes inside provided transaction runner', () async {
+    var transactionCallCount = 0;
+    final useCase = ImportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+      transactionRunner: <T>(Future<T> Function() action) async {
+        transactionCallCount += 1;
+        return action();
+      },
+    );
+
+    await useCase(<String, dynamic>{
+      'schemaVersion': 1,
+      'starnyxs': <Map<String, dynamic>>[],
+      'completions': <Map<String, dynamic>>[],
+      'journalEntries': <Map<String, dynamic>>[],
+      'appSettings': <String, dynamic>{
+        'lastSelectedStarnyxId': null,
+        'updatedAt': '2026-04-10T08:30:00.000',
+      },
+    });
+
+    expect(transactionCallCount, 1);
+  });
 
   test(
     'import use case replaces existing child data instead of merging',

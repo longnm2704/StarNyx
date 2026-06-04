@@ -102,9 +102,11 @@ Map<String, dynamic> _completionToJson(Completion completion) {
 
 Map<String, dynamic> _journalEntryToJson(JournalEntry entry) {
   return <String, dynamic>{
+    'id': entry.id,
     'starnyxId': entry.starnyxId,
     'date': _dateKey(entry.date),
     'content': entry.content,
+    'createdAt': entry.createdAt.toIso8601String(),
   };
 }
 

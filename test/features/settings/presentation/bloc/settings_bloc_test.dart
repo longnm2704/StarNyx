@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/core/services/core_services.dart';
+import 'package:starnyx/core/utils/backup_file_codec.dart';
 import 'package:starnyx/domain/entities/domain_entities.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
@@ -12,14 +15,20 @@ void main() {
   late _InMemoryJournalEntryRepository journalEntryRepository;
   late _InMemoryAppSettingsRepository appSettingsRepository;
   late _FakeNotificationService notificationService;
+  late BackupFileCodec backupFileCodec;
+  late Directory tempDirectory;
   late SettingsBloc bloc;
 
-  setUp(() {
+  setUp(() async {
     starNyxRepository = _InMemoryStarNyxRepository();
     completionRepository = _InMemoryCompletionRepository();
     journalEntryRepository = _InMemoryJournalEntryRepository();
     appSettingsRepository = _InMemoryAppSettingsRepository();
     notificationService = _FakeNotificationService();
+    backupFileCodec = BackupFileCodec();
+    tempDirectory = await Directory.systemTemp.createTemp(
+      'starnyx-settings-bloc-test-',
+    );
 
     final exportUseCase = ExportDataUseCase(
       starNyxRepository,
@@ -42,11 +51,54 @@ void main() {
       exportDataUseCase: exportUseCase,
       importDataUseCase: importUseCase,
       syncNotificationsUseCase: syncUseCase,
+      backupFileCodec: backupFileCodec,
+      tempDirectoryProvider: () async => tempDirectory,
+      nowProvider: () => DateTime(2026, 4, 10, 8, 30),
     );
   });
 
   tearDown(() async {
     await bloc.close();
+    if (await tempDirectory.exists()) {
+      await tempDirectory.delete(recursive: true);
+    }
+  });
+
+  test('export success writes an encrypted starnyxbak file', () async {
+    await starNyxRepository.saveStarnyx(
+      StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 2, 9),
+      ),
+    );
+
+    bloc.add(const SettingsExportRequested(passphrase: 'moonlight'));
+
+    await pumpEventQueue();
+    while (bloc.state.exportStatus == AsyncStatus.inProgress) {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
+
+    final exportedPath = bloc.state.exportedFilePath;
+    expect(bloc.state.exportStatus, AsyncStatus.success);
+    expect(exportedPath, endsWith('.starnyxbak'));
+
+    final fileText = await File(exportedPath!).readAsString();
+    final decoded = await backupFileCodec.decodeText(
+      fileText,
+      passphrase: 'moonlight',
+    );
+
+    expect(fileText, isNot(contains('Hydrate')));
+    expect(decoded.isEncrypted, isTrue);
+    expect(decoded.jsonText, contains('"title": "Hydrate"'));
   });
 
   test('import success rebuilds reminders from imported local data', () async {

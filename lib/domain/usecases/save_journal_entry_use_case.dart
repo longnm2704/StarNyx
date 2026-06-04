@@ -18,18 +18,28 @@ class SaveJournalEntryUseCase {
     required DateTime date,
     required String content,
   }) async {
+    final trimmedContent = content.trim();
+    if (trimmedContent.isEmpty) {
+      throw const FormatException('Journal content is required.');
+    }
+    if (trimmedContent.length > 4000) {
+      throw const FormatException(
+        'Journal content must be 4000 characters or fewer.',
+      );
+    }
+
     final normalizedDate = DateUtils.dateOnly(date);
     _logger.debug(
       'SaveJournalEntryUseCase',
       'save begin starnyxId=$starnyxId date=$normalizedDate '
-          'contentLength=${content.length}',
+          'contentLength=${trimmedContent.length}',
     );
 
     final entry = JournalEntry(
       id: 0, // Assigned by database
       starnyxId: starnyxId,
       date: normalizedDate,
-      content: content,
+      content: trimmedContent,
       createdAt: DateTime.now(),
     );
 

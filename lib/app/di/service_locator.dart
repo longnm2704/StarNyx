@@ -187,6 +187,8 @@ void _registerUseCases() {
       serviceLocator<JournalEntryRepository>(),
       serviceLocator<AppSettingsRepository>(),
       logger: serviceLocator<AppLogService>(),
+      transactionRunner: <T>(Future<T> Function() action) =>
+          serviceLocator<AppDatabase>().transaction<T>(action),
     ),
   );
   serviceLocator.registerLazySingleton<SyncNotificationsUseCase>(

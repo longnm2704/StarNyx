@@ -201,8 +201,10 @@ abstract final class JsonValidationUtils {
       'journalEntries[$index]',
       errors,
     );
+    _optionalPositiveInt(entry, 'id', 'journalEntries[$index]', errors);
     _requireDateString(entry, 'date', 'journalEntries[$index]', errors);
     _requireString(entry, 'content', 'journalEntries[$index]', errors);
+    _optionalIsoDateTime(entry, 'createdAt', 'journalEntries[$index]', errors);
 
     if (starnyxId != null && !knownStarNyxIds.contains(starnyxId)) {
       errors.add(
@@ -258,6 +260,47 @@ abstract final class JsonValidationUtils {
     }
 
     errors.add('$path.$key must be a string or null.');
+  }
+
+  static void _optionalPositiveInt(
+    Map<String, dynamic> entry,
+    String key,
+    String path,
+    List<String> errors,
+  ) {
+    final value = entry[key];
+    if (value == null) {
+      return;
+    }
+
+    if (value is int && value >= 0) {
+      return;
+    }
+
+    errors.add('$path.$key must be a non-negative integer when provided.');
+  }
+
+  static void _optionalIsoDateTime(
+    Map<String, dynamic> entry,
+    String key,
+    String path,
+    List<String> errors,
+  ) {
+    final value = entry[key];
+    if (value == null) {
+      return;
+    }
+
+    if (value is! String) {
+      errors.add('$path.$key must be an ISO date-time string when provided.');
+      return;
+    }
+
+    try {
+      DateTime.parse(value);
+    } on FormatException {
+      errors.add('$path.$key must be an ISO date-time string when provided.');
+    }
   }
 
   static String? _optionalNullableReminderTime(

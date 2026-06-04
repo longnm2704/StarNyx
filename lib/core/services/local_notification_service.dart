@@ -43,6 +43,7 @@ class LocalNotificationService implements NotificationService {
 
   bool _initialized = false;
   bool _timeZonesInitialized = false;
+  bool _permissionsGranted = true;
 
   @override
   Future<void> initialize() async {
@@ -67,6 +68,7 @@ class LocalNotificationService implements NotificationService {
         importance: Importance.high,
       ),
     );
+    _permissionsGranted = await _client.requestPermissions();
 
     _initialized = true;
     _logger.debug('LocalNotificationService', 'initialize success');
@@ -79,6 +81,13 @@ class LocalNotificationService implements NotificationService {
       _logger.debug(
         'LocalNotificationService',
         'create skipped id=${starnyx.id} reminderEnabled=${starnyx.reminderEnabled}',
+      );
+      return;
+    }
+    if (!_permissionsGranted) {
+      _logger.debug(
+        'LocalNotificationService',
+        'create skipped permissions denied id=${starnyx.id}',
       );
       return;
     }
@@ -230,6 +239,8 @@ abstract class NotificationClient {
 
   Future<void> createAndroidChannel(AndroidNotificationChannel channel);
 
+  Future<bool> requestPermissions();
+
   Future<void> zonedSchedule({
     required int id,
     required String title,
@@ -263,6 +274,26 @@ class FlutterLocalNotificationClient implements NotificationClient {
           AndroidFlutterLocalNotificationsPlugin
         >();
     await android?.createNotificationChannel(channel);
+  }
+
+  @override
+  Future<bool> requestPermissions() async {
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    final ios = _plugin.resolvePlatformSpecificImplementation<
+      IOSFlutterLocalNotificationsPlugin
+    >();
+
+    final androidGranted = await android?.requestNotificationsPermission();
+    final iosGranted = await ios?.requestPermissions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    return androidGranted ?? iosGranted ?? true;
   }
 
   @override
