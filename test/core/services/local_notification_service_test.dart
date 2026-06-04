@@ -23,6 +23,24 @@ void main() {
 
     expect(client.initializeCount, 1);
     expect(client.createChannelCount, 1);
+    expect(client.requestPermissionsCount, 1);
+  });
+
+  test('initialize requests notification permissions once', () async {
+    await service.initialize();
+
+    expect(client.requestPermissionsCount, 1);
+  });
+
+  test('create reminder is ignored when permissions are denied', () async {
+    client.permissionsGranted = false;
+    await service.initialize();
+
+    await service.createReminder(
+      _sampleStarNyx(reminderEnabled: true, reminderTime: '09:30'),
+    );
+
+    expect(client.scheduled, isEmpty);
   });
 
   test('create reminder schedules once when reminder is enabled', () async {
@@ -131,6 +149,8 @@ StarNyx _sampleStarNyx({
 class _FakeNotificationClient implements NotificationClient {
   int initializeCount = 0;
   int createChannelCount = 0;
+  int requestPermissionsCount = 0;
+  bool permissionsGranted = true;
   final List<_ScheduledRequest> scheduled = <_ScheduledRequest>[];
   final List<int> cancelled = <int>[];
   int cancelAllCount = 0;
@@ -143,6 +163,12 @@ class _FakeNotificationClient implements NotificationClient {
   @override
   Future<void> createAndroidChannel(AndroidNotificationChannel channel) async {
     createChannelCount += 1;
+  }
+
+  @override
+  Future<bool> requestPermissions() async {
+    requestPermissionsCount += 1;
+    return permissionsGranted;
   }
 
   @override

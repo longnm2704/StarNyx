@@ -11,6 +11,8 @@ import 'package:starnyx/domain/repositories/completion_repository.dart';
 import 'package:starnyx/domain/repositories/app_settings_repository.dart';
 import 'package:starnyx/domain/repositories/journal_entry_repository.dart';
 
+typedef TransactionRunner = Future<T> Function<T>(Future<T> Function() action);
+
 // Validates and imports a full backup payload into local repositories.
 class ImportDataUseCase {
   const ImportDataUseCase(
@@ -19,13 +21,16 @@ class ImportDataUseCase {
     this._journalEntryRepository,
     this._appSettingsRepository, {
     AppLogService logger = const NoOpAppLogService(),
-  }) : _logger = logger;
+    TransactionRunner? transactionRunner,
+  }) : _logger = logger,
+       _transactionRunner = transactionRunner ?? _runWithoutTransaction;
 
   final StarNyxRepository _starnyxRepository;
   final CompletionRepository _completionRepository;
   final JournalEntryRepository _journalEntryRepository;
   final AppSettingsRepository _appSettingsRepository;
   final AppLogService _logger;
+  final TransactionRunner _transactionRunner;
 
   Future<void> callFromJsonText(String jsonText) async {
     _logger.debug('ImportDataUseCase', 'decode begin bytes=${jsonText.length}');
@@ -85,41 +90,43 @@ class ImportDataUseCase {
 
     final snapshot = await _captureCurrentData();
 
-    try {
-      await _clearCurrentData();
-      await _saveImportedData(
-        starnyxs: starnyxs,
-        completions: completions,
-        journalEntries: journalEntries,
-        appSettings: appSettings,
-      );
-      _logger.debug('ImportDataUseCase', 'import success');
-    } catch (error) {
-      _logger.error(
-        'ImportDataUseCase',
-        'import write failed; attempting rollback',
-        error: error,
-      );
+    await _transactionRunner(() async {
       try {
-        await _restoreFromSnapshot(snapshot);
-      } catch (rollbackError) {
+        await _clearCurrentData();
+        await _saveImportedData(
+          starnyxs: starnyxs,
+          completions: completions,
+          journalEntries: journalEntries,
+          appSettings: appSettings,
+        );
+        _logger.debug('ImportDataUseCase', 'import success');
+      } catch (error) {
         _logger.error(
           'ImportDataUseCase',
-          'rollback failed',
-          error: rollbackError,
+          'import write failed; attempting rollback',
+          error: error,
         );
+        try {
+          await _restoreFromSnapshot(snapshot);
+        } catch (rollbackError) {
+          _logger.error(
+            'ImportDataUseCase',
+            'rollback failed',
+            error: rollbackError,
+          );
+          throw ImportDataException(<String>[
+            'Import failed while writing local data.',
+            'Rollback failed: $rollbackError',
+          ]);
+        }
+
+        _logger.debug('ImportDataUseCase', 'rollback success');
         throw ImportDataException(<String>[
-          'Import failed while writing local data.',
-          'Rollback failed: $rollbackError',
+          'Import failed while writing local data. Previous data was restored.',
+          '$error',
         ]);
       }
-
-      _logger.debug('ImportDataUseCase', 'rollback success');
-      throw ImportDataException(<String>[
-        'Import failed while writing local data. Previous data was restored.',
-        '$error',
-      ]);
-    }
+    });
   }
 
   Future<_ImportSnapshot> _captureCurrentData() async {
@@ -240,7 +247,7 @@ Completion _completionFromJson(Map<String, dynamic> json) {
 JournalEntry _journalEntryFromJson(Map<String, dynamic> json) {
   final date = DateTime.parse(json['date'] as String);
   return JournalEntry(
-    id: 0,
+    id: (json['id'] as num?)?.toInt() ?? 0,
     starnyxId: json['starnyxId'] as String,
     date: date,
     content: json['content'] as String,
@@ -248,6 +255,10 @@ JournalEntry _journalEntryFromJson(Map<String, dynamic> json) {
         ? DateTime.parse(json['createdAt'] as String)
         : date,
   );
+}
+
+Future<T> _runWithoutTransaction<T>(Future<T> Function() action) {
+  return action();
 }
 
 AppSettings _appSettingsFromJson(Map<String, dynamic> json) {
