@@ -6,6 +6,7 @@ import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/usecases/use_case_validation.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
+import 'package:starnyx/domain/usecases/save_starnyx_order_use_case.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
 import 'package:starnyx/domain/usecases/toggle_completion_use_case.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_event.dart';
@@ -22,9 +23,11 @@ void main() {
   late _MockLoadStarNyxCompletionDatesForYearUseCase
   loadStarNyxCompletionDatesForYearUseCase;
   late _MockToggleCompletionUseCase toggleCompletionUseCase;
+  late _MockSaveStarNyxOrderUseCase saveStarNyxOrderUseCase;
 
   setUpAll(() {
     registerFallbackValue(DateTime(2026, 4, 14));
+    registerFallbackValue(<String>[]);
   });
 
   setUp(() {
@@ -35,6 +38,7 @@ void main() {
     loadStarNyxCompletionDatesForYearUseCase =
         _MockLoadStarNyxCompletionDatesForYearUseCase();
     toggleCompletionUseCase = _MockToggleCompletionUseCase();
+    saveStarNyxOrderUseCase = _MockSaveStarNyxOrderUseCase();
   });
 
   test('load requested emits success with starnyxs and active id', () async {
@@ -732,6 +736,53 @@ void main() {
     expect(bloc.state.completionFeedbackCount, 1);
     expect(bloc.state.progressStats, _stats());
   });
+
+  test('reorder saves order and updates state immediately', () async {
+    final starnyxs = <StarNyx>[
+      _starnyx(id: '1', title: 'One'),
+      _starnyx(id: '2', title: 'Two'),
+      _starnyx(id: '3', title: 'Three'),
+    ];
+    when(() => loadStarnyxsUseCase()).thenAnswer((_) async => starnyxs);
+    when(
+      () => loadActiveStarNyxUseCase(now: any(named: 'now')),
+    ).thenAnswer((_) async => starnyxs.first);
+    when(
+      () => loadStarNyxProgressStatsUseCase(
+        starnyxId: '1',
+        year: 2026,
+        today: any(named: 'today'),
+      ),
+    ).thenAnswer((_) async => _stats());
+    when(
+      () =>
+          loadStarNyxCompletionDatesForYearUseCase(starnyxId: '1', year: 2026),
+    ).thenAnswer((_) async => <DateTime>[]);
+    when(() => saveStarNyxOrderUseCase(any())).thenAnswer((_) async {});
+    final bloc = HomeBloc(
+      loadStarnyxsUseCase: loadStarnyxsUseCase,
+      loadActiveStarNyxUseCase: loadActiveStarNyxUseCase,
+      selectActiveStarNyxUseCase: selectActiveStarNyxUseCase,
+      loadStarNyxProgressStatsUseCase: loadStarNyxProgressStatsUseCase,
+      loadStarNyxCompletionDatesForYearUseCase:
+          loadStarNyxCompletionDatesForYearUseCase,
+      toggleCompletionUseCase: toggleCompletionUseCase,
+      saveStarNyxOrderUseCase: saveStarNyxOrderUseCase,
+      nowBuilder: () => DateTime(2026, 4, 14),
+    );
+
+    bloc.add(const HomeLoadRequested());
+    await pumpEventQueue(times: 10);
+
+    bloc.add(const HomeStarNyxOrderChanged(<String>['3', '1', '2']));
+    await pumpEventQueue(times: 5);
+
+    final capturedOrder = verify(
+      () => saveStarNyxOrderUseCase(captureAny()),
+    ).captured.single;
+    expect(capturedOrder, <String>['3', '1', '2']);
+    expect(bloc.state.starnyxs.map((item) => item.id), <String>['3', '1', '2']);
+  });
 }
 
 StarNyx _starnyx({required String id, required String title}) {
@@ -764,6 +815,9 @@ class _MockLoadStarNyxCompletionDatesForYearUseCase extends Mock
 
 class _MockToggleCompletionUseCase extends Mock
     implements ToggleCompletionUseCase {}
+
+class _MockSaveStarNyxOrderUseCase extends Mock
+    implements SaveStarNyxOrderUseCase {}
 
 StarNyxProgressStats _stats({int currentStreak = 6}) {
   return StarNyxProgressStats(

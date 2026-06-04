@@ -27,6 +27,7 @@ class HomeBodyBuilder extends StatelessWidget {
     required this.onSelectPressed,
     required this.onDateSelected,
     required this.onPreviousDayPressed,
+    required this.onOrderChanged,
     required this.onNextDayPressed,
     required this.onJumpToTodayPressed,
     required this.onPreviousYearPressed,
@@ -49,6 +50,7 @@ class HomeBodyBuilder extends StatelessWidget {
   final FutureOr<void> Function(StarNyx) onEditPressed;
   final ValueChanged<StarNyx> onSelectPressed;
   final ValueChanged<DateTime> onDateSelected;
+  final ValueChanged<List<String>> onOrderChanged;
   final VoidCallback onPreviousDayPressed;
   final VoidCallback onNextDayPressed;
   final VoidCallback onJumpToTodayPressed;
@@ -101,6 +103,7 @@ class HomeBodyBuilder extends StatelessWidget {
       onEditPressed: onEditPressed,
       onDateSelected: onDateSelected,
       onSelectPressed: onSelectPressed,
+      onOrderChanged: onOrderChanged,
       onPreviousDayPressed: onPreviousDayPressed,
       onNextDayPressed: onNextDayPressed,
       onJumpToTodayPressed: onJumpToTodayPressed,

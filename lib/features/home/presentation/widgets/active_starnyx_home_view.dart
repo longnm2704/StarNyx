@@ -49,6 +49,7 @@ class ActiveStarnyxHomeView extends StatefulWidget {
     required this.onEditPressed,
     required this.onDateSelected,
     required this.onSelectPressed,
+    required this.onOrderChanged,
     required this.onPreviousDayPressed,
     required this.onNextDayPressed,
     required this.onJumpToTodayPressed,
@@ -71,6 +72,7 @@ class ActiveStarnyxHomeView extends StatefulWidget {
   final FutureOr<void> Function(StarNyx) onEditPressed;
   final ValueChanged<DateTime> onDateSelected;
   final ValueChanged<StarNyx> onSelectPressed;
+  final ValueChanged<List<String>> onOrderChanged;
   final VoidCallback onPreviousDayPressed;
   final VoidCallback onNextDayPressed;
   final VoidCallback onJumpToTodayPressed;
@@ -112,6 +114,7 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
             starnyxs: widget.starnyxs,
             activeStarnyxId: widget.activeStarnyxId,
             onSelectPressed: widget.onSelectPressed,
+            onOrderChanged: widget.onOrderChanged,
           );
         }
 
@@ -129,6 +132,7 @@ class _ActiveStarnyxHomeViewState extends State<ActiveStarnyxHomeView> {
                 activeStarnyxId:
                     state.activeStarnyxId ?? widget.activeStarnyxId,
                 onSelectPressed: widget.onSelectPressed,
+                onOrderChanged: widget.onOrderChanged,
               );
             },
           ),

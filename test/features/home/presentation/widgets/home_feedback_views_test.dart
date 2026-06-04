@@ -69,6 +69,7 @@ void main() {
             onSelectPressed: (starnyx) {
               edited = starnyx;
             },
+            onOrderChanged: (_) {},
             onPreviousDayPressed: () {
               previousPressed = true;
             },

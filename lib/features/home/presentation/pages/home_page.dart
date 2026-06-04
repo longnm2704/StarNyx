@@ -9,6 +9,7 @@ import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
+import 'package:starnyx/domain/usecases/save_starnyx_order_use_case.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
 import 'package:starnyx/domain/usecases/toggle_completion_use_case.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_event.dart';
@@ -36,6 +37,7 @@ class HomePage extends StatefulWidget {
     LoadStarNyxCompletionDatesForYearUseCase?
     loadStarNyxCompletionDatesForYearUseCase,
     ToggleCompletionUseCase? toggleCompletionUseCase,
+    SaveStarNyxOrderUseCase? saveStarNyxOrderUseCase,
     FutureOr<void> Function()? onCreatePressed,
     FutureOr<void> Function(StarNyx)? onEditPressed,
     ValueChanged<StarNyx>? onSelectPressed,
@@ -56,6 +58,11 @@ class HomePage extends StatefulWidget {
            serviceLocator<LoadStarNyxCompletionDatesForYearUseCase>(),
        _toggleCompletionUseCase =
            toggleCompletionUseCase ?? serviceLocator<ToggleCompletionUseCase>(),
+       _saveStarNyxOrderUseCase =
+           saveStarNyxOrderUseCase ??
+           (serviceLocator.isRegistered<SaveStarNyxOrderUseCase>()
+               ? serviceLocator<SaveStarNyxOrderUseCase>()
+               : null),
        _onCreatePressed = onCreatePressed,
        _onEditPressed = onEditPressed,
        _onSelectPressed = onSelectPressed,
@@ -68,6 +75,7 @@ class HomePage extends StatefulWidget {
   final LoadStarNyxCompletionDatesForYearUseCase
   _loadStarNyxCompletionDatesForYearUseCase;
   final ToggleCompletionUseCase _toggleCompletionUseCase;
+  final SaveStarNyxOrderUseCase? _saveStarNyxOrderUseCase;
   final FutureOr<void> Function()? _onCreatePressed;
   final FutureOr<void> Function(StarNyx)? _onEditPressed;
   final ValueChanged<StarNyx>? _onSelectPressed;
@@ -97,6 +105,7 @@ class _HomePageState extends State<HomePage> {
       loadStarNyxCompletionDatesForYearUseCase:
           widget._loadStarNyxCompletionDatesForYearUseCase,
       toggleCompletionUseCase: widget._toggleCompletionUseCase,
+      saveStarNyxOrderUseCase: widget._saveStarNyxOrderUseCase,
     )..add(const HomeLoadRequested());
   }
 
@@ -151,8 +160,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _openCreateBottomSheet() async {
     // Reuse _resolveActiveStarnyx to avoid duplicating the look-up logic.
-    final activeColorHex =
-        _resolveActiveStarnyx(_homeBloc.state)?.color;
+    final activeColorHex = _resolveActiveStarnyx(_homeBloc.state)?.color;
 
     final result = await showCreateStarnyxBottomSheet(
       context,
@@ -224,6 +232,8 @@ class _HomePageState extends State<HomePage> {
               onSelectPressed: _onSelectPressed,
               onDateSelected: (DateTime date) =>
                   _homeBloc.add(HomeDaySelected(date)),
+              onOrderChanged: (List<String> orderedIds) =>
+                  _homeBloc.add(HomeStarNyxOrderChanged(orderedIds)),
               onPreviousDayPressed: () =>
                   _homeBloc.add(const HomePreviousDayRequested()),
               onNextDayPressed: () =>
@@ -264,9 +274,7 @@ class _HomePageState extends State<HomePage> {
               : SnackBarAction(
                   label: 'home.retry'.tr(),
                   onPressed: () => _homeBloc.add(
-                    HomeActiveStarnyxSelected(
-                      state.lastSelectionRequestedId!,
-                    ),
+                    HomeActiveStarnyxSelected(state.lastSelectionRequestedId!),
                   ),
                 ),
         ),
