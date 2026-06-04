@@ -26,7 +26,7 @@ void main() {
     (tester) async {
       final exportStarted = Completer<void>();
       final releaseExport = Completer<void>();
-      final tempDirectory = Directory('/private/tmp').createTempSync(
+      final tempDirectory = Directory.systemTemp.createTempSync(
         'starnyx-backup-settings-sheet-test-',
       );
       final bloc = _buildSettingsBloc(
@@ -42,8 +42,8 @@ void main() {
           releaseExport.complete();
         }
         await bloc.close();
-        if (await tempDirectory.exists()) {
-          await tempDirectory.delete(recursive: true);
+        if (tempDirectory.existsSync()) {
+          tempDirectory.deleteSync(recursive: true);
         }
       });
 
