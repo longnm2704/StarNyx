@@ -14,6 +14,7 @@ class StarNyx extends Equatable {
     required this.reminderTime,
     required this.createdAt,
     required this.updatedAt,
+    this.displayOrder = 0,
   });
 
   final String id;
@@ -25,6 +26,7 @@ class StarNyx extends Equatable {
   final String? reminderTime;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final int displayOrder;
 
   // This keeps presentation code from repeating null and blank checks.
   bool get hasDescription => description?.trim().isNotEmpty ?? false;
@@ -43,6 +45,7 @@ class StarNyx extends Equatable {
     Object? reminderTime = _unset,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? displayOrder,
   }) {
     return StarNyx(
       id: id ?? this.id,
@@ -58,6 +61,7 @@ class StarNyx extends Equatable {
           : reminderTime as String?,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      displayOrder: displayOrder ?? this.displayOrder,
     );
   }
 
@@ -72,5 +76,6 @@ class StarNyx extends Equatable {
     reminderTime,
     createdAt,
     updatedAt,
+    displayOrder,
   ];
 }

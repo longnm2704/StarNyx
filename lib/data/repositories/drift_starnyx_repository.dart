@@ -68,6 +68,7 @@ class DriftStarNyxRepository implements StarNyxRepository {
           reminderTime: Value(starnyx.reminderTime),
           createdAt: Value(starnyx.createdAt),
           updatedAt: Value(starnyx.updatedAt),
+          displayOrder: Value(starnyx.displayOrder),
         ),
       );
       _logger.debug(
@@ -83,6 +84,16 @@ class DriftStarNyxRepository implements StarNyxRepository {
       );
       rethrow;
     }
+  }
+
+  @override
+  Future<void> reorderStarnyxs(List<String> orderedIds) async {
+    _logger.debug(
+      'DriftStarNyxRepository',
+      'reorder begin count=${orderedIds.length}',
+    );
+    await _database.starnyxsDao.updateDisplayOrder(orderedIds);
+    _logger.debug('DriftStarNyxRepository', 'reorder success');
   }
 
   @override

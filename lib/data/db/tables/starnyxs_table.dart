@@ -26,6 +26,8 @@ class StarNyxs extends Table {
 
   DateTimeColumn get updatedAt => dateTime()();
 
+  IntColumn get displayOrder => integer().withDefault(const Constant(0))();
+
   @override
   // String ids are generated in app code so import/export can preserve them exactly.
   Set<Column<Object>>? get primaryKey => <Column<Object>>{id};

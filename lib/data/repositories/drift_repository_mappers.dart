@@ -29,6 +29,7 @@ extension DriftStarNyxMapper on db.StarNyx {
       reminderTime: reminderTime,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      displayOrder: displayOrder,
     );
   }
 }

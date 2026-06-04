@@ -35,6 +35,7 @@ void main() {
       reminderTime: '09:30',
       createdAt: DateTime(2026, 4, 1, 8),
       updatedAt: DateTime(2026, 4, 2, 9),
+      displayOrder: 7,
     );
 
     await starNyxRepository.saveStarnyx(entity);
@@ -42,6 +43,46 @@ void main() {
     final saved = await starNyxRepository.getStarnyxById('habit-1');
 
     expect(saved, equals(entity));
+  });
+
+  test('loads StarNyx rows by display order and persists reorders', () async {
+    await starNyxRepository.saveStarnyx(
+      _starnyx(
+        id: 'middle',
+        title: 'Middle',
+        updatedAt: DateTime(2026, 4, 2, 9),
+        displayOrder: 1,
+      ),
+    );
+    await starNyxRepository.saveStarnyx(
+      _starnyx(
+        id: 'first',
+        title: 'First',
+        updatedAt: DateTime(2026, 4, 1, 9),
+        displayOrder: 0,
+      ),
+    );
+    await starNyxRepository.saveStarnyx(
+      _starnyx(
+        id: 'last',
+        title: 'Last',
+        updatedAt: DateTime(2026, 4, 3, 9),
+        displayOrder: 2,
+      ),
+    );
+
+    var loaded = await starNyxRepository.getAllStarnyxs();
+    expect(loaded.map((item) => item.id), <String>['first', 'middle', 'last']);
+
+    await starNyxRepository.reorderStarnyxs(<String>[
+      'last',
+      'first',
+      'middle',
+    ]);
+
+    loaded = await starNyxRepository.getAllStarnyxs();
+    expect(loaded.map((item) => item.id), <String>['last', 'first', 'middle']);
+    expect(loaded.map((item) => item.displayOrder), <int>[0, 1, 2]);
   });
 
   test('saves and loads completion domain entities by date', () async {
@@ -100,7 +141,9 @@ void main() {
 
     await journalEntryRepository.saveJournalEntry(entry);
 
-    final saved = await journalEntryRepository.getJournalEntriesForStarnyx('habit-1');
+    final saved = await journalEntryRepository.getJournalEntriesForStarnyx(
+      'habit-1',
+    );
 
     expect(saved, hasLength(1));
     expect(saved.first.content, equals(entry.content));
@@ -183,4 +226,24 @@ void main() {
 
     expect(saved, equals(settings));
   });
+}
+
+domain.StarNyx _starnyx({
+  required String id,
+  required String title,
+  required DateTime updatedAt,
+  required int displayOrder,
+}) {
+  return domain.StarNyx(
+    id: id,
+    title: title,
+    description: null,
+    color: '#102030',
+    startDate: DateTime(2026, 4, 1),
+    reminderEnabled: false,
+    reminderTime: null,
+    createdAt: DateTime(2026, 4, 1, 8),
+    updatedAt: updatedAt,
+    displayOrder: displayOrder,
+  );
 }

@@ -36,7 +36,6 @@ void main() {
     expect(serviceLocator.isRegistered<AppLogService>(), isTrue);
     expect(serviceLocator.isRegistered<AppBlocObserver>(), isTrue);
     expect(serviceLocator.isRegistered<NotificationService>(), isTrue);
-    expect(serviceLocator.isRegistered<StarNyxOrderStore>(), isTrue);
     expect(serviceLocator.isRegistered<StarNyxRepository>(), isTrue);
     expect(serviceLocator.isRegistered<CompletionRepository>(), isTrue);
     expect(serviceLocator.isRegistered<JournalEntryRepository>(), isTrue);

@@ -14,6 +14,9 @@ abstract interface class StarNyxRepository {
   // Save abstracts both create and update behavior behind one call.
   Future<void> saveStarnyx(StarNyx starnyx);
 
+  // Reorder persists explicit display order for list and picker flows.
+  Future<void> reorderStarnyxs(List<String> orderedIds);
+
   // Delete removes the habit and lets lower layers handle related cleanup.
   Future<void> deleteStarnyxById(String id);
 }

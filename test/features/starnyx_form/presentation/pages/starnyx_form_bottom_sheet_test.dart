@@ -165,6 +165,9 @@ class _InMemoryStarNyxRepository implements StarNyxRepository {
   }
 
   @override
+  Future<void> reorderStarnyxs(List<String> orderedIds) async {}
+
+  @override
   Stream<List<StarNyx>> watchAllStarnyxs() async* {
     yield await getAllStarnyxs();
   }

@@ -50,9 +50,6 @@ void _registerCoreDependencies(SharedPreferences preferences) {
   serviceLocator.registerLazySingleton<ActiveStarnyxColorCache>(
     () => ActiveStarnyxColorCache(preferences),
   );
-  serviceLocator.registerLazySingleton<StarNyxOrderStore>(
-    () => SharedPreferencesStarNyxOrderStore(preferences),
-  );
   serviceLocator.registerLazySingleton<AppBlocObserver>(
     () => AppBlocObserver(serviceLocator<AppLogService>()),
   );
@@ -118,7 +115,6 @@ void _registerUseCases() {
   serviceLocator.registerLazySingleton<LoadStarnyxsUseCase>(
     () => LoadStarnyxsUseCase(
       serviceLocator<StarNyxRepository>(),
-      orderStore: serviceLocator<StarNyxOrderStore>(),
       logger: serviceLocator<AppLogService>(),
     ),
   );
@@ -159,7 +155,7 @@ void _registerUseCases() {
   );
   serviceLocator.registerLazySingleton<SaveStarNyxOrderUseCase>(
     () => SaveStarNyxOrderUseCase(
-      serviceLocator<StarNyxOrderStore>(),
+      serviceLocator<StarNyxRepository>(),
       logger: serviceLocator<AppLogService>(),
     ),
   );
