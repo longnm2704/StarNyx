@@ -83,7 +83,7 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
     );
 
     if (confirmed == true && mounted) {
-      _journalBloc.add(JournalDeleteRequested(entry.id));
+      _journalBloc.add(JournalDeleteRequested(entry));
     }
   }
 
@@ -105,6 +105,7 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
         listenWhen: (previous, current) =>
             previous.saveStatus != current.saveStatus ||
             previous.deleteStatus != current.deleteStatus ||
+            previous.undoDeleteStatus != current.undoDeleteStatus ||
             previous.feedbackCount != current.feedbackCount,
         listener: (context, state) {
           if (state.saveStatus == AsyncStatus.success) {
@@ -138,14 +139,32 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+          } else if (state.deleteStatus == AsyncStatus.success &&
+              state.recentlyDeletedEntry != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('journal.delete_undo_message'.tr()),
+                action: SnackBarAction(
+                  label: 'journal.delete_undo_action'.tr(),
+                  onPressed: () {
+                    _journalBloc.add(const JournalDeleteUndoRequested());
+                  },
+                ),
+              ),
+            );
+          } else if (state.undoDeleteStatus == AsyncStatus.failure &&
+              state.errorMessage != null) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
           }
         },
         child: FractionallySizedBox(
           heightFactor: 1.0,
-        child: AppSheetBackground(
-          accentColor: widget.accentColor,
-          showStars: false,
-          child: SafeArea(
+          child: AppSheetBackground(
+            accentColor: widget.accentColor,
+            showStars: false,
+            child: SafeArea(
               top: false,
               bottom: false,
               child: Column(

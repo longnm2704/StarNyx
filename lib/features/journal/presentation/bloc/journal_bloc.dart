@@ -31,6 +31,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     on<JournalDraftChanged>(_onDraftChanged);
     on<JournalSaveRequested>(_onSaveRequested);
     on<JournalDeleteRequested>(_onDeleteRequested);
+    on<JournalDeleteUndoRequested>(_onDeleteUndoRequested);
     on<JournalEntriesChanged>(_onEntriesChanged);
     on<JournalSubscriptionFailed>(_onSubscriptionFailed);
   }
@@ -56,6 +57,8 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         starnyxId: event.starnyxId,
         saveStatus: AsyncStatus.idle,
         deleteStatus: AsyncStatus.idle,
+        undoDeleteStatus: AsyncStatus.idle,
+        recentlyDeletedEntry: null,
         errorMessage: null,
       ),
     );
@@ -87,6 +90,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         draftContent: event.content,
         saveStatus: AsyncStatus.idle,
         deleteStatus: AsyncStatus.idle,
+        undoDeleteStatus: AsyncStatus.idle,
         errorMessage: null,
       ),
     );
@@ -115,6 +119,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
       state.copyWith(
         saveStatus: AsyncStatus.inProgress,
         deleteStatus: AsyncStatus.idle,
+        undoDeleteStatus: AsyncStatus.idle,
         errorMessage: null,
       ),
     );
@@ -156,21 +161,23 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     JournalDeleteRequested event,
     Emitter<JournalState> emit,
   ) async {
-    _logger.debug('JournalBloc', 'delete begin id=${event.id}');
+    _logger.debug('JournalBloc', 'delete begin id=${event.entry.id}');
     emit(
       state.copyWith(
         deleteStatus: AsyncStatus.inProgress,
         saveStatus: AsyncStatus.idle,
+        undoDeleteStatus: AsyncStatus.idle,
         errorMessage: null,
       ),
     );
 
     try {
-      await _deleteJournalEntryUseCase(id: event.id);
-      _logger.debug('JournalBloc', 'delete success id=${event.id}');
+      await _deleteJournalEntryUseCase(id: event.entry.id);
+      _logger.debug('JournalBloc', 'delete success id=${event.entry.id}');
       emit(
         state.copyWith(
           deleteStatus: AsyncStatus.success,
+          recentlyDeletedEntry: event.entry,
           feedbackCount: state.feedbackCount + 1,
           errorMessage: null,
         ),
@@ -178,7 +185,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     } catch (error, stackTrace) {
       _logger.error(
         'JournalBloc',
-        'delete failed id=${event.id}',
+        'delete failed id=${event.entry.id}',
         error: error,
         stackTrace: stackTrace,
       );
@@ -188,6 +195,55 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
           feedbackCount: state.feedbackCount + 1,
           errorMessage:
               'Unable to delete the journal entry right now. Please try again.',
+        ),
+      );
+    }
+  }
+
+  Future<void> _onDeleteUndoRequested(
+    JournalDeleteUndoRequested event,
+    Emitter<JournalState> emit,
+  ) async {
+    final entry = state.recentlyDeletedEntry;
+    if (entry == null) {
+      _logger.debug('JournalBloc', 'undo delete ignored: no recent entry');
+      return;
+    }
+
+    _logger.debug('JournalBloc', 'undo delete begin id=${entry.id}');
+    emit(
+      state.copyWith(
+        undoDeleteStatus: AsyncStatus.inProgress,
+        deleteStatus: AsyncStatus.idle,
+        saveStatus: AsyncStatus.idle,
+        errorMessage: null,
+      ),
+    );
+
+    try {
+      await _saveJournalEntryUseCase.restore(entry);
+      _logger.debug('JournalBloc', 'undo delete success id=${entry.id}');
+      emit(
+        state.copyWith(
+          undoDeleteStatus: AsyncStatus.success,
+          recentlyDeletedEntry: null,
+          feedbackCount: state.feedbackCount + 1,
+          errorMessage: null,
+        ),
+      );
+    } catch (error, stackTrace) {
+      _logger.error(
+        'JournalBloc',
+        'undo delete failed id=${entry.id}',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      emit(
+        state.copyWith(
+          undoDeleteStatus: AsyncStatus.failure,
+          feedbackCount: state.feedbackCount + 1,
+          errorMessage:
+              'Unable to restore the journal entry right now. Please try again.',
         ),
       );
     }

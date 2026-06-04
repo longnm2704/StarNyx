@@ -50,4 +50,16 @@ class SaveJournalEntryUseCase {
     );
     return entry;
   }
+
+  Future<void> restore(JournalEntry entry) async {
+    _logger.debug(
+      'SaveJournalEntryUseCase',
+      'restore begin id=${entry.id} starnyxId=${entry.starnyxId}',
+    );
+    await _repository.saveJournalEntry(entry);
+    _logger.debug(
+      'SaveJournalEntryUseCase',
+      'restore success id=${entry.id} starnyxId=${entry.starnyxId}',
+    );
+  }
 }

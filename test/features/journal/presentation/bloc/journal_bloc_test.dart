@@ -115,16 +115,66 @@ void main() {
       createdAt: DateTime(2026, 4, 16, 10, 0),
     );
     await repository.saveJournalEntry(entry);
-    
+
     bloc.add(const JournalStarted('s-1'));
     await pumpEventQueue(times: 3);
 
-    bloc.add(const JournalDeleteRequested(100));
+    bloc.add(JournalDeleteRequested(entry));
     await pumpEventQueue(times: 5);
 
     expect(bloc.state.deleteStatus, AsyncStatus.success);
     final entries = await repository.getJournalEntriesForStarnyx('s-1');
     expect(entries.any((e) => e.id == 100), isFalse);
+  });
+
+  test('undo delete restores the recently deleted entry', () async {
+    final entry = JournalEntry(
+      id: 100,
+      starnyxId: 's-1',
+      date: DateTime(2026, 4, 16),
+      content: 'Restore me',
+      createdAt: DateTime(2026, 4, 16, 10, 0),
+    );
+    await repository.saveJournalEntry(entry);
+
+    bloc.add(const JournalStarted('s-1'));
+    await pumpEventQueue(times: 3);
+
+    bloc.add(JournalDeleteRequested(entry));
+    await pumpEventQueue(times: 5);
+
+    var entries = await repository.getJournalEntriesForStarnyx('s-1');
+    expect(entries.any((e) => e.id == 100), isFalse);
+    expect(bloc.state.recentlyDeletedEntry, entry);
+
+    bloc.add(const JournalDeleteUndoRequested());
+    await pumpEventQueue(times: 5);
+
+    entries = await repository.getJournalEntriesForStarnyx('s-1');
+    expect(entries.single, entry);
+    expect(bloc.state.undoDeleteStatus, AsyncStatus.success);
+    expect(bloc.state.recentlyDeletedEntry, isNull);
+  });
+
+  test('deleted entry remains removed when undo is not requested', () async {
+    final entry = JournalEntry(
+      id: 100,
+      starnyxId: 's-1',
+      date: DateTime(2026, 4, 16),
+      content: 'Delete me permanently',
+      createdAt: DateTime(2026, 4, 16, 10, 0),
+    );
+    await repository.saveJournalEntry(entry);
+
+    bloc.add(const JournalStarted('s-1'));
+    await pumpEventQueue(times: 3);
+
+    bloc.add(JournalDeleteRequested(entry));
+    await pumpEventQueue(times: 5);
+
+    final entries = await repository.getJournalEntriesForStarnyx('s-1');
+    expect(entries, isEmpty);
+    expect(bloc.state.recentlyDeletedEntry, entry);
   });
 }
 
