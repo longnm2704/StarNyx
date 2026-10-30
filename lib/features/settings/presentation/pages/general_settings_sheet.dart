@@ -61,9 +61,10 @@ class GeneralSettingsSheet extends StatelessWidget {
   }
 
   // Language names stay in their own language so users can always find theirs.
-  static const _languageNames = <String, String>{
-    'en': 'English',
-    'vi': 'Tiếng Việt',
+  static const _languages = <String, ({String name, String flag})>{
+    'en': (name: 'English', flag: 'assets/icons/us.png'),
+    'vi': (name: 'Tiếng Việt', flag: 'assets/icons/vn.png'),
+    'ja': (name: '日本語', flag: 'assets/icons/jp.png'),
   };
 
   Future<void> _showLanguagePicker(BuildContext context) {
@@ -108,9 +109,9 @@ class GeneralSettingsSheet extends StatelessWidget {
               for (final locale in context.supportedLocales) ...[
                 _LanguageOption(
                   label:
-                      _languageNames[locale.languageCode] ??
+                      _languages[locale.languageCode]?.name ??
                       locale.languageCode,
-                  code: locale.languageCode.toUpperCase(),
+                  flagAsset: _languages[locale.languageCode]?.flag,
                   selected: locale == context.locale,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -130,13 +131,13 @@ class GeneralSettingsSheet extends StatelessWidget {
 class _LanguageOption extends StatelessWidget {
   const _LanguageOption({
     required this.label,
-    required this.code,
+    required this.flagAsset,
     required this.selected,
     required this.onTap,
   });
 
   final String label;
-  final String code;
+  final String? flagAsset;
   final bool selected;
   final VoidCallback onTap;
 
@@ -172,25 +173,23 @@ class _LanguageOption extends StatelessWidget {
             ),
             child: Row(
               children: [
+                // Flag assets are already circular; the ring just lifts them off the card.
                 Container(
                   width: 40,
                   height: 40,
-                  alignment: Alignment.center,
+                  padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: selected
-                        ? AppColors.accentViolet.withValues(alpha: 0.28)
-                        : AppColors.surfaceElevated,
+                        ? AppColors.accentLavender.withValues(alpha: 0.7)
+                        : AppColors.outlineSoft.withValues(alpha: 0.3),
                   ),
-                  child: Text(
-                    code,
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: selected
-                          ? AppColors.accentLavender
-                          : AppColors.textSecondary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  child: flagAsset == null
+                      ? const Icon(
+                          Icons.language_rounded,
+                          color: AppColors.textSecondary,
+                        )
+                      : Image.asset(flagAsset!, fit: BoxFit.cover),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(

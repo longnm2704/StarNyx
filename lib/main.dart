@@ -25,7 +25,11 @@ Future<void> main() async {
       path: 'assets/translations',
       startLocale: const Locale('en'),
       fallbackLocale: const Locale('en'),
-      supportedLocales: const <Locale>[Locale('en'), Locale('vi')],
+      supportedLocales: const <Locale>[
+        Locale('en'),
+        Locale('vi'),
+        Locale('ja'),
+      ],
       child: const StarNyxApp(),
     ),
   );
