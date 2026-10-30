@@ -226,7 +226,7 @@ class FlutterLocalTimezoneProvider implements LocalTimezoneProvider {
   @override
   Future<String?> getLocalTimezone() async {
     try {
-      return FlutterTimezone.getLocalTimezone();
+      return await FlutterTimezone.getLocalTimezone();
     } on Object {
       return null;
     }

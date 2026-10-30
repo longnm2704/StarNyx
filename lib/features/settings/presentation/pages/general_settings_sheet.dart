@@ -45,7 +45,7 @@ class GeneralSettingsSheet extends StatelessWidget {
               _GeneralSettingTile(
                 title: 'settings.language_label'.tr(),
                 value: 'settings.language_value'.tr(),
-                onTap: () {},
+                onTap: () => _showLanguagePicker(context),
               ),
               const SizedBox(height: AppSpacing.md),
               _GeneralSettingTile(
@@ -57,6 +57,39 @@ class GeneralSettingsSheet extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  // Language names stay in their own language so users can always find theirs.
+  static const _languageNames = <String, String>{
+    'en': 'English',
+    'vi': 'Tiếng Việt',
+  };
+
+  Future<void> _showLanguagePicker(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) => SimpleDialog(
+        title: Text('settings.language_label'.tr()),
+        children: [
+          for (final locale in context.supportedLocales)
+            ListTile(
+              title: Text(
+                _languageNames[locale.languageCode] ?? locale.languageCode,
+              ),
+              trailing: locale == context.locale
+                  ? const Icon(
+                      Icons.check_rounded,
+                      color: AppColors.accentLavender,
+                    )
+                  : null,
+              onTap: () {
+                Navigator.of(dialogContext).pop();
+                context.setLocale(locale);
+              },
+            ),
+        ],
+      ),
     );
   }
 }
