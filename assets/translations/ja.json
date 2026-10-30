@@ -97,7 +97,7 @@
   "settings": {
     "title": "設定",
     "general_section": "環境設定",
-    "general_label": "言語と時刻",
+    "general_label": "言語",
     "data_section": "データ管理",
     "backup_section": "データ",
     "backup_label": "バックアップとインポート",
@@ -139,9 +139,6 @@
     "general_title": "一般",
     "language_label": "言語",
     "language_value": "日本語",
-    "time_format_label": "時刻の形式",
-    "time_format_24h": "24時間表示",
-    "time_format_12h": "12時間表示",
     "version_label": "バージョン {}"
   }
 }

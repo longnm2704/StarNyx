@@ -47,12 +47,6 @@ class GeneralSettingsSheet extends StatelessWidget {
                 value: 'settings.language_value'.tr(),
                 onTap: () => _showLanguagePicker(context),
               ),
-              const SizedBox(height: AppSpacing.md),
-              _GeneralSettingTile(
-                title: 'settings.time_format_label'.tr(),
-                value: 'settings.time_format_24h'.tr(),
-                onTap: () {},
-              ),
             ],
           ),
         ),

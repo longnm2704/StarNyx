@@ -97,7 +97,7 @@
   "settings": {
     "title": "Cài đặt",
     "general_section": "Tùy chọn",
-    "general_label": "Ngôn ngữ & thời gian",
+    "general_label": "Ngôn ngữ",
     "data_section": "Quản lý dữ liệu",
     "backup_section": "Dữ liệu",
     "backup_label": "Sao lưu & nhập",
@@ -139,9 +139,6 @@
     "general_title": "Chung",
     "language_label": "Ngôn ngữ",
     "language_value": "Tiếng Việt",
-    "time_format_label": "Định dạng giờ",
-    "time_format_24h": "24 giờ",
-    "time_format_12h": "12 giờ",
     "version_label": "Phiên bản {}"
   }
 }

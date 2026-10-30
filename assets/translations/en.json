@@ -97,7 +97,7 @@
   "settings": {
     "title": "Settings",
     "general_section": "Preferences",
-    "general_label": "Language & time",
+    "general_label": "Language",
     "data_section": "Data Management",
     "backup_section": "Data",
     "backup_label": "Backup & import",
@@ -139,9 +139,6 @@
     "general_title": "General",
     "language_label": "Language",
     "language_value": "English",
-    "time_format_label": "Time Format",
-    "time_format_24h": "24-hour",
-    "time_format_12h": "12-hour",
     "version_label": "Version {}"
   }
 }
