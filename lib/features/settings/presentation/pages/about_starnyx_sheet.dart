@@ -62,7 +62,7 @@ class AboutStarnyxSheet extends StatelessWidget {
                   ),
                   child: const Center(
                     child: AppIcon(
-                      icon: HugeIconsStrokeRounded.strokeRoundedStar,
+                      icon: HugeIconsStrokeRounded.strokeRoundedSparkles,
                       size: 50,
                       color: AppColors.white,
                     ),

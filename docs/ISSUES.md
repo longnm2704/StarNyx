@@ -136,7 +136,7 @@ Tick `[x]` when an issue is done.
     - Body comes from translations in the user's locale, e.g. "{title}: hôm nay bạn đã thắp chưa?" / "{title}: ready to light today?".
     - Scheduled reminders are re-synced after a language change.
     - Test covers body text for at least two locales.
-- [ ] **STX-R014**: Replace star-specific decorative visuals
+- [x] **STX-R014**: Replace star-specific decorative visuals
   - _Should-have · kind:polish · depends on: STX-R002_
   - Remove remaining fixed-star imagery outside the grid.
   - Acceptance criteria:
