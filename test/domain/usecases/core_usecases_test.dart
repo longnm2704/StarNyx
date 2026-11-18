@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:uuid/uuid.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:starnyx/core/utils/json_validation_utils.dart';
 import 'package:starnyx/domain/entities/domain_entities.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
@@ -654,6 +655,7 @@ void main() {
         'reminderTime': '09:30',
         'createdAt': '2026-04-01T08:00:00.000',
         'updatedAt': '2026-04-02T09:00:00.000',
+        'icon': 'star',
       },
     );
     expect(
@@ -1251,6 +1253,268 @@ void main() {
       );
     },
   );
+
+  test('export use case writes icon for each starnyx', () async {
+    await starNyxRepository.saveStarnyx(
+      StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 2, 9),
+        icon: 'flame',
+      ),
+    );
+
+    final useCase = ExportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    );
+    final exportedJson = await useCase();
+    final payload = jsonDecode(exportedJson) as Map<String, dynamic>;
+
+    final starnyxs = payload['starnyxs'] as List<dynamic>;
+    expect(starnyxs, hasLength(1));
+    expect(
+      (starnyxs.first as Map<String, dynamic>)['icon'],
+      'flame',
+    );
+  });
+
+  test('import old backup without icon defaults to star', () async {
+    final useCase = ImportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    );
+
+    await useCase(<String, dynamic>{
+      'schemaVersion': 1,
+      'starnyxs': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'id': 'habit-old',
+          'title': 'Legacy Habit',
+          'description': null,
+          'color': '#111111',
+          'startDate': '2026-04-01',
+          'reminderEnabled': false,
+          'reminderTime': null,
+          'createdAt': '2026-04-01T08:00:00.000',
+          'updatedAt': '2026-04-01T08:00:00.000',
+        },
+      ],
+      'completions': <Map<String, dynamic>>[],
+      'journalEntries': <Map<String, dynamic>>[],
+      'appSettings': <String, dynamic>{
+        'lastSelectedStarnyxId': null,
+        'updatedAt': '2026-04-01T08:00:00.000',
+      },
+    });
+
+    final loaded = await starNyxRepository.getStarnyxById('habit-old');
+    expect(loaded, isNotNull);
+    expect(loaded!.icon, 'star');
+  });
+
+  test('import round-trips a new backup with icon', () async {
+    await starNyxRepository.saveStarnyx(
+      StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 2, 9),
+        icon: 'clover',
+      ),
+    );
+
+    final exportUseCase = ExportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    );
+    final exportedJson = await exportUseCase();
+    final payload = jsonDecode(exportedJson) as Map<String, dynamic>;
+    expect(
+      (payload['starnyxs'] as List<dynamic>).first['icon'],
+      'clover',
+    );
+
+    // Clear and re-import to simulate a round-trip.
+    await starNyxRepository.deleteStarnyxById('habit-1');
+
+    final importUseCase = ImportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    );
+    await importUseCase(payload);
+
+    final loaded = await starNyxRepository.getStarnyxById('habit-1');
+    expect(loaded, isNotNull);
+    expect(loaded!.icon, 'clover');
+  });
+
+  test('import keeps an unknown icon key without failing validation', () async {
+    final useCase = ImportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    );
+
+    await useCase(<String, dynamic>{
+      'schemaVersion': 1,
+      'starnyxs': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'id': 'habit-mystery',
+          'title': 'Mystery',
+          'description': null,
+          'color': '#111111',
+          'startDate': '2026-04-01',
+          'reminderEnabled': false,
+          'reminderTime': null,
+          'createdAt': '2026-04-01T08:00:00.000',
+          'updatedAt': '2026-04-01T08:00:00.000',
+          'icon': 'not-a-real-key',
+        },
+      ],
+      'completions': <Map<String, dynamic>>[],
+      'journalEntries': <Map<String, dynamic>>[],
+      'appSettings': <String, dynamic>{
+        'lastSelectedStarnyxId': null,
+        'updatedAt': '2026-04-01T08:00:00.000',
+      },
+    });
+
+    final loaded = await starNyxRepository.getStarnyxById('habit-mystery');
+    expect(loaded, isNotNull);
+    expect(loaded!.icon, 'not-a-real-key');
+  });
+
+  test('import validation accepts optional icon field', () async {
+    // icon present as a valid string
+    final validResult = JsonValidationUtils.validateImportJson(<String, dynamic>{
+      'schemaVersion': 1,
+      'starnyxs': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'id': 'habit-1',
+          'title': 'Hydrate',
+          'description': null,
+          'color': '#102030',
+          'startDate': '2026-04-01',
+          'reminderEnabled': false,
+          'reminderTime': null,
+          'createdAt': '2026-04-01T08:00:00.000',
+          'updatedAt': '2026-04-01T08:00:00.000',
+          'icon': 'flame',
+        },
+      ],
+      'completions': <Map<String, dynamic>>[],
+      'journalEntries': <Map<String, dynamic>>[],
+      'appSettings': <String, dynamic>{
+        'lastSelectedStarnyxId': null,
+        'updatedAt': '2026-04-01T08:00:00.000',
+      },
+    });
+    expect(validResult.isValid, isTrue);
+
+    // icon missing entirely
+    final missingResult = JsonValidationUtils.validateImportJson(
+      <String, dynamic>{
+        'schemaVersion': 1,
+        'starnyxs': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'id': 'habit-1',
+            'title': 'Hydrate',
+            'description': null,
+            'color': '#102030',
+            'startDate': '2026-04-01',
+            'reminderEnabled': false,
+            'reminderTime': null,
+            'createdAt': '2026-04-01T08:00:00.000',
+            'updatedAt': '2026-04-01T08:00:00.000',
+          },
+        ],
+        'completions': <Map<String, dynamic>>[],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': null,
+          'updatedAt': '2026-04-01T08:00:00.000',
+        },
+      },
+    );
+    expect(missingResult.isValid, isTrue);
+
+    // icon as null
+    final nullResult = JsonValidationUtils.validateImportJson(
+      <String, dynamic>{
+        'schemaVersion': 1,
+        'starnyxs': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'id': 'habit-1',
+            'title': 'Hydrate',
+            'description': null,
+            'color': '#102030',
+            'startDate': '2026-04-01',
+            'reminderEnabled': false,
+            'reminderTime': null,
+            'createdAt': '2026-04-01T08:00:00.000',
+            'updatedAt': '2026-04-01T08:00:00.000',
+            'icon': null,
+          },
+        ],
+        'completions': <Map<String, dynamic>>[],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': null,
+          'updatedAt': '2026-04-01T08:00:00.000',
+        },
+      },
+    );
+    expect(nullResult.isValid, isTrue);
+
+    // icon as non-string is invalid
+    final invalidResult = JsonValidationUtils.validateImportJson(
+      <String, dynamic>{
+        'schemaVersion': 1,
+        'starnyxs': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'id': 'habit-1',
+            'title': 'Hydrate',
+            'description': null,
+            'color': '#102030',
+            'startDate': '2026-04-01',
+            'reminderEnabled': false,
+            'reminderTime': null,
+            'createdAt': '2026-04-01T08:00:00.000',
+            'updatedAt': '2026-04-01T08:00:00.000',
+            'icon': 123,
+          },
+        ],
+        'completions': <Map<String, dynamic>>[],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': null,
+          'updatedAt': '2026-04-01T08:00:00.000',
+        },
+      },
+    );
+    expect(invalidResult.isValid, isFalse);
+  });
 }
 
 class _InMemoryStarNyxRepository implements StarNyxRepository {

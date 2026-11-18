@@ -164,6 +164,9 @@ abstract final class JsonValidationUtils {
       path: 'starnyxs[$index]',
       errors: errors,
     );
+    // `icon` is optional on import: missing/null falls back to `star`, and an
+    // unknown key is kept (fallback happens at read time) without failing.
+    _optionalNullableString(entry, 'icon', 'starnyxs[$index]', errors);
     return id;
   }
 

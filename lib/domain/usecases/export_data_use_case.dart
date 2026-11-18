@@ -89,6 +89,7 @@ Map<String, dynamic> _starnyxToJson(StarNyx starnyx) {
     'reminderTime': starnyx.reminderTime,
     'createdAt': starnyx.createdAt.toIso8601String(),
     'updatedAt': starnyx.updatedAt.toIso8601String(),
+    'icon': starnyx.icon,
   };
 }
 

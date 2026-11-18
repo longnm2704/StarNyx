@@ -50,7 +50,7 @@ Tick `[x]` when an issue is done.
     - `StarNyx` entity, `copyWith`, `props`, mappers, DAO, create/update use cases carry `icon`.
     - Existing habits read back as `star` after migration.
     - Unknown keys render as `star` (via R003 fallback), no crash.
-- [ ] **STX-R005**: Support optional icon field in backup export/import
+- [x] **STX-R005**: Support optional icon field in backup export/import
   - _Must-have · kind:backup · depends on: STX-R004_
   - Include `icon` in backups without breaking existing backup files.
   - Acceptance criteria:
