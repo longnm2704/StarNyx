@@ -42,7 +42,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic R-B - Data
 
-- [ ] **STX-R004**: Add icon column to starnyxs (schema v3 → v4)
+- [x] **STX-R004**: Add icon column to starnyxs (schema v3 → v4)
   - _Must-have · kind:architecture · depends on: STX-R003_
   - Persist the chosen symbol per habit.
   - Acceptance criteria:

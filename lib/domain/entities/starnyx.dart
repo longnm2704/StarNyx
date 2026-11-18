@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:starnyx/core/constants/habit_symbols.dart';
 
 const Object _unset = Object();
 
@@ -15,6 +16,7 @@ class StarNyx extends Equatable {
     required this.createdAt,
     required this.updatedAt,
     this.displayOrder = 0,
+    this.icon = HabitSymbols.defaultKey,
   });
 
   final String id;
@@ -27,6 +29,11 @@ class StarNyx extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
   final int displayOrder;
+
+  // Habit symbol key from the curated catalog. Stable data contract: never
+  // rename or reuse a key. Defaults to `star`; unknown keys fall back via
+  // HabitSymbols.iconFor.
+  final String icon;
 
   // This keeps presentation code from repeating null and blank checks.
   bool get hasDescription => description?.trim().isNotEmpty ?? false;
@@ -46,6 +53,7 @@ class StarNyx extends Equatable {
     DateTime? createdAt,
     DateTime? updatedAt,
     int? displayOrder,
+    String? icon,
   }) {
     return StarNyx(
       id: id ?? this.id,
@@ -62,6 +70,7 @@ class StarNyx extends Equatable {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       displayOrder: displayOrder ?? this.displayOrder,
+      icon: icon ?? this.icon,
     );
   }
 
@@ -77,5 +86,6 @@ class StarNyx extends Equatable {
     createdAt,
     updatedAt,
     displayOrder,
+    icon,
   ];
 }

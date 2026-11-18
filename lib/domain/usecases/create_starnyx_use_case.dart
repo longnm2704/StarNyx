@@ -1,4 +1,5 @@
 import 'package:uuid/uuid.dart';
+import 'package:starnyx/core/constants/habit_symbols.dart';
 import 'package:starnyx/core/utils/date_utils.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/core/services/app_log_service.dart';
@@ -24,6 +25,7 @@ class CreateStarNyxUseCase {
     required DateTime startDate,
     required bool reminderEnabled,
     required String? reminderTime,
+    String icon = HabitSymbols.defaultKey,
     DateTime? now,
   }) async {
     final timestamp = now ?? DateTime.now();
@@ -52,6 +54,7 @@ class CreateStarNyxUseCase {
       createdAt: timestamp,
       updatedAt: timestamp,
       displayOrder: nextDisplayOrder,
+      icon: icon,
     );
 
     _logger.debug(

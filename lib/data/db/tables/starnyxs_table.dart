@@ -22,6 +22,10 @@ class StarNyxs extends Table {
   // Stored as HH:mm when reminders are enabled.
   TextColumn get reminderTime => text().withLength(min: 5, max: 5).nullable()();
 
+  // Habit symbol key from the curated catalog (see HabitSymbols). Stable data
+  // contract: never rename or reuse a key. Defaults to `star`.
+  TextColumn get icon => text().withDefault(const Constant('star'))();
+
   DateTimeColumn get createdAt => dateTime()();
 
   DateTimeColumn get updatedAt => dateTime()();

@@ -36,6 +36,7 @@ void main() {
       createdAt: DateTime(2026, 4, 1, 8),
       updatedAt: DateTime(2026, 4, 2, 9),
       displayOrder: 7,
+      icon: 'flame',
     );
 
     await starNyxRepository.saveStarnyx(entity);
@@ -233,6 +234,7 @@ domain.StarNyx _starnyx({
   required String title,
   required DateTime updatedAt,
   required int displayOrder,
+  String icon = 'star',
 }) {
   return domain.StarNyx(
     id: id,
@@ -245,5 +247,6 @@ domain.StarNyx _starnyx({
     createdAt: DateTime(2026, 4, 1, 8),
     updatedAt: updatedAt,
     displayOrder: displayOrder,
+    icon: icon,
   );
 }

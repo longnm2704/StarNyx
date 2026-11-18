@@ -20,6 +20,7 @@ void main() {
       reminderTime: '09:00',
       createdAt: createdAt,
       updatedAt: updatedAt,
+      icon: 'flame',
     );
 
     final second = StarNyx(
@@ -32,9 +33,30 @@ void main() {
       reminderTime: '09:00',
       createdAt: createdAt,
       updatedAt: updatedAt,
+      icon: 'flame',
     );
 
     expect(first, equals(second));
+  });
+
+  test('icon defaults to star and is preserved by copyWith', () {
+    final entity = StarNyx(
+      id: 'habit-1',
+      title: 'Hydrate',
+      description: null,
+      color: '#123456',
+      startDate: startDate,
+      reminderEnabled: false,
+      reminderTime: null,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+
+    expect(entity.icon, 'star');
+
+    final copied = entity.copyWith(icon: 'clover');
+    expect(copied.icon, 'clover');
+    expect(entity.icon, 'star');
   });
 
   test('copyWith can clear nullable fields', () {
@@ -48,11 +70,13 @@ void main() {
       reminderTime: '09:00',
       createdAt: createdAt,
       updatedAt: updatedAt,
+      icon: 'heart',
     );
 
     final copied = entity.copyWith(description: null, reminderTime: null);
 
     expect(copied.description, isNull);
     expect(copied.reminderTime, isNull);
+    expect(copied.icon, 'heart');
   });
 }

@@ -30,6 +30,7 @@ extension DriftStarNyxMapper on db.StarNyx {
       createdAt: createdAt,
       updatedAt: updatedAt,
       displayOrder: displayOrder,
+      icon: icon,
     );
   }
 }

@@ -69,6 +69,7 @@ class DriftStarNyxRepository implements StarNyxRepository {
           createdAt: Value(starnyx.createdAt),
           updatedAt: Value(starnyx.updatedAt),
           displayOrder: Value(starnyx.displayOrder),
+          icon: Value(starnyx.icon),
         ),
       );
       _logger.debug(

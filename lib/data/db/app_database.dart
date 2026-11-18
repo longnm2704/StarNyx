@@ -20,8 +20,8 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  // Schema version 3: Adds explicit StarNyx display ordering.
-  int get schemaVersion => 3;
+  // Schema version 4: Adds the persisted habit symbol (icon) column.
+  int get schemaVersion => 4;
 
   @override
   // Versioned migrations handle structural changes between schema releases.
@@ -49,6 +49,9 @@ class AppDatabase extends _$AppDatabase {
               )
           )
         ''');
+      }
+      if (from < 4) {
+        await migrator.addColumn(starNyxs, starNyxs.icon);
       }
     },
     beforeOpen: (OpeningDetails details) async {

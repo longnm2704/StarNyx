@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:starnyx/core/constants/habit_symbols.dart';
 import 'package:starnyx/core/services/app_log_service.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/entities/completion.dart';
@@ -233,6 +234,7 @@ StarNyx _starnyxFromJson(Map<String, dynamic> json) {
     reminderTime: json['reminderTime'] as String?,
     createdAt: DateTime.parse(json['createdAt'] as String),
     updatedAt: DateTime.parse(json['updatedAt'] as String),
+    icon: (json['icon'] as String?) ?? HabitSymbols.defaultKey,
   );
 }
 
