@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -269,8 +270,8 @@ class _JournalEmptyState extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              AppSvgIcon(
-                assetPath: 'assets/icons/ic_book.svg',
+              AppIcon(
+                icon: HugeIconsStrokeRounded.strokeRoundedBookOpen01,
                 size: 36,
                 color: AppColors.textMuted.withValues(alpha: 0.9),
               ),
@@ -439,8 +440,8 @@ class _JournalInputArea extends StatelessWidget {
                                 ),
                               ),
                             )
-                          : const Icon(
-                              Icons.send_rounded,
+                          : const AppIcon(
+                              icon: HugeIconsStrokeRounded.strokeRoundedSend,
                               size: 22,
                               color: AppColors.white,
                             ),

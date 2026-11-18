@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/features/home/presentation/widgets/top_circle_asset_icon_button.dart';
@@ -47,7 +48,7 @@ class FirstRunWelcomeView extends StatelessWidget {
                     Align(
                       alignment: Alignment.topRight,
                       child: TopCircleAssetIconButton(
-                        assetPath: 'assets/icons/ic_settings.svg',
+                        icon: HugeIconsStrokeRounded.strokeRoundedSettings01,
                         tooltip: 'welcome.settings'.tr(),
                         onPressed: () => onSettingsPressed?.call(),
                       ),

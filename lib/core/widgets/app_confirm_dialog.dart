@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
-import 'app_svg_icon.dart';
+import 'app_icon.dart';
 
 const LinearGradient _appConfirmDialogGradient = LinearGradient(
   begin: Alignment.topLeft,
@@ -15,7 +16,7 @@ Future<bool?> showAppConfirmDialog({
   required String message,
   required String cancelLabel,
   required String confirmLabel,
-  String iconAssetPath = 'assets/icons/ic_trash.svg',
+  List<List<dynamic>> icon = HugeIconsStrokeRounded.strokeRoundedTrash,
   AppConfirmActionStyle actionStyle = AppConfirmActionStyle.neutral,
   Color? accentColor,
 }) {
@@ -31,7 +32,7 @@ Future<bool?> showAppConfirmDialog({
         message: message,
         cancelLabel: cancelLabel,
         confirmLabel: confirmLabel,
-        iconAssetPath: iconAssetPath,
+        icon: icon,
         actionStyle: actionStyle,
         accentColor: accentColor,
       );
@@ -67,7 +68,7 @@ class AppConfirmDialog extends StatelessWidget {
     required this.cancelLabel,
     required this.confirmLabel,
     super.key,
-    this.iconAssetPath = 'assets/icons/ic_trash.svg',
+    this.icon = HugeIconsStrokeRounded.strokeRoundedTrash,
     this.actionStyle = AppConfirmActionStyle.neutral,
     this.accentColor,
   });
@@ -76,7 +77,7 @@ class AppConfirmDialog extends StatelessWidget {
   final String message;
   final String cancelLabel;
   final String confirmLabel;
-  final String iconAssetPath;
+  final List<List<dynamic>> icon;
   final AppConfirmActionStyle actionStyle;
   final Color? accentColor;
 
@@ -128,8 +129,8 @@ class AppConfirmDialog extends StatelessWidget {
                         ),
                       ),
                       child: Center(
-                        child: AppSvgIcon(
-                          assetPath: iconAssetPath,
+                        child: AppIcon(
+                          icon: icon,
                           color: effectiveAccentColor,
                           size: 22,
                           semanticsLabel: title,

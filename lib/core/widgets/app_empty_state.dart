@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
 import 'gradient_outline_button.dart';
-import 'app_svg_icon.dart';
+import 'app_icon.dart';
 
 // Shared empty-state card for screens that have no content yet.
 class AppEmptyState extends StatelessWidget {
@@ -10,12 +11,12 @@ class AppEmptyState extends StatelessWidget {
     required this.title,
     required this.message,
     super.key,
-    this.iconAssetPath = 'assets/icons/ic_sparkles.svg',
+    this.icon = HugeIconsStrokeRounded.strokeRoundedSparkles,
     this.actionLabel,
     this.onActionPressed,
   });
 
-  final String iconAssetPath;
+  final List<List<dynamic>> icon;
   final String title;
   final String message;
   final String? actionLabel;
@@ -67,8 +68,8 @@ class AppEmptyState extends StatelessWidget {
                 ),
               ),
               child: Center(
-                child: AppSvgIcon(
-                  assetPath: iconAssetPath,
+                child: AppIcon(
+                  icon: icon,
                   size: 28,
                   color: AppColors.accentLavender,
                   semanticsLabel: title,

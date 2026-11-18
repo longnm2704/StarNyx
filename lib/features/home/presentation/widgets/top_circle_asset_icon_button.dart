@@ -4,13 +4,13 @@ import 'package:starnyx/core/constants/core_constants.dart';
 
 class TopCircleAssetIconButton extends StatelessWidget {
   const TopCircleAssetIconButton({
-    required this.assetPath,
+    required this.icon,
     required this.onPressed,
     required this.tooltip,
     super.key,
   });
 
-  final String assetPath;
+  final List<List<dynamic>> icon;
   final VoidCallback onPressed;
   final String tooltip;
 
@@ -36,8 +36,8 @@ class TopCircleAssetIconButton extends StatelessWidget {
       child: IconButton(
         onPressed: onPressed,
         tooltip: tooltip,
-        icon: AppSvgIcon(
-          assetPath: assetPath,
+        icon: AppIcon(
+          icon: icon,
           size: 22,
           color: AppColors.textPrimary.withValues(alpha: 0.94),
           semanticsLabel: tooltip,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_header.dart';
 
@@ -179,8 +181,8 @@ class _LanguageOption extends StatelessWidget {
                         : AppColors.outlineSoft.withValues(alpha: 0.3),
                   ),
                   child: flagAsset == null
-                      ? const Icon(
-                          Icons.language_rounded,
+                      ? const AppIcon(
+                          icon: HugeIconsStrokeRounded.strokeRoundedLanguages,
                           color: AppColors.textSecondary,
                         )
                       : Image.asset(flagAsset!, fit: BoxFit.cover),
@@ -198,14 +200,14 @@ class _LanguageOption extends StatelessWidget {
                 AnimatedSwitcher(
                   duration: AppDurations.fast,
                   child: selected
-                      ? const Icon(
-                          Icons.check_circle_rounded,
+                      ? const AppIcon(
+                          icon: HugeIconsStrokeRounded.strokeRoundedCircleCheck,
                           key: ValueKey('selected'),
                           color: AppColors.accentLavender,
                           size: 24,
                         )
-                      : Icon(
-                          Icons.circle_outlined,
+                      : AppIcon(
+                          icon: HugeIconsStrokeRounded.strokeRoundedCircle,
                           key: const ValueKey('unselected'),
                           color: AppColors.textMuted.withValues(alpha: 0.6),
                           size: 24,
@@ -278,8 +280,8 @@ class _GeneralSettingTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
-                Icons.chevron_right_rounded,
+              const AppIcon(
+                icon: HugeIconsStrokeRounded.strokeRoundedChevronRight,
                 color: AppColors.textMuted,
                 size: 24,
               ),

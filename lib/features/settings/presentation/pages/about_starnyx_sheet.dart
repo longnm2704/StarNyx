@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -60,8 +61,8 @@ class AboutStarnyxSheet extends StatelessWidget {
                     ],
                   ),
                   child: const Center(
-                    child: AppSvgIcon(
-                      assetPath: 'assets/icons/ic_star_active.svg',
+                    child: AppIcon(
+                      icon: HugeIconsStrokeRounded.strokeRoundedStar,
                       size: 50,
                       color: AppColors.white,
                     ),

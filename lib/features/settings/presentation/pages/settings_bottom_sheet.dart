@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -202,7 +203,7 @@ class _SettingsMainViewState extends State<SettingsMainView> {
                 title: 'settings.general_section'.tr(),
                 children: [
                   _SettingsTile(
-                    iconPath: 'assets/icons/ic_general.svg',
+                    icon: HugeIconsStrokeRounded.strokeRoundedSlidersHorizontal,
                     title: 'settings.general_label'.tr(),
                     onTap: widget.onGeneralTap,
                   ),
@@ -213,7 +214,7 @@ class _SettingsMainViewState extends State<SettingsMainView> {
                 title: 'settings.backup_section'.tr(),
                 children: [
                   _SettingsTile(
-                    iconPath: 'assets/icons/ic_book.svg',
+                    icon: HugeIconsStrokeRounded.strokeRoundedBookOpen01,
                     title: 'settings.backup_label'.tr(),
                     onTap: widget.onBackupTap,
                   ),
@@ -224,12 +225,12 @@ class _SettingsMainViewState extends State<SettingsMainView> {
                 title: 'settings.about_section'.tr(),
                 children: [
                   _SettingsTile(
-                    iconPath: 'assets/icons/ic_about.svg',
+                    icon: HugeIconsStrokeRounded.strokeRoundedIdCard,
                     title: 'settings.about_label'.tr(),
                     onTap: widget.onAboutTap,
                   ),
                   _SettingsTile(
-                    iconPath: 'assets/icons/ic_version.svg',
+                    icon: HugeIconsStrokeRounded.strokeRoundedCode,
                     title: 'settings.version_label'.tr(
                       args: <String>[_appVersion],
                     ),
@@ -315,12 +316,12 @@ class _SettingsSection extends StatelessWidget {
 
 class _SettingsTile extends StatelessWidget {
   const _SettingsTile({
-    required this.iconPath,
+    required this.icon,
     required this.title,
     this.onTap,
   });
 
-  final String iconPath;
+  final List<List<dynamic>> icon;
   final String title;
   final VoidCallback? onTap;
 
@@ -346,8 +347,8 @@ class _SettingsTile extends StatelessWidget {
                   ),
                 ),
                 child: Center(
-                  child: AppSvgIcon(
-                    assetPath: iconPath,
+                  child: AppIcon(
+                    icon: icon,
                     size: 18,
                     color: AppColors.accentLavender,
                   ),
@@ -364,8 +365,8 @@ class _SettingsTile extends StatelessWidget {
                 ),
               ),
               if (onTap != null)
-                const Icon(
-                  Icons.chevron_right_rounded,
+                const AppIcon(
+                  icon: HugeIconsStrokeRounded.strokeRoundedChevronRight,
                   color: AppColors.textMuted,
                   size: 20,
                 ),

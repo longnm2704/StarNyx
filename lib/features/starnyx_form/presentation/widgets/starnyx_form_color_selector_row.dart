@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
@@ -120,8 +121,8 @@ class _LockedColorDot extends StatelessWidget {
             color: AppColors.sheetBg,
           ),
           child: const Center(
-            child: AppSvgIcon(
-              assetPath: 'assets/icons/ic_color_picker.svg',
+            child: AppIcon(
+              icon: HugeIconsStrokeRounded.strokeRoundedColorPicker,
               semanticsLabel: 'Color picker',
               size: 18,
               color: AppColors.lockIcon,

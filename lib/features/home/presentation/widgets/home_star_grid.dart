@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:starnyx/core/widgets/app_svg_icon.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
 import 'home_grid_utils.dart';
@@ -297,8 +298,8 @@ class _GridStarCellState extends State<_GridStarCell>
                 },
                 child: SizedBox(
                   key: widget.todayKey,
-                  child: AppSvgIcon(
-                    assetPath: _starAssetPath(),
+                  child: AppIcon(
+                    icon: HugeIconsStrokeRounded.strokeRoundedStar,
                     size: iconSize,
                     color: _starColor(),
                   ),
@@ -309,17 +310,6 @@ class _GridStarCellState extends State<_GridStarCell>
         ),
       ),
     );
-  }
-
-  String _starAssetPath() {
-    switch (widget.dayState) {
-      case HomeGridStarDayState.beforeStart:
-      case HomeGridStarDayState.future:
-        return 'assets/icons/ic_star.svg';
-      case HomeGridStarDayState.completed:
-      case HomeGridStarDayState.missed:
-        return 'assets/icons/ic_star_active.svg';
-    }
   }
 
   Color _starColor() {

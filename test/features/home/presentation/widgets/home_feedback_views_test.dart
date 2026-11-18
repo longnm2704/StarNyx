@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -134,9 +135,18 @@ void main() {
       expect(find.text('Your constellations'), findsOneWidget);
       expect(find.text('Edit to reorder'), findsOneWidget);
       expect(find.text('Stretch'), findsOneWidget);
-      expect(_findSvg('assets/icons/ic_settings.svg'), findsOneWidget);
-      expect(_findSvg('assets/icons/ic_book.svg'), findsOneWidget);
-      expect(_findSvg('assets/icons/ic_plus.svg'), findsOneWidget);
+      expect(
+        _findIcon(HugeIconsStrokeRounded.strokeRoundedSettings01),
+        findsOneWidget,
+      );
+      expect(
+        _findIcon(HugeIconsStrokeRounded.strokeRoundedBookOpen01),
+        findsOneWidget,
+      );
+      expect(
+        _findIcon(HugeIconsStrokeRounded.strokeRoundedPlus),
+        findsOneWidget,
+      );
 
       expect(edited, isNull);
       expect(find.text('Constellation Deck'), findsOneWidget);
@@ -144,13 +154,19 @@ void main() {
       _pressTextButton(tester, 'Edit');
       await tester.pump();
       expect(find.text('Done'), findsOneWidget);
-      expect(_findSvg('assets/icons/ic_cursor.svg'), findsWidgets);
+      expect(
+        _findIcon(HugeIconsStrokeRounded.strokeRoundedCursor01),
+        findsWidgets,
+      );
 
       _pressTextButton(tester, 'Done');
       await tester.pump();
       expect(find.text('Edit'), findsOneWidget);
 
-      _pressSheetActionIcon(tester, 'assets/icons/ic_plus.svg');
+      _pressSheetActionIcon(
+        tester,
+        HugeIconsStrokeRounded.strokeRoundedPlus,
+      );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 220));
       await tester.pump(const Duration(milliseconds: 220));
@@ -176,12 +192,15 @@ void main() {
       await tester.pump(const Duration(milliseconds: 220));
 
       await tester.scrollUntilVisible(
-        _findSvg('assets/icons/ic_edit.svg').last,
+        _findIcon(HugeIconsStrokeRounded.strokeRoundedEdit01).last,
         200,
         scrollable: find.byType(Scrollable).last,
       );
       await tester.pump();
-      _pressIconButton(tester, _findSvg('assets/icons/ic_edit.svg').last);
+      _pressIconButton(
+        tester,
+        _findIcon(HugeIconsStrokeRounded.strokeRoundedEdit01).last,
+      );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 220));
       await tester.pump(const Duration(milliseconds: 220));
@@ -230,9 +249,9 @@ void main() {
   });
 }
 
-Finder _findSvg(String assetPath) {
+Finder _findIcon(List<List<dynamic>> icon) {
   return find.byWidgetPredicate(
-    (Widget widget) => widget is AppSvgIcon && widget.assetPath == assetPath,
+    (Widget widget) => widget is AppIcon && widget.icon == icon,
   );
 }
 
@@ -243,9 +262,9 @@ void _pressTextButton(WidgetTester tester, String label) {
   button.onPressed!.call();
 }
 
-void _pressSheetActionIcon(WidgetTester tester, String assetPath) {
+void _pressSheetActionIcon(WidgetTester tester, List<List<dynamic>> icon) {
   final action = tester.widget<InkWell>(
-    find.ancestor(of: _findSvg(assetPath), matching: find.byType(InkWell)),
+    find.ancestor(of: _findIcon(icon), matching: find.byType(InkWell)),
   );
   action.onTap!.call();
 }

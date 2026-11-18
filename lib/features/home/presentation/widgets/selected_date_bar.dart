@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 
 class SelectedDateBar extends StatelessWidget {
   const SelectedDateBar({
@@ -34,7 +36,7 @@ class SelectedDateBar extends StatelessWidget {
     return Row(
       children: <Widget>[
         _DayChevronButton(
-          icon: Icons.chevron_left_rounded,
+          icon: HugeIconsStrokeRounded.strokeRoundedChevronLeft,
           buttonKey: const Key('home-previous-day-button'),
           onPressed: onPreviousDayPressed,
         ),
@@ -86,7 +88,7 @@ class SelectedDateBar extends StatelessWidget {
         ),
         const SizedBox(width: AppSpacing.md),
         _DayChevronButton(
-          icon: Icons.chevron_right_rounded,
+          icon: HugeIconsStrokeRounded.strokeRoundedChevronRight,
           buttonKey: const Key('home-next-day-button'),
           onPressed: onNextDayPressed,
         ),
@@ -102,7 +104,7 @@ class _DayChevronButton extends StatelessWidget {
     required this.onPressed,
   });
 
-  final IconData icon;
+  final List<List<dynamic>> icon;
   final Key buttonKey;
   final VoidCallback? onPressed;
 
@@ -132,7 +134,7 @@ class _DayChevronButton extends StatelessWidget {
               ),
             ),
           ),
-          child: Icon(icon, color: foreground, size: 24),
+          child: AppIcon(icon: icon, color: foreground, size: 24),
         ),
       ),
     );

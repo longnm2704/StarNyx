@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
-import 'package:starnyx/core/widgets/app_svg_icon.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
@@ -85,8 +86,7 @@ void main() {
         find.byKey(const Key('home-future-star-cell-109')),
         findsOneWidget,
       );
-      expect(_findSvg('assets/icons/ic_star_active.svg'), findsWidgets);
-      expect(_findSvg('assets/icons/ic_star.svg'), findsWidgets);
+      expect(_findIcon(HugeIconsStrokeRounded.strokeRoundedStar), findsWidgets);
     },
   );
 
@@ -150,9 +150,9 @@ void main() {
   );
 }
 
-Finder _findSvg(String assetPath) {
+Finder _findIcon(List<List<dynamic>> icon) {
   return find.byWidgetPredicate(
-    (Widget widget) => widget is AppSvgIcon && widget.assetPath == assetPath,
+    (Widget widget) => widget is AppIcon && widget.icon == icon,
   );
 }
 

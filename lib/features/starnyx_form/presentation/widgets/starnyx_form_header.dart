@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
@@ -63,8 +64,8 @@ class _CloseButton extends StatelessWidget {
       ),
       child: IconButton(
         onPressed: onPressed,
-        icon: const AppSvgIcon(
-          assetPath: 'assets/icons/ic_close.svg',
+        icon: const AppIcon(
+          icon: HugeIconsStrokeRounded.strokeRoundedX,
           size: 18,
           color: AppColors.textPrimary,
         ),

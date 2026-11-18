@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 
 class HomeYearSummaryRow extends StatelessWidget {
   const HomeYearSummaryRow({
@@ -93,7 +95,7 @@ class HomeYearSummaryRow extends StatelessWidget {
         children: <Widget>[
           _YearChevronButton(
             buttonKey: const Key('home-previous-year-button'),
-            icon: Icons.chevron_left_rounded,
+            icon: HugeIconsStrokeRounded.strokeRoundedChevronLeft,
             onPressed: onPreviousYearPressed,
           ),
           SizedBox(
@@ -115,7 +117,7 @@ class HomeYearSummaryRow extends StatelessWidget {
           ),
           _YearChevronButton(
             buttonKey: const Key('home-next-year-button'),
-            icon: Icons.chevron_right_rounded,
+            icon: HugeIconsStrokeRounded.strokeRoundedChevronRight,
             onPressed: onNextYearPressed,
           ),
         ],
@@ -185,7 +187,7 @@ class _YearChevronButton extends StatelessWidget {
   });
 
   final Key buttonKey;
-  final IconData icon;
+  final List<List<dynamic>> icon;
   final VoidCallback? onPressed;
 
   @override
@@ -203,7 +205,7 @@ class _YearChevronButton extends StatelessWidget {
         child: SizedBox(
           width: _buttonSize,
           height: _buttonSize,
-          child: Icon(icon, size: 20, color: color),
+          child: AppIcon(icon: icon, size: 20, color: color),
         ),
       ),
     );

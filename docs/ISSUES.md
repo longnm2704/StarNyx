@@ -21,7 +21,7 @@ Tick `[x]` when an issue is done.
     - `AppSvgIcon` is removed once R002 lands; `flutter_svg` is dropped if nothing else uses it.
   - Notes:
     - Free package = stroke-rounded only. Filled states must be built with shapes (see R007), not solid icon styles.
-- [ ] **STX-R002**: Migrate all UI icons to Hugeicons and delete unused SVG assets
+- [x] **STX-R002**: Migrate all UI icons to Hugeicons and delete unused SVG assets
   - _Must-have · kind:polish · depends on: STX-R001_
   - Replace the 22 custom SVGs in `assets/icons/` and the 11 `Icons.*` usages (chevrons, check, send, language, circle) with Hugeicons equivalents.
   - Acceptance criteria:

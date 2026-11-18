@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 
@@ -39,8 +40,8 @@ class StarnyxFormStartOnCard extends StatelessWidget {
                 ),
               ),
             ),
-            const AppSvgIcon(
-              assetPath: 'assets/icons/ic_calendar.svg',
+            const AppIcon(
+              icon: HugeIconsStrokeRounded.strokeRoundedCalendar01,
               size: 18,
               color: AppColors.iconMuted,
               semanticsLabel: 'Calendar',

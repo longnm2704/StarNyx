@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -200,7 +201,8 @@ class _ConstellationSwitcherSheetState
                     children: <Widget>[
                       Expanded(
                         child: _SheetActionPill(
-                          assetPath: 'assets/icons/ic_settings.svg',
+                          icon: HugeIconsStrokeRounded.strokeRoundedSettings01,
+                          semanticsLabel: 'settings.title'.tr(),
                           onPressed: () => Navigator.of(context).pop(
                             const ConstellationSwitcherSheetAction.settingsRequested(),
                           ),
@@ -209,7 +211,8 @@ class _ConstellationSwitcherSheetState
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: _SheetActionPill(
-                          assetPath: 'assets/icons/ic_book.svg',
+                          icon: HugeIconsStrokeRounded.strokeRoundedBookOpen01,
+                          semanticsLabel: 'journal.title'.tr(),
                           onPressed: () => Navigator.of(context).pop(
                             const ConstellationSwitcherSheetAction.journalRequested(),
                           ),
@@ -218,7 +221,8 @@ class _ConstellationSwitcherSheetState
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: _SheetActionPill(
-                          assetPath: 'assets/icons/ic_plus.svg',
+                          icon: HugeIconsStrokeRounded.strokeRoundedPlus,
+                          semanticsLabel: 'starnyx_form.create_sheet_title'.tr(),
                           onPressed: () => Navigator.of(context).pop(
                             const ConstellationSwitcherSheetAction.createRequested(),
                           ),
@@ -408,9 +412,14 @@ class _ActiveConstellationPill extends StatelessWidget {
 }
 
 class _SheetActionPill extends StatelessWidget {
-  const _SheetActionPill({required this.assetPath, this.onPressed});
+  const _SheetActionPill({
+    required this.icon,
+    required this.semanticsLabel,
+    this.onPressed,
+  });
 
-  final String assetPath;
+  final List<List<dynamic>> icon;
+  final String semanticsLabel;
   final VoidCallback? onPressed;
 
   @override
@@ -432,13 +441,13 @@ class _SheetActionPill extends StatelessWidget {
             ),
           ),
           child: Center(
-            child: AppSvgIcon(
-              assetPath: assetPath,
+            child: AppIcon(
+              icon: icon,
               size: 22,
               color: isEnabled
                   ? AppColors.white.withValues(alpha: 0.9)
                   : AppColors.textMuted,
-              semanticsLabel: assetPath,
+              semanticsLabel: semanticsLabel,
             ),
           ),
         ),
@@ -523,8 +532,8 @@ class _ConstellationSwitcherCard extends StatelessWidget {
                     ? ReorderableDragStartListener(
                         index: reorderIndex,
                         child: Center(
-                          child: AppSvgIcon(
-                            assetPath: 'assets/icons/ic_cursor.svg',
+                          child: AppIcon(
+                            icon: HugeIconsStrokeRounded.strokeRoundedCursor01,
                             color: itemColor.withValues(alpha: 0.92),
                             size: 18,
                             semanticsLabel: 'Reorder ${starnyx.title}',
@@ -533,8 +542,8 @@ class _ConstellationSwitcherCard extends StatelessWidget {
                       )
                     : IconButton(
                         onPressed: onEditPressed,
-                        icon: AppSvgIcon(
-                          assetPath: 'assets/icons/ic_edit.svg',
+                        icon: AppIcon(
+                          icon: HugeIconsStrokeRounded.strokeRoundedEdit01,
                           color: itemColor,
                           size: 18,
                           semanticsLabel: 'Edit ${starnyx.title}',

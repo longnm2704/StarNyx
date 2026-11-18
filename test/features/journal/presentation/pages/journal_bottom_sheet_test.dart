@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/domain/entities/domain_entities.dart';
@@ -60,7 +62,11 @@ void main() {
       'Checked in and felt great.',
     );
     await tester.pump();
-    await tester.tap(find.byIcon(Icons.send_rounded));
+    await tester.tap(find.byWidgetPredicate(
+      (Widget widget) =>
+          widget is AppIcon &&
+          widget.icon == HugeIconsStrokeRounded.strokeRoundedSend,
+    ));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
     await tester.pump(const Duration(milliseconds: 300));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
@@ -22,7 +23,7 @@ class HomeErrorView extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.cardPadding,
               child: AppEmptyState(
-                iconAssetPath: 'assets/icons/ic_error.svg',
+                icon: HugeIconsStrokeRounded.strokeRoundedAlert01,
                 title: 'home.load_error_title'.tr(),
                 message: 'home.load_error_message'.tr(),
                 actionLabel: 'home.retry'.tr(),

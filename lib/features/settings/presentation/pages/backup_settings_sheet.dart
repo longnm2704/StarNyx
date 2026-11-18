@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -391,7 +392,7 @@ class BackupSettingsSheet extends StatelessWidget {
                     if (state.isExporting || state.hasExportFailure)
                       const SizedBox(height: AppSpacing.md),
                     _BackupTile(
-                      iconPath: 'assets/icons/ic_export.svg',
+                      icon: HugeIconsStrokeRounded.strokeRoundedArrowUpFromLine,
                       title: 'settings.export_label'.tr(),
                       subtitle: 'settings.export_hint'.tr(),
                       isLoading: state.isExporting,
@@ -401,7 +402,7 @@ class BackupSettingsSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     _BackupTile(
-                      iconPath: 'assets/icons/ic_import.svg',
+                      icon: HugeIconsStrokeRounded.strokeRoundedArrowDownToLine,
                       title: 'settings.import_label'.tr(),
                       subtitle: 'settings.import_hint'.tr(),
                       isLoading: state.importStatus == AsyncStatus.inProgress,
@@ -422,14 +423,14 @@ class BackupSettingsSheet extends StatelessWidget {
 
 class _BackupTile extends StatelessWidget {
   const _BackupTile({
-    required this.iconPath,
+    required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
     this.isLoading = false,
   });
 
-  final String iconPath;
+  final List<List<dynamic>> icon;
   final String title;
   final String subtitle;
   final VoidCallback? onTap;
@@ -471,8 +472,8 @@ class _BackupTile extends StatelessWidget {
                   ),
                 ),
                 child: Center(
-                  child: AppSvgIcon(
-                    assetPath: iconPath,
+                  child: AppIcon(
+                    icon: icon,
                     size: 18,
                     color: AppColors.textPrimary,
                   ),
@@ -508,8 +509,8 @@ class _BackupTile extends StatelessWidget {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               else
-                const Icon(
-                  Icons.chevron_right_rounded,
+                const AppIcon(
+                  icon: HugeIconsStrokeRounded.strokeRoundedChevronRight,
                   color: AppColors.textMuted,
                 ),
             ],
