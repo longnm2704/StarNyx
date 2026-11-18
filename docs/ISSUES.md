@@ -5,12 +5,14 @@ Hugeicons **Free** package (`stroke-rounded` style only).
 
 Tick `[x]` when an issue is done.
 
+**Rule:** when an issue is done, tick its `[x]` in this file and commit the change (issue work + this file) before moving on to the next issue.
+
 **Suggested order:** R001 → R003 → R004 → R005 → (R006, R007) → (R008, R009) → R015. R012 and R013 can run in parallel from the start.
 
 
 ## Epic R-A - Icon Foundation
 
-- [ ] **STX-R001**: Add hugeicons and an AppIcon widget to replace AppSvgIcon
+- [x] **STX-R001**: Add hugeicons and an AppIcon widget to replace AppSvgIcon
   - _Must-have · kind:setup · depends on: —_
   - Adopt Hugeicons (free package, `stroke-rounded` style only) as the app's icon system and introduce one shared `AppIcon` widget.
   - Acceptance criteria:

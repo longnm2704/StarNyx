@@ -1,4 +1,5 @@
 // Barrel export for shared reusable widgets.
+export 'app_icon.dart';
 export 'app_svg_icon.dart';
 export 'app_empty_state.dart';
 export 'app_error_state.dart';

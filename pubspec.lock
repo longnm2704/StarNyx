@@ -501,6 +501,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  hugeicons:
+    dependency: "direct main"
+    description:
+      name: hugeicons
+      sha256: b93f0b14acf5d7491a84950907ae93be56aa35a20cd5619fe1d706aa340d690b
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.4.0"
   image:
     dependency: transitive
     description:
