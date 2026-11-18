@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
-import 'package:starnyx/domain/entities/starnyx.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
 class ConstellationSwitcherSheetAction {
@@ -514,6 +514,20 @@ class _ConstellationSwitcherCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              SizedBox(
+                width: 44,
+                height: 44,
+                child: Center(
+                  child: AppIcon(
+                    icon: HabitSymbols.iconFor(starnyx.icon),
+                    color: itemColor.withValues(alpha: isActive ? 1.0 : 0.6),
+                    size: 28,
+                    strokeWidth: 2,
+                    semanticsLabel: 'Habit symbol ${starnyx.title}',
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   starnyx.title,

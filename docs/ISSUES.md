@@ -103,7 +103,7 @@ Tick `[x]` when an issue is done.
     - Habit symbol (~40px, accent color) above the title in `HomeShellView`.
     - `longestStreak` and `completionRateForYear` from `StarNyxProgressStats` are displayed alongside lit days and current streak.
     - Layout holds at 320px width and large text scale.
-- [ ] **STX-R011**: Show habit symbol in the switcher sheet rows
+- [x] **STX-R011**: Show habit symbol in the switcher sheet rows
   - _Should-have · kind:feature · depends on: STX-R001, STX-R004_
   - Habits are currently distinguished only by color in the switcher.
   - Acceptance criteria:
