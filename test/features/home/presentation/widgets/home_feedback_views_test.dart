@@ -129,10 +129,10 @@ void main() {
       await tester.pump(const Duration(milliseconds: 220));
       await tester.pump(const Duration(milliseconds: 220));
 
-      expect(find.text('Constellation Deck'), findsOneWidget);
+      expect(find.text('Habit Deck'), findsOneWidget);
       expect(find.text('Switch, write, or adjust'), findsOneWidget);
       expect(find.text('Current focus'), findsOneWidget);
-      expect(find.text('Your constellations'), findsOneWidget);
+      expect(find.text('Your habits'), findsOneWidget);
       expect(find.text('Edit to reorder'), findsOneWidget);
       expect(find.text('Stretch'), findsOneWidget);
       expect(
@@ -149,7 +149,7 @@ void main() {
       );
 
       expect(edited, isNull);
-      expect(find.text('Constellation Deck'), findsOneWidget);
+      expect(find.text('Habit Deck'), findsOneWidget);
 
       _pressTextButton(tester, 'Edit');
       await tester.pump();
@@ -173,7 +173,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 220));
       expect(createPressed, isTrue);
       createPressed = false;
-      expect(find.text('Constellation Deck'), findsOneWidget);
+      expect(find.text('Habit Deck'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.text('Stretch'),
@@ -207,7 +207,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 220));
       expect(edited, starnyxs[1]);
       edited = null;
-      expect(find.text('Constellation Deck'), findsOneWidget);
+      expect(find.text('Habit Deck'), findsOneWidget);
     },
   );
 

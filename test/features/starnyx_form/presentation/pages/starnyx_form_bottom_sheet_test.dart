@@ -31,16 +31,16 @@ void main() {
       await tester.pumpWidget(_buildLocalizedApp(const _AutoOpenFormHost()));
       await tester.pumpAndSettle();
 
-      expect(find.text('New Constellation'), findsOneWidget);
-      expect(find.text('Save Constellation'), findsOneWidget);
+      expect(find.text('New habit'), findsOneWidget);
+      expect(find.text('Save habit'), findsOneWidget);
 
       await tester.scrollUntilVisible(
-        find.text('Save Constellation'),
+        find.text('Save habit'),
         200,
         scrollable: find.byType(Scrollable).first,
       );
       await tester.pump();
-      await tester.tap(find.text('Save Constellation'));
+      await tester.tap(find.text('Save habit'));
       await tester.pump();
 
       expect(find.text('Title is required'), findsOneWidget);

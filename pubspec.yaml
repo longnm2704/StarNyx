@@ -1,5 +1,5 @@
 name: starnyx
-description: "A privacy-first offline habit tracker with a constellation-inspired journal and check-in experience."
+description: "A privacy-first offline habit tracker with a night-light journal and check-in experience."
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1

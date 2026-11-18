@@ -112,7 +112,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic R-E - Copy & Visuals
 
-- [ ] **STX-R012**: Rewrite vi/en/ja copy for the Night Lights voice
+- [x] **STX-R012**: Rewrite vi/en/ja copy for the Night Lights voice
   - _Must-have · kind:polish · depends on: —_
   - All copy assumes stars/constellations ("chòm sao" appears 23× in vi.json, 19× in en.json). Rewrite in all three locales.
   - Acceptance criteria:

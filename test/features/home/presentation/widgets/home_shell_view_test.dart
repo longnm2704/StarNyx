@@ -60,7 +60,7 @@ void main() {
       expect(find.text('257 days left'), findsOneWidget);
       expect(find.text('Today'), findsOneWidget);
       expect(find.text('Sunday, 19 Apr'), findsOneWidget);
-      expect(find.text('Completed: 2 · Streak: 0 · Best: 2 · Rate: 16%'), findsOneWidget);
+      expect(find.text('2 days lit · 0 in a row · 2 best · 16% rate'), findsOneWidget);
       expect(
         find.byWidgetPredicate(
           (Widget widget) =>

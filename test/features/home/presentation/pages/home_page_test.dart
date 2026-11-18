@@ -53,7 +53,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.byType(FirstRunWelcomeView), findsOneWidget);
-    expect(find.text('New Constellation'), findsOneWidget);
+    expect(find.text('New habit'), findsOneWidget);
   });
 
   testWidgets('welcome state stays usable on small screens', (tester) async {
