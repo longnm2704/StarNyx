@@ -89,7 +89,7 @@ Tick `[x]` when an issue is done.
     - `HapticFeedback.lightImpact()` on light.
     - Un-lighting fades the cell, no celebration.
     - Animation respects reduced-motion (`MediaQuery.disableAnimations`).
-- [ ] **STX-R009**: Make the check-in action explicit (Light today / Lit)
+- [x] **STX-R009**: Make the check-in action explicit (Light today / Lit)
   - _Must-have · kind:feature · depends on: STX-R007, STX-R012_
   - Today the user must guess that tapping the date bar toggles completion.
   - Acceptance criteria:

@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/widgets/app_icon.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 
 class SelectedDateBar extends StatelessWidget {
@@ -9,6 +11,8 @@ class SelectedDateBar extends StatelessWidget {
     required this.onPreviousDayPressed,
     required this.onNextDayPressed,
     required this.accentColor,
+    required this.symbolKey,
+    required this.isLit,
     this.onSelectedDatePressed,
     this.isCheckingIn = false,
     super.key,
@@ -18,6 +22,13 @@ class SelectedDateBar extends StatelessWidget {
   final VoidCallback? onPreviousDayPressed;
   final VoidCallback? onNextDayPressed;
   final Color accentColor;
+
+  /// Stable habit symbol key (e.g. 'star', 'clover', 'flame').
+  final String symbolKey;
+
+  /// Whether the selected date is completed (lit).
+  final bool isLit;
+
   final VoidCallback? onSelectedDatePressed;
   final bool isCheckingIn;
 
@@ -32,6 +43,13 @@ class SelectedDateBar extends StatelessWidget {
     final Color bottomColor = canShowActiveState
         ? Color.lerp(accentColor, AppColors.black, 0.88)!
         : AppColors.surfaceMuted.withValues(alpha: 0.28);
+    final iconData = HabitSymbols.iconFor(symbolKey);
+    final actionText = isLit
+        ? 'home.checkin_lit'.tr()
+        : 'home.checkin_light_today'.tr();
+    final actionSemantics = isLit
+        ? 'home.checkin_lit_semantics'.tr()
+        : 'home.checkin_light_today_semantics'.tr();
 
     return Row(
       children: <Widget>[
@@ -72,14 +90,65 @@ class SelectedDateBar extends StatelessWidget {
                       ),
                   ],
                 ),
-                child: Text(
-                  selectedDateLabel,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: AppColors.textPrimary.withValues(
-                      alpha: canShowActiveState ? 0.88 : 0.34,
-                    ),
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.2,
+                child: Semantics(
+                  label: actionSemantics,
+                  button: canTap,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Flexible(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              selectedDateLabel,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: AppColors.textPrimary.withValues(
+                                  alpha: canShowActiveState ? 0.88 : 0.34,
+                                ),
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.2,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                AppIcon(
+                                  icon: iconData,
+                                  color: AppColors.textPrimary.withValues(
+                                    alpha: canShowActiveState ? 0.88 : 0.34,
+                                  ),
+                                  size: 16,
+                                  strokeWidth: 2,
+                                ),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    actionText,
+                                    style: theme.textTheme.bodySmall
+                                        ?.copyWith(
+                                      color: AppColors.textPrimary.withValues(
+                                        alpha:
+                                            canShowActiveState ? 0.88 : 0.34,
+                                      ),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

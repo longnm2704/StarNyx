@@ -284,6 +284,32 @@ class _HomePageState extends State<HomePage> {
     // ── Completion feedback ────────────────────────────────────────────────
     if (state.completionStatus == AsyncStatus.success) {
       HapticFeedback.lightImpact();
+      final normalizedSelected = DateTime.utc(
+        state.selectedDate.year,
+        state.selectedDate.month,
+        state.selectedDate.day,
+      );
+      final nowLit = state.completedDatesForViewedYear.any(
+        (completed) =>
+            DateTime.utc(
+              completed.year,
+              completed.month,
+              completed.day,
+            ) ==
+            normalizedSelected,
+      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              nowLit
+                  ? 'home.checkin_light_success'.tr()
+                  : 'home.checkin_unlight_success'.tr(),
+            ),
+          ),
+        );
+      });
     } else if (state.completionStatus == AsyncStatus.failure) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('home.checkin_error_message'.tr())),

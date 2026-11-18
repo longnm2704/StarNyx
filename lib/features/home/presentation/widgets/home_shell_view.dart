@@ -96,6 +96,20 @@ class HomeShellView extends StatelessWidget {
     final currentStreak = progressStats?.currentStreak ?? 0;
     final gradientColors = homeShellGradientColors(activeStarnyx.color);
     final accentColor = homeShellAccentColor(activeStarnyx.color);
+    final normalizedSelected = DateTime.utc(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
+    final isLit = completedDatesForViewedYear.any(
+      (completed) =>
+          DateTime.utc(
+            completed.year,
+            completed.month,
+            completed.day,
+          ) ==
+          normalizedSelected,
+    );
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -195,6 +209,8 @@ class HomeShellView extends StatelessWidget {
                         onPreviousDayPressed: onPreviousDayPressed,
                         onNextDayPressed: onNextDayPressed,
                         accentColor: accentColor,
+                        symbolKey: activeStarnyx.icon,
+                        isLit: isLit,
                         onSelectedDatePressed: onToggleCompletionPressed,
                         isCheckingIn: isCheckingIn,
                       ),

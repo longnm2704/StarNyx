@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
+import 'package:starnyx/core/widgets/app_icon.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
