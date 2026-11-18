@@ -53,7 +53,7 @@ void main() {
     expect(client.scheduled.length, 1);
     final request = client.scheduled.single;
     expect(request.title, 'Hydrate');
-    expect(request.body, 'Time to check in on your StarNyx.');
+    expect(request.body, 'Hydrate: ready to light today?');
     expect(request.matchDateTimeComponents, DateTimeComponents.time);
     expect(request.scheduledDate.hour, 9);
     expect(request.scheduledDate.minute, 30);
@@ -64,6 +64,78 @@ void main() {
       ),
       isTrue,
     );
+  });
+
+  test('create reminder uses vi body when vi translator is set', () async {
+    service = LocalNotificationService(
+      client: client,
+      timezoneProvider: const _FakeTimezoneProvider('Asia/Ho_Chi_Minh'),
+      now: () => DateTime(2026, 4, 16, 8, 0),
+      tr: (key, {namedArgs}) {
+        if (key == 'home.reminder_body') {
+          final title = namedArgs?['title'] ?? '';
+          return '$title: hôm nay bạn đã thắp chưa?';
+        }
+        return key;
+      },
+    );
+    await service.initialize();
+
+    await service.createReminder(
+      _sampleStarNyx(reminderEnabled: true, reminderTime: '09:30'),
+    );
+
+    expect(client.scheduled.length, 1);
+    final request = client.scheduled.single;
+    expect(request.body, 'Hydrate: hôm nay bạn đã thắp chưa?');
+  });
+
+  test('create reminder uses ja body when ja translator is set', () async {
+    service = LocalNotificationService(
+      client: client,
+      timezoneProvider: const _FakeTimezoneProvider('Asia/Ho_Chi_Minh'),
+      now: () => DateTime(2026, 4, 16, 8, 0),
+      tr: (key, {namedArgs}) {
+        if (key == 'home.reminder_body') {
+          final title = namedArgs?['title'] ?? '';
+          return '$title: 今日の灯しは？';
+        }
+        return key;
+      },
+    );
+    await service.initialize();
+
+    await service.createReminder(
+      _sampleStarNyx(reminderEnabled: true, reminderTime: '09:30'),
+    );
+
+    expect(client.scheduled.length, 1);
+    final request = client.scheduled.single;
+    expect(request.body, 'Hydrate: 今日の灯しは？');
+  });
+
+  test('setTranslator updates body for subsequent reminders', () async {
+    await service.initialize();
+
+    await service.createReminder(
+      _sampleStarNyx(reminderEnabled: true, reminderTime: '09:30'),
+    );
+    expect(client.scheduled.single.body, 'Hydrate: ready to light today?');
+
+    service.setTranslator(
+      (key, {namedArgs}) {
+        if (key == 'home.reminder_body') {
+          final title = namedArgs?['title'] ?? '';
+          return '$title: hôm nay bạn đã thắp chưa?';
+        }
+        return key;
+      },
+    );
+
+    await service.createReminder(
+      _sampleStarNyx(reminderEnabled: true, reminderTime: '09:30'),
+    );
+    expect(client.scheduled.last.body, 'Hydrate: hôm nay bạn đã thắp chưa?');
   });
 
   test('create reminder is ignored when reminder is disabled', () async {

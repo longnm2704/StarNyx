@@ -38,6 +38,7 @@
     "checkin_light_success": "チェックインを保存しました。",
     "checkin_unlight_success": "チェックインを元に戻しました。",
     "header_semantics": "{0}の習慣アイコン",
+    "reminder_body": "{title}: 今日の灯しは？",
     "summary_stats": "{}日灯った · {} 日連続 · {} 最高 · {}% 達成率",
     "start_date_chip": "開始: {}",
     "reminder_enabled_chip": "リマインダー: {}",

@@ -264,6 +264,11 @@ class _FakeNotificationService implements NotificationService {
   Future<void> cancelAllReminders() async {
     cancelAllCount += 1;
   }
+
+  @override
+  void setTranslator(
+    String Function(String key, {Map<String, dynamic>? namedArgs}) tr,
+  ) {}
 }
 
 class _InMemoryStarNyxRepository implements StarNyxRepository {

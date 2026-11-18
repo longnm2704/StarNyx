@@ -129,7 +129,7 @@ Tick `[x]` when an issue is done.
     - Lit: "Đã thắp hôm nay." / "Lit for today."
     - Stats: "{} ngày đã thắp · {} ngày liền" / "{} days lit · {} in a row"
     - Symbol helper: "Thứ sẽ sáng lên mỗi ngày bạn làm được." / "What lights up each day you show up."
-- [ ] **STX-R013**: Localize the reminder notification body
+- [x] **STX-R013**: Localize the reminder notification body
   - _Must-have · kind:notification,bug · depends on: STX-R012_
   - `local_notification_service.dart:129` hardcodes `'Time to check in on your StarNyx.'`, so vi and ja users get English reminders.
   - Acceptance criteria:

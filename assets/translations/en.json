@@ -38,6 +38,7 @@
     "checkin_light_success": "Check-in saved.",
     "checkin_unlight_success": "Check-in undone.",
     "header_semantics": "{0} habit icon",
+    "reminder_body": "{title}: ready to light today?",
     "summary_stats": "{} days lit · {} in a row · {} best · {}% rate",
     "start_date_chip": "Start: {}",
     "reminder_enabled_chip": "Reminder: {}",

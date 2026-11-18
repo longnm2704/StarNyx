@@ -31,15 +31,35 @@ class LocalNotificationService implements NotificationService {
     LocalTimezoneProvider? timezoneProvider,
     AppLogService logger = const NoOpAppLogService(),
     DateTime Function()? now,
+    String Function(String key, {Map<String, dynamic>? namedArgs})? tr,
   }) : _client = client ?? FlutterLocalNotificationClient(),
        _timezoneProvider = timezoneProvider ?? FlutterLocalTimezoneProvider(),
        _logger = logger,
-       _now = now ?? DateTime.now;
+       _now = now ?? DateTime.now,
+       _tr = tr ?? _defaultTr;
 
   final NotificationClient _client;
   final LocalTimezoneProvider _timezoneProvider;
   final AppLogService _logger;
   final DateTime Function() _now;
+  String Function(String key, {Map<String, dynamic>? namedArgs}) _tr;
+
+  static String _defaultTr(String key, {Map<String, dynamic>? namedArgs}) {
+    if (key == 'home.reminder_body') {
+      final title = namedArgs?['title'] ?? '';
+      return '$title: ready to light today?';
+    }
+    return key;
+  }
+
+  /// Replaces the translator used for notification body text. Call this when
+  /// the app locale changes, then re-sync reminders.
+  @override
+  void setTranslator(
+    String Function(String key, {Map<String, dynamic>? namedArgs}) tr,
+  ) {
+    _tr = tr;
+  }
 
   bool _initialized = false;
   bool _timeZonesInitialized = false;
@@ -126,7 +146,10 @@ class LocalNotificationService implements NotificationService {
     await _client.zonedSchedule(
       id: notificationId,
       title: starnyx.title,
-      body: 'Time to check in on your StarNyx.',
+      body: _tr(
+        'home.reminder_body',
+        namedArgs: <String, dynamic>{'title': starnyx.title},
+      ),
       scheduledDate: scheduledAt,
       details: details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

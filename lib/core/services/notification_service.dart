@@ -16,4 +16,10 @@ abstract class NotificationService {
 
   /// Cancels all reminder schedules managed by this app.
   Future<void> cancelAllReminders();
+
+  /// Replaces the translator used for notification body text. Call this when
+  /// the app locale changes, then re-sync reminders.
+  void setTranslator(
+    String Function(String key, {Map<String, dynamic>? namedArgs}) tr,
+  );
 }

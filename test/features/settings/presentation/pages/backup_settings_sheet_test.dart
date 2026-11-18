@@ -252,4 +252,9 @@ class _NoOpNotificationService implements NotificationService {
 
   @override
   Future<void> updateReminder(StarNyx starnyx) async {}
+
+  @override
+  void setTranslator(
+    String Function(String key, {Map<String, dynamic>? namedArgs}) tr,
+  ) {}
 }

@@ -58,7 +58,16 @@ void _registerCoreDependencies(SharedPreferences preferences) {
 void _registerServices() {
   serviceLocator.registerLazySingleton<AppLogService>(ConsoleAppLogService.new);
   serviceLocator.registerLazySingleton<NotificationService>(
-    () => LocalNotificationService(logger: serviceLocator<AppLogService>()),
+    () => LocalNotificationService(
+      logger: serviceLocator<AppLogService>(),
+      tr: (key, {namedArgs}) {
+        if (key == 'home.reminder_body') {
+          final title = namedArgs?['title'] ?? '';
+          return '$title: ready to light today?';
+        }
+        return key;
+      },
+    ),
   );
 }
 

@@ -818,4 +818,9 @@ class _FakeNotificationService implements NotificationService {
 
   @override
   Future<void> cancelAllReminders() async {}
+
+  @override
+  void setTranslator(
+    String Function(String key, {Map<String, dynamic>? namedArgs}) tr,
+  ) {}
 }

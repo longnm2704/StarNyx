@@ -38,6 +38,7 @@
     "checkin_light_success": "Đã lưu check-in.",
     "checkin_unlight_success": "Đã hoàn tác check-in.",
     "header_semantics": "Biểu tượng thói quen {0}",
+    "reminder_body": "{title}: hôm nay bạn đã thắp chưa?",
     "summary_stats": "{} ngày đã thắp · {} ngày liền · {} tốt nhất · {}% tỉ lệ",
     "start_date_chip": "Bắt đầu: {}",
     "reminder_enabled_chip": "Nhắc nhở: {}",

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/services/notification_service.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:starnyx/app/di/service_locator.dart';
+import 'package:starnyx/domain/usecases/sync_notifications_use_case.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_header.dart';
 
 class GeneralSettingsSheet extends StatelessWidget {
@@ -112,6 +115,16 @@ class GeneralSettingsSheet extends StatelessWidget {
                   onTap: () {
                     Navigator.of(sheetContext).pop();
                     context.setLocale(locale);
+                    final notificationService =
+                        serviceLocator<NotificationService>();
+                    notificationService.setTranslator(
+                      (key, {namedArgs}) => context.tr(
+                        key,
+                        namedArgs: namedArgs?.cast<String, String>(),
+                      ),
+                    );
+                    serviceLocator<SyncNotificationsUseCase>()
+                        .rebuildAllFromLocalData();
                   },
                 ),
                 const SizedBox(height: AppSpacing.sm),
