@@ -61,7 +61,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic R-C - Form
 
-- [ ] **STX-R006**: Symbol picker and 7-day preview in create/edit form
+- [x] **STX-R006**: Symbol picker and 7-day preview in create/edit form
   - _Must-have · kind:feature · depends on: STX-R003, STX-R004_
   - Let users choose the symbol that lights up for each habit.
   - Acceptance criteria:

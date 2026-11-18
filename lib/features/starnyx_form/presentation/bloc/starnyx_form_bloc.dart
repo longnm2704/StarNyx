@@ -43,6 +43,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     DateTime Function()? nowBuilder,
     StarNyx? initialStarnyx,
     String? initialColor,
+    String? initialIcon,
   }) : _createStarNyxUseCase = createStarNyxUseCase,
        _updateStarNyxUseCase = updateStarNyxUseCase,
        _deleteStarNyxUseCase = deleteStarNyxUseCase,
@@ -55,12 +56,14 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
            initialStarnyx,
            (nowBuilder ?? DateTime.now)(),
            initialColor,
+           initialIcon,
          ),
        ) {
     // Register event handlers for each event type using on<T>() pattern
     on<StarnyxFormTitleChanged>(_onTitleChanged);
     on<StarnyxFormDescriptionChanged>(_onDescriptionChanged);
     on<StarnyxFormColorChanged>(_onColorChanged);
+    on<StarnyxFormIconChanged>(_onIconChanged);
     on<StarnyxFormStartDateChanged>(_onStartDateChanged);
     on<StarnyxFormReminderToggled>(_onReminderToggled);
     on<StarnyxFormReminderTimeChanged>(_onReminderTimeChanged);
@@ -104,13 +107,18 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     StarNyx? initialStarnyx,
     DateTime now,
     String? initialColor,
+    String? initialIcon,
   ) {
+    final resolvedIcon = initialIcon ??
+        (initialStarnyx?.icon ?? HabitSymbols.defaultKey);
+
     if (initialStarnyx != null) {
       return StarnyxFormState(
         mode: StarnyxFormMode.edit,
         title: initialStarnyx.title,
         description: initialStarnyx.description ?? '',
         color: initialStarnyx.color,
+        icon: resolvedIcon,
         startDate: initialStarnyx.startDate,
         reminderEnabled: initialStarnyx.reminderEnabled,
         reminderTime: initialStarnyx.reminderTime ?? '',
@@ -134,6 +142,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
       title: '',
       description: '',
       color: initialColor ?? AppColors.starnyxPresetColorHexes.first,
+      icon: resolvedIcon,
       startDate: DateUtils.nowDate(now),
       reminderEnabled: false,
       reminderTime: defaultReminder,
@@ -186,6 +195,15 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     Emitter<StarnyxFormState> emit,
   ) {
     _emitFieldChange(emit, state.copyWith(color: event.color));
+  }
+
+  /// Handles symbol (icon) selection changes.
+  /// Selecting a symbol doesn't affect validation; it persists with the habit.
+  void _onIconChanged(
+    StarnyxFormIconChanged event,
+    Emitter<StarnyxFormState> emit,
+  ) {
+    _emitFieldChange(emit, state.copyWith(icon: event.icon));
   }
 
   /// Handles start date field changes.
@@ -296,6 +314,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
                 title: validated.title.trim(),
                 description: description,
                 color: validated.color,
+                icon: validated.icon,
                 startDate: validated.startDate,
                 reminderEnabled: validated.reminderEnabled,
                 reminderTime: reminderTime,
@@ -307,6 +326,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
               title: validated.title.trim(),
               description: description,
               color: validated.color,
+              icon: validated.icon,
               startDate: validated.startDate,
               reminderEnabled: validated.reminderEnabled,
               reminderTime: reminderTime,

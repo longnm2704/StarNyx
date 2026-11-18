@@ -46,6 +46,18 @@ final class StarnyxFormColorChanged extends StarnyxFormEvent {
   List<Object?> get props => <Object?>[color];
 }
 
+/// Triggered when the user selects a different habit symbol from the symbol grid.
+/// The symbol key is a stable persisted data contract (see HabitSymbols).
+final class StarnyxFormIconChanged extends StarnyxFormEvent {
+  const StarnyxFormIconChanged(this.icon);
+
+  /// The selected habit symbol key (e.g., 'star', 'clover', 'flame').
+  final String icon;
+
+  @override
+  List<Object?> get props => <Object?>[icon];
+}
+
 /// Triggered when the user selects a different start date.
 /// Start date is validated to prevent future dates.
 final class StarnyxFormStartDateChanged extends StarnyxFormEvent {

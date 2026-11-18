@@ -235,6 +235,115 @@ void main() {
     expect(bloc.state.startDateError, StarnyxFormStartDateError.tooFarInPast);
   });
 
+  test('create mode defaults icon to star', () {
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    expect(bloc.state.icon, 'star');
+  });
+
+  test('edit mode loads the saved icon from the initial StarNyx', () {
+    final existing = StarNyx(
+      id: 'habit-1',
+      title: 'Hydrate',
+      description: null,
+      color: '#102030',
+      startDate: DateTime(2026, 4, 10),
+      reminderEnabled: false,
+      reminderTime: null,
+      createdAt: DateTime(2026, 4, 10, 8),
+      updatedAt: DateTime(2026, 4, 10, 8),
+      icon: 'flame',
+    );
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
+      initialStarnyx: existing,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    expect(bloc.state.icon, 'flame');
+  });
+
+  test('changing icon updates state without validation errors', () async {
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    bloc.add(const StarnyxFormIconChanged('clover'));
+    await pumpEventQueue();
+
+    expect(bloc.state.icon, 'clover');
+    expect(bloc.state.canSubmit, isFalse);
+  });
+
+  test('submit passes the selected icon to the created StarNyx', () async {
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    bloc.add(const StarnyxFormTitleChanged('Read'));
+    bloc.add(const StarnyxFormIconChanged('clover'));
+    await pumpEventQueue();
+
+    bloc.add(const StarnyxFormSubmitted());
+    await pumpEventQueue(times: 10);
+
+    expect(bloc.state.submissionStatus, AsyncStatus.success);
+    expect(bloc.state.savedStarnyx?.icon, 'clover');
+    final saved = await repository.getStarnyxById(bloc.state.savedStarnyx!.id);
+    expect(saved?.icon, 'clover');
+  });
+
+  test('submit persists the edited icon on update', () async {
+    final existing = StarNyx(
+      id: 'habit-1',
+      title: 'Hydrate',
+      description: null,
+      color: '#102030',
+      startDate: DateTime(2026, 4, 10),
+      reminderEnabled: false,
+      reminderTime: null,
+      createdAt: DateTime(2026, 4, 10, 8),
+      updatedAt: DateTime(2026, 4, 10, 8),
+      icon: 'star',
+    );
+    final bloc = StarnyxFormBloc(
+      createStarNyxUseCase: createUseCase,
+      updateStarNyxUseCase: updateUseCase,
+      deleteStarNyxUseCase: deleteUseCase,
+      syncNotificationsUseCase: syncNotificationsUseCase,
+      initialStarnyx: existing,
+      nowBuilder: () => DateTime(2026, 4, 13, 10, 20),
+    );
+
+    bloc.add(const StarnyxFormIconChanged('flame'));
+    await pumpEventQueue();
+
+    bloc.add(const StarnyxFormSubmitted());
+    await pumpEventQueue(times: 10);
+
+    expect(bloc.state.submissionStatus, AsyncStatus.success);
+    expect(bloc.state.savedStarnyx?.icon, 'flame');
+    final saved = await repository.getStarnyxById('habit-1');
+    expect(saved?.icon, 'flame');
+  });
+
   test('title longer than 60 characters surfaces a form error', () async {
     final bloc = StarnyxFormBloc(
       createStarNyxUseCase: createUseCase,

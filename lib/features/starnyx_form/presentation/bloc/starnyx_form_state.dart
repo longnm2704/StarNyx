@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/constants/enums.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 
@@ -18,6 +19,7 @@ class StarnyxFormState extends Equatable {
     required this.title,
     required this.description,
     required this.color,
+    required this.icon,
     required this.startDate,
     required this.reminderEnabled,
     required this.reminderTime,
@@ -44,6 +46,9 @@ class StarnyxFormState extends Equatable {
 
   /// Selected color as a hex string (e.g., '#8E5BFF').
   final String color;
+
+  /// Selected habit symbol key (e.g., 'star', 'clover', 'flame').
+  final String icon;
 
   /// Selected start date (validated: not in the future).
   final DateTime startDate;
@@ -114,6 +119,7 @@ class StarnyxFormState extends Equatable {
     String? title,
     String? description,
     String? color,
+    String? icon,
     DateTime? startDate,
     bool? reminderEnabled,
     String? reminderTime,
@@ -133,6 +139,7 @@ class StarnyxFormState extends Equatable {
       title: title ?? this.title,
       description: description ?? this.description,
       color: color ?? this.color,
+      icon: icon ?? this.icon,
       startDate: startDate ?? this.startDate,
       reminderEnabled: reminderEnabled ?? this.reminderEnabled,
       reminderTime: reminderTime ?? this.reminderTime,
@@ -174,6 +181,7 @@ class StarnyxFormState extends Equatable {
     title,
     description,
     color,
+    icon,
     startDate,
     reminderEnabled,
     reminderTime,

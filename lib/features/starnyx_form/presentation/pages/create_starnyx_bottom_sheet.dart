@@ -347,6 +347,16 @@ class _StarnyxFormBottomSheetViewState
                                     },
                                   ),
                                   const SizedBox(height: AppSpacing.lg),
+                                  StarnyxFormSymbolPicker(
+                                    selectedSymbol: state.icon,
+                                    color: starnyxColorFromHex(state.color),
+                                    onSymbolSelected: (String symbol) {
+                                      bloc.add(
+                                        StarnyxFormIconChanged(symbol),
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(height: AppSpacing.lg),
                                   StarnyxFormFieldLabel(
                                     label: 'starnyx_form.color_label'.tr(),
                                   ),
