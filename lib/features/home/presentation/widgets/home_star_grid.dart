@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
@@ -237,7 +238,20 @@ class _GridStarCellState extends State<_GridStarCell>
   @override
   void didUpdateWidget(covariant _GridStarCell oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.isSelected &&
+    final disableAnimations =
+        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    final currentlyLit =
+        widget.dayState == HomeGridStarDayState.completed;
+    final wasLit = oldWidget.dayState == HomeGridStarDayState.completed;
+
+    // Lighting up: haptic feedback, no celebration on un-lighting.
+    if (currentlyLit && !wasLit) {
+      HapticFeedback.lightImpact();
+    }
+
+    if (!disableAnimations &&
+        widget.isSelected &&
+        currentlyLit &&
         widget.completionSuccessAnimationToken != null &&
         widget.completionSuccessAnimationToken !=
             oldWidget.completionSuccessAnimationToken) {
@@ -301,7 +315,7 @@ class _GridStarCellState extends State<_GridStarCell>
                           opacity: 1,
                           child: CustomPaint(
                             size: Size.square(widget.size * 3),
-                            painter: _StarFireworkPainter(
+                            painter: _BloomPainter(
                               color: widget.accentColor,
                               progress: _controller.value,
                             ),
@@ -504,11 +518,15 @@ class _MissedCell extends StatelessWidget {
   }
 }
 
-class _StarFireworkPainter extends CustomPainter {
-  const _StarFireworkPainter({required this.color, required this.progress});
+/// Bloom painter: symbol-agnostic light-up effect with a radial bloom plus
+/// 7 soft particles in the accent color. Used when a day lights up.
+class _BloomPainter extends CustomPainter {
+  const _BloomPainter({required this.color, required this.progress});
 
   final Color color;
   final double progress;
+
+  static const int _particleCount = 7;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -518,48 +536,33 @@ class _StarFireworkPainter extends CustomPainter {
       0.0,
       1.0,
     );
-    final outerRadius = size.shortestSide * (0.08 + eased * 0.34);
-    final innerRadius = size.shortestSide * (0.04 + eased * 0.16);
-    final primaryPaint = Paint()
-      ..color = color.withValues(alpha: fade * 0.78)
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round;
-    final secondaryPaint = Paint()
-      ..color = AppColors.white.withValues(alpha: fade * 0.72)
+
+    // Radial bloom: expanding soft circle that fades out.
+    final bloomRadius = size.shortestSide * (0.12 + eased * 0.5);
+    final bloomPaint = Paint()
+      ..color = color.withValues(alpha: fade * 0.45)
       ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, bloomRadius, bloomPaint);
 
-    for (int index = 0; index < 12; index += 1) {
-      final angle = (math.pi * 2 / 12) * index;
-      final start = Offset(
-        center.dx + math.cos(angle) * innerRadius,
-        center.dy + math.sin(angle) * innerRadius,
+    // 7 soft particles scattered radially, pulsing in and out.
+    for (int i = 0; i < _particleCount; i += 1) {
+      final angle = (math.pi * 2 / _particleCount) * i;
+      final particleRadius = size.shortestSide * (0.18 + eased * 0.42);
+      final particleCenter = Offset(
+        center.dx + math.cos(angle) * particleRadius,
+        center.dy + math.sin(angle) * particleRadius,
       );
-      final end = Offset(
-        center.dx + math.cos(angle) * outerRadius,
-        center.dy + math.sin(angle) * outerRadius,
-      );
-      canvas.drawLine(start, end, primaryPaint);
-
-      if (index.isEven) {
-        final dotAngle = angle + math.pi / 12;
-        final dotRadius = outerRadius * 0.82;
-        final dotCenter = Offset(
-          center.dx + math.cos(dotAngle) * dotRadius,
-          center.dy + math.sin(dotAngle) * dotRadius,
-        );
-        canvas.drawCircle(dotCenter, size.shortestSide * 0.015, secondaryPaint);
-      }
+      final particleAlpha = fade * 0.85 * (0.5 + 0.5 * math.sin(i + progress));
+      final particleSize = size.shortestSide * (0.03 + (1 - progress) * 0.02);
+      final particlePaint = Paint()
+        ..color = color.withValues(alpha: particleAlpha.clamp(0.0, 1.0))
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(particleCenter, particleSize, particlePaint);
     }
-
-    final ringPaint = Paint()
-      ..color = color.withValues(alpha: fade * 0.18)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.1;
-    canvas.drawCircle(center, outerRadius * 0.72, ringPaint);
   }
 
   @override
-  bool shouldRepaint(covariant _StarFireworkPainter oldDelegate) {
+  bool shouldRepaint(covariant _BloomPainter oldDelegate) {
     return oldDelegate.color != color || oldDelegate.progress != progress;
   }
 }

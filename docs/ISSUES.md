@@ -81,7 +81,7 @@ Tick `[x]` when an issue is done.
     - Lit: filled accent-colored disc with soft glow, symbol drawn dark inside (state must read even if the glyph does not).
     - Today: ring outline when not lit; keeps current size emphasis.
     - Existing test keys `home-*-star-cell-*` are preserved.
-- [ ] **STX-R008**: Replace firework with bloom animation and add haptics
+- [x] **STX-R008**: Replace firework with bloom animation and add haptics
   - _Must-have · kind:polish · depends on: STX-R007_
   - The 12-ray firework is star-shaped; replace it with a symbol-agnostic light-up effect.
   - Acceptance criteria:

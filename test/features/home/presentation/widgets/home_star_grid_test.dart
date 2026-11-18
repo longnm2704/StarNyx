@@ -38,6 +38,7 @@ Widget _grid({
   DateTime? todayDate,
   DateTime? startDate,
   List<DateTime> completedDatesForViewedYear = const <DateTime>[],
+  int? completionSuccessAnimationToken,
 }) {
   final now = DateTime(2026, 4, 10);
   return HomeStarGrid(
@@ -48,7 +49,7 @@ Widget _grid({
     completedDatesForViewedYear: completedDatesForViewedYear,
     accentColor: const Color(0xFFDE7B30),
     onDateSelected: (_) {},
-    completionSuccessAnimationToken: null,
+    completionSuccessAnimationToken: completionSuccessAnimationToken,
     symbolKey: symbolKey,
   );
 }
