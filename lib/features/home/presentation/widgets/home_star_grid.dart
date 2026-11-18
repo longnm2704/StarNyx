@@ -1,11 +1,14 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
 import 'home_grid_utils.dart';
+
+const double _kDotFraction = 0.22;
+const double _kRingStrokeWidth = 2.0;
+const double _kMissedOpacity = 0.15;
 
 class HomeStarGrid extends StatelessWidget {
   const HomeStarGrid({
@@ -17,6 +20,7 @@ class HomeStarGrid extends StatelessWidget {
     required this.accentColor,
     required this.onDateSelected,
     this.completionSuccessAnimationToken,
+    required this.symbolKey,
     super.key,
   });
 
@@ -28,6 +32,10 @@ class HomeStarGrid extends StatelessWidget {
   final Color accentColor;
   final ValueChanged<DateTime>? onDateSelected;
   final int? completionSuccessAnimationToken;
+
+  /// Stable habit symbol key (e.g. 'star', 'clover', 'flame') used to render
+  /// each cell. Defaults to `HabitSymbols.defaultKey` ('star').
+  final String symbolKey;
 
   static const double _gridSpacing = 4;
 
@@ -86,19 +94,20 @@ class HomeStarGrid extends StatelessWidget {
               key: index == 0
                   ? ValueKey<String>('home-star-grid-day-count-$daysInYear')
                   : null,
-              child: _GridStarCell(
-                key: ValueKey<String>('home-star-cell-$index'),
-                size: effectiveCellExtent,
-                dayState: dayState,
-                isSelected: isSelected,
-                isToday: isToday,
-                accentColor: accentColor,
-                onTap: onDateSelected == null
-                    ? null
-                    : () => onDateSelected!(date),
-                selectedKey: isSelected
-                    ? const Key('home-selected-star-cell')
-                    : null,
+                child: _GridStarCell(
+                  key: ValueKey<String>('home-star-cell-$index'),
+                  size: effectiveCellExtent,
+                  dayState: dayState,
+                  symbolKey: symbolKey,
+                  isSelected: isSelected,
+                  isToday: isToday,
+                  accentColor: accentColor,
+                  onTap: onDateSelected == null
+                      ? null
+                      : () => onDateSelected!(date),
+                  selectedKey: isSelected
+                      ? const Key('home-selected-star-cell')
+                      : null,
                 completedKey: dayState == HomeGridStarDayState.completed
                     ? Key('home-completed-star-cell-$index')
                     : null,
@@ -160,6 +169,7 @@ class _GridStarCell extends StatefulWidget {
   const _GridStarCell({
     required this.size,
     required this.dayState,
+    required this.symbolKey,
     required this.isSelected,
     required this.isToday,
     required this.accentColor,
@@ -176,6 +186,7 @@ class _GridStarCell extends StatefulWidget {
 
   final double size;
   final HomeGridStarDayState dayState;
+  final String symbolKey;
   final bool isSelected;
   final bool isToday;
   final Color accentColor;
@@ -248,6 +259,11 @@ class _GridStarCellState extends State<_GridStarCell>
         ? 1.2
         : 1.0;
     final double iconSize = (widget.size * 0.62 * sizeMultiplier).toDouble();
+    final bool lit = widget.dayState == HomeGridStarDayState.completed;
+    final bool todayNotLit = widget.isToday && !lit;
+    final bool isDotState = widget.dayState == HomeGridStarDayState.beforeStart ||
+        widget.dayState == HomeGridStarDayState.future;
+    final List<List<dynamic>> iconData = HabitSymbols.iconFor(widget.symbolKey);
 
     return SizedBox(
       width: widget.size,
@@ -280,8 +296,7 @@ class _GridStarCellState extends State<_GridStarCell>
                     alignment: Alignment.center,
                     clipBehavior: Clip.none,
                     children: <Widget>[
-                      if (_controller.isAnimating &&
-                          widget.dayState == HomeGridStarDayState.completed)
+                      if (_controller.isAnimating && lit)
                         Opacity(
                           opacity: 1,
                           child: CustomPaint(
@@ -298,10 +313,14 @@ class _GridStarCellState extends State<_GridStarCell>
                 },
                 child: SizedBox(
                   key: widget.todayKey,
-                  child: AppIcon(
-                    icon: HugeIconsStrokeRounded.strokeRoundedStar,
+                  child: _DayCellContent(
+                    dayState: widget.dayState,
+                    lit: lit,
+                    todayNotLit: todayNotLit,
+                    isDotState: isDotState,
+                    iconData: iconData,
+                    color: widget.accentColor,
                     size: iconSize,
-                    color: _starColor(),
                   ),
                 ),
               ),
@@ -310,22 +329,6 @@ class _GridStarCellState extends State<_GridStarCell>
         ),
       ),
     );
-  }
-
-  Color _starColor() {
-    if (widget.isSelected) {
-      return widget.accentColor.withValues(alpha: 0.98);
-    }
-    switch (widget.dayState) {
-      case HomeGridStarDayState.beforeStart:
-        return AppColors.white.withValues(alpha: 0.1);
-      case HomeGridStarDayState.completed:
-        return widget.accentColor.withValues(alpha: 0.88);
-      case HomeGridStarDayState.missed:
-        return widget.accentColor.withValues(alpha: 0.28);
-      case HomeGridStarDayState.future:
-        return AppColors.white.withValues(alpha: 0.2);
-    }
   }
 
   Key? _cellStateKey() {
@@ -342,6 +345,162 @@ class _GridStarCellState extends State<_GridStarCell>
       return widget.futureKey;
     }
     return null;
+  }
+}
+
+/// Renders a single grid day cell according to its state:
+/// - future / before-start: small dot
+/// - missed: symbol stroke at ~0.15 opacity, no glow
+/// - lit: filled accent disc with soft glow, symbol drawn dark inside
+/// - today (not lit): ring outline, keeps size emphasis
+class _DayCellContent extends StatelessWidget {
+  const _DayCellContent({
+    required this.dayState,
+    required this.lit,
+    required this.todayNotLit,
+    required this.isDotState,
+    required this.iconData,
+    required this.color,
+    required this.size,
+  });
+
+  final HomeGridStarDayState dayState;
+  final bool lit;
+  final bool todayNotLit;
+  final bool isDotState;
+  final List<List<dynamic>> iconData;
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    if (lit) {
+      return _LitCell(iconData: iconData, color: color, size: size);
+    }
+    if (todayNotLit) {
+      return _TodayRingCell(iconData: iconData, color: color, size: size);
+    }
+    if (isDotState) {
+      return _DotCell(size: size);
+    }
+    if (dayState == HomeGridStarDayState.missed) {
+      return _MissedCell(iconData: iconData, color: color, size: size);
+    }
+    return const SizedBox.shrink();
+  }
+}
+
+/// Lit day: filled accent-colored disc with soft glow, symbol drawn dark inside.
+class _LitCell extends StatelessWidget {
+  const _LitCell({
+    required this.iconData,
+    required this.color,
+    required this.size,
+  });
+
+  final List<List<dynamic>> iconData;
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: color.withValues(alpha: 0.5),
+            blurRadius: 8,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Center(
+        child: AppIcon(
+          icon: iconData,
+          color: AppColors.black,
+          size: size * 0.55,
+          strokeWidth: 2,
+        ),
+      ),
+    );
+  }
+}
+
+/// Today (not lit): ring outline, keeps size emphasis.
+class _TodayRingCell extends StatelessWidget {
+  const _TodayRingCell({
+    required this.iconData,
+    required this.color,
+    required this.size,
+  });
+
+  final List<List<dynamic>> iconData;
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        border: Border.all(color: color, width: _kRingStrokeWidth),
+        shape: BoxShape.circle,
+      ),
+      alignment: Alignment.center,
+      child: AppIcon(
+        icon: iconData,
+        color: color,
+        size: size * 0.55,
+        strokeWidth: 2,
+      ),
+    );
+  }
+}
+
+/// Future / before-start day: a small dot.
+class _DotCell extends StatelessWidget {
+  const _DotCell({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size * _kDotFraction,
+      height: size * _kDotFraction,
+      decoration: BoxDecoration(
+        color: AppColors.white.withValues(alpha: 0.25),
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+}
+
+/// Missed day: symbol stroke at low opacity, no glow.
+class _MissedCell extends StatelessWidget {
+  const _MissedCell({
+    required this.iconData,
+    required this.color,
+    required this.size,
+  });
+
+  final List<List<dynamic>> iconData;
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppIcon(
+      icon: iconData,
+      color: color.withValues(alpha: _kMissedOpacity),
+      size: size,
+      strokeWidth: 2,
+    );
   }
 }
 

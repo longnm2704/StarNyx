@@ -72,7 +72,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic R-D - Home
 
-- [ ] **STX-R007**: Render habit symbol and new day states in the year grid
+- [x] **STX-R007**: Render habit symbol and new day states in the year grid
   - _Must-have · kind:feature · depends on: STX-R001, STX-R004_
   - Replace fixed star assets in `HomeStarGrid` with the habit's symbol and make day states readable at ~10px.
   - Acceptance criteria:

@@ -174,6 +174,7 @@ class HomeShellView extends StatelessWidget {
                           completedDatesForViewedYear:
                               completedDatesForViewedYear,
                           accentColor: accentColor,
+                          symbolKey: activeStarnyx.icon,
                           onDateSelected: onDateSelected,
                           completionSuccessAnimationToken:
                               completionSuccessAnimationToken,
