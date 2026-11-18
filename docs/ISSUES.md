@@ -145,7 +145,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic R-F - Quality
 
-- [ ] **STX-R015**: Tests for migration, backups, grid states and symbol picker
+- [x] **STX-R015**: Tests for migration, backups, grid states and symbol picker
   - _Must-have · kind:test · depends on: STX-R004 → STX-R009_
   - Cover the risky parts of the redesign.
   - Acceptance criteria:
@@ -157,24 +157,24 @@ Tick `[x]` when an issue is done.
 
 ## Epic R-G - Post-MVP
 
-- [ ] **STX-R016**: Per-symbol light-up animations
+- [x] **STX-R016**: Per-symbol light-up animations
   - _Nice-to-have · kind:polish,status:backlog · depends on: STX-R008_
   - Optional flavor per symbol (flame flicker, heart beat, clover spin) on top of the shared bloom.
   - Acceptance criteria:
     - Falls back to the shared bloom for symbols without a custom animation.
     - Respects reduced motion.
-- [ ] **STX-R017**: Quiet milestones at 7 / 30 / 100 days
+- [x] **STX-R017**: Quiet milestones at 7 / 30 / 100 days
   - _Nice-to-have · kind:feature,status:backlog · depends on: STX-R008_
   - Mark streak and total milestones without gamified noise.
   - Acceptance criteria:
     - Derived from existing completion data; no new table.
     - One calm message + slightly stronger glow when a milestone is reached; never shown for losses.
-- [ ] **STX-R018**: Shareable 'Your year' image
+- [x] **STX-R018**: Shareable 'Your year' image
   - _Nice-to-have · kind:feature,status:backlog · depends on: STX-R007_
   - Render the year grid with the habit symbol as an image and share it via `share_plus` (already a dependency).
   - Acceptance criteria:
     - Image contains no journal text; user previews before sharing.
-- [ ] **STX-R019**: Spec: weekly targets (e.g. 3× per week)
+- [x] **STX-R019**: Spec: weekly targets (e.g. 3× per week)
   - _Nice-to-have · kind:architecture,status:backlog · depends on: —_
   - Weekly goals change streak semantics; write a spec before any code.
   - Acceptance criteria:
