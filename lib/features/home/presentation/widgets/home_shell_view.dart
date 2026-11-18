@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/widgets/app_icon.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
+import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
@@ -94,6 +96,8 @@ class HomeShellView extends StatelessWidget {
     );
     final totalCompleted = progressStats?.totalCompletedCount ?? 0;
     final currentStreak = progressStats?.currentStreak ?? 0;
+    final longestStreak = progressStats?.longestStreak ?? 0;
+    final completionRateForYear = progressStats?.completionRateForYear ?? 0.0;
     final gradientColors = homeShellGradientColors(activeStarnyx.color);
     final accentColor = homeShellAccentColor(activeStarnyx.color);
     final normalizedSelected = DateTime.utc(
@@ -151,6 +155,16 @@ class HomeShellView extends StatelessWidget {
                   ),
                   child: Column(
                     children: <Widget>[
+                      const SizedBox(height: AppSpacing.sm),
+                      AppIcon(
+                        icon: HabitSymbols.iconFor(activeStarnyx.icon),
+                        color: accentColor,
+                        size: 40,
+                        strokeWidth: 2,
+                        semanticsLabel: 'home.header_semantics'.tr(
+                          args: <String>[activeStarnyx.title],
+                        ),
+                      ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         activeStarnyx.title,
@@ -220,8 +234,13 @@ class HomeShellView extends StatelessWidget {
                           args: <String>[
                             totalCompleted.toString(),
                             currentStreak.toString(),
+                            longestStreak.toString(),
+                            (completionRateForYear * 100).round().toString(),
                           ],
                         ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: AppColors.textPrimary.withValues(alpha: 0.64),
                           fontWeight: FontWeight.w800,

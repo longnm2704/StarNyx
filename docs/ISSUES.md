@@ -96,7 +96,7 @@ Tick `[x]` when an issue is done.
     - `SelectedDateBar` shows a clear action with the habit symbol: unlit → "Light today" / "Thắp hôm nay"; lit → "Lit" / "Đã thắp" (still tappable to undo).
     - Disabled state (future, before start, outside 7-day window) is visually distinct and explains why via semantics/tooltip.
     - Separate snackbar messages for light vs unlight (currently both say "Check-in saved").
-- [ ] **STX-R010**: Show symbol in header plus longest streak and yearly rate
+- [x] **STX-R010**: Show symbol in header plus longest streak and yearly rate
   - _Should-have · kind:feature · depends on: STX-R007_
   - Give each habit a visible identity and surface stats that are already computed but hidden.
   - Acceptance criteria:

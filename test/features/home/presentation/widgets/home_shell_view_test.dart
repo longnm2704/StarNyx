@@ -60,7 +60,14 @@ void main() {
       expect(find.text('257 days left'), findsOneWidget);
       expect(find.text('Today'), findsOneWidget);
       expect(find.text('Sunday, 19 Apr'), findsOneWidget);
-      expect(find.text('Completed: 2 · Streak: 0'), findsOneWidget);
+      expect(find.text('Completed: 2 · Streak: 0 · Best: 2 · Rate: 16%'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (Widget widget) =>
+              widget is AppIcon && widget.icon == HabitSymbols.iconFor('star'),
+        ),
+        findsWidgets,
+      );
       expect(
         find.byKey(const Key('home-star-grid-placeholder')),
         findsOneWidget,
