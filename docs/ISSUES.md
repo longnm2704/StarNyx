@@ -29,7 +29,7 @@ Tick `[x]` when an issue is done.
     - Flag images `vn.png`, `us.png`, `jp.png` are kept.
     - No `Icons.*` / `CupertinoIcons.*` usages remain unless no Hugeicons equivalent exists (documented in the PR).
     - Visual check on welcome, home, switcher sheet, form, journal, settings, backup, about.
-- [ ] **STX-R003**: Curate the habit symbol catalog (habit_symbols.dart)
+- [x] **STX-R003**: Curate the habit symbol catalog (habit_symbols.dart)
   - _Must-have · kind:architecture · depends on: STX-R001_
   - Define the set of ~20 Hugeicons users can pick as a habit's symbol, keyed by stable string ids.
   - Acceptance criteria:
