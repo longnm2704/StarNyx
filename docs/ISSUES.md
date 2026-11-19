@@ -391,7 +391,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic U-F - Settings Tab
 
-- [ ] **STX-U015**: Settings screen (`cai_dat`)
+- [x] **STX-U015**: Settings screen (`cai_dat`)
   - _Must-have · kind:feature · depends on: STX-U006_
   - Design: `docs/app_ui_redesign/cai_dat/{code.html,screen.png}`
   - Replaces `SettingsBottomSheet` with a full-screen tab.

@@ -51,6 +51,19 @@ void main() {
       exportDataUseCase: exportUseCase,
       importDataUseCase: importUseCase,
       syncNotificationsUseCase: syncUseCase,
+      loadStarnyxsUseCase: LoadStarnyxsUseCase(starNyxRepository),
+      loadActiveStarNyxUseCase: LoadActiveStarNyxUseCase(
+        starNyxRepository,
+        appSettingsRepository,
+      ),
+      loadStarNyxProgressStatsUseCase: LoadStarNyxProgressStatsUseCase(
+        starNyxRepository,
+        completionRepository,
+      ),
+      setAllRemindersEnabledUseCase: SetAllRemindersEnabledUseCase(
+        starNyxRepository,
+        syncUseCase,
+      ),
       backupFileCodec: backupFileCodec,
       tempDirectoryProvider: () async => tempDirectory,
       nowProvider: () => DateTime(2026, 4, 10, 8, 30),

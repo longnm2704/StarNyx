@@ -8,6 +8,7 @@ import 'package:starnyx/core/widgets/app_icon.dart';
 import 'package:starnyx/features/home/presentation/pages/home_page.dart';
 import 'package:starnyx/features/journal/presentation/pages/journal_page.dart';
 import 'package:starnyx/features/overview/presentation/pages/overview_page.dart';
+import 'package:starnyx/features/settings/presentation/pages/settings_page.dart';
 import 'package:starnyx/features/starnyx_form/presentation/pages/create_starnyx_bottom_sheet.dart';
 
 /// Stable ids for the four primary destinations hosted by [AppShell].
@@ -66,6 +67,7 @@ class _AppShellState extends State<AppShell> {
   int _homeReloadToken = 0;
   int _overviewReloadToken = 0;
   int _journalReloadToken = 0;
+  int _settingsReloadToken = 0;
 
   void _selectIndex(int index) {
     if (index == _index) {
@@ -76,6 +78,7 @@ class _AppShellState extends State<AppShell> {
       // Habits, check-ins, or the active habit may have changed on another tab.
       if (index == AppShellTab.overview.index) _overviewReloadToken++;
       if (index == AppShellTab.journal.index) _journalReloadToken++;
+      if (index == AppShellTab.settings.index) _settingsReloadToken++;
     });
   }
 
@@ -113,9 +116,9 @@ class _AppShellState extends State<AppShell> {
         key: const ValueKey<String>('journal-tab'),
         reloadToken: _journalReloadToken,
       ),
-      const _ShellPlaceholderPage(
-        key: ValueKey<String>('settings-tab'),
-        tab: AppShellTab.settings,
+      SettingsPage(
+        key: const ValueKey<String>('settings-tab'),
+        reloadToken: _settingsReloadToken,
       ),
     ];
   }
@@ -260,32 +263,6 @@ class _AppShellNavDestination extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Temporary tab surface while the dedicated Settings screen is built. Keeping
-/// each tab instantiable preserves shell navigation without shipping
-/// interactive dead ends.
-class _ShellPlaceholderPage extends StatelessWidget {
-  const _ShellPlaceholderPage({required this.tab, super.key});
-
-  final AppShellTab tab;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return SafeArea(
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            AppIcon(icon: tab.icon, size: 36, color: AppColors.textTertiary),
-            const SizedBox(height: AppSpacing.sm),
-            Text(tab.labelKey.tr(), style: theme.textTheme.headlineMedium),
-          ],
         ),
       ),
     );

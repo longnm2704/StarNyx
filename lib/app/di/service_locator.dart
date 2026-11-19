@@ -229,6 +229,12 @@ void _registerUseCases() {
       logger: serviceLocator<AppLogService>(),
     ),
   );
+  serviceLocator.registerLazySingleton<SetAllRemindersEnabledUseCase>(
+    () => SetAllRemindersEnabledUseCase(
+      serviceLocator<StarNyxRepository>(),
+      serviceLocator<SyncNotificationsUseCase>(),
+    ),
+  );
 }
 
 void _registerBlocFactories() {
@@ -277,6 +283,12 @@ void _registerBlocFactories() {
       exportDataUseCase: serviceLocator<ExportDataUseCase>(),
       importDataUseCase: serviceLocator<ImportDataUseCase>(),
       syncNotificationsUseCase: serviceLocator<SyncNotificationsUseCase>(),
+      loadStarnyxsUseCase: serviceLocator<LoadStarnyxsUseCase>(),
+      loadActiveStarNyxUseCase: serviceLocator<LoadActiveStarNyxUseCase>(),
+      loadStarNyxProgressStatsUseCase:
+          serviceLocator<LoadStarNyxProgressStatsUseCase>(),
+      setAllRemindersEnabledUseCase:
+          serviceLocator<SetAllRemindersEnabledUseCase>(),
       logger: serviceLocator<AppLogService>(),
     ),
   );

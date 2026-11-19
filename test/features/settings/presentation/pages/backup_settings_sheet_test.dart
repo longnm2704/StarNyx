@@ -81,6 +81,10 @@ SettingsBloc _buildSettingsBloc({
   final completionRepository = _EmptyCompletionRepository();
   final journalEntryRepository = _EmptyJournalEntryRepository();
   final appSettingsRepository = _EmptyAppSettingsRepository();
+  final syncUseCase = SyncNotificationsUseCase(
+    _NoOpNotificationService(),
+    starNyxRepository,
+  );
 
   return SettingsBloc(
     exportDataUseCase: ExportDataUseCase(
@@ -95,9 +99,19 @@ SettingsBloc _buildSettingsBloc({
       journalEntryRepository,
       appSettingsRepository,
     ),
-    syncNotificationsUseCase: SyncNotificationsUseCase(
-      _NoOpNotificationService(),
+    syncNotificationsUseCase: syncUseCase,
+    loadStarnyxsUseCase: LoadStarnyxsUseCase(starNyxRepository),
+    loadActiveStarNyxUseCase: LoadActiveStarNyxUseCase(
       starNyxRepository,
+      appSettingsRepository,
+    ),
+    loadStarNyxProgressStatsUseCase: LoadStarNyxProgressStatsUseCase(
+      starNyxRepository,
+      completionRepository,
+    ),
+    setAllRemindersEnabledUseCase: SetAllRemindersEnabledUseCase(
+      starNyxRepository,
+      syncUseCase,
     ),
     tempDirectoryProvider: () async => tempDirectory,
   );

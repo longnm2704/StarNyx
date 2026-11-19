@@ -8,6 +8,10 @@ import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/core/utils/backup_file_codec.dart';
 import 'package:starnyx/domain/usecases/export_data_use_case.dart';
 import 'package:starnyx/domain/usecases/import_data_use_case.dart';
+import 'package:starnyx/domain/usecases/load_active_starnyx_use_case.dart';
+import 'package:starnyx/domain/usecases/load_starnyx_progress_stats_use_case.dart';
+import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
+import 'package:starnyx/domain/usecases/set_all_reminders_enabled_use_case.dart';
 import 'package:starnyx/domain/usecases/sync_notifications_use_case.dart';
 
 import 'settings_event.dart';
@@ -21,6 +25,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     required ExportDataUseCase exportDataUseCase,
     required ImportDataUseCase importDataUseCase,
     required SyncNotificationsUseCase syncNotificationsUseCase,
+    required LoadStarnyxsUseCase loadStarnyxsUseCase,
+    required LoadActiveStarNyxUseCase loadActiveStarNyxUseCase,
+    required LoadStarNyxProgressStatsUseCase loadStarNyxProgressStatsUseCase,
+    required SetAllRemindersEnabledUseCase setAllRemindersEnabledUseCase,
     BackupFileCodec? backupFileCodec,
     TempDirectoryProvider? tempDirectoryProvider,
     NowProvider? nowProvider,
@@ -28,6 +36,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }) : _exportDataUseCase = exportDataUseCase,
        _importDataUseCase = importDataUseCase,
        _syncNotificationsUseCase = syncNotificationsUseCase,
+       _loadStarnyxsUseCase = loadStarnyxsUseCase,
+       _loadActiveStarNyxUseCase = loadActiveStarNyxUseCase,
+       _loadStarNyxProgressStatsUseCase = loadStarNyxProgressStatsUseCase,
+       _setAllRemindersEnabledUseCase = setAllRemindersEnabledUseCase,
        _backupFileCodec = backupFileCodec ?? BackupFileCodec(),
        _tempDirectoryProvider = tempDirectoryProvider ?? getTemporaryDirectory,
        _nowProvider = nowProvider ?? DateTime.now,
@@ -35,15 +47,75 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
        super(const SettingsState()) {
     on<SettingsExportRequested>(_onExportRequested);
     on<SettingsImportRequested>(_onImportRequested);
+    on<SettingsSummaryRequested>(_onSummaryRequested);
+    on<SettingsRemindersToggled>(_onRemindersToggled);
   }
 
   final ExportDataUseCase _exportDataUseCase;
   final ImportDataUseCase _importDataUseCase;
   final SyncNotificationsUseCase _syncNotificationsUseCase;
+  final LoadStarnyxsUseCase _loadStarnyxsUseCase;
+  final LoadActiveStarNyxUseCase _loadActiveStarNyxUseCase;
+  final LoadStarNyxProgressStatsUseCase _loadStarNyxProgressStatsUseCase;
+  final SetAllRemindersEnabledUseCase _setAllRemindersEnabledUseCase;
   final BackupFileCodec _backupFileCodec;
   final TempDirectoryProvider _tempDirectoryProvider;
   final NowProvider _nowProvider;
   final AppLogService _logger;
+
+  Future<void> _onSummaryRequested(
+    SettingsSummaryRequested event,
+    Emitter<SettingsState> emit,
+  ) async {
+    try {
+      await _emitSummary(emit);
+    } catch (error, stackTrace) {
+      // Summary is decorative; keep the last known values on failure.
+      _logger.error(
+        'SettingsBloc',
+        'summary failed',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  Future<void> _onRemindersToggled(
+    SettingsRemindersToggled event,
+    Emitter<SettingsState> emit,
+  ) async {
+    try {
+      await _setAllRemindersEnabledUseCase(event.enabled);
+      await _emitSummary(emit);
+    } catch (error, stackTrace) {
+      _logger.error(
+        'SettingsBloc',
+        'reminders toggle failed enabled=${event.enabled}',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  Future<void> _emitSummary(Emitter<SettingsState> emit) async {
+    final now = _nowProvider();
+    final starnyxs = await _loadStarnyxsUseCase();
+    final active = await _loadActiveStarNyxUseCase(now: now);
+    final streak = active == null
+        ? 0
+        : (await _loadStarNyxProgressStatsUseCase(
+            starnyxId: active.id,
+            year: now.year,
+            today: now,
+          )).currentStreak;
+    emit(
+      state.copyWith(
+        starnyxs: starnyxs,
+        activeHabitTitle: active?.title,
+        currentStreak: streak,
+      ),
+    );
+  }
 
   Future<void> _onExportRequested(
     SettingsExportRequested event,

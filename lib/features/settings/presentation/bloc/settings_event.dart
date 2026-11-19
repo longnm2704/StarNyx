@@ -24,3 +24,18 @@ class SettingsImportRequested extends SettingsEvent {
   @override
   List<Object?> get props => [jsonPayload];
 }
+
+/// Loads the live data the Settings tab shows (active habit, streak, reminders).
+class SettingsSummaryRequested extends SettingsEvent {
+  const SettingsSummaryRequested();
+}
+
+/// Master reminder switch: turns every habit reminder on or off.
+class SettingsRemindersToggled extends SettingsEvent {
+  const SettingsRemindersToggled(this.enabled);
+
+  final bool enabled;
+
+  @override
+  List<Object?> get props => [enabled];
+}
