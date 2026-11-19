@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
+import 'package:starnyx/app/router/app_routes.dart';
 import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -18,6 +19,7 @@ import 'package:starnyx/domain/usecases/load_active_starnyx_use_case.dart';
 import 'package:starnyx/domain/usecases/select_active_starnyx_use_case.dart';
 import 'package:starnyx/domain/usecases/load_starnyx_progress_stats_use_case.dart';
 import 'package:starnyx/domain/usecases/load_starnyx_completion_dates_for_year_use_case.dart';
+import 'package:starnyx/features/habits/presentation/pages/habit_list_page.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
 import 'home_body_builder.dart';
@@ -38,6 +40,7 @@ class HomePage extends StatefulWidget {
     SaveStarNyxOrderUseCase? saveStarNyxOrderUseCase,
     FutureOr<void> Function()? onCreatePressed,
     VoidCallback? onSettingsPressed,
+    VoidCallback? onJournalPressed,
     Color? initialAccentColor,
     int reloadToken = 0,
   }) : _loadStarnyxsUseCase =
@@ -63,6 +66,7 @@ class HomePage extends StatefulWidget {
                : null),
        _onCreatePressed = onCreatePressed,
        _onSettingsPressed = onSettingsPressed,
+       _onJournalPressed = onJournalPressed,
        _initialAccentColor = initialAccentColor,
        _reloadToken = reloadToken;
 
@@ -76,6 +80,7 @@ class HomePage extends StatefulWidget {
   final SaveStarNyxOrderUseCase? _saveStarNyxOrderUseCase;
   final FutureOr<void> Function()? _onCreatePressed;
   final VoidCallback? _onSettingsPressed;
+  final VoidCallback? _onJournalPressed;
   final Color? _initialAccentColor;
   final int _reloadToken;
 
@@ -158,6 +163,28 @@ class _HomePageState extends State<HomePage> {
     widget._onSettingsPressed?.call();
   }
 
+  Future<void> _openHabitList() async {
+    final action = await Navigator.of(
+      context,
+    ).pushNamed<HabitListExitAction>(AppRoutes.habitList);
+    if (!mounted) {
+      return;
+    }
+
+    // Any change made in the list (select, edit, create, delete, reorder) is
+    // read back from the database so the Habits tab never shows stale data.
+    _homeBloc.add(const HomeReloadRequested());
+
+    switch (action) {
+      case HabitListExitAction.settingsRequested:
+        _onSettingsPressed();
+      case HabitListExitAction.journalRequested:
+        widget._onJournalPressed?.call();
+      case null:
+        break;
+    }
+  }
+
   // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
@@ -200,6 +227,7 @@ class _HomePageState extends State<HomePage> {
               onNextYearPressed: () =>
                   _homeBloc.add(HomeYearChanged(state.viewedYear + 1)),
               onProfilePressed: widget._onSettingsPressed,
+              onSearchPressed: _openHabitList,
               onToggleCompletionPressed: () =>
                   _homeBloc.add(const HomeCompletionToggled()),
             );

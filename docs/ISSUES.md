@@ -293,7 +293,7 @@ Tick `[x]` when an issue is done.
     - Existing test keys `home-*-star-cell-*` are preserved.
     - `HomeLoadingView` and `HomeErrorView` are restyled to match (skeleton on `#0A0A0C`, no starfield).
 
-- [ ] **STX-U008**: Habit list / switcher screen (`quan_ly_thoi_quen`)
+- [x] **STX-U008**: Habit list / switcher screen (`quan_ly_thoi_quen`)
   - _Must-have · kind:feature · depends on: STX-U006, STX-U007_
   - Design: `docs/app_ui_redesign/quan_ly_thoi_quen/{code.html,screen.png}`
   - Replaces `ConstellationSwitcherSheet` with a full-screen route (pushed from the Habits tab app bar or a "switch habit" affordance).

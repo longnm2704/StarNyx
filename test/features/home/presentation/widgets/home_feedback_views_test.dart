@@ -59,6 +59,7 @@ void main() {
             nextYearPressed = true;
           },
           onProfilePressed: () {},
+          onSearchPressed: () {},
           onToggleCompletionPressed: () {
             checkInPressed = true;
           },

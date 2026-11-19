@@ -164,5 +164,29 @@
     "overview": "概要",
     "journal": "日記",
     "settings": "設定"
+  },
+  "habits": {
+    "title": "習慣ボード",
+    "subtitle": "切り替え、記録、調整",
+    "active_pill": "現在のフォーカス",
+    "settings_action": "設定",
+    "journal_action": "日記",
+    "add_action": "新しい習慣",
+    "your_habits": "あなたの習慣",
+    "edit": "編集",
+    "done": "完了",
+    "edit_habit_semantics": "{}を編集",
+    "reorder_habit_semantics": "{}を並べ替え",
+    "active_habit_semantics": "現在のフォーカス: {}",
+    "no_description": "説明はまだありません",
+    "footer": "連続 {}/{} 達成",
+    "empty_title": "習慣がまだありません",
+    "empty_message": "最初の習慣を追加して、静かな毎日のリズムを始めましょう。",
+    "empty_action": "習慣を作成",
+    "load_error_title": "習慣を読み込めませんでした",
+    "load_error_message": "端末の習慣を読み込む際に問題が発生しました。",
+    "retry": "再試行",
+    "select_error": "習慣を切り替えられませんでした。",
+    "order_error": "新しい順序を保存できませんでした。"
   }
 }

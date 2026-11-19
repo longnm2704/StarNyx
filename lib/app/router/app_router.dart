@@ -1,36 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:starnyx/app/di/service_locator.dart';
+import 'package:starnyx/app/router/app_routes.dart';
 import 'package:starnyx/app/shell/app_shell.dart';
 import 'package:starnyx/core/services/core_services.dart';
+import 'package:starnyx/features/habits/presentation/pages/habit_list_page.dart';
 
-abstract final class AppRoutes {
-  static const habits = '/habits';
-  static const overview = '/overview';
-  static const journal = '/journal';
-  static const settings = '/settings';
+export 'app_routes.dart';
 
-  /// Legacy alias kept for existing call sites; the shell always opens Habits.
-  static const home = habits;
-
-  static AppShellTab tabForRoute(String? name) {
-    return switch (name) {
-      overview => AppShellTab.overview,
-      journal => AppShellTab.journal,
-      settings => AppShellTab.settings,
-      _ => AppShellTab.habits,
-    };
-  }
+/// Maps a deep-link / named route to the tab the shell should open.
+AppShellTab appShellTabForRoute(String? name) {
+  return switch (name) {
+    AppRoutes.overview => AppShellTab.overview,
+    AppRoutes.journal => AppShellTab.journal,
+    AppRoutes.settings => AppShellTab.settings,
+    _ => AppShellTab.habits,
+  };
 }
 
 class AppRouter {
   const AppRouter();
 
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    if (settings.name == AppRoutes.habitList) {
+      return MaterialPageRoute<HabitListExitAction>(
+        builder: (_) => const HabitListPage(),
+        settings: settings,
+      );
+    }
+
     // Every top-level destination is hosted by the same shell route so tab
     // state is preserved and deep links simply choose the initial tab.
     return MaterialPageRoute<void>(
       builder: (_) => AppShell(
-        initialTab: AppRoutes.tabForRoute(settings.name),
+        initialTab: appShellTabForRoute(settings.name),
         initialAccentColor: serviceLocator<ActiveStarnyxColorCache>()
             .readColor(),
       ),

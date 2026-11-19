@@ -40,6 +40,7 @@ class ActiveStarnyxHomeView extends StatelessWidget {
     required this.onPreviousYearPressed,
     required this.onNextYearPressed,
     required this.onProfilePressed,
+    required this.onSearchPressed,
     required this.onToggleCompletionPressed,
     required this.isCheckingIn,
     this.completionSuccessAnimationToken,
@@ -59,6 +60,7 @@ class ActiveStarnyxHomeView extends StatelessWidget {
   final VoidCallback onPreviousYearPressed;
   final VoidCallback onNextYearPressed;
   final VoidCallback? onProfilePressed;
+  final VoidCallback? onSearchPressed;
   final VoidCallback onToggleCompletionPressed;
   final bool isCheckingIn;
   final int? completionSuccessAnimationToken;
@@ -87,6 +89,7 @@ class ActiveStarnyxHomeView extends StatelessWidget {
       onPreviousYearPressed: onPreviousYearPressed,
       onNextYearPressed: canMoveToNextYear ? onNextYearPressed : null,
       onProfilePressed: onProfilePressed,
+      onSearchPressed: onSearchPressed,
       onToggleCompletionPressed: canToggleCompletion
           ? onToggleCompletionPressed
           : null,

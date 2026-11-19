@@ -95,6 +95,7 @@ class _AppShellState extends State<AppShell> {
         reloadToken: _homeReloadToken,
         onCreatePressed: _openCreateHabit,
         onSettingsPressed: () => _selectIndex(AppShellTab.settings.index),
+        onJournalPressed: () => _selectIndex(AppShellTab.journal.index),
       ),
       const _ShellPlaceholderPage(
         key: ValueKey<String>('overview-tab'),

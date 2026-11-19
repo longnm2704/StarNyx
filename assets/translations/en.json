@@ -164,5 +164,29 @@
     "overview": "Overview",
     "journal": "Journal",
     "settings": "Settings"
+  },
+  "habits": {
+    "title": "Habit deck",
+    "subtitle": "Switch, write, or adjust",
+    "active_pill": "Current focus",
+    "settings_action": "Settings",
+    "journal_action": "Journal",
+    "add_action": "New habit",
+    "your_habits": "Your habits",
+    "edit": "Edit",
+    "done": "Done",
+    "edit_habit_semantics": "Edit {}",
+    "reorder_habit_semantics": "Reorder {}",
+    "active_habit_semantics": "Current focus: {}",
+    "no_description": "No description yet",
+    "footer": "STREAK {}/{} COMPLETE",
+    "empty_title": "No habits yet",
+    "empty_message": "Add your first habit to begin a quiet daily ritual.",
+    "empty_action": "Create habit",
+    "load_error_title": "Couldn't load habits",
+    "load_error_message": "Something went wrong while reading your local habits.",
+    "retry": "Try again",
+    "select_error": "Couldn't switch habit.",
+    "order_error": "Couldn't save the new order."
   }
 }

@@ -164,5 +164,29 @@
     "overview": "Tổng quan",
     "journal": "Nhật ký",
     "settings": "Cài đặt"
+  },
+  "habits": {
+    "title": "Bảng thói quen",
+    "subtitle": "Chuyển, viết hoặc điều chỉnh",
+    "active_pill": "Đang tập trung",
+    "settings_action": "Cài đặt",
+    "journal_action": "Nhật ký",
+    "add_action": "Thói quen mới",
+    "your_habits": "Các thói quen của bạn",
+    "edit": "Sửa",
+    "done": "Xong",
+    "edit_habit_semantics": "Sửa {}",
+    "reorder_habit_semantics": "Sắp xếp lại {}",
+    "active_habit_semantics": "Đang tập trung: {}",
+    "no_description": "Chưa có mô tả",
+    "footer": "CHUỖI {}/{} HOÀN THÀNH",
+    "empty_title": "Chưa có thói quen",
+    "empty_message": "Thêm thói quen đầu tiên để bắt đầu một nhịp điệu yên tĩnh mỗi ngày.",
+    "empty_action": "Tạo thói quen",
+    "load_error_title": "Không thể tải thói quen",
+    "load_error_message": "Đã xảy ra lỗi khi đọc thói quen trên thiết bị.",
+    "retry": "Thử lại",
+    "select_error": "Không thể chuyển thói quen.",
+    "order_error": "Không thể lưu thứ tự mới."
   }
 }

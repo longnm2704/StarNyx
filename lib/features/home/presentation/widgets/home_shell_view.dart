@@ -48,6 +48,7 @@ class HomeShellView extends StatelessWidget {
     required this.onPreviousYearPressed,
     required this.onNextYearPressed,
     required this.onProfilePressed,
+    this.onSearchPressed,
     this.onToggleCompletionPressed,
     this.isCheckingIn = false,
     this.completionSuccessAnimationToken,
@@ -67,6 +68,7 @@ class HomeShellView extends StatelessWidget {
   final VoidCallback? onPreviousYearPressed;
   final VoidCallback? onNextYearPressed;
   final VoidCallback? onProfilePressed;
+  final VoidCallback? onSearchPressed;
   final VoidCallback? onToggleCompletionPressed;
   final bool isCheckingIn;
   final int? completionSuccessAnimationToken;
@@ -120,10 +122,10 @@ class HomeShellView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  // Search is intentionally omitted until the habit-list
-                  // screen (STX-U008) can provide real filter results, rather
-                  // than shipping a dead app-bar action.
-                  HomeAppBar(onProfilePressed: onProfilePressed),
+                  HomeAppBar(
+                    onProfilePressed: onProfilePressed,
+                    onSearchPressed: onSearchPressed,
+                  ),
                   _Header(
                     activeStarnyx: activeStarnyx,
                     accentColor: accentColor,

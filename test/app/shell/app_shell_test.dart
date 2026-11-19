@@ -61,12 +61,12 @@ void main() {
   });
 
   test('deep-link routes resolve to the matching initial tab', () {
-    expect(AppRoutes.tabForRoute('/habits'), AppShellTab.habits);
-    expect(AppRoutes.tabForRoute('/overview'), AppShellTab.overview);
-    expect(AppRoutes.tabForRoute('/journal'), AppShellTab.journal);
-    expect(AppRoutes.tabForRoute('/settings'), AppShellTab.settings);
-    expect(AppRoutes.tabForRoute('/unknown'), AppShellTab.habits);
-    expect(AppRoutes.tabForRoute(null), AppShellTab.habits);
+    expect(appShellTabForRoute('/habits'), AppShellTab.habits);
+    expect(appShellTabForRoute('/overview'), AppShellTab.overview);
+    expect(appShellTabForRoute('/journal'), AppShellTab.journal);
+    expect(appShellTabForRoute('/settings'), AppShellTab.settings);
+    expect(appShellTabForRoute('/unknown'), AppShellTab.habits);
+    expect(appShellTabForRoute(null), AppShellTab.habits);
   });
 }
 
