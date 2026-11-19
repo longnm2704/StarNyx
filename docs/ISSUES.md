@@ -254,7 +254,7 @@ Tick `[x]` when an issue is done.
     - `CosmicBackground` / `AnimatedCosmicStarfield` are deleted; screens use a plain `#000000` scaffold (or a very subtle radial emerald glow only on the home header, per `trang_chu`).
     - `AppSheetBackground` is deleted once no caller remains (sheets are replaced by full-screen routes in U006+).
 
-- [ ] **STX-U005**: Remove cosmic/starfield remnants and dead assets
+- [x] **STX-U005**: Remove cosmic/starfield remnants and dead assets
   - _Should-have · kind:polish · depends on: STX-U004_
   - Acceptance criteria:
     - No references to `CosmicBackground`, `AnimatedCosmicStarfield`, `AppColors.screenGradient`, `accentGradient`, `accentFillGradient`, `sheetTop/Mid`, `backgroundMid/Bottom` remain in `lib/`.

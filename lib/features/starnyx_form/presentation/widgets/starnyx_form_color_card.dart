@@ -40,9 +40,9 @@ class StarnyxFormColorCard extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
-          colors: <Color>[AppColors.formCardStart, AppColors.formCardEndAlt],
+          colors: <Color>[AppColors.surfaceLevel2, AppColors.surfaceLevel3],
         ),
-        border: Border.all(color: AppColors.outline.withValues(alpha: 0.62)),
+        border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.62)),
       ),
       child: Column(
         children: <Widget>[

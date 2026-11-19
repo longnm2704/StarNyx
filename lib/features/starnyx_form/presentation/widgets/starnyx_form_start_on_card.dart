@@ -25,9 +25,9 @@ class StarnyxFormStartOnCard extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
-            colors: <Color>[AppColors.formCardStart, AppColors.formCardEnd],
+            colors: <Color>[AppColors.surfaceLevel2, AppColors.surfaceLevel3],
           ),
-          border: Border.all(color: AppColors.outline.withValues(alpha: 0.62)),
+          border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.62)),
         ),
         child: Row(
           children: <Widget>[
@@ -43,7 +43,7 @@ class StarnyxFormStartOnCard extends StatelessWidget {
             const AppIcon(
               icon: HugeIconsStrokeRounded.strokeRoundedCalendar01,
               size: 18,
-              color: AppColors.iconMuted,
+              color: AppColors.textTertiary,
               semanticsLabel: 'Calendar',
             ),
           ],

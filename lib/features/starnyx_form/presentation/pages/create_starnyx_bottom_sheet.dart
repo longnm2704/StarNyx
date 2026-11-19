@@ -312,7 +312,7 @@ class _StarnyxFormBottomSheetViewState
                                             .textTheme
                                             .bodySmall
                                             ?.copyWith(
-                                              color: AppColors.accentPink,
+                                              color: AppColors.primary,
                                             ),
                                       ),
                                     ),
@@ -403,7 +403,7 @@ class _StarnyxFormBottomSheetViewState
                                       height: AppSize.ctaHeight,
                                       child: Center(
                                         child: CircularProgressIndicator(
-                                          color: AppColors.accentPink,
+                                          color: AppColors.primary,
                                         ),
                                       ),
                                     )
@@ -416,7 +416,7 @@ class _StarnyxFormBottomSheetViewState
                                         child: Text(
                                           'starnyx_form.delete_button'.tr(),
                                           style: const TextStyle(
-                                            color: AppColors.accentPink,
+                                            color: AppColors.primary,
                                           ),
                                         ),
                                       ),
@@ -461,7 +461,7 @@ class _CharacterCounter extends StatelessWidget {
     return Text(
       '$currentLength/$maxLength',
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-        color: hasError ? AppColors.accentPink : AppColors.textMuted,
+        color: hasError ? AppColors.primary : AppColors.textTertiary,
         fontWeight: FontWeight.w600,
       ),
     );

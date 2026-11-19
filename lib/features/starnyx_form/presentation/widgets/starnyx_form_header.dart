@@ -52,8 +52,8 @@ class _CloseButton extends StatelessWidget {
       height: 48,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.surfaceMuted.withValues(alpha: 0.92),
-        border: Border.all(color: AppColors.outlineSoft.withValues(alpha: 0.4)),
+        color: AppColors.surfaceLevel2.withValues(alpha: 0.92),
+        border: Border.all(color: AppColors.borderFocus.withValues(alpha: 0.4)),
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: AppColors.black.withValues(alpha: 0.22),

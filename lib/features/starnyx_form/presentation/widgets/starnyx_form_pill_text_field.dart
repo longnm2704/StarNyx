@@ -59,17 +59,17 @@ class _StarnyxFormPillTextFieldState extends State<StarnyxFormPillTextField> {
       fontWeight: FontWeight.w500,
       height: 1,
     );
-    final hintStyle = textStyle?.copyWith(color: AppColors.textMuted);
+    final hintStyle = textStyle?.copyWith(color: AppColors.textTertiary);
 
     return Container(
       height: widget.height,
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.86),
+        color: AppColors.surfaceLevel1.withValues(alpha: 0.86),
         borderRadius: BorderRadius.circular(32),
         border: Border.all(
           color: widget.hasError
-              ? AppColors.accentPink
-              : AppColors.outline.withValues(alpha: 0.58),
+              ? AppColors.primary
+              : AppColors.borderSubtle.withValues(alpha: 0.58),
         ),
       ),
       child: isMultiLine

@@ -22,7 +22,7 @@ Future<DateTime?> showStarnyxCupertinoDateTimePicker({
           height: 320 + mediaQuery.viewPadding.bottom,
           padding: EdgeInsets.only(bottom: mediaQuery.viewPadding.bottom),
           decoration: const BoxDecoration(
-            color: AppColors.pickerBg,
+            color: AppColors.surfaceLevel2,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -40,7 +40,7 @@ Future<DateTime?> showStarnyxCupertinoDateTimePicker({
                       child: Text(
                         'starnyx_form.picker_done'.tr(),
                         style: const TextStyle(
-                          color: AppColors.accentLavender,
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -51,14 +51,14 @@ Future<DateTime?> showStarnyxCupertinoDateTimePicker({
               Divider(
                 height: 1,
                 thickness: 1,
-                color: AppColors.outline.withValues(alpha: 0.5),
+                color: AppColors.borderSubtle.withValues(alpha: 0.5),
               ),
               Expanded(
                 child: CupertinoTheme(
                   data: const CupertinoThemeData(
                     brightness: Brightness.dark,
-                    primaryColor: AppColors.accentLavender,
-                    scaffoldBackgroundColor: AppColors.pickerBg,
+                    primaryColor: AppColors.primary,
+                    scaffoldBackgroundColor: AppColors.surfaceLevel2,
                   ),
                   child: CupertinoDatePicker(
                     mode: mode,

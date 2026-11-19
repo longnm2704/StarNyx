@@ -280,13 +280,13 @@ class _SettingsSection extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: <Color>[
-                AppColors.surfaceGlass.withValues(alpha: 0.84),
-                AppColors.surface.withValues(alpha: 0.74),
+                AppColors.sheet.withValues(alpha: 0.84),
+                AppColors.surfaceLevel1.withValues(alpha: 0.74),
               ],
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: AppColors.outlineSoft.withValues(alpha: 0.18),
+              color: AppColors.borderFocus.withValues(alpha: 0.18),
             ),
             boxShadow: <BoxShadow>[
               BoxShadow(
@@ -347,14 +347,14 @@ class _SettingsTile extends StatelessWidget {
                   color: AppColors.white.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AppColors.outlineSoft.withValues(alpha: 0.12),
+                    color: AppColors.borderFocus.withValues(alpha: 0.12),
                   ),
                 ),
                 child: Center(
                   child: AppIcon(
                     icon: icon,
                     size: 18,
-                    color: AppColors.accentLavender,
+                    color: AppColors.primary,
                   ),
                 ),
               ),
@@ -371,7 +371,7 @@ class _SettingsTile extends StatelessWidget {
               if (onTap != null)
                 const AppIcon(
                   icon: HugeIconsStrokeRounded.strokeRoundedChevronRight,
-                  color: AppColors.textMuted,
+                  color: AppColors.textTertiary,
                   size: 20,
                 ),
             ],

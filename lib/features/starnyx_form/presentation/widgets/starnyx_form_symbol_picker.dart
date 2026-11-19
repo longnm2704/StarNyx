@@ -41,9 +41,9 @@ Widget build(BuildContext context) {
         gradient: const LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
-          colors: <Color>[AppColors.formCardStart, AppColors.formCardEndAlt],
+          colors: <Color>[AppColors.surfaceLevel2, AppColors.surfaceLevel3],
         ),
-        border: Border.all(color: AppColors.outline.withValues(alpha: 0.62)),
+        border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.62)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +65,7 @@ Widget build(BuildContext context) {
                   child: Text(
                     'starnyx_form.symbol_helper'.tr(),
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textMuted,
+                      color: AppColors.textTertiary,
                     ),
                   ),
                 ),
@@ -112,7 +112,7 @@ class _SymbolGrid extends StatelessWidget {
           child: Text(
             group.label.toUpperCase(),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.textMuted,
+              color: AppColors.textTertiary,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.6,
             ),
@@ -192,7 +192,7 @@ class _SymbolCell extends StatelessWidget {
             border: Border.all(
               color: isSelected
                   ? color
-                  : AppColors.outline.withValues(alpha: 0.35),
+                  : AppColors.borderSubtle.withValues(alpha: 0.35),
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -246,7 +246,7 @@ class _SevenDayPreview extends StatelessWidget {
           child: Text(
             'starnyx_form.preview_label'.tr(),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.textMuted,
+              color: AppColors.textTertiary,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.6,
             ),
@@ -330,7 +330,7 @@ class _FutureCell extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.outline.withValues(alpha: 0.35),
+        color: AppColors.borderSubtle.withValues(alpha: 0.35),
         shape: BoxShape.circle,
       ),
     );

@@ -84,10 +84,10 @@ class HomeYearSummaryRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceMuted.withValues(alpha: 0.52),
+        color: AppColors.surfaceLevel2.withValues(alpha: 0.52),
         borderRadius: BorderRadius.circular(AppRadius.pill),
         border: Border.all(
-          color: AppColors.outlineSoft.withValues(alpha: 0.16),
+          color: AppColors.borderFocus.withValues(alpha: 0.16),
         ),
       ),
       child: Row(

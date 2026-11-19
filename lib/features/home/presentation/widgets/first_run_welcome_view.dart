@@ -82,7 +82,7 @@ class FirstRunWelcomeView extends StatelessWidget {
                       child: Text(
                         'welcome.subtitle'.tr(),
                         style: textTheme.bodyLarge?.copyWith(
-                          color: AppColors.textMuted,
+                          color: AppColors.textTertiary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

@@ -38,11 +38,11 @@ class SelectedDateBar extends StatelessWidget {
     final bool canShowActiveState = onSelectedDatePressed != null;
     final bool canTap = canShowActiveState && !isCheckingIn;
     final Color topColor = canShowActiveState
-        ? Color.lerp(accentColor, AppColors.surfaceGlass, 0.72)!
-        : AppColors.surfaceMuted.withValues(alpha: 0.5);
+        ? Color.lerp(accentColor, AppColors.sheet, 0.72)!
+        : AppColors.surfaceLevel2.withValues(alpha: 0.5);
     final Color bottomColor = canShowActiveState
         ? Color.lerp(accentColor, AppColors.black, 0.88)!
-        : AppColors.surfaceMuted.withValues(alpha: 0.28);
+        : AppColors.surfaceLevel2.withValues(alpha: 0.28);
     final iconData = HabitSymbols.iconFor(symbolKey);
     final actionText = isLit
         ? 'home.checkin_lit'.tr()
@@ -79,7 +79,7 @@ class SelectedDateBar extends StatelessWidget {
                   border: Border.all(
                     color: canShowActiveState
                         ? accentColor.withValues(alpha: 0.28)
-                        : AppColors.outlineSoft.withValues(alpha: 0.12),
+                        : AppColors.borderFocus.withValues(alpha: 0.12),
                   ),
                   boxShadow: <BoxShadow>[
                     if (canShowActiveState)
@@ -193,12 +193,12 @@ class _DayChevronButton extends StatelessWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: AppColors.surfaceMuted.withValues(
+            color: AppColors.surfaceLevel2.withValues(
               alpha: onPressed == null ? 0.28 : 0.58,
             ),
             shape: BoxShape.circle,
             border: Border.all(
-              color: AppColors.outlineSoft.withValues(
+              color: AppColors.borderFocus.withValues(
                 alpha: onPressed == null ? 0.08 : 0.18,
               ),
             ),

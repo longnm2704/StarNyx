@@ -277,7 +277,7 @@ class _JournalEmptyState extends StatelessWidget {
               AppIcon(
                 icon: HugeIconsStrokeRounded.strokeRoundedBookOpen01,
                 size: 36,
-                color: AppColors.textMuted.withValues(alpha: 0.9),
+                color: AppColors.textTertiary.withValues(alpha: 0.9),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(
@@ -293,7 +293,7 @@ class _JournalEmptyState extends StatelessWidget {
                 'journal.empty_message'.tr(),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textMuted,
+                  color: AppColors.textTertiary,
                   height: 1.5,
                 ),
               ),
@@ -341,7 +341,7 @@ class _JournalEntryCard extends StatelessWidget {
             Text(
               formattedFullDate,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: AppColors.textMuted.withValues(alpha: 0.6),
+                color: AppColors.textTertiary.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.5,
               ),

@@ -12,7 +12,7 @@ class WelcomeHeroIcon extends StatelessWidget {
     return AppIcon(
       icon: HugeIconsStrokeRounded.strokeRoundedHeart,
       size: 72,
-      color: AppColors.accentLavender.withValues(alpha: 0.98),
+      color: AppColors.primary.withValues(alpha: 0.98),
       semanticsLabel: 'welcome.heart'.tr(),
     );
   }

@@ -27,7 +27,7 @@ class HomeSwipeUpHint extends StatelessWidget {
               offset: const Offset(0, -4),
               child: AppIcon(
                 icon: HugeIconsStrokeRounded.strokeRoundedChevronsUp,
-                color: AppColors.textMuted.withValues(alpha: 0.44),
+                color: AppColors.textTertiary.withValues(alpha: 0.44),
                 size: 20,
                 semanticsLabel: 'home.swipe_hint'.tr(),
               ),
@@ -35,7 +35,7 @@ class HomeSwipeUpHint extends StatelessWidget {
             Text(
               'home.swipe_hint'.tr(),
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: AppColors.textMuted.withValues(alpha: 0.92),
+                color: AppColors.textTertiary.withValues(alpha: 0.92),
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.18,
               ),

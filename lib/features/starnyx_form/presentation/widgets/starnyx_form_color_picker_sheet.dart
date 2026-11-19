@@ -48,9 +48,9 @@ class _StarnyxFormColorPickerSheetState
         16 + MediaQuery.of(context).viewInsets.bottom,
       ),
       decoration: BoxDecoration(
-        color: AppColors.sheetBg,
+        color: AppColors.sheet,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        border: Border.all(color: AppColors.outline.withValues(alpha: 0.62)),
+        border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.62)),
       ),
       child: SafeArea(
         top: false,

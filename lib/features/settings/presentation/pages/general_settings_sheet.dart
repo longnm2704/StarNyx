@@ -76,9 +76,9 @@ class GeneralSettingsSheet extends StatelessWidget {
       builder: (sheetContext) => Container(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
         decoration: BoxDecoration(
-          color: AppColors.sheetBg,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          border: Border.all(color: AppColors.outline.withValues(alpha: 0.62)),
+          color: AppColors.sheet,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
+          border: Border.all(color: AppColors.borderSubtle),
         ),
         child: SafeArea(
           top: false,
@@ -91,7 +91,7 @@ class GeneralSettingsSheet extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.outlineSoft.withValues(alpha: 0.5),
+                    color: AppColors.borderFocus,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -152,14 +152,13 @@ class _LanguageOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(AppRadius.lg);
+    final radius = BorderRadius.circular(AppRadius.card);
 
-    // Selected option gets the accent gradient as a 1.5px border.
+    // Selected option gets an emerald hairline border.
     return Container(
       padding: const EdgeInsets.all(1.5),
       decoration: BoxDecoration(
-        gradient: selected ? AppColors.accentGradient : null,
-        color: selected ? null : AppColors.outlineSoft.withValues(alpha: 0.16),
+        color: selected ? AppColors.primary : AppColors.borderSubtle,
         borderRadius: radius,
       ),
       child: Material(
@@ -170,14 +169,7 @@ class _LanguageOption extends StatelessWidget {
           child: Ink(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: <Color>[
-                  AppColors.surfaceGlass,
-                  selected ? AppColors.starMuted : AppColors.surface,
-                ],
-              ),
+              color: selected ? AppColors.surfaceLevel2 : AppColors.surfaceLevel1,
               borderRadius: radius,
             ),
             child: Row(
@@ -190,8 +182,8 @@ class _LanguageOption extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: selected
-                        ? AppColors.accentLavender.withValues(alpha: 0.7)
-                        : AppColors.outlineSoft.withValues(alpha: 0.3),
+                        ? AppColors.primary.withValues(alpha: 0.7)
+                        : AppColors.borderSubtle,
                   ),
                   child: flagAsset == null
                       ? const AppIcon(
@@ -216,13 +208,13 @@ class _LanguageOption extends StatelessWidget {
                       ? const AppIcon(
                           icon: HugeIconsStrokeRounded.strokeRoundedCircleCheck,
                           key: ValueKey('selected'),
-                          color: AppColors.accentLavender,
+                          color: AppColors.primary,
                           size: 24,
                         )
                       : AppIcon(
                           icon: HugeIconsStrokeRounded.strokeRoundedCircle,
                           key: const ValueKey('unselected'),
-                          color: AppColors.textMuted.withValues(alpha: 0.6),
+                          color: AppColors.textTertiary.withValues(alpha: 0.6),
                           size: 24,
                         ),
                 ),
@@ -256,18 +248,9 @@ class _GeneralSettingTile extends StatelessWidget {
         child: Ink(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: <Color>[
-                AppColors.surfaceGlass.withValues(alpha: 0.82),
-                AppColors.surface.withValues(alpha: 0.72),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: AppColors.outlineSoft.withValues(alpha: 0.16),
-            ),
+            color: AppColors.surfaceLevel1,
+            borderRadius: BorderRadius.circular(AppRadius.card),
+            border: Border.all(color: AppColors.borderSubtle),
           ),
           child: Row(
             children: [
@@ -286,7 +269,7 @@ class _GeneralSettingTile extends StatelessWidget {
                     Text(
                       value,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.accentLavender.withValues(alpha: 0.92),
+                        color: AppColors.primary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -295,7 +278,7 @@ class _GeneralSettingTile extends StatelessWidget {
               ),
               const AppIcon(
                 icon: HugeIconsStrokeRounded.strokeRoundedChevronRight,
-                color: AppColors.textMuted,
+                color: AppColors.textTertiary,
                 size: 24,
               ),
             ],

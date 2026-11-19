@@ -450,13 +450,13 @@ class _BackupTile extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: <Color>[
-                AppColors.surfaceGlass.withValues(alpha: 0.84),
-                AppColors.surface.withValues(alpha: 0.74),
+                AppColors.sheet.withValues(alpha: 0.84),
+                AppColors.surfaceLevel1.withValues(alpha: 0.74),
               ],
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: AppColors.outlineSoft.withValues(alpha: 0.16),
+              color: AppColors.borderFocus.withValues(alpha: 0.16),
             ),
           ),
           child: Row(
@@ -468,7 +468,7 @@ class _BackupTile extends StatelessWidget {
                   color: AppColors.white.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AppColors.outlineSoft.withValues(alpha: 0.12),
+                    color: AppColors.borderFocus.withValues(alpha: 0.12),
                   ),
                 ),
                 child: Center(
@@ -495,7 +495,7 @@ class _BackupTile extends StatelessWidget {
                     Text(
                       subtitle,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textMuted,
+                        color: AppColors.textTertiary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -511,7 +511,7 @@ class _BackupTile extends StatelessWidget {
               else
                 const AppIcon(
                   icon: HugeIconsStrokeRounded.strokeRoundedChevronRight,
-                  color: AppColors.textMuted,
+                  color: AppColors.textTertiary,
                 ),
             ],
           ),
@@ -530,10 +530,10 @@ class _BackupStatusCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.surfaceGlass.withValues(alpha: 0.82),
+        color: AppColors.sheet.withValues(alpha: 0.82),
         borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
-          color: AppColors.outlineSoft.withValues(alpha: 0.16),
+          color: AppColors.borderFocus.withValues(alpha: 0.16),
         ),
       ),
       child: Padding(

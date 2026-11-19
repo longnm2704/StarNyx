@@ -36,12 +36,12 @@ class StarnyxSelectedColorPreview extends StatelessWidget {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.previewOuter, width: 1.8),
+        border: Border.all(color: AppColors.borderFocus, width: 1.8),
       ),
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: AppColors.previewInner, width: 1.2),
+          border: Border.all(color: AppColors.textSecondary, width: 1.2),
           color: color,
         ),
       ),

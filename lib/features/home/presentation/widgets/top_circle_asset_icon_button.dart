@@ -20,10 +20,10 @@ class TopCircleAssetIconButton extends StatelessWidget {
       width: AppSize.iconButton,
       height: AppSize.iconButton,
       decoration: BoxDecoration(
-        color: AppColors.surfaceMuted.withValues(alpha: 0.9),
+        color: AppColors.surfaceLevel2.withValues(alpha: 0.9),
         shape: BoxShape.circle,
         border: Border.all(
-          color: AppColors.outlineSoft.withValues(alpha: 0.34),
+          color: AppColors.borderFocus.withValues(alpha: 0.34),
         ),
         boxShadow: <BoxShadow>[
           BoxShadow(

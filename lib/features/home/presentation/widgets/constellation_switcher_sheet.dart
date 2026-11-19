@@ -100,13 +100,13 @@ class _ConstellationSwitcherSheetState
       orElse: () => _orderedStarnyxs.first,
     );
     final activeColor = starnyxColorFromHex(activeStarnyx.color);
-    final panelColor = Color.lerp(AppColors.surface, AppColors.black, 0.38)!;
+    final panelColor = Color.lerp(AppColors.surfaceLevel1, AppColors.black, 0.38)!;
     final panelHighlight = Color.lerp(activeColor, AppColors.white, 0.2)!;
-    const headerStartColor = AppColors.accentBlue;
-    const headerEndColor = AppColors.accentPink;
+    const headerStartColor = AppColors.secondary;
+    const headerEndColor = AppColors.primary;
     final sectionAccent = Color.lerp(
       activeColor,
-      AppColors.accentOrange,
+      AppColors.tertiary,
       0.22,
     )!;
 
@@ -250,7 +250,7 @@ class _ConstellationSwitcherSheetState
                               'home.sheet_constellations_helper'.tr(),
                               style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
-                                    color: AppColors.textMuted,
+                                    color: AppColors.textTertiary,
                                     fontWeight: FontWeight.w600,
                                   ),
                             ),
@@ -364,11 +364,7 @@ class _ActiveConstellationPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fillColor = Color.lerp(
-      AppColors.surfaceElevated,
-      AppColors.backgroundMid,
-      0.35,
-    )!;
+    const fillColor = AppColors.surfaceLevel2;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -399,7 +395,7 @@ class _ActiveConstellationPill extends StatelessWidget {
               child: Text(
                 label,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.accentPink,
+                  color: AppColors.primary,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -446,7 +442,7 @@ class _SheetActionPill extends StatelessWidget {
               size: 22,
               color: isEnabled
                   ? AppColors.white.withValues(alpha: 0.9)
-                  : AppColors.textMuted,
+                  : AppColors.textTertiary,
               semanticsLabel: semanticsLabel,
             ),
           ),
@@ -483,7 +479,7 @@ class _ConstellationSwitcherCard extends StatelessWidget {
         ? itemColor
         : itemColor.withValues(alpha: 0.56);
     final backgroundColor = isActive
-        ? Color.lerp(itemColor, AppColors.surface, 0.8)!
+        ? Color.lerp(itemColor, AppColors.surfaceLevel1, 0.8)!
         : itemColor.withValues(alpha: 0.08);
 
     return Material(

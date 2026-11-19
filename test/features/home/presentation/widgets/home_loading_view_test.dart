@@ -10,7 +10,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: HomeLoadingView(accentColor: AppColors.accentOrange),
+            body: HomeLoadingView(accentColor: AppColors.tertiary),
           ),
         ),
       );

@@ -12,28 +12,13 @@ class ActiveStarnyxSpotlight extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final surfaceTop = Color.lerp(
-      AppColors.surfaceElevated,
-      AppColors.backgroundMid,
-      0.32,
-    )!;
-    final surfaceBottom = Color.lerp(
-      AppColors.surface,
-      AppColors.background,
-      0.18,
-    )!;
-
     return Container(
       width: double.infinity,
       padding: AppSpacing.cardPadding,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[surfaceTop, surfaceBottom],
-        ),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: AppColors.outline.withValues(alpha: 0.46)),
+        color: AppColors.surfaceLevel1,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: Border.all(color: AppColors.borderSubtle),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +58,7 @@ class ActiveStarnyxSpotlight extends StatelessWidget {
           Text(
             'home.active_constellation_hint'.tr(),
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textMuted,
+              color: AppColors.textTertiary,
             ),
           ),
         ],

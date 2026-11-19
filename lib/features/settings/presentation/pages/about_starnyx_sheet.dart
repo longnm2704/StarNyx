@@ -51,12 +51,11 @@ class AboutStarnyxSheet extends StatelessWidget {
                   height: 100,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: AppColors.accentGradient,
-                    boxShadow: [
+                    color: AppColors.primary,
+                    boxShadow: const [
                       BoxShadow(
-                        color: AppColors.accentViolet.withValues(alpha: 0.3),
-                        blurRadius: 30,
-                        offset: const Offset(0, 10),
+                        color: Color(0x2610B981),
+                        blurRadius: 24,
                       ),
                     ],
                   ),
@@ -89,7 +88,7 @@ class AboutStarnyxSheet extends StatelessWidget {
                 child: Text(
                   'settings.about_made_with'.tr(),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
+                    color: AppColors.textTertiary,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -117,7 +116,7 @@ class _AboutSection extends StatelessWidget {
         Text(
           title,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: AppColors.accentLavender,
+            color: AppColors.primary,
             fontWeight: FontWeight.w800,
           ),
         ),

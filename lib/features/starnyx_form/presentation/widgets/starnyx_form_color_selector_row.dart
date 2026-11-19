@@ -107,25 +107,25 @@ class _LockedColorDot extends StatelessWidget {
           shape: BoxShape.circle,
           gradient: SweepGradient(
             colors: <Color>[
-              AppColors.sysGreen,
-              AppColors.sysBlue,
-              AppColors.sysPurple,
-              AppColors.sysOrange,
-              AppColors.sysGreen,
+              AppColors.primary,
+              AppColors.secondary,
+              AppColors.primary,
+              AppColors.tertiary,
+              AppColors.primary,
             ],
           ),
         ),
         child: Container(
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.sheetBg,
+            color: AppColors.sheet,
           ),
           child: const Center(
             child: AppIcon(
               icon: HugeIconsStrokeRounded.strokeRoundedColorPicker,
               semanticsLabel: 'Color picker',
               size: 18,
-              color: AppColors.lockIcon,
+              color: AppColors.textPrimary,
             ),
           ),
         ),
