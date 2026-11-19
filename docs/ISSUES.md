@@ -561,7 +561,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic U-I - Quality
 
-- [ ] **STX-U025**: Localize all new strings (vi / en / ja)
+- [x] **STX-U025**: Localize all new strings (vi / en / ja)
   - _Must-have · kind:polish · depends on: STX-U007 … STX-U024_
   - Acceptance criteria:
     - New keys added under `overview.*`, `onboarding.*`, `journal.detail.*`, `settings.*` (new rows), `habits.*` (list screen), `common.*` (shared).

@@ -62,7 +62,7 @@ class _BackupPageState extends State<BackupPage> {
               } else if (state.hasImportFailure) {
                 _showSnackBar(
                   context,
-                  state.errorMessage ?? 'settings.import_error_title'.tr(),
+                  'settings.import_error_title'.tr(),
                   isError: true,
                 );
               }
@@ -199,7 +199,7 @@ class _BackupPageState extends State<BackupPage> {
     if (state.hasExportFailure) {
       _showSnackBar(
         context,
-        state.errorMessage ?? 'settings.export_error_title'.tr(),
+        'settings.export_error_title'.tr(),
         isError: true,
       );
       return;

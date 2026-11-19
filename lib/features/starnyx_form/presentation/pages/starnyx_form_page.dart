@@ -147,9 +147,9 @@ class _StarnyxFormPageState extends State<StarnyxFormPage> {
 
     final String? message = switch (state) {
       _ when state.submissionStatus == AsyncStatus.failure =>
-        state.submissionErrorMessage ?? 'starnyx_form.save_error'.tr(),
+        'starnyx_form.save_error'.tr(),
       _ when state.deletionStatus == AsyncStatus.failure =>
-        state.deletionErrorMessage ?? 'starnyx_form.delete_error'.tr(),
+        'starnyx_form.delete_error'.tr(),
       _ => null,
     };
     if (message != null) {

@@ -29,10 +29,8 @@ class StarnyxFormState extends Equatable {
     required this.reminderTimeError,
     required this.submissionStatus,
     required this.savedStarnyx,
-    required this.submissionErrorMessage,
     required this.deletionStatus,
     required this.deletedStarnyxId,
-    required this.deletionErrorMessage,
   });
 
   /// Whether the form is creating a new StarNyx or editing an existing one.
@@ -77,17 +75,11 @@ class StarnyxFormState extends Equatable {
   /// The successfully saved StarNyx entity (only populated after successful submission).
   final StarNyx? savedStarnyx;
 
-  /// Human-readable error message from failed submission (from use case exception).
-  final String? submissionErrorMessage;
-
   /// Current stage of the delete process.
   final AsyncStatus deletionStatus;
 
   /// Deleted StarNyx id when the delete action succeeds.
   final String? deletedStarnyxId;
-
-  /// Human-readable error message from failed deletion.
-  final String? deletionErrorMessage;
 
   /// Convenience getter: true if form is in edit mode.
   bool get isEditing => mode == StarnyxFormMode.edit;
@@ -129,10 +121,8 @@ class StarnyxFormState extends Equatable {
     Object? reminderTimeError = _unset,
     AsyncStatus? submissionStatus,
     Object? savedStarnyx = _unset,
-    Object? submissionErrorMessage = _unset,
     AsyncStatus? deletionStatus,
     Object? deletedStarnyxId = _unset,
-    Object? deletionErrorMessage = _unset,
   }) {
     return StarnyxFormState(
       mode: mode ?? this.mode,
@@ -159,16 +149,10 @@ class StarnyxFormState extends Equatable {
       savedStarnyx: identical(savedStarnyx, _unset)
           ? this.savedStarnyx
           : savedStarnyx as StarNyx?,
-      submissionErrorMessage: identical(submissionErrorMessage, _unset)
-          ? this.submissionErrorMessage
-          : submissionErrorMessage as String?,
       deletionStatus: deletionStatus ?? this.deletionStatus,
       deletedStarnyxId: identical(deletedStarnyxId, _unset)
           ? this.deletedStarnyxId
           : deletedStarnyxId as String?,
-      deletionErrorMessage: identical(deletionErrorMessage, _unset)
-          ? this.deletionErrorMessage
-          : deletionErrorMessage as String?,
     );
   }
 
@@ -191,9 +175,7 @@ class StarnyxFormState extends Equatable {
     reminderTimeError,
     submissionStatus,
     savedStarnyx,
-    submissionErrorMessage,
     deletionStatus,
     deletedStarnyxId,
-    deletionErrorMessage,
   ];
 }

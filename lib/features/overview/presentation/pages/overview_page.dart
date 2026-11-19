@@ -234,7 +234,7 @@ class _RangeSelector extends StatelessWidget {
         ),
         const SizedBox(width: AppSpacing.xs),
         _RangePill(
-          label: 'overview.yearly'.tr(args: <String>[year.toString()]),
+          label: 'overview.yearly'.tr(namedArgs: {'year': '$year'}),
           isActive: currentRange == OverviewRange.year,
           onTap: () => onChanged(OverviewRange.year),
         ),
@@ -364,10 +364,12 @@ class _HeroCard extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      'overview.completion_sub'.tr(args: <String>[
-                        litDays.toString(),
-                        totalValidDays.toString(),
-                      ]),
+                      'overview.completion_sub'.tr(
+                        namedArgs: <String, String>{
+                          'lit': '$litDays',
+                          'total': '$totalValidDays',
+                        },
+                      ),
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontFamily: AppFonts.mono,
                         color: AppColors.textSecondary,
@@ -590,7 +592,7 @@ class _HeatmapCard extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                'overview.discipline_sub'.tr(args: <String>[year.toString()]),
+                'overview.discipline_sub'.tr(namedArgs: {'year': '$year'}),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.textSecondary,
                 ),
@@ -726,12 +728,14 @@ class _HeatmapGrid extends StatelessWidget {
           }
 
           return Semantics(
-            label: 'overview.heatmap_cell'.tr(args: <String>[
-              day.day.toString(),
-              day.month.toString(),
-              lit.toString(),
-              valid.toString(),
-            ]),
+            label: 'overview.heatmap_cell'.tr(
+              namedArgs: <String, String>{
+                'day': '${day.day}',
+                'month': '${day.month}',
+                'lit': '$lit',
+                'total': '$valid',
+              },
+            ),
             child: Container(
               decoration: BoxDecoration(
                 color: cellColor,
@@ -845,7 +849,7 @@ class _HabitRow extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   'overview.current_streak'.tr(
-                    args: <String>[habit.currentStreak.toString()],
+                    namedArgs: {'days': '${habit.currentStreak}'},
                   ),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppColors.textSecondary,
@@ -959,11 +963,11 @@ class _OverviewContent extends StatelessWidget {
                         title: 'overview.lit_days'.tr(),
                         value: '${stats.totalLitDays} / $daysInYear',
                         subtitle: 'overview.lit_sub'.tr(
-                          args: <String>[
-                            stats.totalLitDays.toString(),
-                            daysInYear.toString(),
-                            litPct.toString(),
-                          ],
+                          namedArgs: <String, String>{
+                            'lit': '${stats.totalLitDays}',
+                            'total': '$daysInYear',
+                            'pct': '$litPct',
+                          },
                         ),
                         accentColor: AppColors.primary,
                       ),
@@ -974,7 +978,7 @@ class _OverviewContent extends StatelessWidget {
                         icon: HugeIconsStrokeRounded.strokeRoundedAward02,
                         title: 'overview.longest_streak'.tr(),
                         value: 'overview.longest_streak_sub'.tr(
-                          args: <String>[stats.bestLongestStreak.toString()],
+                          namedArgs: {'days': '${stats.bestLongestStreak}'},
                         ),
                         subtitle: 'overview.longest_streak_note'.tr(),
                         accentColor: AppColors.secondary,

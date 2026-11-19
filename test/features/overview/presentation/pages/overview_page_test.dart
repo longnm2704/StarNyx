@@ -67,6 +67,13 @@ void main() {
     expect(find.text('Ma Trận Kỷ Luật'), findsOneWidget);
     expect(find.text('Theo Từng Thói Quen'), findsOneWidget);
     expect(find.text('Uống nước'), findsOneWidget);
+    // Placeholders are filled, not rendered literally.
+    expect(find.text('Năm 2026'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel('Ngày 10/6: 1/1 đã thắp'),
+      findsOneWidget,
+    );
+    expect(find.textContaining(RegExp(r'\{\w*\}')), findsNothing);
   });
 
   testWidgets('renders multiple habits in the per-habit list', (
