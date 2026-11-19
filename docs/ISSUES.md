@@ -320,7 +320,7 @@ Tick `[x]` when an issue is done.
     - Unit tests cover: empty DB, one habit, multiple habits with different start dates, year boundary.
     - No schema change.
 
-- [ ] **STX-U010**: Overview screen (`tong_quan_thong_ke`)
+- [x] **STX-U010**: Overview screen (`tong_quan_thong_ke`)
   - _Must-have · kind:feature · depends on: STX-U006, STX-U009_
   - Design: `docs/app_ui_redesign/tong_quan_thong_ke/{code.html,screen.png}`
   - Acceptance criteria:

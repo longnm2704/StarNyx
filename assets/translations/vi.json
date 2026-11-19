@@ -188,5 +188,33 @@
     "retry": "Thử lại",
     "select_error": "Không thể chuyển thói quen.",
     "order_error": "Không thể lưu thứ tự mới."
+  },
+  "overview": {
+    "title": "Tổng quan",
+    "subtitle": "Tổng quan",
+    "weekly": "Tuần này",
+    "monthly": "Tháng này",
+    "yearly": "Năm {year}",
+    "completion_rate": "Tỷ lệ hoàn thành",
+    "completion_sub": "Đã thắp {lit} / {total} ngày",
+    "lit_days": "Đã thắp sáng",
+    "lit_sub": "{lit} / {total} {pct}% chặng đường",
+    "longest_streak": "Chuỗi dài nhất",
+    "longest_streak_sub": "{days} ngày",
+    "longest_streak_note": "Kỷ lục cá nhân",
+    "discipline_matrix": "Ma Trận Kỷ Luật",
+    "discipline_sub": "Mật độ duy trì trong năm {year}",
+    "legend_low": "Ít",
+    "legend_high": "Nhiều",
+    "per_habit": "Theo Từng Thói Quen",
+    "detail": "Chi tiết",
+    "current_streak": "Chuỗi {days} ngày liền",
+    "empty_title": "Chưa có thói quen",
+    "empty_message": "Thêm thói quen đầu tiên để xem tổng quan tiến độ.",
+    "empty_action": "Tạo thói quen",
+    "error_title": "Không thể tải tổng quan",
+    "error_message": "Đã xảy ra lỗi khi đọc dữ liệu.",
+    "retry": "Thử lại",
+    "heatmap_cell": "Ngày {0}/{1}: {2}/{3} đã thắp"
   }
 }
