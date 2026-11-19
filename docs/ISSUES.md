@@ -234,7 +234,7 @@ Tick `[x]` when an issue is done.
     - `AppRadius` gains `card = 16`, `sheet = 32` (top), keeps `pill = 9999`; `AppSpacing` gains `pageHorizontal = 16` (mockup uses 1rem margins); `AppLayout.contentMaxWidth = 680`.
     - `AppSize.ctaHeight = 52`, `AppSize.iconButton = 44`, `AppSize.inputMinHeight = 50`.
 
-- [ ] **STX-U003**: Rebuild AppTheme typography and component themes
+- [x] **STX-U003**: Rebuild AppTheme typography and component themes
   - _Must-have · kind:architecture · depends on: STX-U001, STX-U002_
   - Design: `obsidian_lumina/DESIGN.md` (Typography, Components)
   - Acceptance criteria:
