@@ -25,10 +25,7 @@ class HomeScreenSwitcher extends StatelessWidget {
     );
   }
 
-  static Widget _buildTransition(
-    Widget child,
-    Animation<double> animation,
-  ) {
+  static Widget _buildTransition(Widget child, Animation<double> animation) {
     final isIncoming =
         animation.status == AnimationStatus.forward ||
         animation.status == AnimationStatus.completed;
@@ -42,9 +39,7 @@ class HomeScreenSwitcher extends StatelessWidget {
     final slideOffset = Tween<Offset>(
       begin: const Offset(0, 0.04),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
-    );
+    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
 
     return FadeTransition(
       opacity: animation,

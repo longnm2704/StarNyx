@@ -90,7 +90,9 @@ void main() {
 
   test('load success with no habits is an empty success', () async {
     when(() => load()).thenAnswer((_) async => <StarNyx>[]);
-    when(() => loadActive(now: any(named: 'now'))).thenAnswer((_) async => null);
+    when(
+      () => loadActive(now: any(named: 'now')),
+    ).thenAnswer((_) async => null);
     bloc.add(const HabitListLoadRequested());
     final state = await settle();
 
@@ -118,9 +120,7 @@ void main() {
     expect(state.activeHabitId, '2');
     expect(state.selectionStatus, AsyncStatus.success);
 
-    when(
-      () => select('1', now: any(named: 'now')),
-    ).thenThrow(StateError('db'));
+    when(() => select('1', now: any(named: 'now'))).thenThrow(StateError('db'));
     bloc.add(const HabitListHabitSelected('1'));
     state = await settle();
     expect(state.activeHabitId, '2');
@@ -143,12 +143,15 @@ void main() {
     expect(state.orderStatus, AsyncStatus.failure);
   });
 
-  test('SaveStarNyxOrderUseCase persists the order via the repository', () async {
-    final repository = _MockRepository();
-    when(() => repository.reorderStarnyxs(any())).thenAnswer((_) async {});
+  test(
+    'SaveStarNyxOrderUseCase persists the order via the repository',
+    () async {
+      final repository = _MockRepository();
+      when(() => repository.reorderStarnyxs(any())).thenAnswer((_) async {});
 
-    await SaveStarNyxOrderUseCase(repository)(<String>['b', 'a']);
+      await SaveStarNyxOrderUseCase(repository)(<String>['b', 'a']);
 
-    verify(() => repository.reorderStarnyxs(<String>['b', 'a'])).called(1);
-  });
+      verify(() => repository.reorderStarnyxs(<String>['b', 'a'])).called(1);
+    },
+  );
 }

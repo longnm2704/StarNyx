@@ -204,7 +204,10 @@ abstract final class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.borderFocus, width: 1.4),
+          borderSide: const BorderSide(
+            color: AppColors.borderFocus,
+            width: 1.4,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),

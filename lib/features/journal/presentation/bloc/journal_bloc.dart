@@ -303,11 +303,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     JournalSubscriptionFailed event,
     Emitter<JournalState> emit,
   ) {
-    emit(
-      state.copyWith(
-        status: JournalStatus.failure,
-      ),
-    );
+    emit(state.copyWith(status: JournalStatus.failure));
   }
 
   @override

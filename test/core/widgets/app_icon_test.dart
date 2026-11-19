@@ -4,8 +4,9 @@ import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/widgets/app_icon.dart';
 
 void main() {
-  testWidgets('AppIcon renders the given glyph at the requested size',
-      (WidgetTester tester) async {
+  testWidgets('AppIcon renders the given glyph at the requested size', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -21,8 +22,9 @@ void main() {
     expect(find.byType(AppIcon), findsOneWidget);
   });
 
-  testWidgets('AppIcon exposes a semantics label when provided',
-      (WidgetTester tester) async {
+  testWidgets('AppIcon exposes a semantics label when provided', (
+    WidgetTester tester,
+  ) async {
     final handle = tester.ensureSemantics();
     await tester.pumpWidget(
       const MaterialApp(
@@ -41,8 +43,11 @@ void main() {
 
   test('buildSvg bumps stroke width below the small-size threshold', () {
     const icon = HugeIconsStrokeRounded.strokeRoundedStar;
-    final small =
-        AppIcon.buildSvg(icon, Colors.white, AppIcon.smallStrokeWidth);
+    final small = AppIcon.buildSvg(
+      icon,
+      Colors.white,
+      AppIcon.smallStrokeWidth,
+    );
     final regular = AppIcon.buildSvg(icon, Colors.white, null);
 
     expect(small, contains('stroke-width="2.0"'));

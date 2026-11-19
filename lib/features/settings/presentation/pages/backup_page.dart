@@ -197,11 +197,7 @@ class _BackupPageState extends State<BackupPage> {
     SettingsState state,
   ) async {
     if (state.hasExportFailure) {
-      _showSnackBar(
-        context,
-        'settings.export_error_title'.tr(),
-        isError: true,
-      );
+      _showSnackBar(context, 'settings.export_error_title'.tr(), isError: true);
       return;
     }
     if (state.exportStatus != AsyncStatus.success ||

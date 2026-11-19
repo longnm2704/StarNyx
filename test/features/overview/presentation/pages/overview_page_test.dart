@@ -69,16 +69,11 @@ void main() {
     expect(find.text('Uống nước'), findsOneWidget);
     // Placeholders are filled, not rendered literally.
     expect(find.text('Năm 2026'), findsOneWidget);
-    expect(
-      find.bySemanticsLabel('Ngày 10/6: 1/1 đã thắp'),
-      findsOneWidget,
-    );
+    expect(find.bySemanticsLabel('Ngày 10/6: 1/1 đã thắp'), findsOneWidget);
     expect(find.textContaining(RegExp(r'\{\w*\}')), findsNothing);
   });
 
-  testWidgets('renders multiple habits in the per-habit list', (
-    tester,
-  ) async {
+  testWidgets('renders multiple habits in the per-habit list', (tester) async {
     final starnyxRepository = _InMemoryStarNyxRepository();
     final completionRepository = _InMemoryCompletionRepository();
     await starnyxRepository.saveStarnyx(
@@ -168,9 +163,7 @@ void main() {
     expect(bloc.state.range, OverviewRange.month);
   });
 
-  testWidgets('renders empty state when there are no habits', (
-    tester,
-  ) async {
+  testWidgets('renders empty state when there are no habits', (tester) async {
     final bloc = OverviewBloc(
       loadOverviewStatsUseCase: LoadOverviewStatsUseCase(
         LoadStarnyxsUseCase(_InMemoryStarNyxRepository()),

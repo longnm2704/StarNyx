@@ -53,10 +53,7 @@ class AboutStarnyxSheet extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: AppColors.primary,
                     boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x2610B981),
-                        blurRadius: 24,
-                      ),
+                      BoxShadow(color: Color(0x2610B981), blurRadius: 24),
                     ],
                   ),
                   child: const Center(

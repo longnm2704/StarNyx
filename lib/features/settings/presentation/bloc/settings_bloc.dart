@@ -209,11 +209,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         error: error,
         stackTrace: stackTrace,
       );
-      emit(
-        state.copyWith(
-          exportStatus: AsyncStatus.failure,
-        ),
-      );
+      emit(state.copyWith(exportStatus: AsyncStatus.failure));
     }
   }
 
@@ -235,9 +231,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       await _importDataUseCase(event.jsonPayload);
       await _syncNotificationsUseCase.rebuildAllFromLocalData();
       _logger.debug('SettingsBloc', 'import success');
-      emit(
-        state.copyWith(importStatus: AsyncStatus.success),
-      );
+      emit(state.copyWith(importStatus: AsyncStatus.success));
     } catch (error, stackTrace) {
       _logger.error(
         'SettingsBloc',
@@ -245,12 +239,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         error: error,
         stackTrace: stackTrace,
       );
-      emit(
-        state.copyWith(
-          importStatus: AsyncStatus.failure,
-        ),
-      );
+      emit(state.copyWith(importStatus: AsyncStatus.failure));
     }
   }
 }
-

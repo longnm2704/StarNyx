@@ -74,9 +74,7 @@ class _OverviewPageState extends State<OverviewPage> {
         backgroundColor: AppColors.background,
         body: SafeArea(
           bottom: false,
-          child: _OverviewScreen(
-            onProfilePressed: widget.onProfilePressed,
-          ),
+          child: _OverviewScreen(onProfilePressed: widget.onProfilePressed),
         ),
       ),
     );
@@ -106,8 +104,9 @@ class _OverviewScreen extends StatelessWidget {
 
         if (state.status == OverviewStatus.failure && state.stats == null) {
           return _OverviewErrorView(
-            onRetry: () =>
-                context.read<OverviewBloc>().add(const OverviewReloadRequested()),
+            onRetry: () => context.read<OverviewBloc>().add(
+              const OverviewReloadRequested(),
+            ),
           );
         }
 
@@ -492,11 +491,7 @@ class _StatTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: Center(
-              child: AppIcon(
-                icon: icon,
-                size: 22,
-                color: accentColor,
-              ),
+              child: AppIcon(icon: icon, size: 22, color: accentColor),
             ),
           ),
           const SizedBox(width: AppSpacing.md),
@@ -595,9 +590,9 @@ class _HeatmapCard extends StatelessWidget {
               const Spacer(),
               Text(
                 'overview.discipline_sub'.tr(namedArgs: {'year': '$year'}),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
               ),
             ],
           ),
@@ -787,7 +782,8 @@ class _HabitListSection extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: habits.length,
-            separatorBuilder: (_, int index) => const SizedBox(height: AppSpacing.sm),
+            separatorBuilder: (_, int index) =>
+                const SizedBox(height: AppSpacing.sm),
             itemBuilder: (BuildContext context, int index) {
               return _HabitRow(habit: habits[index]);
             },
@@ -936,8 +932,7 @@ class _OverviewContent extends StatelessWidget {
                   child: _RangeSelector(
                     currentRange: state.range,
                     year: state.year,
-                    onChanged: (range) =>
-                        bloc.add(OverviewRangeChanged(range)),
+                    onChanged: (range) => bloc.add(OverviewRangeChanged(range)),
                   ),
                 ),
               ),

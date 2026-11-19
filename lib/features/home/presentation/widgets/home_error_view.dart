@@ -13,23 +13,23 @@ class HomeErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: AppLayout.contentMaxWidth,
-            ),
-            child: Padding(
-              padding: AppSpacing.cardPadding,
-              child: AppEmptyState(
-                icon: HugeIconsStrokeRounded.strokeRoundedAlert01,
-                title: 'home.load_error_title'.tr(),
-                message: 'home.load_error_message'.tr(),
-                actionLabel: 'home.retry'.tr(),
-                onActionPressed: onRetry,
-              ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: AppLayout.contentMaxWidth,
+          ),
+          child: Padding(
+            padding: AppSpacing.cardPadding,
+            child: AppEmptyState(
+              icon: HugeIconsStrokeRounded.strokeRoundedAlert01,
+              title: 'home.load_error_title'.tr(),
+              message: 'home.load_error_message'.tr(),
+              actionLabel: 'home.retry'.tr(),
+              onActionPressed: onRetry,
             ),
           ),
         ),
+      ),
     );
   }
 }

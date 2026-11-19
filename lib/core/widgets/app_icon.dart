@@ -31,7 +31,8 @@ class AppIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconTheme = IconTheme.of(context);
-    final effectiveColor = color ??
+    final effectiveColor =
+        color ??
         iconTheme.color ??
         DefaultTextStyle.of(context).style.color ??
         Theme.of(context).colorScheme.onSurface;
@@ -46,11 +47,7 @@ class AppIcon extends StatelessWidget {
     if (semanticsLabel == null) {
       return iconWidget;
     }
-    return Semantics(
-      label: semanticsLabel,
-      image: true,
-      child: iconWidget,
-    );
+    return Semantics(label: semanticsLabel, image: true, child: iconWidget);
   }
 
   static String _hex(Color color) =>

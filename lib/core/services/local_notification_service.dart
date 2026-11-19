@@ -305,9 +305,10 @@ class FlutterLocalNotificationClient implements NotificationClient {
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >();
-    final ios = _plugin.resolvePlatformSpecificImplementation<
-      IOSFlutterLocalNotificationsPlugin
-    >();
+    final ios = _plugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
 
     final androidGranted = await android?.requestNotificationsPermission();
     final iosGranted = await ios?.requestPermissions(

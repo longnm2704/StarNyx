@@ -109,8 +109,8 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
     String? initialColor,
     String? initialIcon,
   ) {
-    final resolvedIcon = initialIcon ??
-        (initialStarnyx?.icon ?? HabitSymbols.defaultKey);
+    final resolvedIcon =
+        initialIcon ?? (initialStarnyx?.icon ?? HabitSymbols.defaultKey);
 
     if (initialStarnyx != null) {
       return StarnyxFormState(
@@ -346,10 +346,10 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
         error: error,
       );
       emit(
-        _applyUseCaseValidation(validated, error).copyWith(
-          submissionStatus: AsyncStatus.failure,
-          savedStarnyx: null,
-        ),
+        _applyUseCaseValidation(
+          validated,
+          error,
+        ).copyWith(submissionStatus: AsyncStatus.failure, savedStarnyx: null),
       );
     } catch (error, stackTrace) {
       _logger.error(
@@ -393,11 +393,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
         ),
       );
     } catch (_) {
-      emit(
-        state.copyWith(
-          deletionStatus: AsyncStatus.failure,
-        ),
-      );
+      emit(state.copyWith(deletionStatus: AsyncStatus.failure));
     }
   }
 

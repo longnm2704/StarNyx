@@ -122,15 +122,13 @@ void main() {
     );
     expect(client.scheduled.single.body, 'Hydrate: ready to light today?');
 
-    service.setTranslator(
-      (key, {namedArgs}) {
-        if (key == 'home.reminder_body') {
-          final title = namedArgs?['title'] ?? '';
-          return '$title: hôm nay bạn đã thắp chưa?';
-        }
-        return key;
-      },
-    );
+    service.setTranslator((key, {namedArgs}) {
+      if (key == 'home.reminder_body') {
+        final title = namedArgs?['title'] ?? '';
+        return '$title: hôm nay bạn đã thắp chưa?';
+      }
+      return key;
+    });
 
     await service.createReminder(
       _sampleStarNyx(reminderEnabled: true, reminderTime: '09:30'),

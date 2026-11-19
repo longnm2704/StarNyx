@@ -66,9 +66,7 @@ void main() {
     'renders the configured habit symbol, defaults to star, and preserves day-state keys',
     (WidgetTester tester) async {
       // ── Flame symbol renders instead of the fixed star ──
-      await tester.pumpWidget(
-        _buildLocalizedApp(_grid(symbolKey: 'flame')),
-      );
+      await tester.pumpWidget(_buildLocalizedApp(_grid(symbolKey: 'flame')));
       await tester.pump();
 
       expect(
@@ -106,10 +104,7 @@ void main() {
         find.byKey(const ValueKey<String>('home-star-grid-day-count-365')),
         findsOneWidget,
       );
-      expect(
-        find.byKey(const Key('home-selected-star-cell')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('home-selected-star-cell')), findsOneWidget);
       expect(
         find.byKey(const Key('home-before-start-star-cell-98')),
         findsOneWidget,
@@ -122,10 +117,7 @@ void main() {
         find.byKey(const Key('home-missed-star-cell-100')),
         findsOneWidget,
       );
-      expect(
-        find.byKey(const Key('home-today-star-cell-108')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('home-today-star-cell-108')), findsOneWidget);
       expect(
         find.byKey(const Key('home-future-star-cell-109')),
         findsOneWidget,
