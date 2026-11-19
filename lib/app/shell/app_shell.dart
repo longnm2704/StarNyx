@@ -7,6 +7,7 @@ import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/app_icon.dart';
 import 'package:starnyx/features/home/presentation/pages/home_page.dart';
 import 'package:starnyx/features/journal/presentation/pages/journal_page.dart';
+import 'package:starnyx/features/overview/presentation/pages/overview_page.dart';
 import 'package:starnyx/features/starnyx_form/presentation/pages/create_starnyx_bottom_sheet.dart';
 
 /// Stable ids for the four primary destinations hosted by [AppShell].
@@ -63,6 +64,7 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   late int _index = widget.initialTab.index;
   int _homeReloadToken = 0;
+  int _overviewReloadToken = 0;
   int _journalReloadToken = 0;
 
   void _selectIndex(int index) {
@@ -71,7 +73,8 @@ class _AppShellState extends State<AppShell> {
     }
     setState(() {
       _index = index;
-      // The active habit may have changed on another tab.
+      // Habits, check-ins, or the active habit may have changed on another tab.
+      if (index == AppShellTab.overview.index) _overviewReloadToken++;
       if (index == AppShellTab.journal.index) _journalReloadToken++;
     });
   }
@@ -101,9 +104,10 @@ class _AppShellState extends State<AppShell> {
         onSettingsPressed: () => _selectIndex(AppShellTab.settings.index),
         onJournalPressed: () => _selectIndex(AppShellTab.journal.index),
       ),
-      const _ShellPlaceholderPage(
-        key: ValueKey<String>('overview-tab'),
-        tab: AppShellTab.overview,
+      OverviewPage(
+        key: const ValueKey<String>('overview-tab'),
+        reloadToken: _overviewReloadToken,
+        onProfilePressed: () => _selectIndex(AppShellTab.settings.index),
       ),
       JournalPage(
         key: const ValueKey<String>('journal-tab'),
@@ -262,9 +266,9 @@ class _AppShellNavDestination extends StatelessWidget {
   }
 }
 
-/// Temporary tab surface while the dedicated Overview, Journal, and Settings
-/// screens are built. Keeping each tab instantiable preserves shell navigation
-/// from the first commit without shipping interactive dead ends.
+/// Temporary tab surface while the dedicated Settings screen is built. Keeping
+/// each tab instantiable preserves shell navigation without shipping
+/// interactive dead ends.
 class _ShellPlaceholderPage extends StatelessWidget {
   const _ShellPlaceholderPage({required this.tab, super.key});
 
