@@ -182,7 +182,7 @@ class _ProfileButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'overview.profile_semantics'.tr(),
+      label: 'home.profile_semantics'.tr(),
       child: Material(
         color: AppColors.primary,
         shape: const CircleBorder(),
