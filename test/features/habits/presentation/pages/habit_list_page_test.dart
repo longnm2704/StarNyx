@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starnyx/app/di/service_locator.dart';
@@ -15,7 +16,8 @@ import 'package:uuid/uuid.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(() async {
+  setUp(() async {
+    rootBundle.clear();
     SharedPreferences.setMockInitialValues(<String, Object>{});
     await EasyLocalization.ensureInitialized();
   });
@@ -123,6 +125,33 @@ void main() {
       expect(find.byKey(const Key('open-habit-list')), findsOneWidget);
     },
   );
+
+  testWidgets('habit list shows the error state and retries', (
+    WidgetTester tester,
+  ) async {
+    final deps = _TestDeps(habits: <StarNyx>[_hydrate()], activeId: '1');
+    final emptyDeps = _TestDeps();
+    addTearDown(deps.bloc.close);
+    addTearDown(emptyDeps.bloc.close);
+    deps.starnyxRepository.throwOnLoad = true;
+
+    await _pumpLocalized(
+      tester,
+      _HabitListHost(populated: deps.bloc, empty: emptyDeps.bloc),
+    );
+    await tester.tap(find.byKey(const Key('open-populated')));
+    await tester.pumpAndSettle();
+
+    expect(find.text("Couldn't load habits"), findsOneWidget);
+    expect(find.text('Hydrate'), findsNothing);
+
+    deps.starnyxRepository.throwOnLoad = false;
+    await tester.tap(find.text('Try again'));
+    await tester.pumpAndSettle();
+
+    expect(find.text("Couldn't load habits"), findsNothing);
+    expect(find.text('Hydrate'), findsWidgets);
+  });
 }
 
 class _HabitListHost extends StatelessWidget {
@@ -297,6 +326,7 @@ class _InMemoryStarNyxRepository implements StarNyxRepository {
   final Map<String, StarNyx> _items;
   final List<String> _order;
   List<String>? lastReorderedIds;
+  bool throwOnLoad = false;
 
   @override
   Future<void> deleteStarnyxById(String id) async {
@@ -306,6 +336,9 @@ class _InMemoryStarNyxRepository implements StarNyxRepository {
 
   @override
   Future<List<StarNyx>> getAllStarnyxs() async {
+    if (throwOnLoad) {
+      throw StateError('db');
+    }
     return <StarNyx>[
       for (final id in _order)
         if (_items[id] != null) _items[id]!,

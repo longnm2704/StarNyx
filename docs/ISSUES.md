@@ -578,7 +578,7 @@ Tick `[x]` when an issue is done.
     - Screenshots attached to the PR for: Habits, Overview, Journal list, Journal detail, Settings, Backup, Create form, Edit form, Delete dialog, Onboarding ×4, Habit list.
     - No overflow, no clipped text, no dead buttons.
 
-- [ ] **STX-U027**: Tests and dead-code cleanup
+- [x] **STX-U027**: Tests and dead-code cleanup
   - _Must-have · kind:test · depends on: STX-U007 … STX-U024_
   - Acceptance criteria:
     - `flutter test` passes; new blocs/use cases have unit tests; new screens have widget tests for the happy path and empty/error states.

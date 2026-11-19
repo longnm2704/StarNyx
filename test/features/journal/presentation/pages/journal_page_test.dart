@@ -300,6 +300,13 @@ void main() {
     expect(find.byType(JournalEntryCard), findsNothing);
   });
 
+  testWidgets('shows error state when entries fail to load', (tester) async {
+    await _render(tester, _ThrowingJournalEntryRepository(), habit);
+
+    expect(find.text('Không tải được nhật ký'), findsOneWidget);
+    expect(find.text('Thử lại'), findsOneWidget);
+  });
+
   group('detail', () {
     final today = DateUtils.dateOnly(DateTime.now());
     final yesterday = today.subtract(const Duration(days: 1));
@@ -576,4 +583,12 @@ class _FakeCompletionRepository implements CompletionRepository {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _ThrowingJournalEntryRepository extends _InMemoryJournalEntryRepository {
+  _ThrowingJournalEntryRepository() : super(<JournalEntry>[]);
+
+  @override
+  Stream<List<JournalEntry>> watchJournalEntriesForStarnyx(String starnyxId) =>
+      Stream<List<JournalEntry>>.error(StateError('db'));
 }

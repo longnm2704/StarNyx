@@ -188,6 +188,32 @@ void main() {
     expect(find.text('Chưa có thói quen'), findsOneWidget);
     expect(find.text('Tạo thói quen'), findsOneWidget);
   });
+
+  testWidgets('renders error state when stats fail to load', (tester) async {
+    final starnyxRepository = _ThrowingStarNyxRepository();
+    final completionRepository = _InMemoryCompletionRepository();
+    final bloc = OverviewBloc(
+      loadOverviewStatsUseCase: LoadOverviewStatsUseCase(
+        LoadStarnyxsUseCase(starnyxRepository),
+        completionRepository,
+        LoadStarNyxProgressStatsUseCase(
+          starnyxRepository,
+          completionRepository,
+        ),
+      ),
+      nowBuilder: () => DateTime(2026, 6, 15, 10),
+    );
+
+    await _renderOverview(tester, bloc);
+
+    expect(find.text('Không thể tải tổng quan'), findsOneWidget);
+    expect(find.text('Thử lại'), findsOneWidget);
+  });
+}
+
+class _ThrowingStarNyxRepository extends _InMemoryStarNyxRepository {
+  @override
+  Future<List<StarNyx>> getAllStarnyxs() => Future.error(StateError('db'));
 }
 
 Future<void> _renderOverview(WidgetTester tester, OverviewBloc bloc) async {
