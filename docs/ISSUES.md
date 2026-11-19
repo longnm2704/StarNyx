@@ -469,7 +469,7 @@ Tick `[x]` when an issue is done.
     - Layout holds at 320px and 2.0 text scale; the symbol grid scrolls if needed.
     - Widget tests: create flow, edit flow, symbol selection, color selection, validation.
 
-- [ ] **STX-U019**: Delete-habit confirmation dialog (`xac_nhan_xoa_thoi_quen`)
+- [x] **STX-U019**: Delete-habit confirmation dialog (`xac_nhan_xoa_thoi_quen`)
   - _Must-have · kind:feature · depends on: STX-U004, STX-U018_
   - Design: `docs/app_ui_redesign/xac_nhan_xoa_thoi_quen/{code.html,screen.png}`
   - Acceptance criteria:

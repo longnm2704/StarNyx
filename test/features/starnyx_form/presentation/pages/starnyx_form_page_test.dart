@@ -165,6 +165,37 @@ void main() {
     expect(find.text('Title is required'), findsOneWidget);
   });
 
+  testWidgets('delete asks for confirmation; cancel keeps the habit', (
+    tester,
+  ) async {
+    final habit = _habit();
+    await repository.saveStarnyx(habit);
+    final host = _FormHost(starnyx: habit);
+    await openForm(tester, host);
+
+    await tapVisible(tester, find.byKey(const Key('starnyx-form-delete')));
+    expect(find.text('Delete this habit?'), findsOneWidget);
+    expect(
+      find.textContaining('Gym', findRichText: true),
+      findsAtLeastNWidgets(1),
+    );
+
+    await tester.tap(find.byKey(const Key('app-confirm-cancel')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Delete this habit?'), findsNothing);
+    expect(find.text('Edit habit'), findsOneWidget);
+    expect(await repository.getStarnyxById(habit.id), isNotNull);
+
+    await tapVisible(tester, find.byKey(const Key('starnyx-form-delete')));
+    await tester.tap(find.byKey(const Key('app-confirm-confirm')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit habit'), findsNothing);
+    expect(host.result?.deletedStarnyxId, habit.id);
+    expect(await repository.getStarnyxById(habit.id), isNull);
+  });
+
   testWidgets('layout holds at 320px and 2.0 text scale', (tester) async {
     tester.view.physicalSize = const Size(320, 568);
     tester.view.devicePixelRatio = 1;

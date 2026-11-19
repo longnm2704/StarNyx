@@ -118,7 +118,7 @@ class _StarnyxFormPageState extends State<StarnyxFormPage> {
       cancelLabel: 'starnyx_form.delete_cancel'.tr(),
       confirmLabel: 'starnyx_form.delete_confirm'.tr(),
       actionStyle: AppConfirmActionStyle.destructive,
-      accentColor: starnyxColorFromHex(state.color),
+      subject: _DeleteSubjectChip(state: state),
     );
 
     if (confirmed != true || !mounted) {
@@ -460,6 +460,67 @@ class _SubmitButton extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Delete dialog chip: habit symbol + title + start date.
+class _DeleteSubjectChip extends StatelessWidget {
+  const _DeleteSubjectChip({required this.state});
+
+  final StarnyxFormState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = Theme.of(context).textTheme.bodySmall;
+    final startedOn = 'starnyx_form.delete_started_on'.tr(
+      args: <String>[core_date_utils.DateUtils.formatDdMmYyyy(state.startDate)],
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xxs + 2,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.white.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          AppIcon(
+            icon: HabitSymbols.iconFor(state.icon),
+            size: 14,
+            color: starnyxColorFromHex(state.color),
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Flexible(
+            child: Text.rich(
+              TextSpan(
+                children: <InlineSpan>[
+                  TextSpan(
+                    text: state.title.trim(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  TextSpan(
+                    text: ' · $startedOn',
+                    style: const TextStyle(color: AppColors.textSecondary),
+                  ),
+                ],
+              ),
+              key: const Key('starnyx-form-delete-subject'),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: textStyle,
+            ),
+          ),
+        ],
       ),
     );
   }
