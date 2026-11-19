@@ -118,7 +118,12 @@
     "search_close_semantics": "Close search",
     "search_empty": "No notes match.",
     "send_semantics": "Save note",
-    "switch_habit_semantics": "Switch habit"
+    "switch_habit_semantics": "Switch habit",
+    "editor_new_title": "New entry",
+    "editor_edit_title": "Edit entry",
+    "editor_save": "Save",
+    "editor_close": "Back",
+    "editor_open_semantics": "Open full editor"
   },
   "settings": {
     "title": "Settings",

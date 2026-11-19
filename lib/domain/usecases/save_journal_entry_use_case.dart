@@ -18,16 +18,7 @@ class SaveJournalEntryUseCase {
     required DateTime date,
     required String content,
   }) async {
-    final trimmedContent = content.trim();
-    if (trimmedContent.isEmpty) {
-      throw const FormatException('Journal content is required.');
-    }
-    if (trimmedContent.length > 4000) {
-      throw const FormatException(
-        'Journal content must be 4000 characters or fewer.',
-      );
-    }
-
+    final trimmedContent = _validContent(content);
     final normalizedDate = DateUtils.dateOnly(date);
     _logger.debug(
       'SaveJournalEntryUseCase',
@@ -49,6 +40,36 @@ class SaveJournalEntryUseCase {
       'save success starnyxId=$starnyxId date=$normalizedDate',
     );
     return entry;
+  }
+
+  /// Edits [entry]'s content and date; `id`, `starnyxId` and `createdAt` are
+  /// kept as they are.
+  Future<JournalEntry> update(
+    JournalEntry entry, {
+    required String content,
+    DateTime? date,
+  }) async {
+    final updated = entry.copyWith(
+      content: _validContent(content),
+      date: DateUtils.dateOnly(date ?? entry.date),
+    );
+    _logger.debug('SaveJournalEntryUseCase', 'update begin id=${entry.id}');
+    await _repository.updateJournalEntry(updated);
+    _logger.debug('SaveJournalEntryUseCase', 'update success id=${entry.id}');
+    return updated;
+  }
+
+  static String _validContent(String content) {
+    final trimmed = content.trim();
+    if (trimmed.isEmpty) {
+      throw const FormatException('Journal content is required.');
+    }
+    if (trimmed.length > 4000) {
+      throw const FormatException(
+        'Journal content must be 4000 characters or fewer.',
+      );
+    }
+    return trimmed;
   }
 
   Future<void> restore(JournalEntry entry) async {

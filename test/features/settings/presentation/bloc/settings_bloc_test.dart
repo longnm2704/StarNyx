@@ -393,6 +393,12 @@ class _InMemoryJournalEntryRepository implements JournalEntryRepository {
   }
 
   @override
+  Future<void> updateJournalEntry(JournalEntry entry) async {
+    final index = _entries.indexWhere((e) => e.id == entry.id);
+    if (index >= 0) _entries[index] = entry;
+  }
+
+  @override
   Stream<List<JournalEntry>> watchJournalEntriesForStarnyx(
     String starnyxId,
   ) async* {

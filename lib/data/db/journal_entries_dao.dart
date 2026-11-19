@@ -27,16 +27,25 @@ class JournalEntriesDao extends DatabaseAccessor<AppDatabase>
     required String starnyxId,
     required String date,
   }) {
-    return (select(journalEntries)..where(
-          (table) =>
-              table.starnyxId.equals(starnyxId) & table.date.equals(date),
-        )..orderBy([(table) => OrderingTerm.desc(table.createdAt)]))
+    return (select(journalEntries)
+          ..where(
+            (table) =>
+                table.starnyxId.equals(starnyxId) & table.date.equals(date),
+          )
+          ..orderBy([(table) => OrderingTerm.desc(table.createdAt)]))
         .get();
   }
 
   // Insert a new journal entry.
   Future<int> insertJournalEntry(JournalEntriesCompanion companion) {
     return into(journalEntries).insert(companion);
+  }
+
+  // Update an existing entry by its primary key ID.
+  Future<int> updateJournalEntry(int id, JournalEntriesCompanion companion) {
+    return (update(
+      journalEntries,
+    )..where((table) => table.id.equals(id))).write(companion);
   }
 
   // Delete a specific entry by its primary key ID.

@@ -11,6 +11,7 @@ class JournalState extends Equatable {
     required this.entries,
     required this.draftContent,
     required this.saveStatus,
+    required this.updateStatus,
     required this.deleteStatus,
     required this.undoDeleteStatus,
     required this.recentlyDeletedEntry,
@@ -25,6 +26,7 @@ class JournalState extends Equatable {
       entries: <JournalEntry>[],
       draftContent: '',
       saveStatus: AsyncStatus.idle,
+      updateStatus: AsyncStatus.idle,
       deleteStatus: AsyncStatus.idle,
       undoDeleteStatus: AsyncStatus.idle,
       recentlyDeletedEntry: null,
@@ -38,6 +40,7 @@ class JournalState extends Equatable {
   final List<JournalEntry> entries;
   final String draftContent;
   final AsyncStatus saveStatus;
+  final AsyncStatus updateStatus;
   final AsyncStatus deleteStatus;
   final AsyncStatus undoDeleteStatus;
   final JournalEntry? recentlyDeletedEntry;
@@ -56,6 +59,7 @@ class JournalState extends Equatable {
     List<JournalEntry>? entries,
     String? draftContent,
     AsyncStatus? saveStatus,
+    AsyncStatus? updateStatus,
     AsyncStatus? deleteStatus,
     AsyncStatus? undoDeleteStatus,
     Object? recentlyDeletedEntry = _unset,
@@ -70,6 +74,7 @@ class JournalState extends Equatable {
       entries: entries ?? this.entries,
       draftContent: draftContent ?? this.draftContent,
       saveStatus: saveStatus ?? this.saveStatus,
+      updateStatus: updateStatus ?? this.updateStatus,
       deleteStatus: deleteStatus ?? this.deleteStatus,
       undoDeleteStatus: undoDeleteStatus ?? this.undoDeleteStatus,
       recentlyDeletedEntry: identical(recentlyDeletedEntry, _unset)
@@ -89,6 +94,7 @@ class JournalState extends Equatable {
     entries,
     draftContent,
     saveStatus,
+    updateStatus,
     deleteStatus,
     undoDeleteStatus,
     recentlyDeletedEntry,

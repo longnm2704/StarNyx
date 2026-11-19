@@ -30,6 +30,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     on<JournalStarted>(_onStarted);
     on<JournalDraftChanged>(_onDraftChanged);
     on<JournalSaveRequested>(_onSaveRequested);
+    on<JournalEntryUpdated>(_onEntryUpdated);
     on<JournalDeleteRequested>(_onDeleteRequested);
     on<JournalDeleteUndoRequested>(_onDeleteUndoRequested);
     on<JournalEntriesChanged>(_onEntriesChanged);
@@ -56,6 +57,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         status: JournalStatus.loading,
         starnyxId: event.starnyxId,
         saveStatus: AsyncStatus.idle,
+        updateStatus: AsyncStatus.idle,
         deleteStatus: AsyncStatus.idle,
         undoDeleteStatus: AsyncStatus.idle,
         recentlyDeletedEntry: null,
@@ -89,6 +91,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
       state.copyWith(
         draftContent: event.content,
         saveStatus: AsyncStatus.idle,
+        updateStatus: AsyncStatus.idle,
         deleteStatus: AsyncStatus.idle,
         undoDeleteStatus: AsyncStatus.idle,
         errorMessage: null,
@@ -118,6 +121,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     emit(
       state.copyWith(
         saveStatus: AsyncStatus.inProgress,
+        updateStatus: AsyncStatus.idle,
         deleteStatus: AsyncStatus.idle,
         undoDeleteStatus: AsyncStatus.idle,
         errorMessage: null,
@@ -157,6 +161,52 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     }
   }
 
+  Future<void> _onEntryUpdated(
+    JournalEntryUpdated event,
+    Emitter<JournalState> emit,
+  ) async {
+    final id = event.entry.id;
+    _logger.debug('JournalBloc', 'update begin id=$id');
+    emit(
+      state.copyWith(
+        updateStatus: AsyncStatus.inProgress,
+        saveStatus: AsyncStatus.idle,
+        deleteStatus: AsyncStatus.idle,
+        undoDeleteStatus: AsyncStatus.idle,
+        errorMessage: null,
+      ),
+    );
+    try {
+      await _saveJournalEntryUseCase.update(
+        event.entry,
+        content: event.content,
+        date: event.date,
+      );
+      _logger.debug('JournalBloc', 'update success id=$id');
+      emit(
+        state.copyWith(
+          updateStatus: AsyncStatus.success,
+          feedbackCount: state.feedbackCount + 1,
+        ),
+      );
+    } catch (error, stackTrace) {
+      _logger.error(
+        'JournalBloc',
+        'update failed id=$id',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      emit(
+        state.copyWith(
+          updateStatus: AsyncStatus.failure,
+          feedbackCount: state.feedbackCount + 1,
+          errorMessage:
+              'Unable to update the journal entry right now. Please try again.',
+        ),
+      );
+    }
+  }
+
   Future<void> _onDeleteRequested(
     JournalDeleteRequested event,
     Emitter<JournalState> emit,
@@ -166,6 +216,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
       state.copyWith(
         deleteStatus: AsyncStatus.inProgress,
         saveStatus: AsyncStatus.idle,
+        updateStatus: AsyncStatus.idle,
         undoDeleteStatus: AsyncStatus.idle,
         errorMessage: null,
       ),
@@ -216,6 +267,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         undoDeleteStatus: AsyncStatus.inProgress,
         deleteStatus: AsyncStatus.idle,
         saveStatus: AsyncStatus.idle,
+        updateStatus: AsyncStatus.idle,
         errorMessage: null,
       ),
     );

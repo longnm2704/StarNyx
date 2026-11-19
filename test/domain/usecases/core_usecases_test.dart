@@ -211,18 +211,55 @@ void main() {
     },
   );
 
-  test('save journal entry use case rejects content longer than 4000 chars', () {
-    final useCase = SaveJournalEntryUseCase(journalEntryRepository);
+  test(
+    'save journal entry use case rejects content longer than 4000 chars',
+    () {
+      final useCase = SaveJournalEntryUseCase(journalEntryRepository);
 
-    expect(
-      useCase(
+      expect(
+        useCase(
+          starnyxId: 'habit-1',
+          date: DateTime(2026, 4, 13),
+          content: 'a' * 4001,
+        ),
+        throwsA(isA<FormatException>()),
+      );
+    },
+  );
+
+  test(
+    'save journal entry update keeps id and createdAt, changes content and date',
+    () async {
+      final useCase = SaveJournalEntryUseCase(journalEntryRepository);
+      final entry = JournalEntry(
+        id: 5,
         starnyxId: 'habit-1',
-        date: DateTime(2026, 4, 13),
-        content: 'a' * 4001,
-      ),
-      throwsA(isA<FormatException>()),
-    );
-  });
+        date: DateTime(2026, 4, 10),
+        content: 'Old',
+        createdAt: DateTime(2026, 4, 10, 22, 45),
+      );
+      await journalEntryRepository.saveJournalEntry(entry);
+
+      final updated = await useCase.update(
+        entry,
+        content: ' New ',
+        date: DateTime(2026, 4, 11, 9, 30),
+      );
+
+      expect(
+        updated,
+        entry.copyWith(content: 'New', date: DateTime(2026, 4, 11)),
+      );
+      expect(
+        await journalEntryRepository.getJournalEntriesForStarnyx('habit-1'),
+        <JournalEntry>[updated],
+      );
+      expect(
+        () => useCase.update(entry, content: '   '),
+        throwsA(isA<FormatException>()),
+      );
+    },
+  );
 
   test('update use case rejects a future start date', () async {
     final useCase = UpdateStarNyxUseCase(starNyxRepository);
@@ -826,32 +863,80 @@ void main() {
     },
   );
 
-  test('import use case executes writes inside provided transaction runner', () async {
-    var transactionCallCount = 0;
-    final useCase = ImportDataUseCase(
+  test('backup round-trips an edited journal entry unchanged', () async {
+    await starNyxRepository.saveStarnyx(
+      StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 2, 9),
+      ),
+    );
+    final original = JournalEntry(
+      id: 3,
+      starnyxId: 'habit-1',
+      date: DateTime(2026, 4, 10),
+      content: 'First draft',
+      createdAt: DateTime(2026, 4, 10, 22, 45),
+    );
+    await journalEntryRepository.saveJournalEntry(original);
+    final edited = await SaveJournalEntryUseCase(
+      journalEntryRepository,
+    ).update(original, content: 'Edited note', date: DateTime(2026, 4, 11));
+
+    final exported = await ExportDataUseCase(
       starNyxRepository,
       completionRepository,
       journalEntryRepository,
       appSettingsRepository,
-      transactionRunner: <T>(Future<T> Function() action) async {
-        transactionCallCount += 1;
-        return action();
-      },
+    )();
+    await ImportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    ).callFromJsonText(exported);
+
+    expect(
+      await journalEntryRepository.getJournalEntriesForStarnyx('habit-1'),
+      <JournalEntry>[edited],
     );
-
-    await useCase(<String, dynamic>{
-      'schemaVersion': 1,
-      'starnyxs': <Map<String, dynamic>>[],
-      'completions': <Map<String, dynamic>>[],
-      'journalEntries': <Map<String, dynamic>>[],
-      'appSettings': <String, dynamic>{
-        'lastSelectedStarnyxId': null,
-        'updatedAt': '2026-04-10T08:30:00.000',
-      },
-    });
-
-    expect(transactionCallCount, 1);
   });
+
+  test(
+    'import use case executes writes inside provided transaction runner',
+    () async {
+      var transactionCallCount = 0;
+      final useCase = ImportDataUseCase(
+        starNyxRepository,
+        completionRepository,
+        journalEntryRepository,
+        appSettingsRepository,
+        transactionRunner: <T>(Future<T> Function() action) async {
+          transactionCallCount += 1;
+          return action();
+        },
+      );
+
+      await useCase(<String, dynamic>{
+        'schemaVersion': 1,
+        'starnyxs': <Map<String, dynamic>>[],
+        'completions': <Map<String, dynamic>>[],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': null,
+          'updatedAt': '2026-04-10T08:30:00.000',
+        },
+      });
+
+      expect(transactionCallCount, 1);
+    },
+  );
 
   test(
     'import use case replaces existing child data instead of merging',
@@ -1281,10 +1366,7 @@ void main() {
 
     final starnyxs = payload['starnyxs'] as List<dynamic>;
     expect(starnyxs, hasLength(1));
-    expect(
-      (starnyxs.first as Map<String, dynamic>)['icon'],
-      'flame',
-    );
+    expect((starnyxs.first as Map<String, dynamic>)['icon'], 'flame');
   });
 
   test('import old backup without icon defaults to star', () async {
@@ -1347,10 +1429,7 @@ void main() {
     );
     final exportedJson = await exportUseCase();
     final payload = jsonDecode(exportedJson) as Map<String, dynamic>;
-    expect(
-      (payload['starnyxs'] as List<dynamic>).first['icon'],
-      'clover',
-    );
+    expect((payload['starnyxs'] as List<dynamic>).first['icon'], 'clover');
 
     // Clear and re-import to simulate a round-trip.
     await starNyxRepository.deleteStarnyxById('habit-1');
@@ -1407,29 +1486,31 @@ void main() {
 
   test('import validation accepts optional icon field', () async {
     // icon present as a valid string
-    final validResult = JsonValidationUtils.validateImportJson(<String, dynamic>{
-      'schemaVersion': 1,
-      'starnyxs': <Map<String, dynamic>>[
-        <String, dynamic>{
-          'id': 'habit-1',
-          'title': 'Hydrate',
-          'description': null,
-          'color': '#102030',
-          'startDate': '2026-04-01',
-          'reminderEnabled': false,
-          'reminderTime': null,
-          'createdAt': '2026-04-01T08:00:00.000',
+    final validResult = JsonValidationUtils.validateImportJson(
+      <String, dynamic>{
+        'schemaVersion': 1,
+        'starnyxs': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'id': 'habit-1',
+            'title': 'Hydrate',
+            'description': null,
+            'color': '#102030',
+            'startDate': '2026-04-01',
+            'reminderEnabled': false,
+            'reminderTime': null,
+            'createdAt': '2026-04-01T08:00:00.000',
+            'updatedAt': '2026-04-01T08:00:00.000',
+            'icon': 'flame',
+          },
+        ],
+        'completions': <Map<String, dynamic>>[],
+        'journalEntries': <Map<String, dynamic>>[],
+        'appSettings': <String, dynamic>{
+          'lastSelectedStarnyxId': null,
           'updatedAt': '2026-04-01T08:00:00.000',
-          'icon': 'flame',
         },
-      ],
-      'completions': <Map<String, dynamic>>[],
-      'journalEntries': <Map<String, dynamic>>[],
-      'appSettings': <String, dynamic>{
-        'lastSelectedStarnyxId': null,
-        'updatedAt': '2026-04-01T08:00:00.000',
       },
-    });
+    );
     expect(validResult.isValid, isTrue);
 
     // icon missing entirely
@@ -1460,31 +1541,29 @@ void main() {
     expect(missingResult.isValid, isTrue);
 
     // icon as null
-    final nullResult = JsonValidationUtils.validateImportJson(
-      <String, dynamic>{
-        'schemaVersion': 1,
-        'starnyxs': <Map<String, dynamic>>[
-          <String, dynamic>{
-            'id': 'habit-1',
-            'title': 'Hydrate',
-            'description': null,
-            'color': '#102030',
-            'startDate': '2026-04-01',
-            'reminderEnabled': false,
-            'reminderTime': null,
-            'createdAt': '2026-04-01T08:00:00.000',
-            'updatedAt': '2026-04-01T08:00:00.000',
-            'icon': null,
-          },
-        ],
-        'completions': <Map<String, dynamic>>[],
-        'journalEntries': <Map<String, dynamic>>[],
-        'appSettings': <String, dynamic>{
-          'lastSelectedStarnyxId': null,
+    final nullResult = JsonValidationUtils.validateImportJson(<String, dynamic>{
+      'schemaVersion': 1,
+      'starnyxs': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'id': 'habit-1',
+          'title': 'Hydrate',
+          'description': null,
+          'color': '#102030',
+          'startDate': '2026-04-01',
+          'reminderEnabled': false,
+          'reminderTime': null,
+          'createdAt': '2026-04-01T08:00:00.000',
           'updatedAt': '2026-04-01T08:00:00.000',
+          'icon': null,
         },
+      ],
+      'completions': <Map<String, dynamic>>[],
+      'journalEntries': <Map<String, dynamic>>[],
+      'appSettings': <String, dynamic>{
+        'lastSelectedStarnyxId': null,
+        'updatedAt': '2026-04-01T08:00:00.000',
       },
-    );
+    });
     expect(nullResult.isValid, isTrue);
 
     // icon as non-string is invalid
@@ -1731,6 +1810,12 @@ class _InMemoryJournalEntryRepository implements JournalEntryRepository {
   @override
   Future<void> saveJournalEntry(JournalEntry entry) async {
     _entries.add(entry);
+  }
+
+  @override
+  Future<void> updateJournalEntry(JournalEntry entry) async {
+    final index = _entries.indexWhere((e) => e.id == entry.id);
+    if (index >= 0) _entries[index] = entry;
   }
 
   @override

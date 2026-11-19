@@ -369,7 +369,7 @@ Tick `[x]` when an issue is done.
     - Destructive link: "Xóa nhật ký này" → confirm dialog → delete + pop.
     - Widget tests: renders with a mocked entry; delete flow; edit navigation.
 
-- [ ] **STX-U013**: Journal edit support
+- [x] **STX-U013**: Journal edit support
   - _Must-have · kind:feature · depends on: STX-U011_
   - Acceptance criteria:
     - `JournalBloc` gains `JournalEntryUpdated` event and `updateJournalEntry` path in `SaveJournalEntryUseCase` (or a new `UpdateJournalEntryUseCase`) that preserves `id` and `createdAt`, updates `content` and `date`.

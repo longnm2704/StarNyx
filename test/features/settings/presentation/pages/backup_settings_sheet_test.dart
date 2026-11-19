@@ -221,6 +221,9 @@ class _EmptyJournalEntryRepository implements JournalEntryRepository {
   Future<void> saveJournalEntry(JournalEntry entry) async {}
 
   @override
+  Future<void> updateJournalEntry(JournalEntry entry) async {}
+
+  @override
   Stream<List<JournalEntry>> watchJournalEntriesForStarnyx(String starnyxId) {
     return Stream.value(<JournalEntry>[]);
   }

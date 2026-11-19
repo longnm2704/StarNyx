@@ -151,6 +151,46 @@ void main() {
     expect(saved.first.id, isNot(0));
   });
 
+  test('updates a journal entry by id keeping createdAt', () async {
+    await starNyxRepository.saveStarnyx(
+      domain.StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 2, 9),
+      ),
+    );
+    await journalEntryRepository.saveJournalEntry(
+      domain.JournalEntry(
+        id: 0,
+        starnyxId: 'habit-1',
+        date: DateTime(2026, 4, 10),
+        content: 'Before',
+        createdAt: DateTime(2026, 4, 10, 10, 0),
+      ),
+    );
+    final saved = (await journalEntryRepository.getJournalEntriesForStarnyx(
+      'habit-1',
+    )).single;
+
+    await journalEntryRepository.updateJournalEntry(
+      saved.copyWith(content: 'After', date: DateTime(2026, 4, 11)),
+    );
+
+    final updated = (await journalEntryRepository.getJournalEntriesForStarnyx(
+      'habit-1',
+    )).single;
+    expect(
+      updated,
+      saved.copyWith(content: 'After', date: DateTime(2026, 4, 11)),
+    );
+  });
+
   test(
     'deleting a StarNyx cascades related completions and journal entries',
     () async {

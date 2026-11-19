@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starnyx/domain/entities/domain_entities.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
+import 'package:starnyx/features/journal/presentation/pages/journal_editor_page.dart';
 import 'package:starnyx/features/journal/presentation/pages/journal_page.dart';
 
 void main() {
@@ -110,6 +112,76 @@ void main() {
     expect(tester.widget<InkWell>(sendButton).onTap, isNull);
   });
 
+  testWidgets('editor edits an entry in place keeping id and createdAt', (
+    tester,
+  ) async {
+    final original = entry(1, 'Buổi sáng yên tĩnh', DateTime(2026, 11, 19, 7));
+    final repository = _InMemoryJournalEntryRepository([original]);
+    await _render(tester, repository, habit);
+
+    final context = tester.element(find.byType(JournalEntryCard));
+    unawaited(
+      JournalEditorPage.open(
+        context,
+        bloc: context.read<JournalBloc>(),
+        entry: original,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Chỉnh sửa ghi chép'), findsOneWidget);
+    expect(find.text('19/11/2026 07:00'), findsOneWidget);
+    final save = find.byKey(const Key('journal-editor-save'));
+    await tester.enterText(find.byKey(const Key('journal-editor-input')), ' ');
+    await tester.pump();
+    expect(tester.widget<TextButton>(save).onPressed, isNull);
+
+    await tester.enterText(
+      find.byKey(const Key('journal-editor-input')),
+      'Buổi sáng yên tĩnh và trong lành',
+    );
+    await tester.pump();
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(JournalEditorPage), findsNothing);
+    expect(find.text('Buổi sáng yên tĩnh và trong lành'), findsOneWidget);
+    final saved = await repository.getJournalEntriesForStarnyx('habit-1');
+    expect(saved, [
+      original.copyWith(content: 'Buổi sáng yên tĩnh và trong lành'),
+    ]);
+  });
+
+  testWidgets('expand opens the editor in create mode with the draft', (
+    tester,
+  ) async {
+    final repository = _InMemoryJournalEntryRepository([]);
+    await _render(tester, repository, habit);
+
+    await tester.enterText(find.byKey(const Key('journal-input')), 'Bắt đầu');
+    await tester.tap(find.byKey(const Key('journal-expand-button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ghi chép mới'), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const Key('journal-editor-input')),
+      'Bắt đầu\nMột ngày dài',
+    );
+    await tester.tap(find.byKey(const Key('journal-editor-save')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(JournalEditorPage), findsNothing);
+    final saved = await repository.getJournalEntriesForStarnyx('habit-1');
+    expect(saved.single.content, 'Bắt đầu\nMột ngày dài');
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const Key('journal-input')))
+          .controller!
+          .text,
+      isEmpty,
+    );
+  });
+
   testWidgets('shows empty state when there are no entries', (tester) async {
     await _render(tester, _InMemoryJournalEntryRepository([]), habit);
 
@@ -199,6 +271,13 @@ class _InMemoryJournalEntryRepository implements JournalEntryRepository {
   @override
   Future<void> saveJournalEntry(JournalEntry entry) async {
     _items.add(entry.id == 0 ? entry.copyWith(id: _items.length + 1) : entry);
+    _changes.add(null);
+  }
+
+  @override
+  Future<void> updateJournalEntry(JournalEntry entry) async {
+    final index = _items.indexWhere((e) => e.id == entry.id);
+    if (index >= 0) _items[index] = entry;
     _changes.add(null);
   }
 

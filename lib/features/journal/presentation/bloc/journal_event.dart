@@ -30,6 +30,18 @@ class JournalSaveRequested extends JournalEvent {
   const JournalSaveRequested();
 }
 
+/// Saves an edit of [entry]; `id` and `createdAt` are preserved.
+class JournalEntryUpdated extends JournalEvent {
+  const JournalEntryUpdated(this.entry, {required this.content, this.date});
+
+  final JournalEntry entry;
+  final String content;
+  final DateTime? date;
+
+  @override
+  List<Object?> get props => <Object?>[entry, content, date];
+}
+
 class JournalDeleteRequested extends JournalEvent {
   const JournalDeleteRequested(this.entry);
 

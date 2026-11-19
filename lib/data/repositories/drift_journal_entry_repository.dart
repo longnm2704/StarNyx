@@ -95,6 +95,22 @@ class DriftJournalEntryRepository implements JournalEntryRepository {
   }
 
   @override
+  Future<void> updateJournalEntry(domain.JournalEntry entry) async {
+    _logger.debug('DriftJournalEntryRepository', 'update begin id=${entry.id}');
+    await _database.journalEntriesDao.updateJournalEntry(
+      entry.id,
+      JournalEntriesCompanion(
+        date: Value(dateKeyFromDateTime(entry.date)),
+        content: Value(entry.content),
+      ),
+    );
+    _logger.debug(
+      'DriftJournalEntryRepository',
+      'update success id=${entry.id}',
+    );
+  }
+
+  @override
   Future<void> deleteJournalEntryById(int id) async {
     _logger.debug('DriftJournalEntryRepository', 'delete begin id=$id');
     await _database.journalEntriesDao.deleteJournalEntryById(id);

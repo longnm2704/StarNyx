@@ -13,6 +13,7 @@ import 'package:starnyx/domain/usecases/load_active_starnyx_use_case.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_event.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_state.dart';
+import 'package:starnyx/features/journal/presentation/pages/journal_editor_page.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
 /// Full-screen Journal tab.
@@ -111,6 +112,12 @@ class _JournalPageState extends State<JournalPage> {
     _bloc.add(const JournalSaveRequested());
   }
 
+  Future<void> _openEditor() async {
+    await JournalEditorPage.open(context, bloc: _bloc);
+    // The editor shares the bloc draft; mirror it back into the input bar.
+    if (mounted) _draftController.text = _bloc.state.draftContent;
+  }
+
   Future<void> _onDeletePressed(JournalEntry entry) async {
     final confirmed = await showAppConfirmDialog(
       context: context,
@@ -182,6 +189,7 @@ class _JournalPageState extends State<JournalPage> {
                     controller: _draftController,
                     onChanged: (value) => _bloc.add(JournalDraftChanged(value)),
                     onSendPressed: _onSendPressed,
+                    onExpandPressed: _openEditor,
                   ),
               ],
             ),
@@ -634,11 +642,13 @@ class _JournalInputBar extends StatelessWidget {
     required this.controller,
     required this.onChanged,
     required this.onSendPressed,
+    required this.onExpandPressed,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final VoidCallback onSendPressed;
+  final VoidCallback onExpandPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -668,6 +678,16 @@ class _JournalInputBar extends StatelessWidget {
           padding: const EdgeInsets.all(6),
           child: Row(
             children: <Widget>[
+              IconButton(
+                key: const Key('journal-expand-button'),
+                tooltip: 'journal.editor_open_semantics'.tr(),
+                onPressed: onExpandPressed,
+                icon: const AppIcon(
+                  icon: HugeIconsStrokeRounded.strokeRoundedArrowExpand01,
+                  size: 20,
+                  color: AppColors.textSecondary,
+                ),
+              ),
               Expanded(
                 child: TextField(
                   key: const Key('journal-input'),

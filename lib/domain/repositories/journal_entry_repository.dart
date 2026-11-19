@@ -17,6 +17,9 @@ abstract interface class JournalEntryRepository {
   // Save abstracts both create behavior for one note.
   Future<void> saveJournalEntry(JournalEntry entry);
 
+  // Edits keep the note's id and createdAt; content and date change.
+  Future<void> updateJournalEntry(JournalEntry entry);
+
   // Targeted delete removes a note by its ID.
   Future<void> deleteJournalEntryById(int id);
 

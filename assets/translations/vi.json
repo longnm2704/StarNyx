@@ -118,7 +118,12 @@
     "search_close_semantics": "Đóng tìm kiếm",
     "search_empty": "Không có ghi chú nào khớp.",
     "send_semantics": "Lưu nhật ký",
-    "switch_habit_semantics": "Đổi thói quen"
+    "switch_habit_semantics": "Đổi thói quen",
+    "editor_new_title": "Ghi chép mới",
+    "editor_edit_title": "Chỉnh sửa ghi chép",
+    "editor_save": "Lưu",
+    "editor_close": "Quay lại",
+    "editor_open_semantics": "Mở trình soạn thảo đầy đủ"
   },
   "settings": {
     "title": "Cài đặt",

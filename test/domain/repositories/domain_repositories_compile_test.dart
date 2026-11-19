@@ -94,6 +94,9 @@ class _FakeJournalEntryRepository implements JournalEntryRepository {
   Future<void> saveJournalEntry(JournalEntry entry) async {}
 
   @override
+  Future<void> updateJournalEntry(JournalEntry entry) async {}
+
+  @override
   Stream<List<JournalEntry>> watchJournalEntriesForStarnyx(String starnyxId) =>
       const Stream<List<JournalEntry>>.empty();
 }

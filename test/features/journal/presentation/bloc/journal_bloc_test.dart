@@ -106,6 +106,51 @@ void main() {
     expect(bloc.state.entries, hasLength(2));
   });
 
+  test('update edits content and keeps id and createdAt', () async {
+    final entry = JournalEntry(
+      id: 7,
+      starnyxId: 's-1',
+      date: DateTime(2026, 4, 15),
+      content: 'Before',
+      createdAt: DateTime(2026, 4, 15, 21, 30),
+    );
+    await repository.saveJournalEntry(entry);
+    bloc.add(const JournalStarted('s-1'));
+    await pumpEventQueue(times: 3);
+    bloc.add(const JournalDraftChanged('Unsent draft'));
+    await pumpEventQueue();
+
+    bloc.add(JournalEntryUpdated(entry, content: '  After  '));
+    await pumpEventQueue(times: 5);
+
+    expect(bloc.state.updateStatus, AsyncStatus.success);
+    expect(bloc.state.draftContent, 'Unsent draft');
+    final saved = (await repository.getJournalEntriesForStarnyx('s-1')).single;
+    expect(saved, entry.copyWith(content: 'After'));
+    expect(bloc.state.entries.single.content, 'After');
+  });
+
+  test('update failure reports failure and keeps the entry', () async {
+    final entry = JournalEntry(
+      id: 7,
+      starnyxId: 's-1',
+      date: DateTime(2026, 4, 15),
+      content: 'Before',
+      createdAt: DateTime(2026, 4, 15, 21, 30),
+    );
+    await repository.saveJournalEntry(entry);
+    repository.failUpdates = true;
+    bloc.add(const JournalStarted('s-1'));
+    await pumpEventQueue(times: 3);
+
+    bloc.add(JournalEntryUpdated(entry, content: 'After'));
+    await pumpEventQueue(times: 5);
+
+    expect(bloc.state.updateStatus, AsyncStatus.failure);
+    expect(bloc.state.errorMessage, isNotNull);
+    expect((await repository.getJournalEntriesForStarnyx('s-1')).single, entry);
+  });
+
   test('delete removes entry by ID', () async {
     final entry = JournalEntry(
       id: 100,
@@ -183,6 +228,7 @@ class _InMemoryJournalEntryRepository implements JournalEntryRepository {
   final Map<String, StreamController<List<JournalEntry>>> _controllers =
       <String, StreamController<List<JournalEntry>>>{};
   int _idCounter = 1000;
+  bool failUpdates = false;
 
   Future<void> dispose() async {
     for (final controller in _controllers.values) {
@@ -229,6 +275,14 @@ class _InMemoryJournalEntryRepository implements JournalEntryRepository {
       toSave = toSave.copyWith(id: ++_idCounter);
     }
     _entries.add(toSave);
+    _emit(entry.starnyxId);
+  }
+
+  @override
+  Future<void> updateJournalEntry(JournalEntry entry) async {
+    if (failUpdates) throw StateError('update failed');
+    final index = _entries.indexWhere((e) => e.id == entry.id);
+    if (index >= 0) _entries[index] = entry;
     _emit(entry.starnyxId);
   }
 
