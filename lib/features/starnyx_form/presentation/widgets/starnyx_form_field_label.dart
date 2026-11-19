@@ -9,22 +9,23 @@ class StarnyxFormFieldLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
-      fontSize: 17,
-      color: AppColors.textSecondary,
-      fontWeight: FontWeight.w700,
+    final textStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+      fontFamily: AppFonts.body,
+      color: AppColors.textPrimary,
+      fontWeight: FontWeight.w600,
     );
 
-    if (trailing == null) {
-      return Text(label, style: textStyle);
-    }
-
-    return Row(
-      children: <Widget>[
-        Expanded(child: Text(label, style: textStyle)),
-        const SizedBox(width: AppSpacing.sm),
-        trailing!,
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
+      child: Row(
+        children: <Widget>[
+          Expanded(child: Text(label, style: textStyle)),
+          if (trailing != null) ...<Widget>[
+            const SizedBox(width: AppSpacing.sm),
+            trailing!,
+          ],
+        ],
+      ),
     );
   }
 }

@@ -3,17 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/app_icon.dart';
 
-const double _kSymbolSize = 44;
-const double _kSelectedSize = 52;
-const double _kPreviewSize = 34;
+const int _kGridColumns = 6;
+const double _kPreviewSize = 30;
 
-/// A symbol picker for the StarNyx create/edit form.
-///
-/// Displays the curated habit symbol catalog in grouped rows of 6 columns,
-/// with a live 7-day preview row below using the selected symbol and color.
-///
-/// Tapping a symbol calls [onSymbolSelected] with the stable symbol key.
-class StarnyxFormSymbolPicker extends StatelessWidget {
+/// Symbol section of the create/edit form: title + helper, category filter
+/// chips ([HabitSymbols.groups]), a 6-column symbol grid and a live 7-day
+/// streak preview using the selected symbol and [color].
+class StarnyxFormSymbolPicker extends StatefulWidget {
   const StarnyxFormSymbolPicker({
     required this.selectedSymbol,
     required this.color,
@@ -24,64 +20,100 @@ class StarnyxFormSymbolPicker extends StatelessWidget {
   /// Currently selected habit symbol key (e.g. 'star', 'clover', 'flame').
   final String selectedSymbol;
 
-  /// Accent color used to render the symbol and the 7-day preview.
+  /// Accent color used for the selected symbol, chips and the preview.
   final Color color;
 
-/// Callback invoked when the user picks a different symbol.
-final ValueChanged<String> onSymbolSelected;
+  /// Callback invoked when the user picks a different symbol.
+  final ValueChanged<String> onSymbolSelected;
 
-@override
-Widget build(BuildContext context) {
+  @override
+  State<StarnyxFormSymbolPicker> createState() =>
+      _StarnyxFormSymbolPickerState();
+}
+
+class _StarnyxFormSymbolPickerState extends State<StarnyxFormSymbolPicker> {
+  // Selected category id; null shows every symbol.
+  String? _category;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final keys = <String>[
+      for (final group in HabitSymbols.groups)
+        if (_category == null || _category == group.id) ...group.keys,
+    ];
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        gradient: const LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: <Color>[AppColors.surfaceLevel2, AppColors.surfaceLevel3],
-        ),
-        border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.62)),
+        color: AppColors.surfaceLevel1,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.borderSubtle),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, AppSpacing.sm),
+          Text(
+            'starnyx_form.symbol_label'.tr(),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontFamily: AppFonts.headline,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xxs),
+          Text(
+            'starnyx_form.symbol_helper'.tr(),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
             child: Row(
               children: <Widget>[
-                Text(
-                  'starnyx_form.symbol_label'.tr(),
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
-                  ),
+                _CategoryChip(
+                  label: 'starnyx_form.symbol_category_all'.tr(),
+                  color: widget.color,
+                  selected: _category == null,
+                  onTap: () => setState(() => _category = null),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    'starnyx_form.symbol_helper'.tr(),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textTertiary,
-                    ),
+                for (final group in HabitSymbols.groups)
+                  _CategoryChip(
+                    label: 'starnyx_form.symbol_category_${group.id}'.tr(),
+                    color: widget.color,
+                    selected: _category == group.id,
+                    onTap: () => setState(() => _category = group.id),
                   ),
-                ),
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          _SymbolGrid(
-            selectedSymbol: selectedSymbol,
-            color: color,
-            onSymbolSelected: onSymbolSelected,
+          const SizedBox(height: AppSpacing.md),
+          GridView.count(
+            crossAxisCount: _kGridColumns,
+            mainAxisSpacing: AppSpacing.xs,
+            crossAxisSpacing: AppSpacing.xs,
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            children: <Widget>[
+              for (final key in keys)
+                _SymbolCell(
+                  symbolKey: key,
+                  color: widget.color,
+                  isSelected: key == widget.selectedSymbol,
+                  onTap: () => widget.onSymbolSelected(key),
+                ),
+            ],
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+            child: Divider(height: 1, color: AppColors.borderSubtle),
+          ),
           _SevenDayPreview(
-            symbolKey: selectedSymbol,
-            color: color,
+            symbolKey: widget.selectedSymbol,
+            color: widget.color,
           ),
         ],
       ),
@@ -89,118 +121,106 @@ Widget build(BuildContext context) {
   }
 }
 
-/// Grouped symbol grid rendered with 6 columns per group.
-class _SymbolGrid extends StatelessWidget {
-  const _SymbolGrid({
-    required this.selectedSymbol,
+class _CategoryChip extends StatelessWidget {
+  const _CategoryChip({
+    required this.label,
     required this.color,
-    required this.onSymbolSelected,
-  });
-
-  final String selectedSymbol;
-  final Color color;
-  final ValueChanged<String> onSymbolSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final cells = <Widget>[];
-
-    for (final group in HabitSymbols.groups) {
-      cells.add(
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, AppSpacing.xs),
-          child: Text(
-            group.label.toUpperCase(),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.textTertiary,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.6,
-            ),
-          ),
-        ),
-      );
-
-      for (final key in group.keys) {
-        final isSelected = key == selectedSymbol;
-        cells.add(
-          _SymbolCell(
-            symbolKey: key,
-            iconData: HabitSymbols.iconFor(key),
-            color: color,
-            isSelected: isSelected,
-            size: _kSymbolSize,
-            selectedSize: _kSelectedSize,
-            onTap: () => onSymbolSelected(key),
-          ),
-        );
-      }
-    }
-
-    return GridView.extent(
-      maxCrossAxisExtent: _kSelectedSize + 16,
-      mainAxisSpacing: AppSpacing.sm,
-      crossAxisSpacing: AppSpacing.sm,
-      childAspectRatio: 1,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      children: cells,
-    );
-  }
-}
-
-/// A single selectable symbol cell in the symbol grid.
-class _SymbolCell extends StatelessWidget {
-  const _SymbolCell({
-    required this.symbolKey,
-    required this.iconData,
-    required this.color,
-    required this.isSelected,
-    required this.size,
-    required this.selectedSize,
+    required this.selected,
     required this.onTap,
   });
 
-  final String symbolKey;
-  final List<List<dynamic>> iconData;
+  final String label;
   final Color color;
-  final bool isSelected;
-  final double size;
-  final double selectedSize;
+  final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final displaySize = isSelected ? selectedSize : size;
+    return Padding(
+      padding: const EdgeInsets.only(right: AppSpacing.xs),
+      child: Semantics(
+        button: true,
+        selected: selected,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          child: AnimatedContainer(
+            duration: AppDurations.fast,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
+            decoration: BoxDecoration(
+              color: selected
+                  ? color.withValues(alpha: 0.16)
+                  : AppColors.surfaceLevel2,
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+              border: Border.all(
+                color: selected
+                    ? color.withValues(alpha: 0.4)
+                    : AppColors.borderSubtle,
+              ),
+            ),
+            child: Text(
+              label.toUpperCase(),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontFamily: AppFonts.mono,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.2,
+                color: selected ? color : AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
+/// Selected: accent-filled circle with a dark glyph and soft glow.
+/// Unselected: `#121215` circle with a muted glyph.
+class _SymbolCell extends StatelessWidget {
+  const _SymbolCell({
+    required this.symbolKey,
+    required this.color,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String symbolKey;
+  final Color color;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
     return Semantics(
       label: 'starnyx_form.symbol_semantics'.tr(args: <String>[symbolKey]),
       button: true,
       selected: isSelected,
       child: GestureDetector(
+        key: Key('starnyx-form-symbol-$symbolKey'),
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: AnimatedContainer(
           duration: AppDurations.fast,
-          width: displaySize,
-          height: displaySize,
           decoration: BoxDecoration(
-            color: isSelected
-                ? color.withValues(alpha: 0.18)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(
-              color: isSelected
-                  ? color
-                  : AppColors.borderSubtle.withValues(alpha: 0.35),
-              width: isSelected ? 2 : 1,
-            ),
+            shape: BoxShape.circle,
+            color: isSelected ? color : AppColors.surfaceLevel2,
+            boxShadow: isSelected
+                ? <BoxShadow>[
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.35),
+                      blurRadius: 14,
+                    ),
+                  ]
+                : null,
           ),
           child: Center(
             child: AppIcon(
-              icon: iconData,
-              color: isSelected ? color : AppColors.textSecondary,
-              size: size,
+              icon: HabitSymbols.iconFor(symbolKey),
+              color: isSelected ? AppColors.black : AppColors.textSecondary,
+              size: 20,
               strokeWidth: 2,
             ),
           ),
@@ -210,26 +230,23 @@ class _SymbolCell extends StatelessWidget {
   }
 }
 
-/// Live 7-day preview row showing how the selected symbol renders in each
-/// day state (future / missed / lit / today).
+enum _DayState { future, missed, lit, today }
+
+/// Live 7-day preview showing how the selected symbol renders in each day
+/// state (future / missed / lit / today).
 class _SevenDayPreview extends StatelessWidget {
-  const _SevenDayPreview({
-    required this.symbolKey,
-    required this.color,
-  });
+  const _SevenDayPreview({required this.symbolKey, required this.color});
 
   final String symbolKey;
   final Color color;
-
-  static const int _dayCount = 7;
 
   // Representative mix of day states across the 7-day preview window.
   static const List<_DayState> _states = <_DayState>[
     _DayState.future,
     _DayState.missed,
     _DayState.lit,
-    _DayState.today,
     _DayState.lit,
+    _DayState.today,
     _DayState.missed,
     _DayState.future,
   ];
@@ -241,33 +258,30 @@ class _SevenDayPreview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, AppSpacing.xs),
-          child: Text(
-            'starnyx_form.preview_label'.tr(),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.textTertiary,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.6,
-            ),
+        Text(
+          'starnyx_form.preview_label'.tr().toUpperCase(),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            fontFamily: AppFonts.mono,
+            letterSpacing: 1.2,
+            color: AppColors.textSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
-        SizedBox(
-          height: _kPreviewSize + 8,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: _dayCount,
-            separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.xs),
-            itemBuilder: (_, index) {
-              final state = _states[index % _dayCount];
-              return _PreviewDayCell(
-                state: state,
-                iconData: iconData,
-                color: color,
-                size: _kPreviewSize,
-              );
-            },
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.sm,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.black,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              for (final state in _states)
+                _PreviewDayCell(state: state, iconData: iconData, color: color),
+            ],
           ),
         ),
       ],
@@ -275,163 +289,53 @@ class _SevenDayPreview extends StatelessWidget {
   }
 }
 
-/// A single day cell in the 7-day preview.
 class _PreviewDayCell extends StatelessWidget {
   const _PreviewDayCell({
     required this.state,
     required this.iconData,
     required this.color,
-    required this.size,
   });
 
   final _DayState state;
   final List<List<dynamic>> iconData;
   final Color color;
-  final double size;
 
   @override
   Widget build(BuildContext context) {
-    switch (state) {
-      case _DayState.future:
-        return _FutureCell(size: size);
-      case _DayState.missed:
-        return _MissedCell(
-          iconData: iconData,
-          color: color,
-          size: size,
-        );
-      case _DayState.lit:
-        return _LitCell(
-          iconData: iconData,
-          color: color,
-          size: size,
-        );
-      case _DayState.today:
-        return _TodayCell(
-          iconData: iconData,
-          color: color,
-          size: size,
-        );
-    }
-  }
-}
+    final glyph = switch (state) {
+      _DayState.future => null,
+      _DayState.missed => color.withValues(alpha: 0.2),
+      _DayState.lit => AppColors.black,
+      _DayState.today => color,
+    };
 
-enum _DayState { future, missed, lit, today }
-
-/// Future / before-start day: a small dot.
-class _FutureCell extends StatelessWidget {
-  const _FutureCell({required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
     return Container(
-      width: size,
-      height: size,
+      width: _kPreviewSize,
+      height: _kPreviewSize,
       decoration: BoxDecoration(
-        color: AppColors.borderSubtle.withValues(alpha: 0.35),
         shape: BoxShape.circle,
-      ),
-    );
-  }
-}
-
-/// Missed day: symbol stroke at low opacity, no glow.
-class _MissedCell extends StatelessWidget {
-  const _MissedCell({
-    required this.iconData,
-    required this.color,
-    required this.size,
-  });
-
-  final List<List<dynamic>> iconData;
-  final Color color;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      child: AppIcon(
-        icon: iconData,
-        color: color.withValues(alpha: 0.15),
-        size: size,
-        strokeWidth: 2,
-      ),
-    );
-  }
-}
-
-/// Lit day: filled accent-colored disc with soft glow, symbol drawn dark.
-class _LitCell extends StatelessWidget {
-  const _LitCell({
-    required this.iconData,
-    required this.color,
-    required this.size,
-  });
-
-  final List<List<dynamic>> iconData;
-  final Color color;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: color.withValues(alpha: 0.45),
-            blurRadius: 8,
-            spreadRadius: 1,
-          ),
-        ],
+        color: state == _DayState.lit ? color : null,
+        border: state == _DayState.today
+            ? Border.all(color: color, width: 1.5)
+            : null,
+        boxShadow: state == _DayState.lit
+            ? <BoxShadow>[
+                BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 10),
+              ]
+            : null,
       ),
       child: Center(
-        child: AppIcon(
-          icon: iconData,
-          color: AppColors.black,
-          size: size * 0.55,
-          strokeWidth: 2,
-        ),
-      ),
-    );
-  }
-}
-
-/// Today day (not lit): ring outline, keeps size emphasis.
-class _TodayCell extends StatelessWidget {
-  const _TodayCell({
-    required this.iconData,
-    required this.color,
-    required this.size,
-  });
-
-  final List<List<dynamic>> iconData;
-  final Color color;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        border: Border.all(color: color, width: 2),
-        shape: BoxShape.circle,
-      ),
-      alignment: Alignment.center,
-      child: AppIcon(
-        icon: iconData,
-        color: color,
-        size: size * 0.55,
-        strokeWidth: 2,
+        child: glyph == null
+            // Future / before-start day: a small dot.
+            ? Container(
+                width: 6,
+                height: 6,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.surfaceLevel3,
+                ),
+              )
+            : AppIcon(icon: iconData, color: glyph, size: 16, strokeWidth: 2),
       ),
     );
   }

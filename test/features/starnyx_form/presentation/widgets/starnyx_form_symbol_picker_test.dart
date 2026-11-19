@@ -24,7 +24,7 @@ Widget _buildLocalizedApp(Widget child) {
           locale: context.locale,
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
-          home: Scaffold(body: child),
+          home: Scaffold(body: SingleChildScrollView(child: child)),
         );
       },
     ),
@@ -56,7 +56,7 @@ void main() {
 
       expect(find.byType(StarnyxFormSymbolPicker), findsOneWidget);
       expect(find.text('Symbol'), findsOneWidget);
-      expect(find.text('Preview'), findsOneWidget);
+      expect(find.text('STREAK PREVIEW'), findsOneWidget);
 
       // ── Catalog symbols render in grid ──
       expect(_findIcon(HabitSymbols.iconFor('clover')), findsWidgets);

@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 
+/// "Ngày bắt đầu" row: calendar squircle, label + date value, chevron.
 class StarnyxFormStartOnCard extends StatelessWidget {
   const StarnyxFormStartOnCard({
     required this.value,
@@ -15,38 +17,68 @@ class StarnyxFormStartOnCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 62,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32),
-          gradient: const LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            colors: <Color>[AppColors.surfaceLevel2, AppColors.surfaceLevel3],
-          ),
-          border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.62)),
-        ),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                value,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w500,
+    final textTheme = Theme.of(context).textTheme;
+
+    return Material(
+      color: AppColors.surfaceLevel1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        side: const BorderSide(color: AppColors.borderSubtle),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        key: const Key('starnyx-form-start-on'),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceLevel2,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                ),
+                child: const Center(
+                  child: AppIcon(
+                    icon: HugeIconsStrokeRounded.strokeRoundedCalendar03,
+                    size: 20,
+                    color: Color(0xFF9D50FF),
+                  ),
                 ),
               ),
-            ),
-            const AppIcon(
-              icon: HugeIconsStrokeRounded.strokeRoundedCalendar01,
-              size: 18,
-              color: AppColors.textTertiary,
-              semanticsLabel: 'Calendar',
-            ),
-          ],
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'starnyx_form.start_on_label'.tr(),
+                      style: textTheme.bodySmall?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      value,
+                      style: textTheme.titleMedium?.copyWith(
+                        fontFamily: AppFonts.headline,
+                        fontFeatures: AppFonts.tabularFigures,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const AppIcon(
+                icon: HugeIconsStrokeRounded.strokeRoundedArrowRight01,
+                size: 18,
+                color: AppColors.textSecondary,
+              ),
+            ],
+          ),
         ),
       ),
     );

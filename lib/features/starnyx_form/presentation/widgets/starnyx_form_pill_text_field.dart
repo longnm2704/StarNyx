@@ -2,23 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
+/// Rounded `#121215` text field; grows with text scale instead of a fixed
+/// height. Border turns coral on error.
 class StarnyxFormPillTextField extends StatefulWidget {
   const StarnyxFormPillTextField({
     required this.initialValue,
     required this.hintText,
-    required this.maxLines,
     required this.onChanged,
     super.key,
+    this.minLines = 1,
+    this.maxLines = 1,
     this.hasError = false,
-    this.height = AppSize.inputMinHeight,
     this.inputFormatters,
   });
 
   final String initialValue;
   final String hintText;
+  final int minLines;
   final int maxLines;
   final bool hasError;
-  final double height;
   final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<String> onChanged;
 
@@ -51,94 +53,44 @@ class _StarnyxFormPillTextFieldState extends State<StarnyxFormPillTextField> {
     super.dispose();
   }
 
+  OutlineInputBorder _border(Color color) => OutlineInputBorder(
+    borderRadius: BorderRadius.circular(AppRadius.lg),
+    borderSide: BorderSide(color: color),
+  );
+
   @override
   Widget build(BuildContext context) {
-    final isMultiLine = widget.maxLines > 1;
-    final textStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+    final textStyle = Theme.of(context).textTheme.bodyLarge?.copyWith(
+      fontFamily: AppFonts.body,
       color: AppColors.textPrimary,
-      fontWeight: FontWeight.w500,
-      height: 1,
+      height: 1.4,
     );
-    final hintStyle = textStyle?.copyWith(color: AppColors.textTertiary);
+    final idle = widget.hasError ? AppColors.error : AppColors.borderSubtle;
 
-    return Container(
-      height: widget.height,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLevel1.withValues(alpha: 0.86),
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(
-          color: widget.hasError
-              ? AppColors.primary
-              : AppColors.borderSubtle.withValues(alpha: 0.58),
+    return TextField(
+      controller: _controller,
+      onChanged: widget.onChanged,
+      inputFormatters: widget.inputFormatters,
+      minLines: widget.minLines,
+      maxLines: widget.maxLines,
+      onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+      style: textStyle,
+      cursorColor: AppColors.primary,
+      decoration: InputDecoration(
+        hintText: widget.hintText,
+        hintStyle: textStyle?.copyWith(color: AppColors.textTertiary),
+        filled: true,
+        fillColor: AppColors.surfaceLevel2,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 15,
+        ),
+        border: _border(idle),
+        enabledBorder: _border(idle),
+        focusedBorder: _border(
+          widget.hasError ? AppColors.error : AppColors.borderFocus,
         ),
       ),
-      child: isMultiLine
-          ? TextField(
-              controller: _controller,
-              onChanged: widget.onChanged,
-              inputFormatters: widget.inputFormatters,
-              minLines: widget.maxLines,
-              maxLines: widget.maxLines,
-              onTapOutside: (_) {
-                FocusManager.instance.primaryFocus?.unfocus();
-              },
-              textAlignVertical: TextAlignVertical.top,
-              style: textStyle,
-              cursorColor: AppColors.textPrimary,
-              decoration: InputDecoration(
-                isDense: true,
-                hintText: widget.hintText,
-                hintStyle: hintStyle,
-                filled: false,
-                fillColor: Colors.transparent,
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                disabledBorder: InputBorder.none,
-                errorBorder: InputBorder.none,
-                focusedErrorBorder: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 12,
-                ),
-              ),
-            )
-          : Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: TextField(
-                    controller: _controller,
-                    onChanged: widget.onChanged,
-                    inputFormatters: widget.inputFormatters,
-                    maxLines: 1,
-                    minLines: 1,
-                    onTapOutside: (_) {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                    },
-                    textAlignVertical: TextAlignVertical.center,
-                    style: textStyle,
-                    cursorColor: AppColors.textPrimary,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      isCollapsed: true,
-                      hintText: widget.hintText,
-                      hintStyle: hintStyle,
-                      filled: false,
-                      fillColor: Colors.transparent,
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      focusedErrorBorder: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                ),
-              ),
-            ),
     );
   }
 }

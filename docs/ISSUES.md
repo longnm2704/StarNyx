@@ -449,7 +449,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic U-G - Form (Create / Edit Habit)
 
-- [ ] **STX-U018**: Restyle create/edit habit form (`them_thoi_quen` / `chinh_sua_thoi_quen`)
+- [x] **STX-U018**: Restyle create/edit habit form (`them_thoi_quen` / `chinh_sua_thoi_quen`)
   - _Must-have · kind:feature · depends on: STX-U004_
   - Design: `docs/app_ui_redesign/them_thoi_quen/{code.html,screen.png}`, `docs/app_ui_redesign/chinh_sua_thoi_quen/{code.html,screen.png}`
   - The form becomes a full-screen route (pushed), not a bottom sheet.

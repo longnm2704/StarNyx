@@ -31,27 +31,17 @@ abstract final class HabitSymbols {
       };
 
   static const List<HabitSymbolGroup> groups = <HabitSymbolGroup>[
-    HabitSymbolGroup('Nature', <String>[
+    HabitSymbolGroup('nature', <String>[
       'clover',
       'sprout',
       'leaf',
       'flower',
       'tree',
     ]),
-    HabitSymbolGroup('Feelings', <String>[
-      'heart',
-      'brain',
-      'music',
-      'pencil',
-    ]),
-    HabitSymbolGroup('Energy', <String>[
-      'flame',
-      'zap',
-      'dumbbell',
-      'bike',
-    ]),
-    HabitSymbolGroup('Sky', <String>['star', 'moon', 'sun', 'cloud']),
-    HabitSymbolGroup('Daily life', <String>['coffee', 'book', 'home']),
+    HabitSymbolGroup('feelings', <String>['heart', 'brain', 'music', 'pencil']),
+    HabitSymbolGroup('energy', <String>['flame', 'zap', 'dumbbell', 'bike']),
+    HabitSymbolGroup('sky', <String>['star', 'moon', 'sun', 'cloud']),
+    HabitSymbolGroup('daily_life', <String>['coffee', 'book', 'home']),
   ];
 
   // Unknown keys fall back to `star` so a bad backup or a stale DB row never
@@ -62,8 +52,9 @@ abstract final class HabitSymbols {
 }
 
 class HabitSymbolGroup {
-  const HabitSymbolGroup(this.label, this.keys);
+  const HabitSymbolGroup(this.id, this.keys);
 
-  final String label;
+  // Stable id; the form localizes it as `starnyx_form.symbol_category_<id>`.
+  final String id;
   final List<String> keys;
 }

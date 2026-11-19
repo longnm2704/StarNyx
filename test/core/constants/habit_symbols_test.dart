@@ -17,7 +17,7 @@ void main() {
         expect(
           HabitSymbols.icons[key],
           isNotNull,
-          reason: 'missing icon for key "$key" in group "${group.label}"',
+          reason: 'missing icon for key "$key" in group "${group.id}"',
         );
       }
     }
@@ -25,8 +25,14 @@ void main() {
 
   test('groups cover the expected categories', () {
     expect(
-      HabitSymbols.groups.map((group) => group.label),
-      containsAll(<String>['Nature', 'Feelings', 'Energy', 'Sky', 'Daily life']),
+      HabitSymbols.groups.map((group) => group.id),
+      containsAll(<String>[
+        'nature',
+        'feelings',
+        'energy',
+        'sky',
+        'daily_life',
+      ]),
     );
   });
 

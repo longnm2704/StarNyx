@@ -9,7 +9,7 @@ import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/features/habits/presentation/bloc/habit_list_bloc.dart';
 import 'package:starnyx/features/habits/presentation/bloc/habit_list_event.dart';
 import 'package:starnyx/features/habits/presentation/bloc/habit_list_state.dart';
-import 'package:starnyx/features/starnyx_form/presentation/pages/create_starnyx_bottom_sheet.dart';
+import 'package:starnyx/features/starnyx_form/presentation/pages/starnyx_form_page.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
 /// Result returned to the Habits tab when the habit list closes a tab-level
@@ -111,7 +111,7 @@ class _HabitListPageState extends State<HabitListPage> {
         _isReorderMode = false;
       });
     }
-    final result = await showCreateStarnyxBottomSheet(context);
+    final result = await StarnyxFormPage.open(context);
     if (!mounted || result == null || !result.hasChanges) {
       return;
     }
@@ -119,7 +119,7 @@ class _HabitListPageState extends State<HabitListPage> {
   }
 
   Future<void> _openEdit(StarNyx habit) async {
-    final result = await showEditStarnyxBottomSheet(context, habit);
+    final result = await StarnyxFormPage.open(context, starnyx: habit);
     if (!mounted || result == null || !result.hasChanges) {
       return;
     }

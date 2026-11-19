@@ -9,7 +9,7 @@ import 'package:starnyx/features/home/presentation/pages/home_page.dart';
 import 'package:starnyx/features/journal/presentation/pages/journal_page.dart';
 import 'package:starnyx/features/overview/presentation/pages/overview_page.dart';
 import 'package:starnyx/features/settings/presentation/pages/settings_page.dart';
-import 'package:starnyx/features/starnyx_form/presentation/pages/create_starnyx_bottom_sheet.dart';
+import 'package:starnyx/features/starnyx_form/presentation/pages/starnyx_form_page.dart';
 
 /// Stable ids for the four primary destinations hosted by [AppShell].
 enum AppShellTab { habits, overview, journal, settings }
@@ -83,7 +83,7 @@ class _AppShellState extends State<AppShell> {
   }
 
   Future<void> _openCreateHabit() async {
-    final result = await showCreateStarnyxBottomSheet(context);
+    final result = await StarnyxFormPage.open(context);
     if (!mounted || result == null || !result.hasChanges) {
       return;
     }
