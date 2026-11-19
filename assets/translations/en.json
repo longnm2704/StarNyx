@@ -378,6 +378,29 @@
       "cta": "Create your first habit",
       "restore": "Restore data",
       "footer": "No sign-up required · Private by default"
+    },
+    "reminder": {
+      "step": "STEP 3/3",
+      "overline_step": "STEP 3 OF 3",
+      "overline_label": "Activate your routine",
+      "title_lead": "Reminders that fit your ",
+      "title_emphasis": "natural rhythm",
+      "subtitle": "A gentle daily nudge so you never miss the promise you made to yourself.",
+      "selected_count": "{} HABITS SELECTED",
+      "time_label": "Reminder: {} {}",
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening",
+      "edit_time": "Change reminder time",
+      "shared_title": "Shared reminder time",
+      "shared_subtitle": "Pick one time and apply it to every selected habit",
+      "daily": "Daily",
+      "earlier": "15 minutes earlier",
+      "later": "15 minutes later",
+      "apply_all": "Apply to all",
+      "cta": "Begin your routine",
+      "footer": "You can adjust or turn off notifications any time in Settings.",
+      "create_error": "Could not create your habits. Nothing was saved, please try again."
     }
   }
 }

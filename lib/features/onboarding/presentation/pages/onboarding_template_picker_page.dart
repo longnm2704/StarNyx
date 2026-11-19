@@ -4,6 +4,7 @@ import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/features/onboarding/domain/onboarding_template.dart';
+import 'package:starnyx/features/onboarding/presentation/widgets/onboarding_widgets.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
 /// Onboarding step 2/3: pick 1–3 starter habits (`chon_thoi_quen_mau`).
@@ -68,7 +69,11 @@ class _OnboardingTemplatePickerPageState
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            _Header(onBack: widget.onBack, onSkip: widget.onSkip),
+            OnboardingHeader(
+              step: 'onboarding.picker.step'.tr(),
+              onBack: widget.onBack,
+              onSkip: widget.onSkip,
+            ),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(
@@ -78,7 +83,7 @@ class _OnboardingTemplatePickerPageState
                   AppSpacing.lg,
                 ),
                 children: <Widget>[
-                  _DotLabel(
+                  OnboardingDotLabel(
                     child: Text.rich(
                       TextSpan(
                         children: <InlineSpan>[
@@ -163,77 +168,6 @@ class _OnboardingTemplatePickerPageState
           ],
         ),
       ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header({required this.onBack, required this.onSkip});
-
-  final VoidCallback onBack;
-  final VoidCallback onSkip;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xs,
-        vertical: AppSpacing.xxs,
-      ),
-      child: Row(
-        children: <Widget>[
-          IconButton(
-            key: const Key('onboarding-back'),
-            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-            onPressed: onBack,
-            icon: const AppIcon(
-              icon: HugeIconsStrokeRounded.strokeRoundedArrowLeft01,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              'onboarding.picker.step'.tr(),
-              style: Theme.of(context).textTheme.labelLarge,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          TextButton(
-            key: const Key('onboarding-skip'),
-            onPressed: onSkip,
-            child: Text(
-              'onboarding.skip'.tr(),
-              style: const TextStyle(color: AppColors.textSecondary),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Emerald status dot followed by a mono label.
-class _DotLabel extends StatelessWidget {
-  const _DotLabel({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Container(
-          width: 6,
-          height: 6,
-          decoration: const BoxDecoration(
-            color: AppColors.primary,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.xs),
-        Flexible(child: child),
-      ],
     );
   }
 }
@@ -344,7 +278,7 @@ class _TemplateCard extends StatelessWidget {
               padding: AppSpacing.cardPadding,
               child: Row(
                 children: <Widget>[
-                  _IconTile(symbol: template.symbol, color: accent),
+                  OnboardingSymbolTile(symbol: template.symbol, color: accent),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
@@ -404,27 +338,6 @@ class _TemplateCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _IconTile extends StatelessWidget {
-  const _IconTile({required this.symbol, required this.color});
-
-  final String symbol;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(AppRadius.sm),
-      ),
-      alignment: Alignment.center,
-      child: AppIcon(icon: HabitSymbols.iconFor(symbol), color: color),
     );
   }
 }
@@ -533,7 +446,7 @@ class _Footer extends StatelessWidget {
               crossAxisAlignment: WrapCrossAlignment.center,
               spacing: AppSpacing.xs,
               children: <Widget>[
-                _DotLabel(
+                OnboardingDotLabel(
                   child: Text(
                     'onboarding.picker.selected_count'.tr(
                       args: <String>['$count', '$onboardingMaxTemplates'],

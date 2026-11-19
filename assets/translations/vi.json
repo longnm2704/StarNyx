@@ -378,6 +378,29 @@
       "cta": "Tạo thói quen đầu tiên",
       "restore": "Khôi phục dữ liệu",
       "footer": "Không yêu cầu đăng ký phức tạp · Mặc định bảo mật"
+    },
+    "reminder": {
+      "step": "BƯỚC 3/3",
+      "overline_step": "BƯỚC 3 TRÊN 3",
+      "overline_label": "Kích hoạt kỷ luật",
+      "title_lead": "Nhắc nhở đúng ",
+      "title_emphasis": "nhịp sinh học",
+      "subtitle": "Khoảng lặng nhắc nhở nhẹ nhàng vào mỗi ngày giúp bạn không bao giờ bỏ lỡ cam kết với bản thân.",
+      "selected_count": "{} THÓI QUEN ĐÃ CHỌN",
+      "time_label": "Giờ nhắc: {} {}",
+      "morning": "Sáng",
+      "afternoon": "Chiều",
+      "evening": "Tối",
+      "edit_time": "Đổi giờ nhắc",
+      "shared_title": "Khung giờ nhắc chung",
+      "shared_subtitle": "Chọn một giờ rồi áp dụng cho mọi thói quen đã chọn",
+      "daily": "Mỗi ngày",
+      "earlier": "Sớm hơn 15 phút",
+      "later": "Muộn hơn 15 phút",
+      "apply_all": "Áp dụng cho tất cả",
+      "cta": "Bắt đầu hành trình kỷ luật",
+      "footer": "Bạn luôn có thể tùy chỉnh hoặc tắt thông báo bất cứ lúc nào trong Cài đặt.",
+      "create_error": "Chưa thể tạo thói quen. Không có gì được lưu, hãy thử lại."
     }
   }
 }

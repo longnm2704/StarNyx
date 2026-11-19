@@ -516,7 +516,7 @@ Tick `[x]` when an issue is done.
     - Selecting more than 3 shows a snackbar and does not select.
     - Widget tests: select/deselect, max 3, continue disabled at 0.
 
-- [ ] **STX-U022**: Onboarding flow — reminder setup (`thiet_lap_nhac_nho`)
+- [x] **STX-U022**: Onboarding flow — reminder setup (`thiet_lap_nhac_nho`)
   - _Must-have · kind:feature · depends on: STX-U021_
   - Design: `docs/app_ui_redesign/thiet_lap_nhac_nho/{code.html,screen.png}`
   - Acceptance criteria:

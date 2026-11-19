@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/domain/usecases/domain_usecases.dart';
+import 'package:starnyx/features/onboarding/domain/create_onboarding_habits.dart';
 import 'package:starnyx/features/onboarding/domain/onboarding_template.dart';
+import 'package:starnyx/features/onboarding/presentation/pages/onboarding_reminder_page.dart';
 import 'package:starnyx/features/onboarding/presentation/pages/onboarding_template_picker_page.dart';
 import 'package:starnyx/features/onboarding/presentation/pages/onboarding_welcome_page.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
@@ -43,10 +46,27 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     );
   }
 
-  // ponytail: STX-U022 replaces this with a push of the reminder setup page
-  // (which creates the habits, then pushes U023). Until then the picked
-  // templates just end onboarding.
   void _openReminderSetup(List<OnboardingTemplate> templates) {
+    _navigator.push(
+      MaterialPageRoute<void>(
+        builder: (_) => OnboardingReminderPage(
+          templates: templates,
+          onBack: _navigator.pop,
+          onSkip: widget.onFinished,
+          onStart: _createHabits,
+        ),
+      ),
+    );
+  }
+
+  // Throws on failure (after rolling back); the reminder page shows the error.
+  Future<void> _createHabits(List<OnboardingHabitDraft> drafts) async {
+    await createOnboardingHabits(
+      drafts,
+      create: serviceLocator<CreateStarNyxUseCase>(),
+      delete: serviceLocator<DeleteStarNyxUseCase>(),
+      sync: serviceLocator<SyncNotificationsUseCase>(),
+    );
     widget.onFinished();
   }
 

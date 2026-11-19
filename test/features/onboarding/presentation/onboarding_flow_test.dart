@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starnyx/app/theme/app_theme.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/features/onboarding/presentation/onboarding_flow.dart';
 
 void main() {
@@ -101,6 +102,27 @@ void main() {
     await tapVisible(tester, find.byKey(const Key('onboarding-start')));
     await tester.tap(find.byKey(const Key('onboarding-skip')));
     expect(finished, 2);
+  });
+
+  testWidgets('continue opens reminder setup, skip there finishes', (
+    tester,
+  ) async {
+    await render(tester);
+
+    await tapVisible(tester, find.byKey(const Key('onboarding-start')));
+    final water = find.byKey(const Key('onboarding-template-water'));
+    await tester.ensureVisible(water);
+    await tester.pumpAndSettle();
+    await tester.tap(water);
+    await tester.pumpAndSettle();
+    tester
+        .widget<AppPrimaryButton>(find.byKey(const Key('onboarding-continue')))
+        .onPressed!();
+    await tester.pumpAndSettle();
+    expect(find.text('STEP 3/3'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('onboarding-skip')));
+    expect(finished, 1);
   });
 
   testWidgets('fits 320px at 2.0 text scale', (tester) async {

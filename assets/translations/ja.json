@@ -378,6 +378,29 @@
       "cta": "最初の習慣を作る",
       "restore": "データを復元",
       "footer": "面倒な登録は不要 · 標準でプライベート"
+    },
+    "reminder": {
+      "step": "ステップ 3/3",
+      "overline_step": "ステップ 3 / 3",
+      "overline_label": "習慣をはじめる",
+      "title_lead": "リマインダーは",
+      "title_emphasis": "自分のリズムで",
+      "subtitle": "毎日のやさしいリマインダーで、自分との約束を忘れずに続けられます。",
+      "selected_count": "選択した習慣: {}件",
+      "time_label": "リマインダー: {} {}",
+      "morning": "朝",
+      "afternoon": "昼",
+      "evening": "夜",
+      "edit_time": "リマインダー時刻を変更",
+      "shared_title": "共通のリマインダー時刻",
+      "shared_subtitle": "時刻をひとつ選んで、選択したすべての習慣に適用します",
+      "daily": "毎日",
+      "earlier": "15分早く",
+      "later": "15分遅く",
+      "apply_all": "すべてに適用",
+      "cta": "習慣をはじめる",
+      "footer": "通知は設定からいつでも調整・オフにできます。",
+      "create_error": "習慣を作成できませんでした。何も保存されていません。もう一度お試しください。"
     }
   }
 }
