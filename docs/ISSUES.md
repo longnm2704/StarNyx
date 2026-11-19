@@ -212,7 +212,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic U-A - Design System Foundation
 
-- [ ] **STX-U001**: Bundle Space Grotesk, Plus Jakarta Sans and JetBrains Mono
+- [x] **STX-U001**: Bundle Space Grotesk, Plus Jakarta Sans and JetBrains Mono
   - _Must-have · kind:setup · depends on: —_
   - Design: `obsidian_lumina/DESIGN.md` (Typography)
   - The app currently uses the platform default font; Obsidian Lumina needs three families.
