@@ -16,4 +16,8 @@ class ActiveStarnyxColorCache {
   Future<void> saveColor(Color color) {
     return _preferences.setInt(_colorKey, color.toARGB32());
   }
+
+  Future<void> clear() {
+    return _preferences.remove(_colorKey);
+  }
 }

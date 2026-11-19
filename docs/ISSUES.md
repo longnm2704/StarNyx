@@ -434,7 +434,7 @@ Tick `[x]` when an issue is done.
     - Export/import success and error snackbars preserved.
     - Widget tests: export button triggers bloc event; delete-all requires confirmation; size is displayed.
 
-- [ ] **STX-U017**: Delete-all-data use case
+- [x] **STX-U017**: Delete-all-data use case
   - _Must-have · kind:architecture · depends on: —_
   - Acceptance criteria:
     - New `DeleteAllDataUseCase` wipes `completions`, `journal_entries`, `starnyxs`, and resets `app_settings` to a single empty row, inside one Drift transaction.
@@ -442,6 +442,7 @@ Tick `[x]` when an issue is done.
     - Notifications are cancelled (`SyncNotificationsUseCase` gains `cancelAll()` or is called per deleted habit).
     - `ActiveStarnyxColorCache` is cleared.
     - After deletion, the app returns to the onboarding/first-run state (U020) or an empty Habits tab — document choice.
+      - Choice: empty Habits tab until U024 adds the onboarding flag (reset it in `DeleteAllDataUseCase`).
     - Unit test: seed DB → delete all → all tables empty, settings reset.
     - Backup export before delete is **not** automatic; the UI must warn that this is irreversible.
 

@@ -66,6 +66,20 @@ class AppDatabase extends _$AppDatabase {
       await customStatement('PRAGMA foreign_keys = ON');
     },
   );
+
+  /// Wipes every user table in one transaction and leaves a single empty
+  /// app_settings row behind (used by DeleteAllDataUseCase).
+  Future<void> clearAll({DateTime? now}) {
+    return transaction(() async {
+      await delete(completions).go();
+      await delete(journalEntries).go();
+      await delete(starNyxs).go();
+      await delete(appSettings).go();
+      await into(
+        appSettings,
+      ).insert(AppSettingsCompanion.insert(updatedAt: now ?? DateTime.now()));
+    });
+  }
 }
 
 // Drift opens the SQLite file lazily so startup work stays lightweight.

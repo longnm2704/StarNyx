@@ -229,6 +229,14 @@ void _registerUseCases() {
       logger: serviceLocator<AppLogService>(),
     ),
   );
+  serviceLocator.registerLazySingleton<DeleteAllDataUseCase>(
+    () => DeleteAllDataUseCase(
+      serviceLocator<AppDatabase>().clearAll,
+      serviceLocator<SyncNotificationsUseCase>(),
+      serviceLocator<ActiveStarnyxColorCache>(),
+      logger: serviceLocator<AppLogService>(),
+    ),
+  );
   serviceLocator.registerLazySingleton<SetAllRemindersEnabledUseCase>(
     () => SetAllRemindersEnabledUseCase(
       serviceLocator<StarNyxRepository>(),

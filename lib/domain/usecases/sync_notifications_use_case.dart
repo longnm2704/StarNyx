@@ -60,6 +60,12 @@ class SyncNotificationsUseCase {
     );
   }
 
+  /// Cancel every schedule (used by delete-all).
+  Future<void> cancelAll() async {
+    _logger.debug('SyncNotificationsUseCase', 'cancel all');
+    await _notificationService.cancelAllReminders();
+  }
+
   /// Rebuild all schedules from local data (used after import).
   Future<void> rebuildAllFromLocalData() async {
     _logger.debug('SyncNotificationsUseCase', 'rebuild all begin');
