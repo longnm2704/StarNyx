@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "tertiary-container": "#e29100", "on-secondary": "#003640", "primary-fixed-dim": "#4edea3", "on-primary": "#003824", "inverse-surface": "#e5e1e4", "surface-tint": "#4edea3", "surface-container-highest": "#353437", "inverse-primary": "#006c49", "surface-container-low": "#1c1b1d", "on-primary-container": "#00422b", "tertiary-fixed": "#ffddb8", "on-tertiary": "#472a00", "on-tertiary-container": "#523200", "secondary-container": "#03b5d3", "surface-container-lowest": "#0e0e10", "on-tertiary-fixed-variant": "#653e00", "surface-bright": "#39393b", "on-primary-fixed-variant": "#005236", "on-error-container": "#ffdad6", "background": "#131315", "secondary-fixed-dim": "#4cd7f6", "error-container": "#93000a", "primary-container": "#10b981", "on-primary-fixed": "#002113", "primary": "#4edea3", "surface-dim": "#131315", "on-surface": "#e5e1e4", "outline-variant": "#3c4a42", "inverse-on-surface": "#313032", "on-tertiary-fixed": "#2a1700", "tertiary": "#ffb95f", "on-error": "#690005", "outline": "#86948a", "error": "#ffb4ab", "on-secondary-container": "#00424e", "on-secondary-fixed": "#001f26", "on-surface-variant": "#bbcabf", "on-secondary-fixed-variant": "#004e5c", "surface-variant": "#353437", "surface-container": "#201f21", "secondary": "#4cd7f6", "tertiary-fixed-dim": "#ffb95f", "surface": "#131315", "primary-fixed": "#6ffbbe", "secondary-fixed": "#acedff", "surface-container-high": "#2a2a2c", "on-background": "#e5e1e4" }, borderRadius: { DEFAULT: "1rem", lg: "2rem", xl: "3rem", full: "9999px" }, spacing: { "margin-desktop": "3rem", "space-xl": "2rem", "gutter": "1rem", "space-xs": "0.25rem", "space-lg": "1.5rem", "margin": "1rem", "space-md": "1rem", "space-sm": "0.5rem", "margin-tablet": "2rem" }, fontFamily: { "body-md": ["Plus Jakarta Sans"], "title-lg": ["Plus Jakarta Sans"], "label-sm": ["JetBrains Mono"], "headline-md": ["Space Grotesk"], "body-lg": ["Plus Jakarta Sans"], "headline-lg": ["Space Grotesk"], "label-md": ["JetBrains Mono"], "body-sm": ["Plus Jakarta Sans"], "headline-xl": ["Space Grotesk"], "headline-xl-mobile": ["Space Grotesk"], "title-md": ["Plus Jakarta Sans"] }, fontSize: { "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }], "title-lg": ["18px", { lineHeight: "24px", fontWeight: "600" }], "label-sm": ["10px", { lineHeight: "14px", letterSpacing: "0.06em", fontWeight: "500" }], "headline-md": ["20px", { lineHeight: "26px", letterSpacing: "-0.01em", fontWeight: "600" }], "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }], "headline-lg": ["24px", { lineHeight: "30px", letterSpacing: "-0.02em", fontWeight: "600" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.04em", fontWeight: "500" }], "body-sm": ["12px", { lineHeight: "18px", fontWeight: "400" }], "headline-xl": ["36px", { lineHeight: "44px", letterSpacing: "-0.03em", fontWeight: "700" }], "headline-xl-mobile": ["28px", { lineHeight: "34px", letterSpacing: "-0.02em", fontWeight: "700" }], "title-md": ["16px", { lineHeight: "22px", fontWeight: "600" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#131315;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface font-body-md text-body-md min-h-screen flex flex-col antialiased selection:bg-primary/20 selection:text-primary"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_12px_rgba(0,0,0,0.4)]"><div class="h-16 px-gutter flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(78,222,163,0.6)]"></div><h1 class="font-headline-md text-headline-md text-on-surface tracking-tight font-bold">Overview List</h1></div><div class="flex items-center gap-space-xs"><button aria-label="Search" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[20px]">search</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_0_12px_rgba(78,222,163,0.25)]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full max-w-[540px] mx-auto px-gutter pb-8 select-none">
+<!-- Backdrop Atmospheric Ambient Illumination -->
+<div class="relative w-full mb-2 flex flex-col items-center justify-center pt-2">
+<!-- Faint Background Habit Silhouette (Echoing the background in preview) -->
+<div class="opacity-15 flex flex-col items-center gap-1 -mb-3 transition-opacity duration-300">
+<span class="material-symbols-outlined text-[42px] text-tertiary">potted_plant</span>
+<span class="font-headline-md text-headline-md tracking-tight font-bold text-tertiary">Ngủ Sớm</span>
+</div>
+<!-- Sheet Panel Container -->
+<div class="w-full bg-surface-container-lowest/90 backdrop-blur-2xl rounded-t-lg rounded-b-lg shadow-[0_20px_60px_rgba(0,0,0,0.85)] p-space-md flex flex-col items-center">
+<!-- Drag Handle Pill -->
+<div class="w-12 h-1.5 rounded-full bg-outline-variant/60 hover:bg-outline/80 transition-colors mb-5 mt-1 cursor-grab active:cursor-grabbing"></div>
+<!-- Main Header Text Group -->
+<div class="text-center w-full mb-6">
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">Bảng thói quen</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Chuyển, viết hoặc điều chỉnh</p>
+</div>
+<!-- Current Focus Glow Indicator Pill (Interactive Mode Switcher) -->
+<button class="group relative w-full h-14 rounded-full bg-surface-container/60 hover:bg-surface-container-high transition-all duration-300 flex items-center justify-center mb-5 overflow-hidden shadow-[0_0_20px_rgba(76,215,246,0.12)] active:scale-[0.99]" id="btn-focus-mode">
+<!-- Gradient Ring Ambient Overlay -->
+<div class="absolute inset-0 rounded-full p-[1.5px] bg-gradient-to-r from-secondary-container via-primary-container to-secondary-fixed opacity-70 group-hover:opacity-100 transition-opacity">
+<div class="w-full h-full bg-surface-container-lowest/90 rounded-full"></div>
+</div>
+<div class="relative z-10 flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+<span class="font-title-md text-title-md text-secondary font-semibold tracking-wide">Đang tập trung</span>
+</div>
+</button>
+<!-- Quick Action Controls (3-Button Bar) -->
+<div class="grid grid-cols-3 gap-space-sm w-full mb-8">
+<!-- Settings Quick Button -->
+<button aria-label="Cài đặt thói quen" class="h-14 rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 shadow-sm group">
+<span class="material-symbols-outlined text-[24px] group-hover:rotate-45 transition-transform duration-300">settings</span>
+</button>
+<!-- Journal Notes Quick Button -->
+<button aria-label="Mở nhật ký" class="h-14 rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 shadow-sm group">
+<span class="material-symbols-outlined text-[24px] group-hover:-translate-y-0.5 transition-transform duration-200">menu_book</span>
+</button>
+<!-- Add New Habit Button -->
+<button aria-label="Thêm thói quen mới" class="h-14 rounded-2xl bg-surface-container-low hover:bg-surface-container hover:text-primary transition-all flex items-center justify-center text-on-surface-variant active:scale-95 shadow-sm group" id="btn-add-habit">
+<span class="material-symbols-outlined text-[26px] group-hover:scale-125 transition-transform duration-200">add</span>
+</button>
+</div>
+<!-- Section Title & Reorder Actions Header -->
+<div class="w-full flex items-center justify-between mb-3 px-1">
+<div class="flex items-center gap-space-xs">
+<span class="font-title-md text-title-md text-on-surface font-semibold">Các thói quen của bạn</span>
+<span class="font-body-sm text-body-sm text-outline hidden sm:inline">• Sửa để sắp xếp lại</span>
+</div>
+<button class="font-title-md text-title-md text-tertiary-fixed hover:text-tertiary transition-colors flex items-center gap-1 active:opacity-75" id="btn-edit-toggle">
+<span class="font-medium text-body-sm">Sửa</span>
+<span class="material-symbols-outlined text-[16px]">tune</span>
+</button>
+</div>
+<!-- Habit Cards Stack -->
+<div class="w-full flex flex-col gap-space-sm" id="habit-list">
+<!-- Habit Card 1: GYM (Ruby / Carmine Accent) -->
+<div class="group relative w-full h-[68px] rounded-2xl bg-surface-container-low/80 hover:bg-surface-container transition-all duration-200 p-space-md flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.4)] overflow-hidden cursor-pointer">
+<!-- Subtle Glow Hairline Ring -->
+<div class="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-r from-error/40 via-error/20 to-error/10 pointer-events-none">
+<div class="w-full h-full bg-transparent rounded-2xl"></div>
+</div>
+<div class="flex items-center gap-space-md min-w-0 relative z-10">
+<div class="w-10 h-10 rounded-xl bg-error-container/40 flex items-center justify-center text-error group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md text-error tracking-wider uppercase font-bold truncate">GYM</span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-error-container/30 text-error hidden xs:inline">14 ngày</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">06:00 - Sức mạnh &amp; Thể lực</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs relative z-10">
+<button aria-label="Chỉnh sửa GYM" class="w-10 h-10 rounded-full flex items-center justify-center text-error/70 hover:text-error hover:bg-error-container/30 transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<div class="reorder-handle hidden text-outline-variant hover:text-on-surface cursor-grab">
+<span class="material-symbols-outlined text-[20px]">drag_indicator</span>
+</div>
+</div>
+</div>
+<!-- Habit Card 2: Ngủ Sớm (Amber / Gold Accent) -->
+<div class="group relative w-full h-[68px] rounded-2xl bg-surface-container-low/80 hover:bg-surface-container transition-all duration-200 p-space-md flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.4)] overflow-hidden cursor-pointer">
+<!-- Subtle Glow Hairline Ring -->
+<div class="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-r from-tertiary/50 via-tertiary/20 to-tertiary/10 pointer-events-none">
+<div class="w-full h-full bg-transparent rounded-2xl"></div>
+</div>
+<div class="flex items-center gap-space-md min-w-0 relative z-10">
+<div class="w-10 h-10 rounded-xl bg-tertiary-container/30 flex items-center justify-center text-tertiary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">potted_plant</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md text-tertiary font-bold truncate">Ngủ Sớm</span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-tertiary-container/30 text-tertiary hidden xs:inline">21 ngày</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">22:30 - Tái tạo năng lượng</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs relative z-10">
+<button aria-label="Chỉnh sửa Ngủ Sớm" class="w-10 h-10 rounded-full flex items-center justify-center text-tertiary/70 hover:text-tertiary hover:bg-tertiary-container/30 transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<div class="reorder-handle hidden text-outline-variant hover:text-on-surface cursor-grab">
+<span class="material-symbols-outlined text-[20px]">drag_indicator</span>
+</div>
+</div>
+</div>
+<!-- Habit Card 3: Đọc sách 30p (Emerald Accent) -->
+<div class="group relative w-full h-[68px] rounded-2xl bg-surface-container-low/80 hover:bg-surface-container transition-all duration-200 p-space-md flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.4)] overflow-hidden cursor-pointer">
+<!-- Subtle Glow Hairline Ring -->
+<div class="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-r from-primary/50 via-primary/20 to-primary/10 pointer-events-none">
+<div class="w-full h-full bg-transparent rounded-2xl"></div>
+</div>
+<div class="flex items-center gap-space-md min-w-0 relative z-10">
+<div class="w-10 h-10 rounded-xl bg-on-primary-container/40 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md text-primary font-bold truncate">Đọc sách 30p</span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-on-primary-container/50 text-primary hidden xs:inline">07 ngày</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Trang 142/320 • Sách phát triển</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs relative z-10">
+<button aria-label="Chỉnh sửa Đọc sách" class="w-10 h-10 rounded-full flex items-center justify-center text-primary/70 hover:text-primary hover:bg-on-primary-container/30 transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<div class="reorder-handle hidden text-outline-variant hover:text-on-surface cursor-grab">
+<span class="material-symbols-outlined text-[20px]">drag_indicator</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Reflection Quote / Delight Footnote -->
+<div class="mt-6 w-full flex items-center justify-between px-2 text-on-surface-variant/70">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm tracking-wider uppercase">Chuỗi 3/3 hoàn thành</span>
+</div>
+<span class="font-label-sm text-label-sm font-label-sm text-outline">Đồng bộ đám mây</span>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple interactive micro-behaviors for Delight
+  (function initDashboard() {
+    const editToggleBtn = document.getElementById('btn-edit-toggle');
+    const reorderHandles = document.querySelectorAll('.reorder-handle');
+    let isEditing = false;
+
+    if (editToggleBtn) {
+      editToggleBtn.addEventListener('click', () => {
+        isEditing = !isEditing;
+        editToggleBtn.innerHTML = isEditing
+          ? '<span class="font-medium text-body-sm text-primary">Xong</span><span class="material-symbols-outlined text-[16px] text-primary">done</span>'
+          : '<span class="font-medium text-body-sm">Sửa</span><span class="material-symbols-outlined text-[16px]">tune</span>';
+        
+        reorderHandles.forEach(handle => {
+          handle.classList.toggle('hidden', !isEditing);
+        });
+      });
+    }
+
+    // Toggle Focus Mode subtle feedback
+    const focusBtn = document.getElementById('btn-focus-mode');
+    if (focusBtn) {
+      focusBtn.addEventListener('click', () => {
+        focusBtn.classList.toggle('scale-[0.98]');
+        setTimeout(() => focusBtn.classList.remove('scale-[0.98]'), 150);
+      });
+    }
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-2px_16px_rgba(0,0,0,0.6)]" data-active-classes="text-primary [&amp;_.indicator]:opacity-100 [&amp;_.indicator]:scale-100"><div class="h-16 px-gutter flex items-center justify-around"><a class="group relative flex flex-col items-center justify-center min-w-[52px] h-11 text-on-surface-variant hover:text-on-surface transition-all" data-path="home-habits" href="#"><span class="material-symbols-outlined text-[22px] transition-transform duration-200 group-hover:scale-110">check_circle</span><span class="font-label-sm text-label-sm mt-0.5 tracking-wider">Habits</span><span class="indicator absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-primary opacity-0 scale-50 transition-all duration-200 shadow-[0_0_8px_rgba(78,222,163,0.8)]"></span></a><a aria-current="page" class="group relative flex flex-col items-center justify-center min-w-[52px] h-11 transition-all text-primary [&amp;_.indicator]:opacity-100 [&amp;_.indicator]:scale-100" data-path="overview-list" href="#"><span class="material-symbols-outlined text-[22px] transition-transform duration-200 group-hover:scale-110">stacked_bar_chart</span><span class="font-label-sm text-label-sm mt-0.5 tracking-wider">Overview</span><span class="indicator absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-primary opacity-0 scale-50 transition-all duration-200 shadow-[0_0_8px_rgba(78,222,163,0.8)]"></span></a><a class="group relative flex flex-col items-center justify-center min-w-[52px] h-11 text-on-surface-variant hover:text-on-surface transition-all" data-path="journal-notes" href="#"><span class="material-symbols-outlined text-[22px] transition-transform duration-200 group-hover:scale-110">edit_note</span><span class="font-label-sm text-label-sm mt-0.5 tracking-wider">Journal</span><span class="indicator absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-primary opacity-0 scale-50 transition-all duration-200 shadow-[0_0_8px_rgba(78,222,163,0.8)]"></span></a><a class="group relative flex flex-col items-center justify-center min-w-[52px] h-11 text-on-surface-variant hover:text-on-surface transition-all" data-path="settings" href="#"><span class="material-symbols-outlined text-[22px] transition-transform duration-200 group-hover:scale-110">tune</span><span class="font-label-sm text-label-sm mt-0.5 tracking-wider">Settings</span><span class="indicator absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-primary opacity-0 scale-50 transition-all duration-200 shadow-[0_0_8px_rgba(78,222,163,0.8)]"></span></a></div></nav></body></html>
