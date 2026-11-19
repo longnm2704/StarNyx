@@ -6,6 +6,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:starnyx/core/constants/enums.dart';
 import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/core/utils/backup_file_codec.dart';
+import 'package:starnyx/domain/entities/storage_stats.dart';
+import 'package:starnyx/domain/usecases/delete_all_data_use_case.dart';
 import 'package:starnyx/domain/usecases/export_data_use_case.dart';
 import 'package:starnyx/domain/usecases/import_data_use_case.dart';
 import 'package:starnyx/domain/usecases/load_active_starnyx_use_case.dart';
@@ -19,6 +21,7 @@ import 'settings_state.dart';
 
 typedef TempDirectoryProvider = Future<Directory> Function();
 typedef NowProvider = DateTime Function();
+typedef StorageStatsLoader = Future<StorageStats> Function();
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   SettingsBloc({
@@ -29,6 +32,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     required LoadActiveStarNyxUseCase loadActiveStarNyxUseCase,
     required LoadStarNyxProgressStatsUseCase loadStarNyxProgressStatsUseCase,
     required SetAllRemindersEnabledUseCase setAllRemindersEnabledUseCase,
+    required DeleteAllDataUseCase deleteAllDataUseCase,
+    required StorageStatsLoader loadStorageStats,
     BackupFileCodec? backupFileCodec,
     TempDirectoryProvider? tempDirectoryProvider,
     NowProvider? nowProvider,
@@ -40,6 +45,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
        _loadActiveStarNyxUseCase = loadActiveStarNyxUseCase,
        _loadStarNyxProgressStatsUseCase = loadStarNyxProgressStatsUseCase,
        _setAllRemindersEnabledUseCase = setAllRemindersEnabledUseCase,
+       _deleteAllDataUseCase = deleteAllDataUseCase,
+       _loadStorageStats = loadStorageStats,
        _backupFileCodec = backupFileCodec ?? BackupFileCodec(),
        _tempDirectoryProvider = tempDirectoryProvider ?? getTemporaryDirectory,
        _nowProvider = nowProvider ?? DateTime.now,
@@ -49,6 +56,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsImportRequested>(_onImportRequested);
     on<SettingsSummaryRequested>(_onSummaryRequested);
     on<SettingsRemindersToggled>(_onRemindersToggled);
+    on<SettingsStorageRequested>(_onStorageRequested);
+    on<SettingsDeleteAllRequested>(_onDeleteAllRequested);
   }
 
   final ExportDataUseCase _exportDataUseCase;
@@ -58,6 +67,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final LoadActiveStarNyxUseCase _loadActiveStarNyxUseCase;
   final LoadStarNyxProgressStatsUseCase _loadStarNyxProgressStatsUseCase;
   final SetAllRemindersEnabledUseCase _setAllRemindersEnabledUseCase;
+  final DeleteAllDataUseCase _deleteAllDataUseCase;
+  final StorageStatsLoader _loadStorageStats;
   final BackupFileCodec _backupFileCodec;
   final TempDirectoryProvider _tempDirectoryProvider;
   final NowProvider _nowProvider;
@@ -94,6 +105,47 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         error: error,
         stackTrace: stackTrace,
       );
+    }
+  }
+
+  Future<void> _onStorageRequested(
+    SettingsStorageRequested event,
+    Emitter<SettingsState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(storage: await _loadStorageStats()));
+    } catch (error, stackTrace) {
+      _logger.error(
+        'SettingsBloc',
+        'storage stats failed',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  Future<void> _onDeleteAllRequested(
+    SettingsDeleteAllRequested event,
+    Emitter<SettingsState> emit,
+  ) async {
+    emit(state.copyWith(deleteAllStatus: AsyncStatus.inProgress));
+    try {
+      await _deleteAllDataUseCase();
+      emit(
+        state.copyWith(
+          deleteAllStatus: AsyncStatus.success,
+          storage: await _loadStorageStats(),
+        ),
+      );
+      await _emitSummary(emit);
+    } catch (error, stackTrace) {
+      _logger.error(
+        'SettingsBloc',
+        'delete all failed',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      emit(state.copyWith(deleteAllStatus: AsyncStatus.failure));
     }
   }
 

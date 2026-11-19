@@ -7,6 +7,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
+import 'package:starnyx/domain/entities/storage_stats.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/settings/presentation/pages/settings_page.dart';
@@ -24,6 +25,8 @@ class _MockLoadActive extends Mock implements LoadActiveStarNyxUseCase {}
 class _MockStats extends Mock implements LoadStarNyxProgressStatsUseCase {}
 
 class _MockSetReminders extends Mock implements SetAllRemindersEnabledUseCase {}
+
+class _MockDeleteAll extends Mock implements DeleteAllDataUseCase {}
 
 final _habit = StarNyx(
   id: 'habit-1',
@@ -90,6 +93,13 @@ void main() {
       loadActiveStarNyxUseCase: loadActive,
       loadStarNyxProgressStatsUseCase: stats,
       setAllRemindersEnabledUseCase: setReminders,
+      deleteAllDataUseCase: _MockDeleteAll(),
+      loadStorageStats: () async => const StorageStats(
+        bytes: 0,
+        habitCount: 1,
+        completionCount: 0,
+        journalCount: 0,
+      ),
     );
   });
 

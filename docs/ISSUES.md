@@ -415,7 +415,7 @@ Tick `[x]` when an issue is done.
     - All rows are 44px+ touch targets; section cards use `#0A0A0C` + hairline + 16px radius.
     - Widget tests: renders, language picker opens, version is shown.
 
-- [ ] **STX-U016**: Backup & export screen (`sao_luu_xuat_du_lieu`)
+- [x] **STX-U016**: Backup & export screen (`sao_luu_xuat_du_lieu`)
   - _Must-have · kind:feature · depends on: STX-U015_
   - Design: `docs/app_ui_redesign/sao_luu_xuat_du_lieu/{code.html,screen.png}`
   - Replaces `BackupSettingsSheet` with a full-screen route pushed from Settings.
@@ -433,6 +433,7 @@ Tick `[x]` when an issue is done.
       - "Xóa toàn bộ dữ liệu ứng dụng" — coral title, description, full-width red (`#DC2626` / `#F43F5E`) pill button "Xóa tất cả dữ liệu" with trash icon → requires typing a confirmation phrase or a two-step confirm dialog → calls the new `DeleteAllDataUseCase` (U017) → signs out to onboarding / empty state.
     - Export/import success and error snackbars preserved.
     - Widget tests: export button triggers bloc event; delete-all requires confirmation; size is displayed.
+    - Choices: no avatar or "Sao lưu thủ công" card (nothing real to show); segmented bar uses row counts; tiles = habits / check-ins / journal notes; delete-all is a two-step confirm, then the shell reloads and lands on the empty Habits tab (import does the same).
 
 - [x] **STX-U017**: Delete-all-data use case
   - _Must-have · kind:architecture · depends on: —_

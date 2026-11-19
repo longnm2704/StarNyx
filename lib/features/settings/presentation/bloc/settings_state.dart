@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:starnyx/core/constants/enums.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
+import 'package:starnyx/domain/entities/storage_stats.dart';
 
 const Object _unset = Object();
 
@@ -13,6 +14,8 @@ class SettingsState extends Equatable {
     this.starnyxs = const <StarNyx>[],
     this.activeHabitTitle,
     this.currentStreak = 0,
+    this.storage,
+    this.deleteAllStatus = AsyncStatus.idle,
   });
 
   final AsyncStatus exportStatus;
@@ -24,6 +27,10 @@ class SettingsState extends Equatable {
   final List<StarNyx> starnyxs;
   final String? activeHabitTitle;
   final int currentStreak;
+
+  /// Null until the backup screen loads it.
+  final StorageStats? storage;
+  final AsyncStatus deleteAllStatus;
 
   /// True when at least one habit reminder is scheduled.
   bool get remindersOn => starnyxs.any((s) => s.hasReminder);
@@ -63,6 +70,8 @@ class SettingsState extends Equatable {
     List<StarNyx>? starnyxs,
     Object? activeHabitTitle = _unset,
     int? currentStreak,
+    StorageStats? storage,
+    AsyncStatus? deleteAllStatus,
   }) {
     return SettingsState(
       exportStatus: exportStatus ?? this.exportStatus,
@@ -78,6 +87,8 @@ class SettingsState extends Equatable {
           ? this.activeHabitTitle
           : activeHabitTitle as String?,
       currentStreak: currentStreak ?? this.currentStreak,
+      storage: storage ?? this.storage,
+      deleteAllStatus: deleteAllStatus ?? this.deleteAllStatus,
     );
   }
 
@@ -90,5 +101,7 @@ class SettingsState extends Equatable {
     starnyxs,
     activeHabitTitle,
     currentStreak,
+    storage,
+    deleteAllStatus,
   ];
 }

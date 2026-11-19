@@ -12,17 +12,24 @@ import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_event.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_state.dart';
 import 'package:starnyx/features/settings/presentation/pages/about_starnyx_sheet.dart';
-import 'package:starnyx/features/settings/presentation/pages/backup_settings_sheet.dart';
+import 'package:starnyx/features/settings/presentation/pages/backup_page.dart';
 
 /// Full-screen Settings tab (Obsidian Lumina `cai_dat`).
 ///
 /// Owns its [SettingsBloc] unless one is injected. [reloadToken] bumps when the
 /// shell re-selects the tab so the streak and reminder summary stay fresh.
+/// [onDataReplaced] fires after an import or delete-all on the backup screen.
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({this.bloc, this.reloadToken = 0, super.key});
+  const SettingsPage({
+    this.bloc,
+    this.reloadToken = 0,
+    this.onDataReplaced,
+    super.key,
+  });
 
   final SettingsBloc? bloc;
   final int reloadToken;
+  final VoidCallback? onDataReplaced;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -65,11 +72,11 @@ class _SettingsPageState extends State<SettingsPage> {
     super.dispose();
   }
 
-  // Backup and about reuse the existing sheets as full-screen routes.
-  // ponytail: STX-U016 swaps the backup target for the new backup screen.
+  // Backup and about are full-screen routes sharing this page's bloc.
+  // The backup screen pops `true` when local data was replaced.
   Future<void> _push(Widget Function(VoidCallback onBack) builder) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
+    final replaced = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
         builder: (routeContext) => BlocProvider<SettingsBloc>.value(
           value: _bloc,
           child: Scaffold(
@@ -79,8 +86,9 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
     );
-    // An import may have replaced every habit.
-    if (mounted) _bloc.add(const SettingsSummaryRequested());
+    if (!mounted) return;
+    _bloc.add(const SettingsSummaryRequested());
+    if (replaced ?? false) widget.onDataReplaced?.call();
   }
 
   @override
@@ -98,8 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
               onLanguageTap: () => _showLanguagePicker(context),
               onRemindersChanged: (enabled) =>
                   _bloc.add(SettingsRemindersToggled(enabled)),
-              onBackupTap: () =>
-                  _push((onBack) => BackupSettingsSheet(onBack: onBack)),
+              onBackupTap: () => _push((onBack) => BackupPage(onBack: onBack)),
               onAboutTap: () =>
                   _push((onBack) => AboutStarnyxSheet(onBack: onBack)),
             ),

@@ -297,6 +297,8 @@ void _registerBlocFactories() {
           serviceLocator<LoadStarNyxProgressStatsUseCase>(),
       setAllRemindersEnabledUseCase:
           serviceLocator<SetAllRemindersEnabledUseCase>(),
+      deleteAllDataUseCase: serviceLocator<DeleteAllDataUseCase>(),
+      loadStorageStats: serviceLocator<AppDatabase>().loadStorageStats,
       logger: serviceLocator<AppLogService>(),
     ),
   );

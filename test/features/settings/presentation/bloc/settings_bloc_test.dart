@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/core/utils/backup_file_codec.dart';
 import 'package:starnyx/domain/entities/domain_entities.dart';
@@ -18,6 +19,7 @@ void main() {
   late BackupFileCodec backupFileCodec;
   late Directory tempDirectory;
   late SettingsBloc bloc;
+  late int clearCalls;
 
   setUp(() async {
     starNyxRepository = _InMemoryStarNyxRepository();
@@ -47,6 +49,12 @@ void main() {
       starNyxRepository,
     );
 
+    clearCalls = 0;
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final colorCache = ActiveStarnyxColorCache(
+      await SharedPreferences.getInstance(),
+    );
+
     bloc = SettingsBloc(
       exportDataUseCase: exportUseCase,
       importDataUseCase: importUseCase,
@@ -64,6 +72,17 @@ void main() {
         starNyxRepository,
         syncUseCase,
       ),
+      deleteAllDataUseCase: DeleteAllDataUseCase(
+        () async => clearCalls++,
+        syncUseCase,
+        colorCache,
+      ),
+      loadStorageStats: () async => StorageStats(
+        bytes: 4096,
+        habitCount: clearCalls == 0 ? 2 : 0,
+        completionCount: 0,
+        journalCount: 0,
+      ),
       backupFileCodec: backupFileCodec,
       tempDirectoryProvider: () async => tempDirectory,
       nowProvider: () => DateTime(2026, 4, 10, 8, 30),
@@ -75,6 +94,24 @@ void main() {
     if (await tempDirectory.exists()) {
       await tempDirectory.delete(recursive: true);
     }
+  });
+
+  test('storage request loads stats', () async {
+    bloc.add(const SettingsStorageRequested());
+    await pumpEventQueue();
+
+    expect(bloc.state.storage?.bytes, 4096);
+    expect(bloc.state.storage?.habitCount, 2);
+  });
+
+  test('delete all wipes data, cancels reminders, refreshes storage', () async {
+    bloc.add(const SettingsDeleteAllRequested());
+    await pumpEventQueue();
+
+    expect(bloc.state.deleteAllStatus, AsyncStatus.success);
+    expect(clearCalls, 1);
+    expect(notificationService.cancelAllCount, 1);
+    expect(bloc.state.storage?.habitCount, 0);
   });
 
   test('export success writes an encrypted starnyxbak file', () async {

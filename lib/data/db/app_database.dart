@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:starnyx/data/db/starnyx_schema.dart';
+import 'package:starnyx/domain/entities/storage_stats.dart';
 
 part 'starnyxs_dao.dart';
 part 'app_database.g.dart';
@@ -80,14 +81,33 @@ class AppDatabase extends _$AppDatabase {
       ).insert(AppSettingsCompanion.insert(updatedAt: now ?? DateTime.now()));
     });
   }
+
+  /// Size of the SQLite file plus row counts for the backup screen.
+  Future<StorageStats> loadStorageStats() async {
+    final row = await customSelect(
+      'SELECT (SELECT COUNT(*) FROM starnyxs) AS habits, '
+      '(SELECT COUNT(*) FROM completions) AS completions, '
+      '(SELECT COUNT(*) FROM journal_entries) AS journals',
+    ).getSingle();
+    final file = await appDatabaseFile();
+    return StorageStats(
+      bytes: await file.exists() ? await file.length() : 0,
+      habitCount: row.read<int>('habits'),
+      completionCount: row.read<int>('completions'),
+      journalCount: row.read<int>('journals'),
+    );
+  }
+}
+
+/// Location of the app's SQLite file.
+Future<File> appDatabaseFile() async {
+  final appDirectory = await getApplicationDocumentsDirectory();
+  return File('${appDirectory.path}/starnyx.sqlite');
 }
 
 // Drift opens the SQLite file lazily so startup work stays lightweight.
 LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final appDirectory = await getApplicationDocumentsDirectory();
-    final databaseFile = File('${appDirectory.path}/starnyx.sqlite');
-
-    return NativeDatabase.createInBackground(databaseFile);
-  });
+  return LazyDatabase(
+    () async => NativeDatabase.createInBackground(await appDatabaseFile()),
+  );
 }

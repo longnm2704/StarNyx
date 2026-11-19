@@ -119,6 +119,11 @@ class _AppShellState extends State<AppShell> {
       SettingsPage(
         key: const ValueKey<String>('settings-tab'),
         reloadToken: _settingsReloadToken,
+        // Import or delete-all replaced everything: show the fresh Habits tab.
+        onDataReplaced: () => setState(() {
+          _homeReloadToken++;
+          _index = AppShellTab.habits.index;
+        }),
       ),
     ];
   }

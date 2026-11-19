@@ -39,3 +39,13 @@ class SettingsRemindersToggled extends SettingsEvent {
   @override
   List<Object?> get props => [enabled];
 }
+
+/// Loads database size and row counts for the backup screen.
+class SettingsStorageRequested extends SettingsEvent {
+  const SettingsStorageRequested();
+}
+
+/// Irreversibly wipes all local data (already confirmed by the user).
+class SettingsDeleteAllRequested extends SettingsEvent {
+  const SettingsDeleteAllRequested();
+}
