@@ -22,6 +22,10 @@ enum StarnyxFormReminderTimeError { missing, invalid }
 
 enum HomeStatus { initial, loading, success, failure }
 
+enum OverviewStatus { initial, loading, success, failure }
+
+enum OverviewRange { week, month, year }
+
 enum JournalStatus { initial, loading, success, failure }
 
 enum HomeGridStarDayState { beforeStart, completed, missed, future }

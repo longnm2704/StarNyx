@@ -12,6 +12,7 @@ import 'package:starnyx/domain/repositories/domain_repositories.dart';
 import 'package:starnyx/features/habits/presentation/bloc/habit_list_bloc.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_bloc.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
+import 'package:starnyx/features/overview/presentation/bloc/overview_bloc.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_bloc.dart';
 
@@ -175,6 +176,14 @@ void _registerUseCases() {
       logger: serviceLocator<AppLogService>(),
     ),
   );
+  serviceLocator.registerLazySingleton<LoadOverviewStatsUseCase>(
+    () => LoadOverviewStatsUseCase(
+      serviceLocator<LoadStarnyxsUseCase>(),
+      serviceLocator<CompletionRepository>(),
+      serviceLocator<LoadStarNyxProgressStatsUseCase>(),
+      logger: serviceLocator<AppLogService>(),
+    ),
+  );
   serviceLocator.registerLazySingleton<SaveJournalEntryUseCase>(
     () => SaveJournalEntryUseCase(
       serviceLocator<JournalEntryRepository>(),
@@ -245,6 +254,12 @@ void _registerBlocFactories() {
       saveStarNyxOrderUseCase: serviceLocator<SaveStarNyxOrderUseCase>(),
       countHabitsCompletedOnDateUseCase:
           serviceLocator<CountHabitsCompletedOnDateUseCase>(),
+      logger: serviceLocator<AppLogService>(),
+    ),
+  );
+  serviceLocator.registerFactory<OverviewBloc>(
+    () => OverviewBloc(
+      loadOverviewStatsUseCase: serviceLocator<LoadOverviewStatsUseCase>(),
       logger: serviceLocator<AppLogService>(),
     ),
   );

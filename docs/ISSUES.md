@@ -310,7 +310,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic U-D - Overview Tab
 
-- [ ] **STX-U009**: Aggregate stats use case for Overview
+- [x] **STX-U009**: Aggregate stats use case for Overview
   - _Must-have · kind:architecture · depends on: —_
   - Design: `tong_quan_thong_ke/code.html` (data requirements)
   - Acceptance criteria:
