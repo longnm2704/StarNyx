@@ -4,12 +4,6 @@ import 'package:starnyx/core/constants/core_constants.dart';
 
 import 'app_icon.dart';
 
-const LinearGradient _appConfirmDialogGradient = LinearGradient(
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-  colors: <Color>[Color(0xFF32284B), Color(0xFF1A1526)],
-);
-
 Future<bool?> showAppConfirmDialog({
   required BuildContext context,
   required String title,
@@ -94,23 +88,9 @@ class AppConfirmDialog extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 420),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                gradient: _appConfirmDialogGradient,
-                borderRadius: BorderRadius.circular(AppRadius.xl),
-                border: Border.all(
-                  color: AppColors.outline.withValues(alpha: 0.58),
-                ),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: AppColors.black.withValues(alpha: 0.32),
-                    blurRadius: 34,
-                    offset: const Offset(0, 20),
-                  ),
-                  BoxShadow(
-                    color: effectiveAccentColor.withValues(alpha: 0.12),
-                    blurRadius: 28,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
+                color: AppColors.surfaceLevel2,
+                borderRadius: BorderRadius.circular(AppRadius.card),
+                border: Border.all(color: AppColors.borderSubtle),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
@@ -142,7 +122,7 @@ class AppConfirmDialog extends StatelessWidget {
                       title,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
@@ -184,8 +164,8 @@ class AppConfirmDialog extends StatelessWidget {
   }
 
   Color get _defaultAccentColor => switch (actionStyle) {
-    AppConfirmActionStyle.neutral => AppColors.accentLavender,
-    AppConfirmActionStyle.destructive => AppColors.accentPink,
+    AppConfirmActionStyle.neutral => AppColors.textPrimary,
+    AppConfirmActionStyle.destructive => AppColors.error,
   };
 }
 
@@ -205,15 +185,15 @@ class _AppDialogGhostButton extends StatelessWidget {
         child: Ink(
           height: AppSize.ctaHeight,
           decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.88),
+            color: AppColors.surfaceLevel1,
             borderRadius: BorderRadius.circular(AppRadius.pill),
-            border: Border.all(color: AppColors.outline.withValues(alpha: 0.5)),
+            border: Border.all(color: AppColors.borderSubtle),
           ),
           child: Center(
             child: Text(
               label,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.textSecondary,
+                color: AppColors.textPrimary,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -239,34 +219,25 @@ class _AppDialogActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveShadowColor = accentColor ?? _shadowColor;
+    final fill = accentColor ?? _fillColor;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: _gradient,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.pill),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: effectiveShadowColor.withValues(alpha: 0.22),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+        onTap: onPressed,
+        child: Ink(
+          height: AppSize.ctaHeight,
+          decoration: BoxDecoration(
+            color: fill,
+            borderRadius: BorderRadius.circular(AppRadius.pill),
           ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-          onTap: onPressed,
-          child: SizedBox(
-            height: AppSize.ctaHeight,
-            child: Center(
-              child: Text(
-                label,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.white,
-                  fontWeight: FontWeight.w800,
-                ),
+          child: Center(
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppColors.black,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -275,34 +246,8 @@ class _AppDialogActionButton extends StatelessWidget {
     );
   }
 
-  LinearGradient get _gradient {
-    if (accentColor != null) {
-      return LinearGradient(
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-        colors: <Color>[
-          accentColor!.withValues(alpha: 0.8),
-          accentColor!,
-        ],
-      );
-    }
-
-    return switch (actionStyle) {
-      AppConfirmActionStyle.neutral => const LinearGradient(
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-        colors: <Color>[AppColors.accentBlue, AppColors.accentViolet],
-      ),
-      AppConfirmActionStyle.destructive => const LinearGradient(
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-        colors: <Color>[Color(0xFFFF7E9D), AppColors.accentPink],
-      ),
-    };
-  }
-
-  Color get _shadowColor => switch (actionStyle) {
-    AppConfirmActionStyle.neutral => AppColors.accentViolet,
-    AppConfirmActionStyle.destructive => AppColors.accentPink,
+  Color get _fillColor => switch (actionStyle) {
+    AppConfirmActionStyle.neutral => AppColors.white,
+    AppConfirmActionStyle.destructive => AppColors.error,
   };
 }

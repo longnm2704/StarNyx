@@ -11,7 +11,6 @@ import 'package:starnyx/features/settings/presentation/pages/about_starnyx_sheet
 import 'package:starnyx/features/settings/presentation/pages/backup_settings_sheet.dart';
 import 'package:starnyx/features/settings/presentation/pages/general_settings_sheet.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_header.dart';
-import 'package:starnyx/core/widgets/app_sheet_background.dart';
 
 Future<void> showSettingsBottomSheet(
   BuildContext context, {
@@ -84,9 +83,14 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
             page = const SizedBox.shrink();
         }
 
-        return AppSheetBackground(
-          accentColor: accentColor,
-          showStars: false,
+        return Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: const BoxDecoration(
+            color: AppColors.sheet,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppRadius.sheet),
+            ),
+          ),
           child: page,
         );
       },

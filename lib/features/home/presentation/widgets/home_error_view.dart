@@ -12,9 +12,7 @@ class HomeErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CosmicBackground(
-      accentColor: accentColor,
-      child: SafeArea(
+    return SafeArea(
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(
@@ -32,7 +30,6 @@ class HomeErrorView extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 }

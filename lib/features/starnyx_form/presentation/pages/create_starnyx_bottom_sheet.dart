@@ -7,7 +7,6 @@ import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
-import 'package:starnyx/core/widgets/app_sheet_background.dart';
 import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_bloc.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_event.dart';
@@ -194,13 +193,16 @@ class _StarnyxFormBottomSheetViewState
 
     return BlocBuilder<StarnyxFormBloc, StarnyxFormState>(
       builder: (BuildContext context, StarnyxFormState state) {
-        final Color accentColor = starnyxColorFromHex(state.color);
-
         return FractionallySizedBox(
           heightFactor: 1,
-          child: AppSheetBackground(
-            accentColor: accentColor,
-            showStars: false,
+          child: Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: const BoxDecoration(
+              color: AppColors.sheet,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AppRadius.sheet),
+              ),
+            ),
             child: SafeArea(
               top: false,
               bottom: false,
@@ -420,7 +422,7 @@ class _StarnyxFormBottomSheetViewState
                                       ),
                                       const SizedBox(height: AppSpacing.sm),
                                     ],
-                                    GradientOutlineButton(
+                                    AppPrimaryButton(
                                       label: saveButtonLabel,
                                       onPressed: _submitForm,
                                     ),

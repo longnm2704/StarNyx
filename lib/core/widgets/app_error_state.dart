@@ -18,15 +18,15 @@ class AppErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
       width: double.infinity,
       padding: AppSpacing.cardPadding,
       decoration: BoxDecoration(
-        color: colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
+        color: AppColors.surfaceLevel1,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: Border.all(color: AppColors.error.withValues(alpha: 0.35)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,14 +35,14 @@ class AppErrorState extends StatelessWidget {
           Text(
             title,
             style: textTheme.titleMedium?.copyWith(
-              color: colorScheme.onErrorContainer,
+              color: AppColors.errorOnDark,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             message,
             style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onErrorContainer,
+              color: AppColors.textSecondary,
             ),
           ),
           if (onRetry != null) ...<Widget>[

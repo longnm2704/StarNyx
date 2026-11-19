@@ -24,8 +24,7 @@ class FirstRunWelcomeView extends StatelessWidget {
         ? mediaQuery.viewPadding.bottom
         : mediaQuery.padding.bottom;
 
-    return CosmicBackground(
-      child: SafeArea(
+    return SafeArea(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             return SingleChildScrollView(
@@ -89,7 +88,7 @@ class FirstRunWelcomeView extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xxl),
-                    GradientOutlineButton(
+                    AppPrimaryButton(
                       label: 'welcome.primary_action'.tr(),
                       onPressed: () {
                         if (onCreatePressed != null) {
@@ -108,7 +107,6 @@ class FirstRunWelcomeView extends StatelessWidget {
             );
           },
         ),
-      ),
     );
   }
 }

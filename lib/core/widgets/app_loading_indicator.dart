@@ -9,14 +9,21 @@ class AppLoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const CircularProgressIndicator(),
+          const CircularProgressIndicator(color: AppColors.primary),
           if (label != null) ...<Widget>[
             const SizedBox(height: AppSpacing.md),
-            Text(label!),
+            Text(
+              label!,
+              style: textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
           ],
         ],
       ),

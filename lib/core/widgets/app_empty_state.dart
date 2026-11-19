@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
-import 'gradient_outline_button.dart';
+import 'app_primary_button.dart';
 import 'app_icon.dart';
 
 // Shared empty-state card for screens that have no content yet.
@@ -26,83 +26,59 @@ class AppEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return DecoratedBox(
+    return Container(
+      width: double.infinity,
+      padding: AppSpacing.cardPadding,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[
-            AppColors.surfaceGlass.withValues(alpha: 0.94),
-            AppColors.surface.withValues(alpha: 0.9),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(
-          color: AppColors.outlineSoft.withValues(alpha: 0.24),
-        ),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.22),
-            blurRadius: 24,
-            offset: const Offset(0, 14),
-          ),
-        ],
+        color: AppColors.surfaceLevel1,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: Border.all(color: AppColors.borderSubtle),
       ),
-      child: Container(
-        width: double.infinity,
-        padding: AppSpacing.cardPadding,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              width: 68,
-              height: 68,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: AppColors.accentFillGradient,
-                border: Border.all(
-                  color: AppColors.accentLavender.withValues(alpha: 0.18),
-                ),
-              ),
-              child: Center(
-                child: AppIcon(
-                  icon: icon,
-                  size: 28,
-                  color: AppColors.accentLavender,
-                  semanticsLabel: title,
-                ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Container(
+            width: 68,
+            height: 68,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.surfaceLevel2,
+              border: Border.all(color: AppColors.borderSubtle),
+            ),
+            child: Center(
+              child: AppIcon(
+                icon: icon,
+                size: 28,
+                color: AppColors.primary,
+                semanticsLabel: title,
               ),
             ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            title,
+            style: textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.35,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            message,
+            style: textTheme.bodyMedium?.copyWith(
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (actionLabel != null && onActionPressed != null) ...<Widget>[
             const SizedBox(height: AppSpacing.lg),
-            Text(
-              title,
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.35,
-              ),
-              textAlign: TextAlign.center,
+            AppPrimaryButton(
+              label: actionLabel!,
+              onPressed: onActionPressed!,
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              message,
-              style: textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            if (actionLabel != null && onActionPressed != null) ...<Widget>[
-              const SizedBox(height: AppSpacing.lg),
-              GradientOutlineButton(
-                label: actionLabel!,
-                onPressed: onActionPressed!,
-                height: 50,
-              ),
-            ],
           ],
-        ),
+        ],
       ),
     );
   }

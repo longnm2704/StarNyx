@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:starnyx/core/widgets/gradient_outline_button.dart';
+import 'package:starnyx/core/widgets/app_primary_button.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
 Future<String?> showStarnyxFormColorPickerSheet(
@@ -79,7 +79,7 @@ class _StarnyxFormColorPickerSheetState
             const SizedBox(height: AppSpacing.md),
             SizedBox(
               width: double.infinity,
-              child: GradientOutlineButton(
+              child: AppPrimaryButton(
                 label: 'starnyx_form.picker_done'.tr(),
                 onPressed: () {
                   Navigator.of(context).pop(starnyxHexFromColor(editingColor));

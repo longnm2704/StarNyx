@@ -243,7 +243,7 @@ Tick `[x]` when an issue is done.
     - `AppTheme.dark()` is the only theme; light theme is out of scope.
     - Widgetbook/golden or at least a `flutter test` smoke test renders `AppTheme.dark()` without overflow at 320px and at 2.0 text scale.
 
-- [ ] **STX-U004**: Restyle shared widgets to Obsidian Lumina
+- [x] **STX-U004**: Restyle shared widgets to Obsidian Lumina
   - _Must-have · kind:polish · depends on: STX-U002, STX-U003_
   - Design: `obsidian_lumina/DESIGN.md` (Components: Buttons, Habit Cards, Checkboxes, Chips, Journal Entry Card)
   - Acceptance criteria:

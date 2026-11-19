@@ -7,7 +7,6 @@ import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/domain/entities/journal_entry.dart';
-import 'package:starnyx/core/widgets/app_sheet_background.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_event.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_state.dart';
@@ -162,9 +161,14 @@ class _JournalBottomSheetState extends State<JournalBottomSheet> {
         },
         child: FractionallySizedBox(
           heightFactor: 1.0,
-          child: AppSheetBackground(
-            accentColor: widget.accentColor,
-            showStars: false,
+          child: Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: const BoxDecoration(
+              color: AppColors.sheet,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AppRadius.sheet),
+              ),
+            ),
             child: SafeArea(
               top: false,
               bottom: false,

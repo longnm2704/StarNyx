@@ -17,7 +17,6 @@ class AppSectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,7 +31,7 @@ class AppSectionTitle extends StatelessWidget {
                 Text(
                   subtitle!,
                   style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],

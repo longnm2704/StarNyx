@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/features/home/presentation/widgets/home_grid_utils.dart';
 
@@ -63,9 +62,7 @@ class _HomeLoadingViewState extends State<HomeLoadingView>
 
   @override
   Widget build(BuildContext context) {
-    return CosmicBackground(
-      accentColor: widget.accentColor,
-      child: SafeArea(
+    return SafeArea(
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(
@@ -126,7 +123,6 @@ class _HomeLoadingViewState extends State<HomeLoadingView>
             ),
           ),
         ),
-      ),
     );
   }
 }
