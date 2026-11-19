@@ -16,7 +16,7 @@ class StarNyxApp extends StatelessWidget {
     return MaterialApp(
       locale: context.locale,
       theme: AppTheme.dark(),
-      initialRoute: AppRoutes.home,
+      initialRoute: AppRoutes.habits,
       debugShowCheckedModeBanner: false,
       onGenerateRoute: router.onGenerateRoute,
       supportedLocales: context.supportedLocales,

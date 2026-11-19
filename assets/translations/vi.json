@@ -152,5 +152,11 @@
     "language_label": "Ngôn ngữ",
     "language_value": "Tiếng Việt",
     "version_label": "Phiên bản {}"
+  },
+  "nav": {
+    "habits": "Thói quen",
+    "overview": "Tổng quan",
+    "journal": "Nhật ký",
+    "settings": "Cài đặt"
   }
 }

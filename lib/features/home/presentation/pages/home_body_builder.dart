@@ -23,11 +23,8 @@ class HomeBodyBuilder extends StatelessWidget {
     required this.onRetry,
     required this.onCreatePressed,
     required this.onSettingsPressed,
-    required this.onEditPressed,
-    required this.onSelectPressed,
     required this.onDateSelected,
     required this.onPreviousDayPressed,
-    required this.onOrderChanged,
     required this.onNextDayPressed,
     required this.onJumpToTodayPressed,
     required this.onPreviousYearPressed,
@@ -45,12 +42,9 @@ class HomeBodyBuilder extends StatelessWidget {
   // ── Callbacks forwarded to child views ────────────────────────────────────
 
   final VoidCallback onRetry;
-  final FutureOr<void> Function() onCreatePressed;
-  final FutureOr<void> Function() onSettingsPressed;
-  final FutureOr<void> Function(StarNyx) onEditPressed;
-  final ValueChanged<StarNyx> onSelectPressed;
+  final FutureOr<void> Function()? onCreatePressed;
+  final VoidCallback? onSettingsPressed;
   final ValueChanged<DateTime> onDateSelected;
-  final ValueChanged<List<String>> onOrderChanged;
   final VoidCallback onPreviousDayPressed;
   final VoidCallback onNextDayPressed;
   final VoidCallback onJumpToTodayPressed;
@@ -93,17 +87,12 @@ class HomeBodyBuilder extends StatelessWidget {
 
     return ActiveStarnyxHomeView(
       key: const ValueKey<String>('active_view'),
-      starnyxs: state.starnyxs,
-      activeStarnyxId: state.activeStarnyxId,
+      activeStarnyx: _resolveActiveStarnyx(),
       selectedDate: state.selectedDate,
       todayDate: DateTime.now(),
       viewedYear: state.viewedYear,
       completedDatesForViewedYear: state.completedDatesForViewedYear,
-      onCreatePressed: onCreatePressed,
-      onEditPressed: onEditPressed,
       onDateSelected: onDateSelected,
-      onSelectPressed: onSelectPressed,
-      onOrderChanged: onOrderChanged,
       onPreviousDayPressed: onPreviousDayPressed,
       onNextDayPressed: onNextDayPressed,
       onJumpToTodayPressed: onJumpToTodayPressed,
@@ -116,6 +105,17 @@ class HomeBodyBuilder extends StatelessWidget {
           ? state.completionFeedbackCount
           : null,
       progressStats: state.progressStats,
+    );
+  }
+
+  StarNyx _resolveActiveStarnyx() {
+    final activeId = state.activeStarnyxId;
+    if (activeId == null) {
+      return state.starnyxs.first;
+    }
+    return state.starnyxs.firstWhere(
+      (starnyx) => starnyx.id == activeId,
+      orElse: () => state.starnyxs.first,
     );
   }
 }

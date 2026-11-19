@@ -17,10 +17,8 @@ import 'package:starnyx/features/home/presentation/bloc/home_state.dart';
 import 'package:starnyx/domain/usecases/load_active_starnyx_use_case.dart';
 import 'package:starnyx/domain/usecases/select_active_starnyx_use_case.dart';
 import 'package:starnyx/domain/usecases/load_starnyx_progress_stats_use_case.dart';
-import 'package:starnyx/features/settings/presentation/pages/settings_bottom_sheet.dart';
 import 'package:starnyx/domain/usecases/load_starnyx_completion_dates_for_year_use_case.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
-import 'package:starnyx/features/starnyx_form/presentation/pages/create_starnyx_bottom_sheet.dart';
 
 import 'home_body_builder.dart';
 
@@ -39,9 +37,9 @@ class HomePage extends StatefulWidget {
     ToggleCompletionUseCase? toggleCompletionUseCase,
     SaveStarNyxOrderUseCase? saveStarNyxOrderUseCase,
     FutureOr<void> Function()? onCreatePressed,
-    FutureOr<void> Function(StarNyx)? onEditPressed,
-    ValueChanged<StarNyx>? onSelectPressed,
+    VoidCallback? onSettingsPressed,
     Color? initialAccentColor,
+    int reloadToken = 0,
   }) : _loadStarnyxsUseCase =
            loadStarnyxsUseCase ?? serviceLocator<LoadStarnyxsUseCase>(),
        _loadActiveStarNyxUseCase =
@@ -64,9 +62,9 @@ class HomePage extends StatefulWidget {
                ? serviceLocator<SaveStarNyxOrderUseCase>()
                : null),
        _onCreatePressed = onCreatePressed,
-       _onEditPressed = onEditPressed,
-       _onSelectPressed = onSelectPressed,
-       _initialAccentColor = initialAccentColor;
+       _onSettingsPressed = onSettingsPressed,
+       _initialAccentColor = initialAccentColor,
+       _reloadToken = reloadToken;
 
   final LoadStarnyxsUseCase _loadStarnyxsUseCase;
   final LoadActiveStarNyxUseCase _loadActiveStarNyxUseCase;
@@ -77,9 +75,9 @@ class HomePage extends StatefulWidget {
   final ToggleCompletionUseCase _toggleCompletionUseCase;
   final SaveStarNyxOrderUseCase? _saveStarNyxOrderUseCase;
   final FutureOr<void> Function()? _onCreatePressed;
-  final FutureOr<void> Function(StarNyx)? _onEditPressed;
-  final ValueChanged<StarNyx>? _onSelectPressed;
+  final VoidCallback? _onSettingsPressed;
   final Color? _initialAccentColor;
+  final int _reloadToken;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -107,6 +105,14 @@ class _HomePageState extends State<HomePage> {
       toggleCompletionUseCase: widget._toggleCompletionUseCase,
       saveStarNyxOrderUseCase: widget._saveStarNyxOrderUseCase,
     )..add(const HomeLoadRequested());
+  }
+
+  @override
+  void didUpdateWidget(covariant HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget._reloadToken != oldWidget._reloadToken) {
+      _homeBloc.add(const HomeReloadRequested());
+    }
   }
 
   @override
@@ -145,58 +151,11 @@ class _HomePageState extends State<HomePage> {
   // ── Navigation / callback handlers ────────────────────────────────────────
 
   Future<void> _onCreatePressed() async {
-    if (widget._onCreatePressed != null) {
-      await Future.sync(widget._onCreatePressed!);
-      return;
-    }
-    await _openCreateBottomSheet();
+    await Future.sync(() => widget._onCreatePressed?.call());
   }
 
-  Future<void> _onSettingsPressed() async {
-    // _lastActiveAccentColor is always kept up-to-date by the BlocConsumer
-    // listener, so no need to re-resolve from the BLoC state here.
-    await showSettingsBottomSheet(context, accentColor: _lastActiveAccentColor);
-  }
-
-  Future<void> _openCreateBottomSheet() async {
-    // Reuse _resolveActiveStarnyx to avoid duplicating the look-up logic.
-    final activeColorHex = _resolveActiveStarnyx(_homeBloc.state)?.color;
-
-    final result = await showCreateStarnyxBottomSheet(
-      context,
-      initialColor: activeColorHex,
-    );
-    if (!mounted || result == null || !result.hasChanges) return;
-
-    final saved = result.savedStarnyx;
-    if (saved != null) {
-      _homeBloc.add(HomeActiveStarnyxSelected(saved.id));
-    } else {
-      _homeBloc.add(const HomeReloadRequested());
-    }
-  }
-
-  Future<void> _onEditPressed(StarNyx starnyx) async {
-    if (widget._onEditPressed != null) {
-      await Future.sync(() => widget._onEditPressed!(starnyx));
-      return;
-    }
-    await _openEditBottomSheet(starnyx);
-  }
-
-  Future<void> _openEditBottomSheet(StarNyx starnyx) async {
-    final result = await showEditStarnyxBottomSheet(context, starnyx);
-    if (!mounted || result == null || !result.hasChanges) return;
-    _homeBloc.add(const HomeReloadRequested());
-  }
-
-  // No longer async — neither branch awaits anything.
-  void _onSelectPressed(StarNyx starnyx) {
-    if (widget._onSelectPressed != null) {
-      widget._onSelectPressed!(starnyx);
-      return;
-    }
-    _homeBloc.add(HomeActiveStarnyxSelected(starnyx.id));
+  void _onSettingsPressed() {
+    widget._onSettingsPressed?.call();
   }
 
   // ── Build ─────────────────────────────────────────────────────────────────
@@ -228,12 +187,8 @@ class _HomePageState extends State<HomePage> {
               onRetry: () => _homeBloc.add(const HomeReloadRequested()),
               onCreatePressed: _onCreatePressed,
               onSettingsPressed: _onSettingsPressed,
-              onEditPressed: _onEditPressed,
-              onSelectPressed: _onSelectPressed,
               onDateSelected: (DateTime date) =>
                   _homeBloc.add(HomeDaySelected(date)),
-              onOrderChanged: (List<String> orderedIds) =>
-                  _homeBloc.add(HomeStarNyxOrderChanged(orderedIds)),
               onPreviousDayPressed: () =>
                   _homeBloc.add(const HomePreviousDayRequested()),
               onNextDayPressed: () =>
@@ -291,11 +246,7 @@ class _HomePageState extends State<HomePage> {
       );
       final nowLit = state.completedDatesForViewedYear.any(
         (completed) =>
-            DateTime.utc(
-              completed.year,
-              completed.month,
-              completed.day,
-            ) ==
+            DateTime.utc(completed.year, completed.month, completed.day) ==
             normalizedSelected,
       );
       WidgetsBinding.instance.addPostFrameCallback((_) {

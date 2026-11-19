@@ -47,7 +47,6 @@ void main() {
             onDateSelected: (_) {},
             onPreviousYearPressed: () {},
             onNextYearPressed: () {},
-            onQuickActionsPressed: null,
           ),
         ),
       );

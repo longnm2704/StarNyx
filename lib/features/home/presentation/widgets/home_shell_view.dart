@@ -56,11 +56,9 @@ class HomeShellView extends StatelessWidget {
     required this.onDateSelected,
     required this.onPreviousYearPressed,
     required this.onNextYearPressed,
-    required this.onQuickActionsPressed,
     this.onToggleCompletionPressed,
     this.isCheckingIn = false,
     this.completionSuccessAnimationToken,
-    this.footer,
     super.key,
   });
 
@@ -76,11 +74,9 @@ class HomeShellView extends StatelessWidget {
   final ValueChanged<DateTime>? onDateSelected;
   final VoidCallback? onPreviousYearPressed;
   final VoidCallback? onNextYearPressed;
-  final VoidCallback? onQuickActionsPressed;
   final VoidCallback? onToggleCompletionPressed;
   final bool isCheckingIn;
   final int? completionSuccessAnimationToken;
-  final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
@@ -107,11 +103,7 @@ class HomeShellView extends StatelessWidget {
     );
     final isLit = completedDatesForViewedYear.any(
       (completed) =>
-          DateTime.utc(
-            completed.year,
-            completed.month,
-            completed.day,
-          ) ==
+          DateTime.utc(completed.year, completed.month, completed.day) ==
           normalizedSelected,
     );
 
@@ -246,10 +238,6 @@ class HomeShellView extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      if (footer != null) ...<Widget>[
-                        const SizedBox(height: AppSpacing.xxs),
-                        footer!,
-                      ],
                     ],
                   ),
                 ),

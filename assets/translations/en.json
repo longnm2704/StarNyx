@@ -152,5 +152,11 @@
     "language_label": "Language",
     "language_value": "English",
     "version_label": "Version {}"
+  },
+  "nav": {
+    "habits": "Habits",
+    "overview": "Overview",
+    "journal": "Journal",
+    "settings": "Settings"
   }
 }

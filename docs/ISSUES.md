@@ -264,7 +264,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic U-B - Navigation Shell
 
-- [ ] **STX-U006**: Introduce 4-tab bottom navigation (Habits / Overview / Journal / Settings)
+- [x] **STX-U006**: Introduce 4-tab bottom navigation (Habits / Overview / Journal / Settings)
   - _Must-have · kind:architecture · depends on: STX-U003, STX-U004_
   - Design: `trang_chu/code.html`, `tong_quan_thong_ke/code.html`, `nhat_ky/code.html`, `cai_dat/code.html` (bottom `<nav>`)
   - Acceptance criteria:

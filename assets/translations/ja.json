@@ -152,5 +152,11 @@
     "language_label": "言語",
     "language_value": "日本語",
     "version_label": "バージョン {}"
+  },
+  "nav": {
+    "habits": "習慣",
+    "overview": "概要",
+    "journal": "日記",
+    "settings": "設定"
   }
 }
