@@ -7,7 +7,7 @@ enum AppPrimaryButtonVariant { primary, ghost }
 //
 // Primary: pill, `#10B981` fill, black w700 label, 52px height, pressed
 // scale 0.98 with a soft emerald glow. Ghost: `#0A0A0C` fill, hairline
-// border, `#F9FAFB` label.
+// border, `#F9FAFB` label. A null [onPressed] renders the disabled state.
 class AppPrimaryButton extends StatefulWidget {
   const AppPrimaryButton({
     required this.label,
@@ -18,7 +18,7 @@ class AppPrimaryButton extends StatefulWidget {
   });
 
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final AppPrimaryButtonVariant variant;
   final double height;
 
@@ -30,16 +30,25 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
   bool _pressed = false;
 
   bool get _isPrimary => widget.variant == AppPrimaryButtonVariant.primary;
+  bool get _enabled => widget.onPressed != null;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    final Color fill = _isPrimary ? AppColors.primary : AppColors.surfaceLevel1;
-    final Color labelColor = _isPrimary ? AppColors.onPrimary : AppColors.textPrimary;
+    final Color fill = !_enabled
+        ? AppColors.surfaceLevel3
+        : _isPrimary
+        ? AppColors.primary
+        : AppColors.surfaceLevel1;
+    final Color labelColor = !_enabled
+        ? AppColors.textTertiary
+        : _isPrimary
+        ? AppColors.onPrimary
+        : AppColors.textPrimary;
 
     return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
+      onTapDown: (_) => setState(() => _pressed = _enabled),
       onTapUp: (_) => setState(() => _pressed = false),
       onTapCancel: () => setState(() => _pressed = false),
       child: AnimatedScale(
@@ -53,7 +62,7 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
             border: _isPrimary
                 ? null
                 : Border.all(color: AppColors.borderSubtle),
-            boxShadow: _isPrimary
+            boxShadow: _isPrimary && _enabled
                 ? const <BoxShadow>[
                     BoxShadow(
                       color: Color(0x2610B981), // rgba(16,185,129,0.15)

@@ -22,12 +22,14 @@ abstract final class HabitSymbols {
         'zap': HugeIconsStrokeRounded.strokeRoundedZap,
         'dumbbell': HugeIconsStrokeRounded.strokeRoundedDumbbell01,
         'bike': HugeIconsStrokeRounded.strokeRoundedBike,
+        'run': HugeIconsStrokeRounded.strokeRoundedRunningShoes,
         'moon': HugeIconsStrokeRounded.strokeRoundedMoon01,
         'sun': HugeIconsStrokeRounded.strokeRoundedSun01,
         'cloud': HugeIconsStrokeRounded.strokeRoundedCloud,
         'coffee': HugeIconsStrokeRounded.strokeRoundedCoffee01,
         'book': HugeIconsStrokeRounded.strokeRoundedBookOpen01,
         'home': HugeIconsStrokeRounded.strokeRoundedHome01,
+        'droplet': HugeIconsStrokeRounded.strokeRoundedDroplet,
       };
 
   static const List<HabitSymbolGroup> groups = <HabitSymbolGroup>[
@@ -39,9 +41,20 @@ abstract final class HabitSymbols {
       'tree',
     ]),
     HabitSymbolGroup('feelings', <String>['heart', 'brain', 'music', 'pencil']),
-    HabitSymbolGroup('energy', <String>['flame', 'zap', 'dumbbell', 'bike']),
+    HabitSymbolGroup('energy', <String>[
+      'flame',
+      'zap',
+      'dumbbell',
+      'bike',
+      'run',
+    ]),
     HabitSymbolGroup('sky', <String>['star', 'moon', 'sun', 'cloud']),
-    HabitSymbolGroup('daily_life', <String>['coffee', 'book', 'home']),
+    HabitSymbolGroup('daily_life', <String>[
+      'coffee',
+      'book',
+      'home',
+      'droplet',
+    ]),
   ];
 
   // Unknown keys fall back to `star` so a bad backup or a stale DB row never

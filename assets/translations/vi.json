@@ -306,5 +306,58 @@
     "error_message": "Đã xảy ra lỗi khi đọc dữ liệu.",
     "retry": "Thử lại",
     "heatmap_cell": "Ngày {0}/{1}: {2}/{3} đã thắp"
+  },
+  "onboarding": {
+    "skip": "Bỏ qua",
+    "picker": {
+      "step": "BƯỚC 2/3",
+      "overline_step": "BƯỚC 2 TRÊN 3",
+      "overline_label": "Khởi tạo nền tảng",
+      "title": "Bắt đầu với sự tinh gọn",
+      "subtitle": "Chọn từ 1 đến 3 thói quen mẫu để kiến tạo chu kỳ tích cực. Mọi mục tiêu đều có thể tinh chỉnh sau này.",
+      "category_all": "Tất cả",
+      "category_health": "Sức khỏe",
+      "category_mind": "Tâm trí",
+      "category_discipline": "Kỷ luật",
+      "category_energy": "Năng lượng",
+      "create_custom": "Tự tạo thói quen theo ý bạn",
+      "selected_count": "ĐÃ CHỌN: {} / {} THÓI QUEN",
+      "recommended": "Khuyên dùng 1-3",
+      "continue": "Tiếp tục thiết lập ({})",
+      "helper": "Bạn hoàn toàn tự do xóa bỏ hoặc bổ sung thói quen trong tương lai.",
+      "max_reached": "Bạn có thể chọn tối đa {} thói quen. Bỏ chọn một thói quen để đổi."
+    },
+    "templates": {
+      "water": {
+        "title": "Uống 500ml nước ấm",
+        "description": "Mỗi sáng khi thức dậy",
+        "tag": "Dễ thực hiện",
+        "duration": "5 phút"
+      },
+      "sleep": {
+        "title": "Ngủ sâu trước 23:00",
+        "description": "Tái tạo năng lượng và phục hồi làn da",
+        "tag": "Cốt lõi",
+        "duration": "Hằng ngày"
+      },
+      "reading": {
+        "title": "Đọc sách 15 phút",
+        "description": "Mở rộng chiều sâu tư duy và tĩnh tâm",
+        "tag": "Tâm trí",
+        "duration": "15 phút"
+      },
+      "move": {
+        "title": "Vận động nhẹ 10 phút",
+        "description": "Giãn cơ sảng khoái vào buổi sáng",
+        "tag": "Thể chất",
+        "duration": "10 phút"
+      },
+      "gratitude": {
+        "title": "Viết 3 điều biết ơn",
+        "description": "Nuôi dưỡng trạng thái tích cực bền vững",
+        "tag": "Cảm xúc",
+        "duration": "3 phút"
+      }
+    }
   }
 }

@@ -306,5 +306,58 @@
     "error_message": "データの読み取り中にエラーが発生しました。",
     "retry": "再試行",
     "heatmap_cell": "{0}/{1}日: {2}/{3} 点灯"
+  },
+  "onboarding": {
+    "skip": "スキップ",
+    "picker": {
+      "step": "ステップ 2/3",
+      "overline_step": "ステップ 2 / 3",
+      "overline_label": "土台づくり",
+      "title": "シンプルに始める",
+      "subtitle": "テンプレートから1〜3個の習慣を選んで、良いリズムを作りましょう。目標はあとからいつでも調整できます。",
+      "category_all": "すべて",
+      "category_health": "健康",
+      "category_mind": "こころ",
+      "category_discipline": "規律",
+      "category_energy": "エネルギー",
+      "create_custom": "自分で習慣を作る",
+      "selected_count": "選択中: {} / {} 件",
+      "recommended": "おすすめ 1〜3件",
+      "continue": "設定を続ける ({})",
+      "helper": "習慣はあとからいつでも削除・追加できます。",
+      "max_reached": "選べる習慣は最大{}件です。入れ替えるには選択を外してください。"
+    },
+    "templates": {
+      "water": {
+        "title": "白湯を500ml飲む",
+        "description": "毎朝、起きてすぐに",
+        "tag": "手軽",
+        "duration": "5分"
+      },
+      "sleep": {
+        "title": "23:00までに寝る",
+        "description": "エネルギーを回復し、体を整える",
+        "tag": "基本",
+        "duration": "毎日"
+      },
+      "reading": {
+        "title": "15分読書する",
+        "description": "思考を深め、心を落ち着かせる",
+        "tag": "こころ",
+        "duration": "15分"
+      },
+      "move": {
+        "title": "10分軽く体を動かす",
+        "description": "朝のすっきりストレッチ",
+        "tag": "体",
+        "duration": "10分"
+      },
+      "gratitude": {
+        "title": "感謝を3つ書く",
+        "description": "前向きな気持ちを育てる",
+        "tag": "感情",
+        "duration": "3分"
+      }
+    }
   }
 }

@@ -501,7 +501,7 @@ Tick `[x]` when an issue is done.
     - Footer: shield icon + "Không yêu cầu đăng ký phức tạp · Mặc định bảo mật" (mono, muted).
     - Widget test: renders, CTA navigates, skip works.
 
-- [ ] **STX-U021**: Onboarding flow — template picker (`chon_thoi_quen_mau`)
+- [x] **STX-U021**: Onboarding flow — template picker (`chon_thoi_quen_mau`)
   - _Must-have · kind:feature · depends on: STX-U020_
   - Design: `docs/app_ui_redesign/chon_thoi_quen_mau/{code.html,screen.png}`
   - Acceptance criteria:

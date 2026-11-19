@@ -306,5 +306,58 @@
     "error_message": "Đã xảy ra lỗi khi đọc dữ liệu.",
     "retry": "Thử lại",
     "heatmap_cell": "Day {0}/{1}: {2}/{3} lit"
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "picker": {
+      "step": "STEP 2/3",
+      "overline_step": "STEP 2 OF 3",
+      "overline_label": "Lay the foundation",
+      "title": "Start simple",
+      "subtitle": "Pick 1 to 3 starter habits to build a steady rhythm. You can fine-tune every goal later.",
+      "category_all": "All",
+      "category_health": "Health",
+      "category_mind": "Mind",
+      "category_discipline": "Discipline",
+      "category_energy": "Energy",
+      "create_custom": "Create your own habit",
+      "selected_count": "SELECTED: {} / {} HABITS",
+      "recommended": "Recommended 1-3",
+      "continue": "Continue setup ({})",
+      "helper": "You can remove or add habits any time later.",
+      "max_reached": "You can pick up to {} habits. Deselect one to swap."
+    },
+    "templates": {
+      "water": {
+        "title": "Drink 500ml of warm water",
+        "description": "Every morning after waking up",
+        "tag": "Easy",
+        "duration": "5 min"
+      },
+      "sleep": {
+        "title": "Sleep before 23:00",
+        "description": "Restore your energy and recover overnight",
+        "tag": "Core",
+        "duration": "Daily"
+      },
+      "reading": {
+        "title": "Read for 15 minutes",
+        "description": "Deepen your thinking and calm your mind",
+        "tag": "Mind",
+        "duration": "15 min"
+      },
+      "move": {
+        "title": "Move gently for 10 minutes",
+        "description": "A refreshing morning stretch",
+        "tag": "Body",
+        "duration": "10 min"
+      },
+      "gratitude": {
+        "title": "Write 3 things you are grateful for",
+        "description": "Nurture a lasting positive outlook",
+        "tag": "Feelings",
+        "duration": "3 min"
+      }
+    }
   }
 }
