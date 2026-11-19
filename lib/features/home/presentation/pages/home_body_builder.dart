@@ -29,6 +29,7 @@ class HomeBodyBuilder extends StatelessWidget {
     required this.onJumpToTodayPressed,
     required this.onPreviousYearPressed,
     required this.onNextYearPressed,
+    required this.onProfilePressed,
     required this.onToggleCompletionPressed,
     super.key,
   });
@@ -50,6 +51,7 @@ class HomeBodyBuilder extends StatelessWidget {
   final VoidCallback onJumpToTodayPressed;
   final VoidCallback onPreviousYearPressed;
   final VoidCallback onNextYearPressed;
+  final VoidCallback? onProfilePressed;
   final VoidCallback onToggleCompletionPressed;
 
   @override
@@ -98,6 +100,7 @@ class HomeBodyBuilder extends StatelessWidget {
       onJumpToTodayPressed: onJumpToTodayPressed,
       onPreviousYearPressed: onPreviousYearPressed,
       onNextYearPressed: onNextYearPressed,
+      onProfilePressed: onProfilePressed,
       onToggleCompletionPressed: onToggleCompletionPressed,
       isCheckingIn: state.completionStatus == AsyncStatus.inProgress,
       completionSuccessAnimationToken:

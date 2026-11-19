@@ -278,7 +278,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic U-C - Habits Tab (Home)
 
-- [ ] **STX-U007**: Restyle the Habits (home) screen to `trang_chu`
+- [x] **STX-U007**: Restyle the Habits (home) screen to `trang_chu`
   - _Must-have · kind:feature · depends on: STX-U004, STX-U006_
   - Design: `docs/app_ui_redesign/trang_chu/{code.html,screen.png}`
   - Acceptance criteria:

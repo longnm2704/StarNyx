@@ -199,6 +199,7 @@ class _HomePageState extends State<HomePage> {
                   _homeBloc.add(HomeYearChanged(state.viewedYear - 1)),
               onNextYearPressed: () =>
                   _homeBloc.add(HomeYearChanged(state.viewedYear + 1)),
+              onProfilePressed: widget._onSettingsPressed,
               onToggleCompletionPressed: () =>
                   _homeBloc.add(const HomeCompletionToggled()),
             );

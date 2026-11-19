@@ -58,6 +58,7 @@ void main() {
           onNextYearPressed: () {
             nextYearPressed = true;
           },
+          onProfilePressed: () {},
           onToggleCompletionPressed: () {
             checkInPressed = true;
           },
@@ -76,21 +77,39 @@ void main() {
     expect(find.text('Swipe up for tools'), findsNothing);
     expect(find.text('Habit Deck'), findsNothing);
 
+    await tester.ensureVisible(
+      find.byKey(const Key('home-selected-date-button')),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('home-selected-date-button')));
     await tester.pump();
     expect(checkInPressed, isTrue);
+    await tester.ensureVisible(
+      find.byKey(const Key('home-previous-day-button')),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('home-previous-day-button')));
     await tester.pump();
     expect(previousPressed, isTrue);
+    await tester.ensureVisible(find.byKey(const Key('home-next-day-button')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('home-next-day-button')));
     await tester.pump();
     expect(nextPressed, isTrue);
+    await tester.ensureVisible(find.byKey(const Key('home-jump-today-button')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('home-jump-today-button')));
     await tester.pump();
     expect(jumpTodayPressed, isTrue);
+    await tester.ensureVisible(
+      find.byKey(const Key('home-previous-year-button')),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('home-previous-year-button')));
     await tester.pump();
     expect(previousYearPressed, isTrue);
+    await tester.ensureVisible(find.byKey(const Key('home-next-year-button')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('home-next-year-button')));
     await tester.pump();
     expect(nextYearPressed, isFalse);

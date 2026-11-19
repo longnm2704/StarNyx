@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
-import 'package:starnyx/core/widgets/core_widgets.dart';
+import 'package:starnyx/core/widgets/app_icon.dart';
 
 class HomeYearSummaryRow extends StatelessWidget {
   const HomeYearSummaryRow({
@@ -31,97 +31,87 @@ class HomeYearSummaryRow extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final isCompact = constraints.maxWidth < 320;
+        final textScale = MediaQuery.textScalerOf(context).scale(12) / 12;
+        final isCompact = constraints.maxWidth < 340 || textScale > 1.35;
 
         if (isCompact) {
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: yearControl,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Flexible(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: daysLeftLabel,
-                    ),
-                  ),
-                ],
-              ),
+              Center(child: yearControl),
               const SizedBox(height: AppSpacing.xs),
-              Center(child: jumpToTodayButton),
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.xxs,
+                children: <Widget>[jumpToTodayButton, daysLeftLabel],
+              ),
             ],
           );
         }
 
-        return Row(
-          children: <Widget>[
-            Expanded(
-              child: Align(alignment: Alignment.centerLeft, child: yearControl),
-            ),
-            const SizedBox(width: AppSpacing.xs),
-            Center(child: jumpToTodayButton),
-            const SizedBox(width: AppSpacing.xs),
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: daysLeftLabel,
+        return Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.pageHorizontal,
+          ),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: yearControl,
+                ),
               ),
-            ),
-          ],
+              jumpToTodayButton,
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: daysLeftLabel,
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
   }
 
   Widget _buildYearControl(ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLevel2.withValues(alpha: 0.52),
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-        border: Border.all(
-          color: AppColors.borderFocus.withValues(alpha: 0.16),
+    final yearStyle = theme.textTheme.labelMedium?.copyWith(
+      color: AppColors.textPrimary,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.8,
+    );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        _YearChevronButton(
+          buttonKey: const Key('home-previous-year-button'),
+          icon: HugeIconsStrokeRounded.strokeRoundedChevronLeft,
+          onPressed: onPreviousYearPressed,
         ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          _YearChevronButton(
-            buttonKey: const Key('home-previous-year-button'),
-            icon: HugeIconsStrokeRounded.strokeRoundedChevronLeft,
-            onPressed: onPreviousYearPressed,
-          ),
-          SizedBox(
-            width: 44,
-            child: Center(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  key: const Key('home-viewed-year-label'),
-                  viewedYear.toString(),
-                  maxLines: 1,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textPrimary.withValues(alpha: 0.82),
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
+        SizedBox(
+          width: 48,
+          child: Center(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                key: const Key('home-viewed-year-label'),
+                viewedYear.toString(),
+                maxLines: 1,
+                style: yearStyle,
               ),
             ),
           ),
-          _YearChevronButton(
-            buttonKey: const Key('home-next-year-button'),
-            icon: HugeIconsStrokeRounded.strokeRoundedChevronRight,
-            onPressed: onNextYearPressed,
-          ),
-        ],
-      ),
+        ),
+        _YearChevronButton(
+          buttonKey: const Key('home-next-year-button'),
+          icon: HugeIconsStrokeRounded.strokeRoundedChevronRight,
+          onPressed: onNextYearPressed,
+        ),
+      ],
     );
   }
 
@@ -132,14 +122,15 @@ class HomeYearSummaryRow extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadius.pill),
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.xs,
-          vertical: AppSpacing.xxs,
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xxs + 2,
         ),
         child: Text(
           'home.reset_current_date'.tr(),
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: accentColor.withValues(alpha: 0.96),
-            fontWeight: FontWeight.w700,
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: accentColor,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.6,
           ),
         ),
       ),
@@ -147,30 +138,39 @@ class HomeYearSummaryRow extends StatelessWidget {
   }
 
   Widget _buildDaysLeftLabel(ThemeData theme) {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      alignment: Alignment.centerRight,
-      child: Text.rich(
-        textAlign: TextAlign.right,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        TextSpan(
-          children: <TextSpan>[
-            TextSpan(
-              text: '$daysLeft ',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: accentColor.withValues(alpha: 0.95),
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            TextSpan(
-              text: 'home.days_left_suffix'.tr(),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.textPrimary.withValues(alpha: 0.78),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
+    final numberStyle = theme.textTheme.labelMedium?.copyWith(
+      color: accentColor,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 0.4,
+    );
+    final suffixStyle = theme.textTheme.labelMedium?.copyWith(
+      color: AppColors.textPrimary.withValues(alpha: 0.78),
+      fontWeight: FontWeight.w500,
+      letterSpacing: 0.2,
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xxs + 2,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLevel1.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerRight,
+        child: Text.rich(
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          TextSpan(
+            children: <TextSpan>[
+              TextSpan(text: '$daysLeft ', style: numberStyle),
+              TextSpan(text: 'home.days_left_suffix'.tr(), style: suffixStyle),
+            ],
+          ),
         ),
       ),
     );
@@ -178,7 +178,7 @@ class HomeYearSummaryRow extends StatelessWidget {
 }
 
 class _YearChevronButton extends StatelessWidget {
-  static const double _buttonSize = 36;
+  static const double _buttonSize = 28;
 
   const _YearChevronButton({
     required this.buttonKey,
@@ -192,8 +192,8 @@ class _YearChevronButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = AppColors.textPrimary.withValues(
-      alpha: onPressed == null ? 0.3 : 0.6,
+    final color = AppColors.textSecondary.withValues(
+      alpha: onPressed == null ? 0.3 : 1,
     );
 
     return Material(
@@ -201,7 +201,7 @@ class _YearChevronButton extends StatelessWidget {
       child: InkWell(
         key: buttonKey,
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(AppRadius.pill),
+        customBorder: const CircleBorder(),
         child: SizedBox(
           width: _buttonSize,
           height: _buttonSize,

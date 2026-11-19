@@ -63,66 +63,146 @@ class _HomeLoadingViewState extends State<HomeLoadingView>
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: AppLayout.contentMaxWidth,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: AppLayout.contentMaxWidth,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.pageHorizontal,
+              AppSpacing.md,
+              AppSpacing.pageHorizontal,
+              0,
             ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.pageHorizontal,
-                AppSpacing.md,
-                AppSpacing.pageHorizontal,
-                0,
-              ),
-              child: Column(
-                children: <Widget>[
-                  const SizedBox(height: AppSpacing.sm),
-                  _LoadingPill(
-                    animation: _controller,
-                    width: 172,
-                    height: 28,
-                    color: widget.accentColor,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  _LoadingPill(
-                    animation: _controller,
-                    width: 118,
-                    height: 14,
-                    color: widget.accentColor,
-                    opacity: 0.18,
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  Expanded(
+            child: Column(
+              children: <Widget>[
+                _LoadingAppBar(
+                  animation: _controller,
+                  accentColor: widget.accentColor,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _LoadingHeader(
+                  animation: _controller,
+                  accentColor: widget.accentColor,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceLevel1,
+                      borderRadius: BorderRadius.circular(AppRadius.card),
+                      border: Border.all(color: AppColors.borderSubtle),
+                    ),
                     child: _LoadingStarGrid(
                       animation: _controller,
                       accentColor: widget.accentColor,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  _LoadingYearRow(
-                    animation: _controller,
-                    color: widget.accentColor,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _LoadingDateBar(
-                    animation: _controller,
-                    color: widget.accentColor,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  _LoadingPill(
-                    animation: _controller,
-                    width: 152,
-                    height: 14,
-                    color: widget.accentColor,
-                    opacity: 0.16,
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                ],
-              ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _LoadingYearRow(
+                  animation: _controller,
+                  color: widget.accentColor,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _LoadingDateBar(
+                  animation: _controller,
+                  color: widget.accentColor,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                _LoadingPill(
+                  animation: _controller,
+                  width: 152,
+                  height: 14,
+                  color: widget.accentColor,
+                  opacity: 0.16,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _LoadingAppBar extends StatelessWidget {
+  const _LoadingAppBar({required this.animation, required this.accentColor});
+
+  final Animation<double> animation;
+  final Color accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: accentColor.withValues(alpha: 0.72),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        _LoadingPill(
+          animation: animation,
+          width: 96,
+          height: 20,
+          color: accentColor,
+          opacity: 0.14,
+        ),
+        const Spacer(),
+        _LoadingCircle(animation: animation, color: accentColor, size: 36),
+      ],
+    );
+  }
+}
+
+class _LoadingHeader extends StatelessWidget {
+  const _LoadingHeader({required this.animation, required this.accentColor});
+
+  final Animation<double> animation;
+  final Color accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.surfaceLevel1,
+            border: Border.all(color: accentColor.withValues(alpha: 0.16)),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: accentColor.withValues(alpha: 0.2),
+                blurRadius: 26,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        _LoadingPill(
+          animation: animation,
+          width: 168,
+          height: 28,
+          color: accentColor,
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        _LoadingPill(
+          animation: animation,
+          width: 118,
+          height: 14,
+          color: accentColor,
+          opacity: 0.18,
+        ),
+      ],
     );
   }
 }
@@ -133,7 +213,7 @@ class _LoadingStarGrid extends StatelessWidget {
   final Animation<double> animation;
   final Color accentColor;
 
-  static const double _gridSpacing = 4;
+  static const double _gridSpacing = 3;
 
   @override
   Widget build(BuildContext context) {

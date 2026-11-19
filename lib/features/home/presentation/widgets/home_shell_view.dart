@@ -7,22 +7,13 @@ import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/entities/starnyx_progress_stats.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
+import 'home_app_bar.dart';
 import 'home_star_grid.dart';
 import 'selected_date_bar.dart';
 import 'home_year_summary_row.dart';
 
 export 'home_grid_utils.dart'
     show homeGridColumnCount, homeGridDateForIndex, homeGridDayCountForYear;
-
-List<Color> homeShellGradientColors(String starnyxHex) {
-  final Color accent = starnyxColorFromHex(starnyxHex);
-  return <Color>[
-    Color.lerp(accent, AppColors.black, 0.18)!,
-    Color.lerp(accent, AppColors.black, 0.52)!,
-    Color.lerp(accent, AppColors.black, 0.88)!,
-    AppColors.black,
-  ];
-}
 
 Color homeShellAccentColor(String starnyxHex) {
   return starnyxColorFromHex(starnyxHex);
@@ -56,6 +47,7 @@ class HomeShellView extends StatelessWidget {
     required this.onDateSelected,
     required this.onPreviousYearPressed,
     required this.onNextYearPressed,
+    required this.onProfilePressed,
     this.onToggleCompletionPressed,
     this.isCheckingIn = false,
     this.completionSuccessAnimationToken,
@@ -74,6 +66,7 @@ class HomeShellView extends StatelessWidget {
   final ValueChanged<DateTime>? onDateSelected;
   final VoidCallback? onPreviousYearPressed;
   final VoidCallback? onNextYearPressed;
+  final VoidCallback? onProfilePressed;
   final VoidCallback? onToggleCompletionPressed;
   final bool isCheckingIn;
   final int? completionSuccessAnimationToken;
@@ -94,7 +87,6 @@ class HomeShellView extends StatelessWidget {
     final currentStreak = progressStats?.currentStreak ?? 0;
     final longestStreak = progressStats?.longestStreak ?? 0;
     final completionRateForYear = progressStats?.completionRateForYear ?? 0.0;
-    final gradientColors = homeShellGradientColors(activeStarnyx.color);
     final accentColor = homeShellAccentColor(activeStarnyx.color);
     final normalizedSelected = DateTime.utc(
       selectedDate.year,
@@ -109,142 +101,262 @@ class HomeShellView extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: gradientColors,
-          stops: const <double>[0.0, 0.26, 0.54, 1.0],
+        gradient: RadialGradient(
+          center: const Alignment(0, -0.82),
+          radius: 1.08,
+          colors: <Color>[
+            accentColor.withValues(alpha: 0.16),
+            AppColors.background,
+          ],
+          stops: const <double>[0.0, 0.68],
         ),
       ),
-      child: Stack(
-        children: <Widget>[
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(0, -0.82),
-                  radius: 1.02,
-                  colors: <Color>[
-                    accentColor.withValues(alpha: 0.24),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: AppLayout.contentMaxWidth,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.pageHorizontal,
-                    AppSpacing.md,
-                    AppSpacing.pageHorizontal,
-                    0,
+      child: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  // Search is intentionally omitted until the habit-list
+                  // screen (STX-U008) can provide real filter results, rather
+                  // than shipping a dead app-bar action.
+                  HomeAppBar(onProfilePressed: onProfilePressed),
+                  _Header(
+                    activeStarnyx: activeStarnyx,
+                    accentColor: accentColor,
                   ),
-                  child: Column(
-                    children: <Widget>[
-                      const SizedBox(height: AppSpacing.sm),
-                      AppIcon(
-                        icon: HabitSymbols.iconFor(activeStarnyx.icon),
-                        color: accentColor,
-                        size: 40,
-                        strokeWidth: 2,
-                        semanticsLabel: 'home.header_semantics'.tr(
-                          args: <String>[activeStarnyx.title],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        activeStarnyx.title,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 28,
-                          letterSpacing: -0.7,
-                        ),
-                      ),
-                      if ((activeStarnyx.description ?? '')
-                          .trim()
-                          .isNotEmpty) ...<Widget>[
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          activeStarnyx.description!,
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textPrimary.withValues(alpha: 0.7),
-                            fontWeight: FontWeight.w600,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.pageHorizontal,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceLevel1,
+                        borderRadius: BorderRadius.circular(AppRadius.card),
+                        border: Border.all(color: AppColors.borderSubtle),
+                        boxShadow: <BoxShadow>[
+                          BoxShadow(
+                            color: AppColors.black.withValues(alpha: 0.6),
+                            blurRadius: 32,
+                            offset: const Offset(0, 8),
                           ),
-                        ),
-                      ],
-                      const SizedBox(height: AppSpacing.xl),
-                      Expanded(
-                        child: HomeStarGrid(
-                          viewedYear: viewedYear,
-                          selectedDate: selectedDate,
-                          todayDate: todayDate,
-                          startDate: activeStarnyx.startDate,
-                          completedDatesForViewedYear:
-                              completedDatesForViewedYear,
-                          accentColor: accentColor,
-                          symbolKey: activeStarnyx.icon,
-                          onDateSelected: onDateSelected,
-                          completionSuccessAnimationToken:
-                              completionSuccessAnimationToken,
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      HomeYearSummaryRow(
+                      child: HomeStarGrid(
                         viewedYear: viewedYear,
-                        daysLeft: daysLeft,
-                        accentColor: accentColor,
-                        onPreviousYearPressed: onPreviousYearPressed,
-                        onNextYearPressed: onNextYearPressed,
-                        onJumpToTodayPressed: onJumpToTodayPressed,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      SelectedDateBar(
-                        selectedDateLabel: selectedDateLabel,
-                        onPreviousDayPressed: onPreviousDayPressed,
-                        onNextDayPressed: onNextDayPressed,
+                        selectedDate: selectedDate,
+                        todayDate: todayDate,
+                        startDate: activeStarnyx.startDate,
+                        completedDatesForViewedYear:
+                            completedDatesForViewedYear,
                         accentColor: accentColor,
                         symbolKey: activeStarnyx.icon,
-                        isLit: isLit,
-                        onSelectedDatePressed: onToggleCompletionPressed,
-                        isCheckingIn: isCheckingIn,
+                        onDateSelected: onDateSelected,
+                        completionSuccessAnimationToken:
+                            completionSuccessAnimationToken,
                       ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        'home.summary_stats'.tr(
-                          args: <String>[
-                            totalCompleted.toString(),
-                            currentStreak.toString(),
-                            longestStreak.toString(),
-                            (completionRateForYear * 100).round().toString(),
-                          ],
-                        ),
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textPrimary.withValues(alpha: 0.64),
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
+                  const SizedBox(height: AppSpacing.md),
+                  HomeYearSummaryRow(
+                    viewedYear: viewedYear,
+                    daysLeft: daysLeft,
+                    accentColor: accentColor,
+                    onPreviousYearPressed: onPreviousYearPressed,
+                    onNextYearPressed: onNextYearPressed,
+                    onJumpToTodayPressed: onJumpToTodayPressed,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.pageHorizontal,
+                    ),
+                    child: SelectedDateBar(
+                      selectedDateLabel: selectedDateLabel,
+                      onPreviousDayPressed: onPreviousDayPressed,
+                      onNextDayPressed: onNextDayPressed,
+                      accentColor: accentColor,
+                      symbolKey: activeStarnyx.icon,
+                      isLit: isLit,
+                      onSelectedDatePressed: onToggleCompletionPressed,
+                      isCheckingIn: isCheckingIn,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.pageHorizontal,
+                    ),
+                    child: _StatsPill(
+                      totalCompleted: totalCompleted,
+                      currentStreak: currentStreak,
+                      longestStreak: longestStreak,
+                      completionRate: completionRateForYear,
+                      accentColor: accentColor,
+                      style: theme.textTheme.labelSmall,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header({required this.activeStarnyx, required this.accentColor});
+
+  final StarNyx activeStarnyx;
+  final Color accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.pageHorizontal,
+        AppSpacing.md,
+        AppSpacing.pageHorizontal,
+        AppSpacing.lg,
+      ),
+      child: Column(
+        children: <Widget>[
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.surfaceLevel1,
+              border: Border.all(color: accentColor.withValues(alpha: 0.22)),
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: accentColor.withValues(alpha: 0.35),
+                  blurRadius: 30,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Center(
+              child: AppIcon(
+                icon: HabitSymbols.iconFor(activeStarnyx.icon),
+                color: accentColor,
+                size: 30,
+                strokeWidth: 2,
+                semanticsLabel: 'home.header_semantics'.tr(
+                  args: <String>[activeStarnyx.title],
                 ),
               ),
             ),
           ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            activeStarnyx.title,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.headlineLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          if (activeStarnyx.hasDescription) ...<Widget>[
+            const SizedBox(height: AppSpacing.xxs),
+            Text(
+              activeStarnyx.description!,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: accentColor.withValues(alpha: 0.9),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _StatsPill extends StatelessWidget {
+  const _StatsPill({
+    required this.totalCompleted,
+    required this.currentStreak,
+    required this.longestStreak,
+    required this.completionRate,
+    required this.accentColor,
+    required this.style,
+  });
+
+  final int totalCompleted;
+  final int currentStreak;
+  final int longestStreak;
+  final double completionRate;
+  final Color accentColor;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) {
+    final baseStyle = style?.copyWith(
+      height: 16 / 12,
+      color: AppColors.textSecondary,
+      fontWeight: FontWeight.w500,
+    );
+    final rateStyle = baseStyle?.copyWith(
+      color: accentColor,
+      fontWeight: FontWeight.w700,
+    );
+    final separator = Text('·', style: baseStyle);
+
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xxs + 2,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceLevel1.withValues(alpha: 0.72),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          border: Border.all(color: AppColors.borderSubtle),
+        ),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: AppSpacing.xs,
+          runSpacing: 2,
+          children: <Widget>[
+            Text(
+              'home.stats_days_lit'.tr(
+                args: <String>[totalCompleted.toString()],
+              ),
+              style: baseStyle,
+            ),
+            separator,
+            Text(
+              'home.stats_streak'.tr(args: <String>[currentStreak.toString()]),
+              style: baseStyle,
+            ),
+            separator,
+            Text(
+              'home.stats_best'.tr(args: <String>[longestStreak.toString()]),
+              style: baseStyle,
+            ),
+            separator,
+            Text(
+              'home.stats_rate'.tr(
+                args: <String>[(completionRate * 100).round().toString()],
+              ),
+              style: rateStyle,
+            ),
+          ],
+        ),
       ),
     );
   }

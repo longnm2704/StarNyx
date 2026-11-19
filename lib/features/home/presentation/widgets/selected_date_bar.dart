@@ -38,11 +38,11 @@ class SelectedDateBar extends StatelessWidget {
     final bool canShowActiveState = onSelectedDatePressed != null;
     final bool canTap = canShowActiveState && !isCheckingIn;
     final Color topColor = canShowActiveState
-        ? Color.lerp(accentColor, AppColors.sheet, 0.72)!
-        : AppColors.surfaceLevel2.withValues(alpha: 0.5);
+        ? Color.lerp(AppColors.surfaceLevel2, accentColor, 0.12)!
+        : AppColors.surfaceLevel1.withValues(alpha: 0.6);
     final Color bottomColor = canShowActiveState
-        ? Color.lerp(accentColor, AppColors.black, 0.88)!
-        : AppColors.surfaceLevel2.withValues(alpha: 0.28);
+        ? Color.lerp(AppColors.surfaceLevel1, accentColor, 0.04)!
+        : AppColors.surfaceLevel1.withValues(alpha: 0.4);
     final iconData = HabitSymbols.iconFor(symbolKey);
     final actionText = isLit
         ? 'home.checkin_lit'.tr()
@@ -50,6 +50,7 @@ class SelectedDateBar extends StatelessWidget {
     final actionSemantics = isLit
         ? 'home.checkin_lit_semantics'.tr()
         : 'home.checkin_light_today_semantics'.tr();
+    final textOpacity = canShowActiveState ? 1.0 : 0.34;
 
     return Row(
       children: <Widget>[
@@ -58,7 +59,7 @@ class SelectedDateBar extends StatelessWidget {
           buttonKey: const Key('home-previous-day-button'),
           onPressed: onPreviousDayPressed,
         ),
-        const SizedBox(width: AppSpacing.md),
+        const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: Material(
             color: Colors.transparent,
@@ -67,7 +68,11 @@ class SelectedDateBar extends StatelessWidget {
               onTap: canTap ? onSelectedDatePressed : null,
               borderRadius: BorderRadius.circular(AppRadius.pill),
               child: Container(
-                height: 52,
+                constraints: const BoxConstraints(minHeight: 56),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.xs,
+                ),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -78,75 +83,66 @@ class SelectedDateBar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                   border: Border.all(
                     color: canShowActiveState
-                        ? accentColor.withValues(alpha: 0.28)
-                        : AppColors.borderFocus.withValues(alpha: 0.12),
+                        ? accentColor.withValues(alpha: 0.24)
+                        : AppColors.borderSubtle,
                   ),
                   boxShadow: <BoxShadow>[
                     if (canShowActiveState)
                       BoxShadow(
-                        color: AppColors.black.withValues(alpha: 0.24),
-                        blurRadius: 18,
-                        offset: const Offset(0, 10),
+                        color: accentColor.withValues(alpha: 0.12),
+                        blurRadius: 24,
+                        spreadRadius: 1,
                       ),
                   ],
                 ),
                 child: Semantics(
                   label: actionSemantics,
                   button: canTap,
-                  child: Row(
+                  child: Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Flexible(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              selectedDateLabel,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: AppColors.textPrimary.withValues(
-                                  alpha: canShowActiveState ? 0.88 : 0.34,
+                      Text(
+                        selectedDateLabel,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontFamily: AppFonts.headline,
+                          color: AppColors.textPrimary.withValues(
+                            alpha: textOpacity,
+                          ),
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.2,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          AppIcon(
+                            icon: iconData,
+                            color: accentColor.withValues(
+                              alpha: canShowActiveState ? 0.92 : 0.34,
+                            ),
+                            size: 14,
+                            strokeWidth: 2,
+                          ),
+                          const SizedBox(width: AppSpacing.xxs),
+                          Flexible(
+                            child: Text(
+                              actionText,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: accentColor.withValues(
+                                  alpha: canShowActiveState ? 0.92 : 0.34,
                                 ),
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.2,
+                                fontWeight: FontWeight.w500,
                               ),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             ),
-                            const SizedBox(height: 2),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                AppIcon(
-                                  icon: iconData,
-                                  color: AppColors.textPrimary.withValues(
-                                    alpha: canShowActiveState ? 0.88 : 0.34,
-                                  ),
-                                  size: 16,
-                                  strokeWidth: 2,
-                                ),
-                                const SizedBox(width: 4),
-                                Flexible(
-                                  child: Text(
-                                    actionText,
-                                    style: theme.textTheme.bodySmall
-                                        ?.copyWith(
-                                      color: AppColors.textPrimary.withValues(
-                                        alpha:
-                                            canShowActiveState ? 0.88 : 0.34,
-                                      ),
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -155,7 +151,7 @@ class SelectedDateBar extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: AppSpacing.md),
+        const SizedBox(width: AppSpacing.sm),
         _DayChevronButton(
           icon: HugeIconsStrokeRounded.strokeRoundedChevronRight,
           buttonKey: const Key('home-next-day-button'),
@@ -179,31 +175,24 @@ class _DayChevronButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foreground = AppColors.textPrimary.withValues(
-      alpha: onPressed == null ? 0.22 : 0.72,
+    final foreground = AppColors.textSecondary.withValues(
+      alpha: onPressed == null ? 0.3 : 1,
     );
 
     return Material(
-      color: Colors.transparent,
+      color: AppColors.surfaceLevel1,
+      shape: const CircleBorder(
+        side: BorderSide(color: AppColors.borderSubtle),
+      ),
       child: InkWell(
         key: buttonKey,
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-        child: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: AppColors.surfaceLevel2.withValues(
-              alpha: onPressed == null ? 0.28 : 0.58,
-            ),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.borderFocus.withValues(
-                alpha: onPressed == null ? 0.08 : 0.18,
-              ),
-            ),
+        customBorder: const CircleBorder(),
+        child: SizedBox.square(
+          dimension: 48,
+          child: Center(
+            child: AppIcon(icon: icon, color: foreground, size: 22),
           ),
-          child: AppIcon(icon: icon, color: foreground, size: 24),
         ),
       ),
     );

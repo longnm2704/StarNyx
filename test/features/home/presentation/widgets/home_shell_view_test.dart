@@ -19,7 +19,7 @@ void main() {
   });
 
   testWidgets(
-    'home shell view renders the active constellation shell with bound title and footer data',
+    'home shell view renders the active habit shell with bound header and stats',
     (WidgetTester tester) async {
       await tester.pumpWidget(
         _buildLocalizedApp(
@@ -47,6 +47,7 @@ void main() {
             onDateSelected: (_) {},
             onPreviousYearPressed: () {},
             onNextYearPressed: () {},
+            onProfilePressed: () {},
           ),
         ),
       );
@@ -59,7 +60,12 @@ void main() {
       expect(find.text('257 days left'), findsOneWidget);
       expect(find.text('Today'), findsOneWidget);
       expect(find.text('Sunday, 19 Apr'), findsOneWidget);
-      expect(find.text('2 days lit · 0 in a row · 2 best · 16% rate'), findsOneWidget);
+      expect(find.text('2 days lit'), findsOneWidget);
+      expect(find.text('0 in a row'), findsOneWidget);
+      expect(find.text('2 best'), findsOneWidget);
+      expect(find.text('16% rate'), findsOneWidget);
+      expect(find.text('StarNyx'), findsOneWidget);
+      expect(find.byKey(const Key('home-profile-button')), findsOneWidget);
       expect(
         find.byWidgetPredicate(
           (Widget widget) =>
@@ -100,14 +106,6 @@ void main() {
   test('home grid day count returns 366 for leap years', () {
     expect(homeGridDayCountForYear(2024), 366);
     expect(homeGridDayCountForYear(2026), 365);
-  });
-
-  test('home shell gradient colors follow the active starnyx color', () {
-    final colors = homeShellGradientColors('#2360E9');
-
-    expect(colors.length, 4);
-    expect(colors.last, AppColors.black);
-    expect(colors.first, isNot(const Color(0xFFB45A21)));
   });
 
   test('home shell accent color follows the active starnyx color', () {
