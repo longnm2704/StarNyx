@@ -358,6 +358,26 @@
         "tag": "Feelings",
         "duration": "3 min"
       }
+    },
+    "welcome": {
+      "overline": "DAILY DISCIPLINE",
+      "title_lead": "Begin your ",
+      "title_emphasis": "journey.",
+      "subtitle": "Small steps every day — build steady resilience and take charge of your own life.",
+      "days_pill": "365 days",
+      "values_pill": "Minimal · Private · Offline",
+      "feature_grid_title": "365-day dot matrix",
+      "feature_grid_subtitle": "Light up each square as you stay consistent",
+      "feature_privacy_title": "Offline privacy",
+      "feature_privacy_subtitle": "Your habit data stays entirely on this device",
+      "feature_privacy_badge": "100% private",
+      "feature_reminder_title": "Gentle reminders",
+      "feature_reminder_subtitle": "Calm notifications that fit your daily rhythm",
+      "demo_hint": "Tap to feel what done is like",
+      "demo_done": "Lit for today",
+      "cta": "Create your first habit",
+      "restore": "Restore data",
+      "footer": "No sign-up required · Private by default"
     }
   }
 }

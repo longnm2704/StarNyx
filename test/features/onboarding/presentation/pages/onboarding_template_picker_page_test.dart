@@ -65,6 +65,8 @@ void main() {
     final card = find.byKey(Key('onboarding-template-$id'));
     await tester.scrollUntilVisible(card, 200, scrollable: _list);
     await tester.pumpAndSettle();
+    await tester.ensureVisible(card);
+    await tester.pumpAndSettle();
     await tester.tap(card);
     await tester.pumpAndSettle();
   }

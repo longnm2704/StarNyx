@@ -76,16 +76,29 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
             child: InkWell(
               borderRadius: BorderRadius.circular(AppRadius.pill),
               onTap: widget.onPressed,
-              child: SizedBox(
-                width: double.infinity,
-                height: widget.height,
-                child: Center(
-                  child: Text(
-                    widget.label,
-                    style: textTheme.titleMedium?.copyWith(
-                      color: labelColor,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.15,
+              // Min height so large text scales grow the pill instead of
+              // clipping the label.
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: double.infinity,
+                  minHeight: widget.height,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.xs,
+                  ),
+                  child: Center(
+                    widthFactor: 1,
+                    heightFactor: 1,
+                    child: Text(
+                      widget.label,
+                      textAlign: TextAlign.center,
+                      style: textTheme.titleMedium?.copyWith(
+                        color: labelColor,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.15,
+                      ),
                     ),
                   ),
                 ),

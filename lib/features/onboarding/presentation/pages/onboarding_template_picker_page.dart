@@ -141,6 +141,14 @@ class _OnboardingTemplatePickerPageState
                   ],
                   const SizedBox(height: AppSpacing.xs),
                   _CreateCustomRow(onTap: widget.onCreateCustom),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'onboarding.picker.helper'.tr(),
+                    style: textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               ),
             ),
@@ -549,14 +557,6 @@ class _Footer extends StatelessWidget {
               label:
                   '${'onboarding.picker.continue'.tr(args: <String>['$count'])} →',
               onPressed: onContinue,
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              'onboarding.picker.helper'.tr(),
-              style: textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),

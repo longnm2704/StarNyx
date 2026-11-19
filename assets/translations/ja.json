@@ -358,6 +358,26 @@
         "tag": "感情",
         "duration": "3分"
       }
+    },
+    "welcome": {
+      "overline": "毎日の積み重ね",
+      "title_lead": "さあ、",
+      "title_emphasis": "はじめよう。",
+      "subtitle": "毎日の小さな一歩が、続ける力と自分らしい暮らしを育てます。",
+      "days_pill": "365日",
+      "values_pill": "シンプル · プライベート · オフライン",
+      "feature_grid_title": "365日のドットマトリクス",
+      "feature_grid_subtitle": "続けるたびにマスがひとつずつ灯ります",
+      "feature_privacy_title": "オフラインで安心",
+      "feature_privacy_subtitle": "習慣データはすべてこの端末だけに保存されます",
+      "feature_privacy_badge": "100% プライベート",
+      "feature_reminder_title": "さりげないリマインダー",
+      "feature_reminder_subtitle": "生活のリズムに合わせたやさしい通知",
+      "demo_hint": "タップして達成の感覚を試してみましょう",
+      "demo_done": "今日の分が灯りました",
+      "cta": "最初の習慣を作る",
+      "restore": "データを復元",
+      "footer": "面倒な登録は不要 · 標準でプライベート"
     }
   }
 }

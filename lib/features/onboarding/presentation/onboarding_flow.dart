@@ -1,0 +1,91 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:starnyx/app/di/service_locator.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/features/onboarding/domain/onboarding_template.dart';
+import 'package:starnyx/features/onboarding/presentation/pages/onboarding_template_picker_page.dart';
+import 'package:starnyx/features/onboarding/presentation/pages/onboarding_welcome_page.dart';
+import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:starnyx/features/settings/presentation/pages/backup_page.dart';
+import 'package:starnyx/features/starnyx_form/presentation/pages/starnyx_form_page.dart';
+
+/// First-run onboarding: welcome (U020) → template picker (U021) → reminder
+/// setup (U022) → completion (U023).
+///
+/// Mount it from the app root (STX-U024). The flow owns a nested [Navigator],
+/// so every onboarding route goes away when this widget is unmounted.
+/// [onFinished] fires once the user leaves onboarding: skipped, restored a
+/// backup, saved a custom habit, or completed the flow.
+class OnboardingFlow extends StatefulWidget {
+  const OnboardingFlow({required this.onFinished, super.key});
+
+  final VoidCallback onFinished;
+
+  @override
+  State<OnboardingFlow> createState() => _OnboardingFlowState();
+}
+
+class _OnboardingFlowState extends State<OnboardingFlow> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+
+  NavigatorState get _navigator => _navigatorKey.currentState!;
+
+  void _openTemplatePicker() {
+    _navigator.push(
+      MaterialPageRoute<void>(
+        builder: (_) => OnboardingTemplatePickerPage(
+          onBack: _navigator.pop,
+          onSkip: widget.onFinished,
+          onCreateCustom: _createCustomHabit,
+          onContinue: _openReminderSetup,
+        ),
+      ),
+    );
+  }
+
+  // ponytail: STX-U022 replaces this with a push of the reminder setup page
+  // (which creates the habits, then pushes U023). Until then the picked
+  // templates just end onboarding.
+  void _openReminderSetup(List<OnboardingTemplate> templates) {
+    widget.onFinished();
+  }
+
+  Future<void> _createCustomHabit() async {
+    final result = await StarnyxFormPage.open(_navigatorKey.currentContext!);
+    if (result?.savedStarnyx != null) widget.onFinished();
+  }
+
+  // BackupPage pops `true` after an import (or delete-all) replaced local data.
+  Future<void> _restore() async {
+    final replaced = await _navigator.push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (routeContext) => BlocProvider<SettingsBloc>(
+          create: (_) => serviceLocator<SettingsBloc>(),
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            body: BackupPage(onBack: () => Navigator.of(routeContext).pop()),
+          ),
+        ),
+      ),
+    );
+    if (replaced ?? false) widget.onFinished();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return NavigatorPopHandler<Object?>(
+      onPopWithResult: (_) => _navigator.maybePop(),
+      child: Navigator(
+        key: _navigatorKey,
+        onGenerateRoute: (_) => MaterialPageRoute<void>(
+          builder: (_) => OnboardingWelcomePage(
+            onStart: _openTemplatePicker,
+            // Skip leaves onboarding with no habits (empty Habits tab).
+            onSkip: widget.onFinished,
+            onRestore: _restore,
+          ),
+        ),
+      ),
+    );
+  }
+}

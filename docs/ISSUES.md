@@ -481,7 +481,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic U-H - Onboarding
 
-- [ ] **STX-U020**: Onboarding flow — welcome screen (`chao_mung`)
+- [x] **STX-U020**: Onboarding flow — welcome screen (`chao_mung`)
   - _Must-have · kind:feature · depends on: STX-U004, STX-U006_
   - Design: `docs/app_ui_redesign/chao_mung/{code.html,screen.png}`
   - Acceptance criteria:

@@ -358,6 +358,26 @@
         "tag": "Cảm xúc",
         "duration": "3 phút"
       }
+    },
+    "welcome": {
+      "overline": "KỶ LUẬT MỖI NGÀY",
+      "title_lead": "Bắt đầu ",
+      "title_emphasis": "hành trình.",
+      "subtitle": "Từng bước nhỏ mỗi ngày — Vun đắp sự bền bỉ và làm chủ cuộc sống của chính bạn.",
+      "days_pill": "365 ngày",
+      "values_pill": "Tối giản · Riêng tư · Ngoại tuyến",
+      "feature_grid_title": "Ma trận điểm 365 ngày",
+      "feature_grid_subtitle": "Thắp sáng từng ô vuông theo tiến trình kiên định",
+      "feature_privacy_title": "Bảo mật ngoại tuyến",
+      "feature_privacy_subtitle": "Dữ liệu thói quen lưu cục bộ hoàn toàn trên máy",
+      "feature_privacy_badge": "100% Riêng tư",
+      "feature_reminder_title": "Nhắc nhở tinh tế",
+      "feature_reminder_subtitle": "Thông báo nhẹ nhàng đúng nhịp sinh học",
+      "demo_hint": "Chạm để thử cảm giác hoàn thành",
+      "demo_done": "Đã thắp sáng hôm nay",
+      "cta": "Tạo thói quen đầu tiên",
+      "restore": "Khôi phục dữ liệu",
+      "footer": "Không yêu cầu đăng ký phức tạp · Mặc định bảo mật"
     }
   }
 }
