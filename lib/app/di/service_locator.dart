@@ -52,6 +52,9 @@ void _registerCoreDependencies(SharedPreferences preferences) {
   serviceLocator.registerLazySingleton<ActiveStarnyxColorCache>(
     () => ActiveStarnyxColorCache(preferences),
   );
+  serviceLocator.registerLazySingleton<OnboardingPreferences>(
+    () => OnboardingPreferences(preferences),
+  );
   serviceLocator.registerLazySingleton<AppBlocObserver>(
     () => AppBlocObserver(serviceLocator<AppLogService>()),
   );
@@ -234,6 +237,7 @@ void _registerUseCases() {
       serviceLocator<AppDatabase>().clearAll,
       serviceLocator<SyncNotificationsUseCase>(),
       serviceLocator<ActiveStarnyxColorCache>(),
+      serviceLocator<OnboardingPreferences>(),
       logger: serviceLocator<AppLogService>(),
     ),
   );

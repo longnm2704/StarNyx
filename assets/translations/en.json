@@ -54,15 +54,6 @@
     "load_error_message": "Your local data couldn't be loaded. Try again in a moment.",
     "retry": "Retry"
   },
-  "welcome": {
-    "settings": "Settings",
-    "heart": "Heart",
-    "title_lead": "Welcome\n",
-    "title_emphasis": "back.",
-    "subtitle": "Start a new habit to keep in view.",
-    "primary_action": "New habit",
-    "pending_flow": "The habit form couldn't open right now."
-  },
   "starnyx_form": {
     "create_sheet_title": "New habit",
     "edit_sheet_title": "Edit habit",

@@ -54,15 +54,6 @@
     "load_error_message": "端末内のデータを読み込めませんでした。しばらくしてから再度お試しください。",
     "retry": "再試行"
   },
-  "welcome": {
-    "settings": "設定",
-    "heart": "お気に入り",
-    "title_lead": "おかえり\n",
-    "title_emphasis": "なさい。",
-    "subtitle": "続けたい習慣のために、新しい習慣をつくりましょう。",
-    "primary_action": "新しい習慣",
-    "pending_flow": "現在習慣フォームを開けません。"
-  },
   "starnyx_form": {
     "create_sheet_title": "新しい習慣",
     "edit_sheet_title": "習慣を編集",

@@ -103,10 +103,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     if (result?.savedStarnyx != null) widget.onFinished();
   }
 
-  // BackupPage pops `true` after an import (or delete-all) replaced local data.
+  // Only an import finishes onboarding; a delete-all leaves it running.
   Future<void> _restore() async {
-    final replaced = await _navigator.push<bool>(
-      MaterialPageRoute<bool>(
+    final outcome = await _navigator.push<BackupOutcome>(
+      MaterialPageRoute<BackupOutcome>(
         builder: (routeContext) => BlocProvider<SettingsBloc>(
           create: (_) => serviceLocator<SettingsBloc>(),
           child: Scaffold(
@@ -116,7 +116,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         ),
       ),
     );
-    if (replaced ?? false) widget.onFinished();
+    if (outcome == BackupOutcome.imported) widget.onFinished();
   }
 
   @override

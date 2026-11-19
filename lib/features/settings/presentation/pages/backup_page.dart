@@ -17,10 +17,14 @@ import 'package:starnyx/features/settings/presentation/bloc/settings_state.dart'
 
 const _danger = Color(0xFFDC2626);
 
+/// How the backup screen replaced local data; it pops with one of these.
+enum BackupOutcome { imported, deletedAll }
+
 /// Full-screen backup & export screen (`sao_luu_xuat_du_lieu`).
 ///
-/// Uses the [SettingsBloc] provided by the Settings tab. Pops with `true`
-/// after an import or delete-all replaced local data so the shell can reload.
+/// Uses the [SettingsBloc] provided by the Settings tab. Pops with a
+/// [BackupOutcome] after an import or delete-all replaced local data so the
+/// caller can reload (onboarding only finishes on an import).
 class BackupPage extends StatefulWidget {
   const BackupPage({required this.onBack, super.key});
 
@@ -54,7 +58,7 @@ class _BackupPageState extends State<BackupPage> {
             listener: (context, state) {
               if (state.importStatus == AsyncStatus.success) {
                 _showSnackBar(context, 'settings.import_success'.tr());
-                Navigator.of(context).pop(true);
+                Navigator.of(context).pop(BackupOutcome.imported);
               } else if (state.hasImportFailure) {
                 _showSnackBar(
                   context,
@@ -70,7 +74,7 @@ class _BackupPageState extends State<BackupPage> {
             listener: (context, state) {
               if (state.deleteAllStatus == AsyncStatus.success) {
                 _showSnackBar(context, 'settings.delete_all_success'.tr());
-                Navigator.of(context).pop(true);
+                Navigator.of(context).pop(BackupOutcome.deletedAll);
               } else if (state.deleteAllStatus == AsyncStatus.failure) {
                 _showSnackBar(
                   context,

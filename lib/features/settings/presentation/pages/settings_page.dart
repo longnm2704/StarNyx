@@ -73,10 +73,10 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   // Backup and about are full-screen routes sharing this page's bloc.
-  // The backup screen pops `true` when local data was replaced.
+  // The backup screen pops a [BackupOutcome] when local data was replaced.
   Future<void> _push(Widget Function(VoidCallback onBack) builder) async {
-    final replaced = await Navigator.of(context).push<bool>(
-      MaterialPageRoute<bool>(
+    final outcome = await Navigator.of(context).push<BackupOutcome>(
+      MaterialPageRoute<BackupOutcome>(
         builder: (routeContext) => BlocProvider<SettingsBloc>.value(
           value: _bloc,
           child: Scaffold(
@@ -88,7 +88,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
     if (!mounted) return;
     _bloc.add(const SettingsSummaryRequested());
-    if (replaced ?? false) widget.onDataReplaced?.call();
+    if (outcome != null) widget.onDataReplaced?.call();
   }
 
   @override

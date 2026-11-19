@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/features/home/presentation/bloc/home_state.dart';
 import 'package:starnyx/features/home/presentation/widgets/home_widgets.dart';
@@ -11,7 +14,9 @@ import 'home_screen_switcher.dart';
 ///
 /// - [HomeStatus.initial] / [HomeStatus.loading] → [HomeLoadingView]
 /// - [HomeStatus.failure]                        → [HomeErrorView]
-/// - loaded + empty list                         → [FirstRunWelcomeView]
+/// - loaded + empty list                         → [AppEmptyState] with a
+///   create CTA (first run goes through onboarding; this is for users who
+///   skipped it or deleted every habit)
 /// - loaded + non-empty list                     → [ActiveStarnyxHomeView]
 ///
 /// Passes the chosen child to [HomeScreenSwitcher] so transitions are always
@@ -82,10 +87,19 @@ class HomeBodyBuilder extends StatelessWidget {
     }
 
     if (state.starnyxs.isEmpty) {
-      return FirstRunWelcomeView(
-        key: const ValueKey<String>('first_run_view'),
-        onCreatePressed: onCreatePressed,
-        onSettingsPressed: onSettingsPressed,
+      return SafeArea(
+        key: const ValueKey<String>('empty_view'),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.pageHorizontal),
+            child: AppEmptyState(
+              title: 'habits.empty_title'.tr(),
+              message: 'habits.empty_message'.tr(),
+              actionLabel: 'habits.empty_action'.tr(),
+              onActionPressed: () => onCreatePressed?.call(),
+            ),
+          ),
+        ),
       );
     }
 

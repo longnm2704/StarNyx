@@ -51,9 +51,8 @@ void main() {
 
     clearCalls = 0;
     SharedPreferences.setMockInitialValues(<String, Object>{});
-    final colorCache = ActiveStarnyxColorCache(
-      await SharedPreferences.getInstance(),
-    );
+    final preferences = await SharedPreferences.getInstance();
+    final colorCache = ActiveStarnyxColorCache(preferences);
 
     bloc = SettingsBloc(
       exportDataUseCase: exportUseCase,
@@ -76,6 +75,7 @@ void main() {
         () async => clearCalls++,
         syncUseCase,
         colorCache,
+        OnboardingPreferences(preferences),
       ),
       loadStorageStats: () async => StorageStats(
         bytes: 4096,

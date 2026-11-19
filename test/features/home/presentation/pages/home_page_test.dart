@@ -6,7 +6,7 @@ import 'package:starnyx/domain/entities/domain_entities.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/features/home/presentation/pages/home_page.dart';
-import 'package:starnyx/features/home/presentation/widgets/first_run_welcome_view.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -16,63 +16,47 @@ void main() {
     await EasyLocalization.ensureInitialized();
   });
 
-  testWidgets('home page shows welcome state when there is no StarNyx', (
-    tester,
-  ) async {
-    final starnyxRepository = _InMemoryStarNyxRepository();
-    final completionRepository = _InMemoryCompletionRepository();
-    final appSettingsRepository = _InMemoryAppSettingsRepository();
+  testWidgets(
+    'home page shows an empty state with a create CTA when there is no StarNyx',
+    (tester) async {
+      final starnyxRepository = _InMemoryStarNyxRepository();
+      final completionRepository = _InMemoryCompletionRepository();
+      final appSettingsRepository = _InMemoryAppSettingsRepository();
 
-    await tester.pumpWidget(
-      _buildLocalizedApp(
-        HomePage(
-          loadStarnyxsUseCase: LoadStarnyxsUseCase(starnyxRepository),
-          loadActiveStarNyxUseCase: LoadActiveStarNyxUseCase(
-            starnyxRepository,
-            appSettingsRepository,
-          ),
-          selectActiveStarNyxUseCase: SelectActiveStarNyxUseCase(
-            starnyxRepository,
-            appSettingsRepository,
-          ),
-          loadStarNyxProgressStatsUseCase: LoadStarNyxProgressStatsUseCase(
-            starnyxRepository,
-            completionRepository,
-          ),
-          loadStarNyxCompletionDatesForYearUseCase:
-              LoadStarNyxCompletionDatesForYearUseCase(completionRepository),
-          toggleCompletionUseCase: ToggleCompletionUseCase(
-            starnyxRepository,
-            completionRepository,
+      await tester.pumpWidget(
+        _buildLocalizedApp(
+          HomePage(
+            loadStarnyxsUseCase: LoadStarnyxsUseCase(starnyxRepository),
+            loadActiveStarNyxUseCase: LoadActiveStarNyxUseCase(
+              starnyxRepository,
+              appSettingsRepository,
+            ),
+            selectActiveStarNyxUseCase: SelectActiveStarNyxUseCase(
+              starnyxRepository,
+              appSettingsRepository,
+            ),
+            loadStarNyxProgressStatsUseCase: LoadStarNyxProgressStatsUseCase(
+              starnyxRepository,
+              completionRepository,
+            ),
+            loadStarNyxCompletionDatesForYearUseCase:
+                LoadStarNyxCompletionDatesForYearUseCase(completionRepository),
+            toggleCompletionUseCase: ToggleCompletionUseCase(
+              starnyxRepository,
+              completionRepository,
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
-    await tester.pump(const Duration(milliseconds: 300));
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.byType(FirstRunWelcomeView), findsOneWidget);
-    expect(find.text('New habit'), findsOneWidget);
-  });
-
-  testWidgets('welcome state stays usable on small screens', (tester) async {
-    await tester.pumpWidget(
-      _buildLocalizedApp(
-        const MediaQuery(
-          data: MediaQueryData(size: Size(320, 568)),
-          child: SizedBox(
-            width: 320,
-            height: 568,
-            child: FirstRunWelcomeView(),
-          ),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(tester.takeException(), isNull);
-  });
+      expect(find.byType(AppEmptyState), findsOneWidget);
+      expect(find.text('No habits yet'), findsOneWidget);
+      expect(find.text('Create habit'), findsOneWidget);
+    },
+  );
 }
 
 Widget _buildLocalizedApp(Widget child) {

@@ -54,15 +54,6 @@
     "load_error_message": "Không thể tải dữ liệu trên máy. Vui lòng thử lại sau.",
     "retry": "Thử lại"
   },
-  "welcome": {
-    "settings": "Cài đặt",
-    "heart": "Yêu thích",
-    "title_lead": "Chào mừng\n",
-    "title_emphasis": "trở lại.",
-    "subtitle": "Tạo một thói quen mới để giữ trong tầm nhìn.",
-    "primary_action": "Thói quen mới",
-    "pending_flow": "Không thể mở biểu mẫu thói quen lúc này."
-  },
   "starnyx_form": {
     "create_sheet_title": "Thói quen mới",
     "edit_sheet_title": "Sửa thói quen",

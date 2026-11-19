@@ -48,11 +48,16 @@ class AppShell extends StatefulWidget {
     this.initialTab = AppShellTab.habits,
     this.initialAccentColor,
     this.tabs,
+    this.onDataReplaced,
     super.key,
   });
 
   final AppShellTab initialTab;
   final Color? initialAccentColor;
+
+  /// Fires after an import or delete-all from Settings, once the shell has
+  /// reloaded Habits. The app root uses it to re-check onboarding.
+  final VoidCallback? onDataReplaced;
 
   /// Optional injected tab children (indexed by [AppShellTab]). Used by tests
   /// and by future feature modules that want to compose the shell themselves.
@@ -120,10 +125,13 @@ class _AppShellState extends State<AppShell> {
         key: const ValueKey<String>('settings-tab'),
         reloadToken: _settingsReloadToken,
         // Import or delete-all replaced everything: show the fresh Habits tab.
-        onDataReplaced: () => setState(() {
-          _homeReloadToken++;
-          _index = AppShellTab.habits.index;
-        }),
+        onDataReplaced: () {
+          setState(() {
+            _homeReloadToken++;
+            _index = AppShellTab.habits.index;
+          });
+          widget.onDataReplaced?.call();
+        },
       ),
     ];
   }

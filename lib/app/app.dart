@@ -11,12 +11,13 @@ class StarNyxApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Router comes from DI so later route guards or feature modules stay centralized.
+    // No initialRoute: '/habits' would also push '/', stacking two app roots
+    // (two onboarding flows). '/' already opens the Habits tab.
     final router = serviceLocator<AppRouter>();
 
     return MaterialApp(
       locale: context.locale,
       theme: AppTheme.dark(),
-      initialRoute: AppRoutes.habits,
       debugShowCheckedModeBanner: false,
       onGenerateRoute: router.onGenerateRoute,
       supportedLocales: context.supportedLocales,

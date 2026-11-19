@@ -549,7 +549,7 @@ Tick `[x]` when an issue is done.
     - Footer: "Mọi thiết lập luôn có thể điều chỉnh trong Cài đặt" (mono, muted).
     - Widget test: renders with the created habits; CTA navigates.
 
-- [ ] **STX-U024**: Onboarding state, routing and first-run detection
+- [x] **STX-U024**: Onboarding state, routing and first-run detection
   - _Must-have · kind:architecture · depends on: STX-U020, STX-U021, STX-U022, STX-U023_
   - Acceptance criteria:
     - `AppSettings` (or a new `OnboardingState` in `SharedPreferences`) gains `onboardingCompleted: bool` (default false). If stored in Drift, schema v4 → v5 is required — prefer `SharedPreferences` to avoid a migration; document choice.

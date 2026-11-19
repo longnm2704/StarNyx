@@ -10,7 +10,7 @@ import 'package:starnyx/domain/usecases/domain_usecases.dart';
 
 void main() {
   test(
-    'seeded data is wiped, settings reset, reminders and color cleared',
+    'seeded data is wiped, settings reset, reminders, color and onboarding cleared',
     () async {
       final database = AppDatabase(NativeDatabase.memory());
       addTearDown(database.close);
@@ -59,6 +59,10 @@ void main() {
         await SharedPreferences.getInstance(),
       );
       await colorCache.saveColor(const Color(0xFF102030));
+      final onboarding = OnboardingPreferences(
+        await SharedPreferences.getInstance(),
+      );
+      await onboarding.setCompleted(true);
       final notifications = _FakeNotificationService();
       final resetAt = DateTime(2026, 5, 1);
 
@@ -66,6 +70,7 @@ void main() {
         () => database.clearAll(now: resetAt),
         SyncNotificationsUseCase(notifications, starnyxs),
         colorCache,
+        onboarding,
       ).call();
 
       expect(await database.select(database.starNyxs).get(), isEmpty);
@@ -77,6 +82,7 @@ void main() {
       expect(settingsRows.single.updatedAt, resetAt);
       expect(notifications.cancelAllCount, 1);
       expect(colorCache.readColor(), isNull);
+      expect(onboarding.completed, isFalse);
     },
   );
 }
