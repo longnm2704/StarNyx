@@ -110,7 +110,15 @@
     "delete_general_error": "Unable to delete the journal entry right now. Please try again.",
     "no_entries": "No entries yet.",
     "load_error_title": "Observation interrupted",
-    "load_error_message": "Unable to load journal entries right now."
+    "load_error_message": "Unable to load journal entries right now.",
+    "entry_day_title": "Journal day {}",
+    "read_more": "Read more",
+    "search_hint": "Search your journal",
+    "search_semantics": "Search your journal",
+    "search_close_semantics": "Close search",
+    "search_empty": "No notes match.",
+    "send_semantics": "Save note",
+    "switch_habit_semantics": "Switch habit"
   },
   "settings": {
     "title": "Settings",

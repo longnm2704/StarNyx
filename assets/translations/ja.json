@@ -110,7 +110,15 @@
     "delete_general_error": "現在ジャーナルを削除できません。もう一度お試しください。",
     "no_entries": "記録はまだありません。",
     "load_error_title": "ジャーナルが中断されました",
-    "load_error_message": "現在ジャーナルを読み込めません。"
+    "load_error_message": "現在ジャーナルを読み込めません。",
+    "entry_day_title": "日記 {}日目",
+    "read_more": "続きを読む",
+    "search_hint": "日記を検索",
+    "search_semantics": "日記を検索",
+    "search_close_semantics": "検索を閉じる",
+    "search_empty": "一致するメモはありません。",
+    "send_semantics": "メモを保存",
+    "switch_habit_semantics": "習慣を切り替える"
   },
   "settings": {
     "title": "設定",

@@ -6,6 +6,7 @@ import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/app_icon.dart';
 import 'package:starnyx/features/home/presentation/pages/home_page.dart';
+import 'package:starnyx/features/journal/presentation/pages/journal_page.dart';
 import 'package:starnyx/features/starnyx_form/presentation/pages/create_starnyx_bottom_sheet.dart';
 
 /// Stable ids for the four primary destinations hosted by [AppShell].
@@ -62,6 +63,7 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   late int _index = widget.initialTab.index;
   int _homeReloadToken = 0;
+  int _journalReloadToken = 0;
 
   void _selectIndex(int index) {
     if (index == _index) {
@@ -69,6 +71,8 @@ class _AppShellState extends State<AppShell> {
     }
     setState(() {
       _index = index;
+      // The active habit may have changed on another tab.
+      if (index == AppShellTab.journal.index) _journalReloadToken++;
     });
   }
 
@@ -101,9 +105,9 @@ class _AppShellState extends State<AppShell> {
         key: ValueKey<String>('overview-tab'),
         tab: AppShellTab.overview,
       ),
-      const _ShellPlaceholderPage(
-        key: ValueKey<String>('journal-tab'),
-        tab: AppShellTab.journal,
+      JournalPage(
+        key: const ValueKey<String>('journal-tab'),
+        reloadToken: _journalReloadToken,
       ),
       const _ShellPlaceholderPage(
         key: ValueKey<String>('settings-tab'),

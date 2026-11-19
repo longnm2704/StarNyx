@@ -337,7 +337,7 @@ Tick `[x]` when an issue is done.
 
 ## Epic U-E - Journal Tab
 
-- [ ] **STX-U011**: Journal list screen (`nhat_ky`)
+- [x] **STX-U011**: Journal list screen (`nhat_ky`)
   - _Must-have · kind:feature · depends on: STX-U006_
   - Design: `docs/app_ui_redesign/nhat_ky/{code.html,screen.png}`
   - Replaces `JournalBottomSheet` with a full-screen tab.

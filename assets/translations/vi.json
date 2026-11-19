@@ -110,7 +110,15 @@
     "delete_general_error": "Không thể xóa nhật ký lúc này. Vui lòng thử lại.",
     "no_entries": "Chưa có ghi chú.",
     "load_error_title": "Không tải được nhật ký",
-    "load_error_message": "Không thể tải nhật ký lúc này."
+    "load_error_message": "Không thể tải nhật ký lúc này.",
+    "entry_day_title": "Nhật ký ngày {}",
+    "read_more": "Xem thêm",
+    "search_hint": "Tìm trong nhật ký",
+    "search_semantics": "Tìm trong nhật ký",
+    "search_close_semantics": "Đóng tìm kiếm",
+    "search_empty": "Không có ghi chú nào khớp.",
+    "send_semantics": "Lưu nhật ký",
+    "switch_habit_semantics": "Đổi thói quen"
   },
   "settings": {
     "title": "Cài đặt",
