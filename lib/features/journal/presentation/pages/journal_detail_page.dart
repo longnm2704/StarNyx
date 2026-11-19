@@ -519,8 +519,16 @@ class _ContentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final (title, body) = journalTitleAndBody(entry, habit.startDate);
+    final (title, rawBody) = journalTitleAndBody(entry, habit.startDate);
     final quote = journalPullQuote(entry.content);
+    // The pull quote gets its own block below; don't print its line twice.
+    final body = quote == null
+        ? rawBody
+        : rawBody
+              .split('\n')
+              .where((line) => journalPullQuote(line) != quote)
+              .join('\n')
+              .trim();
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: _cardDecoration(),
@@ -547,15 +555,17 @@ class _ContentCard extends StatelessWidget {
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
-          SelectableText(
-            body,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontFamily: AppFonts.body,
-              height: 1.6,
-              color: AppColors.textSecondary,
+          if (body.isNotEmpty) ...<Widget>[
+            const SizedBox(height: AppSpacing.md),
+            SelectableText(
+              body,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontFamily: AppFonts.body,
+                height: 1.6,
+                color: AppColors.textSecondary,
+              ),
             ),
-          ),
+          ],
           if (quote != null) ...<Widget>[
             const SizedBox(height: AppSpacing.lg),
             Container(

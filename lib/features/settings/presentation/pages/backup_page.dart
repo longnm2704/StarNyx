@@ -831,29 +831,32 @@ class _StorageCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          Row(
-            children: <Widget>[
-              _StatTile(
-                color: AppColors.primary,
-                label: 'settings.storage_habits'.tr(),
-                count: stats?.habitCount,
-                caption: 'settings.storage_habits_caption'.tr(),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              _StatTile(
-                color: AppColors.secondary,
-                label: 'settings.storage_checkins'.tr(),
-                count: stats?.completionCount,
-                caption: 'settings.storage_checkins_caption'.tr(),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              _StatTile(
-                color: AppColors.tertiary,
-                label: 'settings.storage_journal'.tr(),
-                count: stats?.journalCount,
-                caption: 'settings.storage_journal_caption'.tr(),
-              ),
-            ],
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _StatTile(
+                  color: AppColors.primary,
+                  label: 'settings.storage_habits'.tr(),
+                  count: stats?.habitCount,
+                  caption: 'settings.storage_habits_caption'.tr(),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                _StatTile(
+                  color: AppColors.secondary,
+                  label: 'settings.storage_checkins'.tr(),
+                  count: stats?.completionCount,
+                  caption: 'settings.storage_checkins_caption'.tr(),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                _StatTile(
+                  color: AppColors.tertiary,
+                  label: 'settings.storage_journal'.tr(),
+                  count: stats?.journalCount,
+                  caption: 'settings.storage_journal_caption'.tr(),
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -35,6 +35,8 @@ void main() {
     expect(theme.textTheme.headlineSmall?.fontFamily, AppFonts.headline);
     expect(theme.textTheme.titleLarge?.fontFamily, AppFonts.body);
     expect(theme.textTheme.titleMedium?.fontFamily, AppFonts.body);
+    expect(theme.textTheme.titleSmall?.fontFamily, AppFonts.body);
+    expect(theme.textTheme.displaySmall?.fontFamily, AppFonts.headline);
     expect(theme.textTheme.bodyLarge?.fontFamily, AppFonts.body);
     expect(theme.textTheme.bodyMedium?.fontFamily, AppFonts.body);
     expect(theme.textTheme.bodySmall?.fontFamily, AppFonts.body);

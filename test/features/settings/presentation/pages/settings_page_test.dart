@@ -115,6 +115,22 @@ void main() {
     expect(find.text('1.2.3 (45)'), findsOneWidget);
   });
 
+  testWidgets('fits a 320pt screen at 2x text without overflow', (
+    tester,
+  ) async {
+    // Regression for STX-U026: trailing values used to squeeze row titles.
+    tester.view.physicalSize = const Size(320, 3600);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await _render(tester, makeBloc());
+
+    expect(find.text('Ngôn ngữ'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('language row opens the language picker', (tester) async {
     await _render(tester, makeBloc());
 

@@ -247,7 +247,7 @@
     "completion_rate": "Completion rate",
     "completion_sub": "{lit} / {total} days lit",
     "lit_days": "Days lit",
-    "lit_sub": "{lit} / {total} · {pct}% of the way",
+    "lit_sub": "{pct}% of the way",
     "longest_streak": "Longest streak",
     "longest_streak_sub": "{days} days",
     "longest_streak_note": "Personal best",

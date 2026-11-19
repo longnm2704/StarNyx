@@ -570,7 +570,7 @@ Tick `[x]` when an issue is done.
     - Branding is "StarNyx" everywhere; no "Home Habits", "Journal Notes", "Overview List", "Habit Tracker", "LUMINESCENT TRACKER".
     - `pubspec.yaml` description remains accurate.
 
-- [ ] **STX-U026**: Visual QA pass against mockups
+- [x] **STX-U026**: Visual QA pass against mockups
   - _Must-have · kind:test · depends on: STX-U007 … STX-U024_
   - Acceptance criteria:
     - Every screen in `docs/app_ui_redesign/` is compared side-by-side with the running app on a 390×844 (iPhone 14) and 320×568 (iPhone SE) viewport, at 1.0 and 2.0 text scale.

@@ -247,13 +247,21 @@ class _AppShellNavDestination extends StatelessWidget {
             children: <Widget>[
               AppIcon(icon: tab.icon, color: color, size: 22),
               const SizedBox(height: 2),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: color,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+              // Fixed-height bar: cap label growth and shrink-to-fit instead
+              // of ellipsizing at large text sizes (the full label stays in
+              // Semantics).
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  textScaler: MediaQuery.textScalerOf(
+                    context,
+                  ).clamp(maxScaleFactor: 1.3),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: color,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  ),
                 ),
               ),
               const SizedBox(height: 4),

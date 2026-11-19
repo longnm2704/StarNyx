@@ -247,7 +247,7 @@
     "completion_rate": "完了率",
     "completion_sub": "{lit} / {total} 日完了",
     "lit_days": "点灯日数",
-    "lit_sub": "{lit} / {total} {pct}% 達成",
+    "lit_sub": "{pct}% 達成",
     "longest_streak": "最長連続",
     "longest_streak_sub": "{days} 日",
     "longest_streak_note": "自己記録",

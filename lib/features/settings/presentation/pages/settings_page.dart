@@ -439,9 +439,13 @@ class _Section extends StatelessWidget {
             children: <Widget>[
               Expanded(child: Text(title.toUpperCase(), style: overline)),
               if (trailing != null)
-                Text(
-                  trailing!,
-                  style: overline?.copyWith(color: AppColors.primary),
+                Flexible(
+                  child: Text(
+                    trailing!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: overline?.copyWith(color: AppColors.primary),
+                  ),
                 ),
             ],
           ),
@@ -532,13 +536,14 @@ class _SettingsRow extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
+                flex: 2,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    // Wraps instead of ellipsizing so large text stays
+                    // readable on narrow screens.
                     Text(
                       title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
@@ -557,18 +562,24 @@ class _SettingsRow extends StatelessWidget {
               ),
               if (value != null) ...<Widget>[
                 const SizedBox(width: AppSpacing.xs),
-                Text(
-                  value!,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    fontFamily: AppFonts.mono,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+                Flexible(
+                  child: Text(
+                    value!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontFamily: AppFonts.mono,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
               ],
               if (trailing != null) ...<Widget>[
                 const SizedBox(width: AppSpacing.xs),
-                trailing!,
+                Flexible(
+                  child: FittedBox(fit: BoxFit.scaleDown, child: trailing),
+                ),
               ],
               if (onTap != null) ...<Widget>[
                 const SizedBox(width: AppSpacing.xxs),

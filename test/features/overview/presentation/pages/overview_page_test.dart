@@ -62,8 +62,8 @@ void main() {
     await _renderOverview(tester, bloc);
 
     expect(find.text('Tổng quan'), findsWidgets);
-    expect(find.text('Đã thắp sáng'), findsOneWidget);
-    expect(find.text('Chuỗi dài nhất'), findsOneWidget);
+    expect(find.text('ĐÃ THẮP SÁNG'), findsOneWidget);
+    expect(find.text('CHUỖI DÀI NHẤT'), findsOneWidget);
     expect(find.text('Ma Trận Kỷ Luật'), findsOneWidget);
     expect(find.text('Theo Từng Thói Quen'), findsOneWidget);
     expect(find.text('Uống nước'), findsOneWidget);
@@ -201,6 +201,49 @@ void main() {
 
     expect(find.text('Không thể tải tổng quan'), findsOneWidget);
     expect(find.text('Thử lại'), findsOneWidget);
+  });
+  testWidgets('fits a 320pt screen at 2x text without overflow', (
+    tester,
+  ) async {
+    // Tall view so every card is built; regression for STX-U026 overflows in
+    // the range selector, stat tiles, heatmap and per-habit headers.
+    tester.view.physicalSize = const Size(320, 3600);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    final starnyxRepository = _InMemoryStarNyxRepository();
+    final completionRepository = _InMemoryCompletionRepository();
+    await starnyxRepository.saveStarnyx(
+      StarNyx(
+        id: 'habit-1',
+        title: 'Uống nước',
+        description: null,
+        color: '#10B981',
+        startDate: DateTime(2026, 6, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 6, 1, 8),
+        updatedAt: DateTime(2026, 6, 1, 8),
+      ),
+    );
+    final bloc = OverviewBloc(
+      loadOverviewStatsUseCase: LoadOverviewStatsUseCase(
+        LoadStarnyxsUseCase(starnyxRepository),
+        completionRepository,
+        LoadStarNyxProgressStatsUseCase(
+          starnyxRepository,
+          completionRepository,
+        ),
+      ),
+      nowBuilder: () => DateTime(2026, 6, 15, 10),
+    );
+
+    await _renderOverview(tester, bloc);
+
+    expect(find.text('Theo Từng Thói Quen'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }
 

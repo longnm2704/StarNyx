@@ -43,7 +43,17 @@ abstract final class AppTheme {
     const body = AppFonts.body;
     const mono = AppFonts.mono;
 
+    // Every slot the app reads must be listed here: an unlisted slot falls
+    // back to Material's default (platform) font instead of the bundled ones.
     const textTheme = TextTheme(
+      displaySmall: TextStyle(
+        fontFamily: headline,
+        color: AppColors.textPrimary,
+        fontSize: 36,
+        fontWeight: FontWeight.w700,
+        height: 44 / 36,
+        letterSpacing: -0.72, // -0.02em
+      ),
       headlineLarge: TextStyle(
         fontFamily: headline,
         color: AppColors.textPrimary,
@@ -81,6 +91,13 @@ abstract final class AppTheme {
         fontSize: 16,
         fontWeight: FontWeight.w600,
         height: 22 / 16,
+      ),
+      titleSmall: TextStyle(
+        fontFamily: body,
+        color: AppColors.textPrimary,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        height: 20 / 14,
       ),
       bodyLarge: TextStyle(
         fontFamily: body,

@@ -378,6 +378,9 @@ void main() {
       );
       expect(find.text('Về giường sớm'), findsOneWidget);
       expect(find.text('“Kỷ luật là tự do”'), findsOneWidget);
+      // The quote line is lifted out of the body, not shown twice.
+      expect(find.text('Đọc sách dưới đèn vàng.'), findsOneWidget);
+      expect(find.textContaining('> Kỷ luật'), findsNothing);
       expect(find.text('#NguSom'), findsOneWidget);
       expect(find.text('#DigitalDetox'), findsOneWidget);
       expect(

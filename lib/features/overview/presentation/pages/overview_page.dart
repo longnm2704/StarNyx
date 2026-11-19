@@ -139,36 +139,38 @@ class _OverviewAppBar extends StatelessWidget {
         AppSpacing.pageHorizontal,
         AppSpacing.xs,
       ),
-      child: SizedBox(
-        height: 48,
-        child: Row(
-          children: <Widget>[
-            Text(
-              'overview.title'.tr().toUpperCase(),
-              style: theme.textTheme.labelSmall?.copyWith(
-                fontFamily: AppFonts.mono,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.1,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.xs),
-            Expanded(
-              child: Text(
-                'overview.title'.tr(),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontFamily: AppFonts.headline,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.4,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'app.title'.tr().toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontFamily: AppFonts.mono,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.1,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
-              ),
+                Text(
+                  'overview.title'.tr(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontFamily: AppFonts.headline,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+              ],
             ),
-            _ProfileButton(onPressed: onProfilePressed),
-          ],
-        ),
+          ),
+          _ProfileButton(onPressed: onProfilePressed),
+        ],
       ),
     );
   }
@@ -222,22 +224,26 @@ class _RangeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: <Widget>[
-        _RangePill(
-          label: 'overview.weekly'.tr(),
-          isActive: currentRange == OverviewRange.week,
-          onTap: () => onChanged(OverviewRange.week),
+        Expanded(
+          child: _RangePill(
+            label: 'overview.weekly'.tr(),
+            isActive: currentRange == OverviewRange.week,
+            onTap: () => onChanged(OverviewRange.week),
+          ),
         ),
-        const SizedBox(width: AppSpacing.xs),
-        _RangePill(
-          label: 'overview.monthly'.tr(),
-          isActive: currentRange == OverviewRange.month,
-          onTap: () => onChanged(OverviewRange.month),
+        Expanded(
+          child: _RangePill(
+            label: 'overview.monthly'.tr(),
+            isActive: currentRange == OverviewRange.month,
+            onTap: () => onChanged(OverviewRange.month),
+          ),
         ),
-        const SizedBox(width: AppSpacing.xs),
-        _RangePill(
-          label: 'overview.yearly'.tr(namedArgs: {'year': '$year'}),
-          isActive: currentRange == OverviewRange.year,
-          onTap: () => onChanged(OverviewRange.year),
+        Expanded(
+          child: _RangePill(
+            label: 'overview.yearly'.tr(namedArgs: {'year': '$year'}),
+            isActive: currentRange == OverviewRange.year,
+            onTap: () => onChanged(OverviewRange.year),
+          ),
         ),
       ],
     );
@@ -269,7 +275,7 @@ class _RangePill extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.pill),
           side: BorderSide(
-            color: isActive ? AppColors.primary : AppColors.borderSubtle,
+            color: isActive ? AppColors.primary : Colors.transparent,
             width: 1.2,
           ),
         ),
@@ -278,15 +284,19 @@ class _RangePill extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.pill),
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
+              horizontal: AppSpacing.xs,
               vertical: AppSpacing.xs,
             ),
-            child: Text(
-              label,
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: isActive ? AppColors.primary : AppColors.textSecondary,
-                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                letterSpacing: 0.2,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: isActive ? AppColors.primary : AppColors.textSecondary,
+                  fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                  letterSpacing: 0.2,
+                ),
               ),
             ),
           ),
@@ -340,30 +350,24 @@ class _HeroCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      '$pct%',
-                      style: theme.textTheme.displaySmall?.copyWith(
-                        fontFamily: AppFonts.headline,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 40,
-                        height: 1.0,
-                        color: AppColors.primary,
-                        fontFeatures: <FontFeature>[
-                          const FontFeature.tabularFigures(),
-                        ],
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        '$pct%',
+                        maxLines: 1,
+                        style: theme.textTheme.displaySmall?.copyWith(
+                          fontFamily: AppFonts.headline,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 40,
+                          height: 1.0,
+                          color: AppColors.primary,
+                          fontFeatures: <FontFeature>[
+                            const FontFeature.tabularFigures(),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
-                    CustomPaint(
-                      size: const Size(48, 48),
-                      painter: _CircularProgressPainter(
-                        progress: completionRate,
-                        strokeWidth: 6,
-                        color: AppColors.primary,
-                        glowColor: AppColors.primary.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       'overview.completion_sub'.tr(
                         namedArgs: <String, String>{
@@ -378,6 +382,16 @@ class _HeroCard extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              CustomPaint(
+                size: const Size(88, 88),
+                painter: _CircularProgressPainter(
+                  progress: completionRate,
+                  strokeWidth: 8,
+                  color: AppColors.primary,
+                  glowColor: AppColors.primary.withValues(alpha: 0.3),
                 ),
               ),
             ],
@@ -481,26 +495,15 @@ class _StatTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(color: AppColors.borderSubtle),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: accentColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppRadius.sm),
-            ),
-            child: Center(
-              child: AppIcon(icon: icon, size: 22, color: accentColor),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  title,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  title.toUpperCase(),
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontFamily: AppFonts.mono,
                     fontWeight: FontWeight.w700,
@@ -508,23 +511,25 @@ class _StatTile extends StatelessWidget {
                     color: AppColors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xxs),
-                Text(
-                  value,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontFamily: AppFonts.headline,
-                    fontWeight: FontWeight.w700,
-                    color: accentColor,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
+              ),
+              const SizedBox(width: AppSpacing.xxs),
+              AppIcon(icon: icon, size: 18, color: accentColor),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            value,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontFamily: AppFonts.headline,
+              fontWeight: FontWeight.w700,
+              color: accentColor,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppColors.textSecondary,
             ),
           ),
         ],
@@ -578,23 +583,19 @@ class _HeatmapCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Text(
-                'overview.discipline_matrix'.tr(),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontFamily: AppFonts.headline,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                'overview.discipline_sub'.tr(namedArgs: {'year': '$year'}),
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
-              ),
-            ],
+          Text(
+            'overview.discipline_matrix'.tr(),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontFamily: AppFonts.headline,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'overview.discipline_sub'.tr(namedArgs: {'year': '$year'}),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
           ),
           const SizedBox(height: AppSpacing.md),
           const _HeatmapLegend(),
@@ -618,7 +619,8 @@ class _HeatmapLegend extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Row(
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
         Text(
           'overview.legend_low'.tr(),
@@ -766,16 +768,12 @@ class _HabitListSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Text(
-                'overview.per_habit'.tr(),
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontFamily: AppFonts.headline,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
+          Text(
+            'overview.per_habit'.tr(),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontFamily: AppFonts.headline,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           ListView.separated(
@@ -952,36 +950,35 @@ class _OverviewContent extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.pageHorizontal,
                 ),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: _StatTile(
-                        icon: HugeIconsStrokeRounded.strokeRoundedFire,
-                        title: 'overview.lit_days'.tr(),
-                        value: '${stats.totalLitDays} / $daysInYear',
-                        subtitle: 'overview.lit_sub'.tr(
-                          namedArgs: <String, String>{
-                            'lit': '${stats.totalLitDays}',
-                            'total': '$daysInYear',
-                            'pct': '$litPct',
-                          },
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Expanded(
+                        child: _StatTile(
+                          icon: HugeIconsStrokeRounded.strokeRoundedFire,
+                          title: 'overview.lit_days'.tr(),
+                          value: '${stats.totalLitDays} / $daysInYear',
+                          subtitle: 'overview.lit_sub'.tr(
+                            namedArgs: <String, String>{'pct': '$litPct'},
+                          ),
+                          accentColor: AppColors.primary,
                         ),
-                        accentColor: AppColors.primary,
                       ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: _StatTile(
-                        icon: HugeIconsStrokeRounded.strokeRoundedAward02,
-                        title: 'overview.longest_streak'.tr(),
-                        value: 'overview.longest_streak_sub'.tr(
-                          namedArgs: {'days': '${stats.bestLongestStreak}'},
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: _StatTile(
+                          icon: HugeIconsStrokeRounded.strokeRoundedAward02,
+                          title: 'overview.longest_streak'.tr(),
+                          value: 'overview.longest_streak_sub'.tr(
+                            namedArgs: {'days': '${stats.bestLongestStreak}'},
+                          ),
+                          subtitle: 'overview.longest_streak_note'.tr(),
+                          accentColor: AppColors.secondary,
                         ),
-                        subtitle: 'overview.longest_streak_note'.tr(),
-                        accentColor: AppColors.secondary,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),

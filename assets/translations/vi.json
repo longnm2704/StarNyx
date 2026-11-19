@@ -247,7 +247,7 @@
     "completion_rate": "Tỷ lệ hoàn thành",
     "completion_sub": "Đã thắp {lit} / {total} ngày",
     "lit_days": "Đã thắp sáng",
-    "lit_sub": "{lit} / {total} {pct}% chặng đường",
+    "lit_sub": "{pct}% chặng đường",
     "longest_streak": "Chuỗi dài nhất",
     "longest_streak_sub": "{days} ngày",
     "longest_streak_note": "Kỷ lục cá nhân",
