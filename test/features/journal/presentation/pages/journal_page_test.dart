@@ -10,6 +10,7 @@ import 'package:starnyx/domain/entities/domain_entities.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
+import 'package:starnyx/features/journal/presentation/pages/journal_detail_page.dart';
 import 'package:starnyx/features/journal/presentation/pages/journal_editor_page.dart';
 import 'package:starnyx/features/journal/presentation/pages/journal_page.dart';
 
@@ -298,6 +299,163 @@ void main() {
     expect(find.text('Chưa có gì được ghi lại'), findsOneWidget);
     expect(find.byType(JournalEntryCard), findsNothing);
   });
+
+  group('detail', () {
+    final today = DateUtils.dateOnly(DateTime.now());
+    final yesterday = today.subtract(const Duration(days: 1));
+    final rich = JournalEntry(
+      id: 1,
+      starnyxId: 'habit-1',
+      date: yesterday,
+      content: 'Về giường sớm\nĐọc sách dưới đèn vàng.\n> Kỷ luật là tự do',
+      createdAt: DateTime(
+        yesterday.year,
+        yesterday.month,
+        yesterday.day,
+        22,
+        45,
+      ),
+      mood: JournalMood.calm,
+      energy: 4,
+      sleepMinutes: 465,
+      tags: const <String>['NguSom', 'DigitalDetox'],
+    );
+    final completions = _FakeCompletionRepository(<DateTime>[
+      yesterday.subtract(const Duration(days: 1)),
+      yesterday,
+      today,
+    ]);
+
+    Future<void> openDetail(WidgetTester tester, JournalEntry e) async {
+      final context = tester.element(find.byType(JournalEntryCard));
+      unawaited(
+        JournalDetailPage.open(
+          context,
+          bloc: context.read<JournalBloc>(),
+          entry: e,
+          habit: habit,
+          completionRepository: completions,
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('card tap opens the detail screen', (tester) async {
+      await _render(tester, _InMemoryJournalEntryRepository([rich]), habit);
+      await tester.tap(find.byType(JournalEntryCard));
+      await tester.pumpAndSettle();
+      expect(find.text('Chi tiết nhật ký'), findsOneWidget);
+    });
+
+    testWidgets('renders entry, metadata, quote, lumen and streak', (
+      tester,
+    ) async {
+      tester.view
+        ..physicalSize = const Size(800, 3000)
+        ..devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await _render(tester, _InMemoryJournalEntryRepository([rich]), habit);
+      await openDetail(tester, rich);
+
+      expect(find.text('Chi tiết nhật ký'), findsOneWidget);
+      expect(find.text('Đọc sách'), findsWidgets);
+      expect(find.text('Chấm sáng #2'), findsOneWidget);
+      expect(find.text('TRẠNG THÁI PHẢN CHIẾU'), findsOneWidget);
+      expect(find.text('Bình an'), findsOneWidget);
+      expect(find.text('7h 45m'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is Semantics && w.properties.label == 'Năng lượng 4 trên 5',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Về giường sớm'), findsOneWidget);
+      expect(find.text('“Kỷ luật là tự do”'), findsOneWidget);
+      expect(find.text('#NguSom'), findsOneWidget);
+      expect(find.text('#DigitalDetox'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('journal-detail-streak')),
+          matching: find.textContaining('3'),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('omits reflection card and quote when absent', (tester) async {
+      final plain = entry(1, 'Chỉ một dòng', DateTime(2026, 11, 19, 7));
+      await _render(tester, _InMemoryJournalEntryRepository([plain]), habit);
+      await openDetail(tester, plain);
+
+      expect(find.byKey(const Key('journal-detail-reflection')), findsNothing);
+      expect(find.byKey(const Key('journal-detail-quote')), findsNothing);
+      expect(find.text('Nhật ký ngày 19'), findsOneWidget);
+    });
+
+    testWidgets('delete confirms, pops and removes the entry', (tester) async {
+      final repository = _InMemoryJournalEntryRepository([rich]);
+      await _render(tester, repository, habit);
+      await openDetail(tester, rich);
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('journal-detail-delete')),
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byType(JournalDetailPage),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.tap(find.byKey(const Key('journal-detail-delete')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Xóa'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(JournalDetailPage), findsNothing);
+      expect(find.byType(JournalEntryCard), findsNothing);
+      expect(await repository.getJournalEntriesForStarnyx('habit-1'), isEmpty);
+      expect(find.text('Đã xóa ghi chú. Bạn có thể hoàn tác.'), findsOneWidget);
+    });
+
+    testWidgets('edit opens the editor and the detail reflects the save', (
+      tester,
+    ) async {
+      final repository = _InMemoryJournalEntryRepository([rich]);
+      await _render(tester, repository, habit);
+      await openDetail(tester, rich);
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('journal-detail-edit')),
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byType(JournalDetailPage),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.tap(find.byKey(const Key('journal-detail-edit')));
+      await tester.pumpAndSettle();
+      expect(find.byType(JournalEditorPage), findsOneWidget);
+
+      await tester.enterText(
+        find.byKey(const Key('journal-editor-input')),
+        'Tiêu đề mới\nNội dung mới',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('journal-editor-save')));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(JournalEditorPage), findsNothing);
+      expect(find.text('Tiêu đề mới'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('journal-detail-back')));
+      await tester.pumpAndSettle();
+      expect(find.text('Tiêu đề mới'), findsOneWidget);
+      expect(find.text('Nội dung mới'), findsOneWidget);
+    });
+  });
 }
 
 Future<void> _render(
@@ -402,4 +560,20 @@ class _InMemoryJournalEntryRepository implements JournalEntryRepository {
     _items.removeWhere((e) => e.starnyxId == starnyxId);
     _changes.add(null);
   }
+}
+
+class _FakeCompletionRepository implements CompletionRepository {
+  _FakeCompletionRepository(this.days);
+
+  final List<DateTime> days;
+
+  @override
+  Future<List<Completion>> getCompletionsForStarnyx(String starnyxId) async =>
+      <Completion>[
+        for (final d in days)
+          Completion(starnyxId: starnyxId, date: d, completed: true),
+      ];
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

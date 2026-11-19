@@ -138,7 +138,19 @@
     "sleep_done": "Xong",
     "tags_title": "Từ khóa",
     "tags_hint": "Thêm từ khóa",
-    "tag_remove_semantics": "Xóa từ khóa {}"
+    "tag_remove_semantics": "Xóa từ khóa {}",
+    "detail_title": "Chi tiết nhật ký",
+    "detail_menu_semantics": "Tùy chọn nhật ký",
+    "detail_habit_goal": "{} · Mục tiêu {}",
+    "detail_lumen": "Chấm sáng #{}",
+    "detail_saved_at": "{} · Đã lưu lúc {}",
+    "detail_reflection_title": "Trạng thái phản chiếu",
+    "detail_deep_title": "Ghi nhận sâu",
+    "detail_quote_title": "Điểm cốt lõi",
+    "detail_stats_title": "Chỉ số ngày ghi nhận",
+    "detail_streak_label": "Duy trì liên tục",
+    "detail_streak_unit": "ngày",
+    "detail_delete": "Xóa nhật ký này"
   },
   "settings": {
     "title": "Cài đặt",

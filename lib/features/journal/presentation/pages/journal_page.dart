@@ -13,6 +13,7 @@ import 'package:starnyx/domain/usecases/load_active_starnyx_use_case.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_event.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_state.dart';
+import 'package:starnyx/features/journal/presentation/pages/journal_detail_page.dart';
 import 'package:starnyx/features/journal/presentation/pages/journal_editor_page.dart';
 import 'package:starnyx/features/journal/presentation/widgets/journal_metadata.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
@@ -281,6 +282,12 @@ class _JournalPageState extends State<JournalPage> {
               entry: entry,
               habitStartDate: habit.startDate,
               accentColor: accent,
+              onTap: () => JournalDetailPage.open(
+                context,
+                bloc: _bloc,
+                entry: entry,
+                habit: habit,
+              ),
               onLongPress: () => _onDeletePressed(entry),
             );
           },
@@ -483,11 +490,12 @@ class _JournalSearchField extends StatelessWidget {
 
 /// One journal entry card: accent dot, title, mono timestamp, clamped body,
 /// then mood and tag chips when the entry has them.
-class JournalEntryCard extends StatefulWidget {
+class JournalEntryCard extends StatelessWidget {
   const JournalEntryCard({
     required this.entry,
     required this.habitStartDate,
     required this.accentColor,
+    this.onTap,
     this.onLongPress,
     super.key,
   });
@@ -497,47 +505,15 @@ class JournalEntryCard extends StatefulWidget {
   final JournalEntry entry;
   final DateTime habitStartDate;
   final Color accentColor;
+  final VoidCallback? onTap;
   final VoidCallback? onLongPress;
-
-  @override
-  State<JournalEntryCard> createState() => _JournalEntryCardState();
-}
-
-class _JournalEntryCardState extends State<JournalEntryCard> {
-  bool _expanded = false;
-
-  /// First line becomes the title when the note has several lines; otherwise
-  /// the title falls back to "Journal day {n}" (n = day of the habit).
-  (String, String) _titleAndBody() {
-    final content = widget.entry.content.trim();
-    final newline = content.indexOf('\n');
-    if (newline > 0) {
-      final body = content.substring(newline + 1).trim();
-      if (body.isNotEmpty) {
-        return (content.substring(0, newline).trim(), body);
-      }
-    }
-    final start = widget.habitStartDate;
-    final date = widget.entry.date;
-    final day =
-        DateTime.utc(
-          date.year,
-          date.month,
-          date.day,
-        ).difference(DateTime.utc(start.year, start.month, start.day)).inDays +
-        1;
-    return (
-      'journal.entry_day_title'.tr(args: <String>['${day < 1 ? 1 : day}']),
-      content,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final (title, body) = _titleAndBody();
-    final mood = widget.entry.mood;
-    final tags = widget.entry.tags;
+    final (title, body) = journalTitleAndBody(entry, habitStartDate);
+    final mood = entry.mood;
+    final tags = entry.tags;
     final bodyStyle = theme.textTheme.bodyMedium?.copyWith(
       fontFamily: AppFonts.body,
       height: 1.6,
@@ -549,9 +525,8 @@ class _JournalEntryCardState extends State<JournalEntryCard> {
       borderRadius: BorderRadius.circular(AppRadius.card),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.card),
-        // ponytail: tap expands in place until the detail screen (U012) lands.
-        onTap: () => setState(() => _expanded = !_expanded),
-        onLongPress: widget.onLongPress,
+        onTap: onTap,
+        onLongPress: onLongPress,
         child: Padding(
           padding: AppSpacing.cardPadding,
           child: Column(
@@ -564,11 +539,11 @@ class _JournalEntryCardState extends State<JournalEntryCard> {
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: widget.accentColor,
+                      color: accentColor,
                       shape: BoxShape.circle,
                       boxShadow: <BoxShadow>[
                         BoxShadow(
-                          color: widget.accentColor.withValues(alpha: 0.7),
+                          color: accentColor.withValues(alpha: 0.7),
                           blurRadius: 10,
                         ),
                       ],
@@ -589,9 +564,7 @@ class _JournalEntryCardState extends State<JournalEntryCard> {
                   ),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
-                    DateFormat(
-                      'dd/MM/yyyy HH:mm',
-                    ).format(widget.entry.createdAt),
+                    DateFormat('dd/MM/yyyy HH:mm').format(entry.createdAt),
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontFamily: AppFonts.mono,
                       fontFeatures: AppFonts.tabularFigures,
@@ -615,15 +588,11 @@ class _JournalEntryCardState extends State<JournalEntryCard> {
                     children: <Widget>[
                       Text(
                         body,
-                        maxLines: _expanded
-                            ? null
-                            : JournalEntryCard.collapsedMaxLines,
-                        overflow: _expanded
-                            ? TextOverflow.visible
-                            : TextOverflow.ellipsis,
+                        maxLines: JournalEntryCard.collapsedMaxLines,
+                        overflow: TextOverflow.ellipsis,
                         style: bodyStyle,
                       ),
-                      if (overflows && !_expanded)
+                      if (overflows)
                         Padding(
                           padding: const EdgeInsets.only(top: AppSpacing.xxs),
                           child: Text(

@@ -138,7 +138,19 @@
     "sleep_done": "完了",
     "tags_title": "タグ",
     "tags_hint": "タグを追加",
-    "tag_remove_semantics": "タグ {} を削除"
+    "tag_remove_semantics": "タグ {} を削除",
+    "detail_title": "日記の詳細",
+    "detail_menu_semantics": "日記のオプション",
+    "detail_habit_goal": "{} · 目標 {}",
+    "detail_lumen": "光 #{}",
+    "detail_saved_at": "{} · {} に保存",
+    "detail_reflection_title": "振り返りの状態",
+    "detail_deep_title": "深い記録",
+    "detail_quote_title": "核心の一言",
+    "detail_stats_title": "この日の記録",
+    "detail_streak_label": "継続中",
+    "detail_streak_unit": "日",
+    "detail_delete": "この日記を削除"
   },
   "settings": {
     "title": "設定",

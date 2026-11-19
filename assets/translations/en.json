@@ -138,7 +138,19 @@
     "sleep_done": "Done",
     "tags_title": "Tags",
     "tags_hint": "Add a tag",
-    "tag_remove_semantics": "Remove tag {}"
+    "tag_remove_semantics": "Remove tag {}",
+    "detail_title": "Journal detail",
+    "detail_menu_semantics": "Journal options",
+    "detail_habit_goal": "{} · Goal {}",
+    "detail_lumen": "Light #{}",
+    "detail_saved_at": "{} · Saved at {}",
+    "detail_reflection_title": "Reflection state",
+    "detail_deep_title": "Deep note",
+    "detail_quote_title": "Key thought",
+    "detail_stats_title": "Day snapshot",
+    "detail_streak_label": "Current streak",
+    "detail_streak_unit": "d",
+    "detail_delete": "Delete this entry"
   },
   "settings": {
     "title": "Settings",

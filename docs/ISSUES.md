@@ -352,7 +352,7 @@ Tick `[x]` when an issue is done.
     - Empty state, loading state, error state all restyled.
     - Widget tests: list renders, search filters, send dispatches save, empty state.
 
-- [ ] **STX-U012**: Journal detail screen (`chi_tiet_nhat_ky`)
+- [x] **STX-U012**: Journal detail screen (`chi_tiet_nhat_ky`)
   - _Must-have · kind:feature · depends on: STX-U011_
   - Design: `docs/app_ui_redesign/chi_tiet_nhat_ky/{code.html,screen.png}`
   - Acceptance criteria:

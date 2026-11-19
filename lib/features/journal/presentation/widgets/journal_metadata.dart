@@ -25,6 +25,36 @@ extension JournalMoodUi on JournalMood {
   String get label => 'journal.mood_$name'.tr();
 }
 
+/// (title, body) of an entry. The first line becomes the title when the note
+/// has several lines; otherwise the title is "Journal day {n}" (n = day of the
+/// habit since [habitStartDate]) and the body is the whole note.
+(String, String) journalTitleAndBody(
+  JournalEntry entry,
+  DateTime habitStartDate,
+) {
+  final content = entry.content.trim();
+  final newline = content.indexOf('\n');
+  if (newline > 0) {
+    final body = content.substring(newline + 1).trim();
+    if (body.isNotEmpty) {
+      return (content.substring(0, newline).trim(), body);
+    }
+  }
+  final start = habitStartDate;
+  final date = entry.date;
+  final day =
+      DateTime.utc(
+        date.year,
+        date.month,
+        date.day,
+      ).difference(DateTime.utc(start.year, start.month, start.day)).inDays +
+      1;
+  return (
+    'journal.entry_day_title'.tr(args: <String>['${day < 1 ? 1 : day}']),
+    content,
+  );
+}
+
 /// "7h 45m" style sleep duration.
 String formatSleepMinutes(int minutes) => 'journal.sleep_value'.tr(
   args: <String>['${minutes ~/ 60}', '${minutes % 60}'.padLeft(2, '0')],
