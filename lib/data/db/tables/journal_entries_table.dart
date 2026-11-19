@@ -18,4 +18,15 @@ class JournalEntries extends Table {
 
   // Exact timestamp to sort multiple entries correctly within the same day.
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  // Optional reflection metadata (schema v5). Range and tag limits are
+  // enforced by SaveJournalEntryUseCase and backup validation.
+  TextColumn get mood => text().nullable()();
+
+  IntColumn get energy => integer().nullable()();
+
+  IntColumn get sleepMinutes => integer().nullable()();
+
+  // JSON array of tag strings; null when the entry has no tags.
+  TextColumn get tags => text().nullable()();
 }

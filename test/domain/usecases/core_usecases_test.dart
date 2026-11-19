@@ -227,6 +227,56 @@ void main() {
     },
   );
 
+  test('save journal entry carries metadata and normalizes tags', () async {
+    final useCase = SaveJournalEntryUseCase(journalEntryRepository);
+
+    final created = await useCase(
+      starnyxId: 'habit-1',
+      date: DateTime(2026, 4, 13),
+      content: 'Calm day',
+      mood: JournalMood.calm,
+      energy: 3,
+      sleepMinutes: 450,
+      tags: const <String>[' #NguSom ', 'ngusom', '', 'Focus'],
+    );
+    expect(created.mood, JournalMood.calm);
+    expect(created.energy, 3);
+    expect(created.sleepMinutes, 450);
+    expect(created.tags, <String>['NguSom', 'Focus']);
+
+    final updated = await useCase.update(created, content: 'Calm day');
+    expect(updated.mood, isNull);
+    expect(updated.energy, isNull);
+    expect(updated.sleepMinutes, isNull);
+    expect(updated.tags, isEmpty);
+  });
+
+  test('save journal entry rejects out-of-range metadata', () {
+    final useCase = SaveJournalEntryUseCase(journalEntryRepository);
+    Future<JournalEntry> save({
+      int? energy,
+      int? sleepMinutes,
+      List<String> tags = const <String>[],
+    }) => useCase(
+      starnyxId: 'habit-1',
+      date: DateTime(2026, 4, 13),
+      content: 'Note',
+      energy: energy,
+      sleepMinutes: sleepMinutes,
+      tags: tags,
+    );
+
+    expect(save(energy: 0), throwsA(isA<FormatException>()));
+    expect(save(energy: 6), throwsA(isA<FormatException>()));
+    expect(save(sleepMinutes: -1), throwsA(isA<FormatException>()));
+    expect(save(sleepMinutes: 24 * 60 + 1), throwsA(isA<FormatException>()));
+    expect(
+      save(tags: List<String>.generate(11, (i) => 'tag$i')),
+      throwsA(isA<FormatException>()),
+    );
+    expect(save(tags: <String>['a' * 33]), throwsA(isA<FormatException>()));
+  });
+
   test(
     'save journal entry update keeps id and createdAt, changes content and date',
     () async {
@@ -906,6 +956,78 @@ void main() {
       await journalEntryRepository.getJournalEntriesForStarnyx('habit-1'),
       <JournalEntry>[edited],
     );
+  });
+
+  test('backup round-trips journal metadata and validates it', () async {
+    await starNyxRepository.saveStarnyx(
+      StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 2, 9),
+      ),
+    );
+    final withMetadata = JournalEntry(
+      id: 4,
+      starnyxId: 'habit-1',
+      date: DateTime(2026, 4, 10),
+      content: 'Slept early',
+      createdAt: DateTime(2026, 4, 10, 22, 45),
+      mood: JournalMood.tired,
+      energy: 2,
+      sleepMinutes: 0,
+      tags: const <String>['HoiPhuc'],
+    );
+    final plain = JournalEntry(
+      id: 5,
+      starnyxId: 'habit-1',
+      date: DateTime(2026, 4, 11),
+      content: 'Plain',
+      createdAt: DateTime(2026, 4, 11, 21),
+    );
+    await journalEntryRepository.saveJournalEntry(withMetadata);
+    await journalEntryRepository.saveJournalEntry(plain);
+    final exportUseCase = ExportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    );
+    final importUseCase = ImportDataUseCase(
+      starNyxRepository,
+      completionRepository,
+      journalEntryRepository,
+      appSettingsRepository,
+    );
+
+    final exported = await exportUseCase();
+    final json = jsonDecode(exported) as Map<String, dynamic>;
+    expect(json['schemaVersion'], 1);
+    await importUseCase.callFromJsonText(exported);
+    expect(
+      (await journalEntryRepository.getJournalEntriesForStarnyx(
+        'habit-1',
+      )).toSet(),
+      <JournalEntry>{withMetadata, plain},
+    );
+
+    final entries = json['journalEntries'] as List<dynamic>;
+    final first = entries.first as Map<String, dynamic>;
+    // Unknown mood is tolerated (read back as null); bad energy is rejected.
+    first['mood'] = 'ecstatic';
+    expect(JsonValidationUtils.validateImportJson(json).isValid, isTrue);
+    first['energy'] = 7;
+    expect(JsonValidationUtils.validateImportJson(json).errors, <String>[
+      'journalEntries[0].energy must be an integer from 1 to 5 or null.',
+    ]);
+    first['energy'] = null;
+    first['tags'] = <dynamic>[1];
+    expect(JsonValidationUtils.validateImportJson(json).isValid, isFalse);
   });
 
   test(

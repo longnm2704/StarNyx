@@ -14,6 +14,7 @@ import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_event.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_state.dart';
 import 'package:starnyx/features/journal/presentation/pages/journal_editor_page.dart';
+import 'package:starnyx/features/journal/presentation/widgets/journal_metadata.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
 /// Full-screen Journal tab.
@@ -240,12 +241,17 @@ class _JournalPageState extends State<JournalPage> {
           );
         }
 
-        // ponytail: in-memory substring match, fine for one habit's notes.
+        // ponytail: in-memory substring match on content and tags, fine for one
+        // habit's notes.
         final query = _searchController.text.trim().toLowerCase();
         final entries = query.isEmpty
             ? state.entries
             : state.entries
-                  .where((e) => e.content.toLowerCase().contains(query))
+                  .where(
+                    (e) =>
+                        e.content.toLowerCase().contains(query) ||
+                        e.tags.any((t) => t.toLowerCase().contains(query)),
+                  )
                   .toList(growable: false);
         if (entries.isEmpty) {
           return Center(
@@ -475,7 +481,8 @@ class _JournalSearchField extends StatelessWidget {
   }
 }
 
-/// One journal entry card: accent dot, title, mono timestamp, clamped body.
+/// One journal entry card: accent dot, title, mono timestamp, clamped body,
+/// then mood and tag chips when the entry has them.
 class JournalEntryCard extends StatefulWidget {
   const JournalEntryCard({
     required this.entry,
@@ -529,6 +536,8 @@ class _JournalEntryCardState extends State<JournalEntryCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final (title, body) = _titleAndBody();
+    final mood = widget.entry.mood;
+    final tags = widget.entry.tags;
     final bodyStyle = theme.textTheme.bodyMedium?.copyWith(
       fontFamily: AppFonts.body,
       height: 1.6,
@@ -629,6 +638,26 @@ class _JournalEntryCardState extends State<JournalEntryCard> {
                   );
                 },
               ),
+              if (mood != null || tags.isNotEmpty) ...<Widget>[
+                const SizedBox(height: AppSpacing.sm),
+                Wrap(
+                  spacing: AppSpacing.xs,
+                  runSpacing: AppSpacing.xs,
+                  children: <Widget>[
+                    if (mood != null)
+                      JournalMetaChip(
+                        label: mood.label,
+                        color: mood.color,
+                        icon: mood.icon,
+                      ),
+                    for (final tag in tags)
+                      JournalMetaChip(
+                        label: '#$tag',
+                        color: AppColors.textSecondary,
+                      ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),

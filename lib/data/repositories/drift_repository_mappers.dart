@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:starnyx/core/utils/date_utils.dart';
 import 'package:starnyx/data/db/app_database.dart' as db;
 import 'package:starnyx/domain/entities/domain_entities.dart' as domain;
@@ -55,8 +57,27 @@ extension DriftJournalEntryMapper on db.JournalEntry {
       date: dateTimeFromDateKey(date),
       content: content,
       createdAt: createdAt,
+      mood: domain.JournalEntry.moodFromName(mood),
+      energy: energy,
+      sleepMinutes: sleepMinutes,
+      tags: decodeJournalTags(tags),
     );
   }
+}
+
+/// Tags are stored as a JSON array; empty lists are stored as null.
+String? encodeJournalTags(List<String> tags) =>
+    tags.isEmpty ? null : jsonEncode(tags);
+
+List<String> decodeJournalTags(String? raw) {
+  if (raw == null) return const <String>[];
+  try {
+    final decoded = jsonDecode(raw);
+    if (decoded is List) return decoded.whereType<String>().toList();
+  } on FormatException {
+    // Corrupt value: treat as no tags rather than failing the whole list.
+  }
+  return const <String>[];
 }
 
 // Maps Drift AppSetting rows into domain objects.

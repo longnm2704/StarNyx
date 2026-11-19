@@ -378,7 +378,7 @@ Tick `[x]` when an issue is done.
     - Backup export/import round-trips edited entries unchanged (no schema change; `id` is already exported).
     - Unit + bloc tests for update; widget test for edit flow.
 
-- [ ] **STX-U014**: (Optional) Journal metadata — mood, energy, sleep, tags
+- [x] **STX-U014**: (Optional) Journal metadata — mood, energy, sleep, tags
   - _Nice-to-have · kind:architecture,status:backlog · depends on: STX-U011_
   - Only do this if the team wants the mockup's "Cảm xúc hiện tại" / "TRẠNG THÁI PHẢN CHIẾU" / "TỪ KHÓA LIÊN KẾT" to be real.
   - Acceptance criteria:

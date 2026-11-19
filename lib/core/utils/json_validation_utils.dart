@@ -208,12 +208,52 @@ abstract final class JsonValidationUtils {
     _requireDateString(entry, 'date', 'journalEntries[$index]', errors);
     _requireString(entry, 'content', 'journalEntries[$index]', errors);
     _optionalIsoDateTime(entry, 'createdAt', 'journalEntries[$index]', errors);
+    _validateJournalMetadata(entry, 'journalEntries[$index]', errors);
 
     if (starnyxId != null && !knownStarNyxIds.contains(starnyxId)) {
       errors.add(
         'journalEntries[$index].starnyxId must reference a known StarNyx.',
       );
     }
+  }
+
+  // Metadata keys are optional (absent in pre-U014 backups). An unknown mood
+  // is kept as a string and read back as null, like an unknown habit icon.
+  static void _validateJournalMetadata(
+    Map<String, dynamic> entry,
+    String path,
+    List<String> errors,
+  ) {
+    _optionalNullableString(entry, 'mood', path, errors);
+    _optionalIntInRange(entry, 'energy', path, 1, 5, errors);
+    _optionalIntInRange(entry, 'sleepMinutes', path, 0, 24 * 60, errors);
+    final tags = entry['tags'];
+    if (tags == null) {
+      return;
+    }
+    if (tags is! List ||
+        tags.length > 10 ||
+        tags.any((tag) => tag is! String || tag.isEmpty || tag.length > 32)) {
+      errors.add(
+        '$path.tags must be a list of at most 10 non-empty strings '
+        '(32 characters max).',
+      );
+    }
+  }
+
+  static void _optionalIntInRange(
+    Map<String, dynamic> entry,
+    String key,
+    String path,
+    int min,
+    int max,
+    List<String> errors,
+  ) {
+    final value = entry[key];
+    if (value == null || (value is int && value >= min && value <= max)) {
+      return;
+    }
+    errors.add('$path.$key must be an integer from $min to $max or null.');
   }
 
   static void _validateAppSettings(

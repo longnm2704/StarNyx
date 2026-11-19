@@ -133,6 +133,10 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         starnyxId: starnyxId,
         date: DateUtils.nowDate(_nowBuilder()),
         content: trimmed,
+        mood: event.mood,
+        energy: event.energy,
+        sleepMinutes: event.sleepMinutes,
+        tags: event.tags,
       );
       _logger.debug('JournalBloc', 'save success starnyxId=$starnyxId');
       emit(
@@ -181,6 +185,10 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         event.entry,
         content: event.content,
         date: event.date,
+        mood: event.mood,
+        energy: event.energy,
+        sleepMinutes: event.sleepMinutes,
+        tags: event.tags,
       );
       _logger.debug('JournalBloc', 'update success id=$id');
       emit(

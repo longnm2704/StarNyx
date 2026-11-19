@@ -123,7 +123,22 @@
     "editor_edit_title": "記録を編集",
     "editor_save": "保存",
     "editor_close": "戻る",
-    "editor_open_semantics": "全画面エディタを開く"
+    "editor_open_semantics": "全画面エディタを開く",
+    "mood_title": "気分",
+    "mood_calm": "穏やか",
+    "mood_energized": "エネルギッシュ",
+    "mood_focused": "集中",
+    "mood_tired": "お疲れ気味",
+    "energy_title": "エネルギー",
+    "energy_level_semantics": "エネルギー {} / 5",
+    "sleep_title": "睡眠",
+    "sleep_empty": "未記録",
+    "sleep_value": "{}時間{}分",
+    "sleep_clear": "睡眠の記録を消す",
+    "sleep_done": "完了",
+    "tags_title": "タグ",
+    "tags_hint": "タグを追加",
+    "tag_remove_semantics": "タグ {} を削除"
   },
   "settings": {
     "title": "設定",

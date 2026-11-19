@@ -191,6 +191,51 @@ void main() {
     );
   });
 
+  test('persists and clears journal metadata through Drift', () async {
+    await starNyxRepository.saveStarnyx(
+      domain.StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: false,
+        reminderTime: null,
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 2, 9),
+      ),
+    );
+    final entry = domain.JournalEntry(
+      id: 9,
+      starnyxId: 'habit-1',
+      date: DateTime(2026, 4, 10),
+      content: 'Slept early',
+      createdAt: DateTime(2026, 4, 10, 22, 45),
+      mood: domain.JournalMood.calm,
+      energy: 4,
+      sleepMinutes: 465,
+      tags: const <String>['NguSom', 'DigitalDetox'],
+    );
+    await journalEntryRepository.saveJournalEntry(entry);
+    expect(
+      await journalEntryRepository.getJournalEntriesForStarnyx('habit-1'),
+      <domain.JournalEntry>[entry],
+    );
+
+    final cleared = domain.JournalEntry(
+      id: 9,
+      starnyxId: 'habit-1',
+      date: DateTime(2026, 4, 10),
+      content: 'Slept early',
+      createdAt: DateTime(2026, 4, 10, 22, 45),
+    );
+    await journalEntryRepository.updateJournalEntry(cleared);
+    expect(
+      await journalEntryRepository.getJournalEntriesForStarnyx('habit-1'),
+      <domain.JournalEntry>[cleared],
+    );
+  });
+
   test(
     'deleting a StarNyx cascades related completions and journal entries',
     () async {

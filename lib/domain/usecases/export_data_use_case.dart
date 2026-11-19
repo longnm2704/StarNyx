@@ -108,6 +108,12 @@ Map<String, dynamic> _journalEntryToJson(JournalEntry entry) {
     'date': _dateKey(entry.date),
     'content': entry.content,
     'createdAt': entry.createdAt.toIso8601String(),
+    // Optional metadata (STX-U014), written only when set; older backups
+    // simply omit these keys.
+    if (entry.mood != null) 'mood': entry.mood!.name,
+    if (entry.energy != null) 'energy': entry.energy,
+    if (entry.sleepMinutes != null) 'sleepMinutes': entry.sleepMinutes,
+    if (entry.tags.isNotEmpty) 'tags': entry.tags,
   };
 }
 

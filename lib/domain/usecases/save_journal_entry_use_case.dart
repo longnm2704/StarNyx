@@ -17,8 +17,14 @@ class SaveJournalEntryUseCase {
     required String starnyxId,
     required DateTime date,
     required String content,
+    JournalMood? mood,
+    int? energy,
+    int? sleepMinutes,
+    List<String> tags = const <String>[],
   }) async {
     final trimmedContent = _validContent(content);
+    _validateMetadata(energy: energy, sleepMinutes: sleepMinutes);
+    final validTags = normalizeTags(tags);
     final normalizedDate = DateUtils.dateOnly(date);
     _logger.debug(
       'SaveJournalEntryUseCase',
@@ -32,6 +38,10 @@ class SaveJournalEntryUseCase {
       date: normalizedDate,
       content: trimmedContent,
       createdAt: DateTime.now(),
+      mood: mood,
+      energy: energy,
+      sleepMinutes: sleepMinutes,
+      tags: validTags,
     );
 
     await _repository.saveJournalEntry(entry);
@@ -42,21 +52,68 @@ class SaveJournalEntryUseCase {
     return entry;
   }
 
-  /// Edits [entry]'s content and date; `id`, `starnyxId` and `createdAt` are
-  /// kept as they are.
+  /// Edits [entry]'s content, date and metadata; `id`, `starnyxId` and
+  /// `createdAt` are kept as they are. Metadata is replaced as given, so
+  /// passing null clears a field.
   Future<JournalEntry> update(
     JournalEntry entry, {
     required String content,
     DateTime? date,
+    JournalMood? mood,
+    int? energy,
+    int? sleepMinutes,
+    List<String> tags = const <String>[],
   }) async {
-    final updated = entry.copyWith(
-      content: _validContent(content),
+    _validateMetadata(energy: energy, sleepMinutes: sleepMinutes);
+    final updated = JournalEntry(
+      id: entry.id,
+      starnyxId: entry.starnyxId,
       date: DateUtils.dateOnly(date ?? entry.date),
+      content: _validContent(content),
+      createdAt: entry.createdAt,
+      mood: mood,
+      energy: energy,
+      sleepMinutes: sleepMinutes,
+      tags: normalizeTags(tags),
     );
     _logger.debug('SaveJournalEntryUseCase', 'update begin id=${entry.id}');
     await _repository.updateJournalEntry(updated);
     _logger.debug('SaveJournalEntryUseCase', 'update success id=${entry.id}');
     return updated;
+  }
+
+  static void _validateMetadata({int? energy, int? sleepMinutes}) {
+    if (energy != null &&
+        (energy < JournalEntry.minEnergy || energy > JournalEntry.maxEnergy)) {
+      throw const FormatException('Journal energy must be between 1 and 5.');
+    }
+    if (sleepMinutes != null &&
+        (sleepMinutes < 0 || sleepMinutes > JournalEntry.maxSleepMinutes)) {
+      throw const FormatException(
+        'Journal sleep must be between 0 and 24 hours.',
+      );
+    }
+  }
+
+  /// Trims tags, drops a leading `#`, empties and case-insensitive duplicates.
+  /// Throws when more than [JournalEntry.maxTags] remain or one is too long.
+  static List<String> normalizeTags(List<String> tags) {
+    final seen = <String>{};
+    final result = <String>[];
+    for (final raw in tags) {
+      final tag = raw.trim().replaceFirst(RegExp(r'^#+'), '').trim();
+      if (tag.isEmpty || !seen.add(tag.toLowerCase())) continue;
+      if (tag.length > JournalEntry.maxTagLength) {
+        throw const FormatException(
+          'Journal tags must be 32 characters or fewer.',
+        );
+      }
+      result.add(tag);
+    }
+    if (result.length > JournalEntry.maxTags) {
+      throw const FormatException('Journal entries allow at most 10 tags.');
+    }
+    return List.unmodifiable(result);
   }
 
   static String _validContent(String content) {

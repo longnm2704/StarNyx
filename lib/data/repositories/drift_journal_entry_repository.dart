@@ -86,6 +86,10 @@ class DriftJournalEntryRepository implements JournalEntryRepository {
         date: Value(dateKey),
         content: Value(entry.content),
         createdAt: Value(entry.createdAt),
+        mood: Value(entry.mood?.name),
+        energy: Value(entry.energy),
+        sleepMinutes: Value(entry.sleepMinutes),
+        tags: Value(encodeJournalTags(entry.tags)),
       ),
     );
     _logger.debug(
@@ -102,6 +106,10 @@ class DriftJournalEntryRepository implements JournalEntryRepository {
       JournalEntriesCompanion(
         date: Value(dateKeyFromDateTime(entry.date)),
         content: Value(entry.content),
+        mood: Value(entry.mood?.name),
+        energy: Value(entry.energy),
+        sleepMinutes: Value(entry.sleepMinutes),
+        tags: Value(encodeJournalTags(entry.tags)),
       ),
     );
     _logger.debug(

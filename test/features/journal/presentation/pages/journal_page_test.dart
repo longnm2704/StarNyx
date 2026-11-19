@@ -182,6 +182,116 @@ void main() {
     );
   });
 
+  testWidgets('editor saves mood, energy, sleep and tags; card shows chips', (
+    tester,
+  ) async {
+    final repository = _InMemoryJournalEntryRepository([]);
+    await _render(tester, repository, habit);
+
+    await tester.tap(find.byKey(const Key('journal-expand-button')));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('journal-editor-input')),
+      'Ngủ sớm',
+    );
+    await tester.tap(find.byKey(const Key('journal-mood-energized')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('journal-mood-calm')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('journal-energy-4')));
+    await tester.pump();
+
+    await tester.ensureVisible(find.byKey(const Key('journal-sleep-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('journal-sleep-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('journal-sleep-done')));
+    await tester.pumpAndSettle();
+    expect(find.text('7h 00m'), findsOneWidget);
+
+    await tester.ensureVisible(find.byKey(const Key('journal-tag-input')));
+    await tester.enterText(
+      find.byKey(const Key('journal-tag-input')),
+      '#NguSom',
+    );
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pump();
+    expect(find.text('#NguSom'), findsOneWidget);
+    // A tag left in the field is saved too.
+    await tester.enterText(find.byKey(const Key('journal-tag-input')), 'Detox');
+
+    await tester.tap(find.byKey(const Key('journal-editor-save')));
+    await tester.pumpAndSettle();
+
+    final saved = (await repository.getJournalEntriesForStarnyx(
+      'habit-1',
+    )).single;
+    expect(saved.mood, JournalMood.calm);
+    expect(saved.energy, 4);
+    expect(saved.sleepMinutes, 420);
+    expect(saved.tags, <String>['NguSom', 'Detox']);
+
+    final card = find.byType(JournalEntryCard);
+    expect(
+      find.descendant(of: card, matching: find.text('Bình an')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: card, matching: find.text('#NguSom')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: card, matching: find.text('#Detox')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('editor edit mode can clear metadata', (tester) async {
+    final original = JournalEntry(
+      id: 1,
+      starnyxId: 'habit-1',
+      date: DateTime(2026, 11, 19),
+      content: 'Mệt',
+      createdAt: DateTime(2026, 11, 19, 22),
+      mood: JournalMood.tired,
+      energy: 2,
+      tags: const <String>['HoiPhuc'],
+    );
+    final repository = _InMemoryJournalEntryRepository([original]);
+    await _render(tester, repository, habit);
+    expect(find.text('Mỏi mệt'), findsOneWidget);
+
+    final context = tester.element(find.byType(JournalEntryCard));
+    unawaited(
+      JournalEditorPage.open(
+        context,
+        bloc: context.read<JournalBloc>(),
+        entry: original,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('journal-mood-tired')));
+    await tester.tap(find.byKey(const Key('journal-energy-2')));
+    await tester.pump();
+    await tester.ensureVisible(find.text('#HoiPhuc'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(InputChip, '#HoiPhuc'),
+        matching: find.byTooltip('Xóa từ khóa HoiPhuc'),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('journal-editor-save')));
+    await tester.pumpAndSettle();
+
+    final saved = (await repository.getJournalEntriesForStarnyx(
+      'habit-1',
+    )).single;
+    expect(saved, entry(1, 'Mệt', DateTime(2026, 11, 19, 22)));
+  });
+
   testWidgets('shows empty state when there are no entries', (tester) async {
     await _render(tester, _InMemoryJournalEntryRepository([]), habit);
 

@@ -26,20 +26,55 @@ class JournalDraftChanged extends JournalEvent {
   List<Object?> get props => <Object?>[content];
 }
 
+/// Saves the draft as a new entry, with optional metadata from the editor.
 class JournalSaveRequested extends JournalEvent {
-  const JournalSaveRequested();
+  const JournalSaveRequested({
+    this.mood,
+    this.energy,
+    this.sleepMinutes,
+    this.tags = const <String>[],
+  });
+
+  final JournalMood? mood;
+  final int? energy;
+  final int? sleepMinutes;
+  final List<String> tags;
+
+  @override
+  List<Object?> get props => <Object?>[mood, energy, sleepMinutes, tags];
 }
 
-/// Saves an edit of [entry]; `id` and `createdAt` are preserved.
+/// Saves an edit of [entry]; `id` and `createdAt` are preserved. Metadata is
+/// replaced with the given values (null clears a field).
 class JournalEntryUpdated extends JournalEvent {
-  const JournalEntryUpdated(this.entry, {required this.content, this.date});
+  const JournalEntryUpdated(
+    this.entry, {
+    required this.content,
+    this.date,
+    this.mood,
+    this.energy,
+    this.sleepMinutes,
+    this.tags = const <String>[],
+  });
 
   final JournalEntry entry;
   final String content;
   final DateTime? date;
+  final JournalMood? mood;
+  final int? energy;
+  final int? sleepMinutes;
+  final List<String> tags;
 
   @override
-  List<Object?> get props => <Object?>[entry, content, date];
+  List<Object?> get props => <Object?>[
+    entry,
+    content,
+    date,
+    mood,
+    energy,
+    sleepMinutes,
+    tags,
+  ];
 }
 
 class JournalDeleteRequested extends JournalEvent {

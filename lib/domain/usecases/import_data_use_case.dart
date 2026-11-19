@@ -256,6 +256,10 @@ JournalEntry _journalEntryFromJson(Map<String, dynamic> json) {
     createdAt: json.containsKey('createdAt')
         ? DateTime.parse(json['createdAt'] as String)
         : date,
+    mood: JournalEntry.moodFromName(json['mood'] as String?),
+    energy: json['energy'] as int?,
+    sleepMinutes: json['sleepMinutes'] as int?,
+    tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? const <String>[],
   );
 }
 

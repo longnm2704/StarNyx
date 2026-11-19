@@ -20,8 +20,8 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  // Schema version 4: Adds the persisted habit symbol (icon) column.
-  int get schemaVersion => 4;
+  // Schema version 5: Adds journal metadata (mood, energy, sleep, tags).
+  int get schemaVersion => 5;
 
   @override
   // Versioned migrations handle structural changes between schema releases.
@@ -52,6 +52,13 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 4) {
         await migrator.addColumn(starNyxs, starNyxs.icon);
+      }
+      // from < 2 recreated journal_entries above with the v5 columns already.
+      if (from >= 2 && from < 5) {
+        await migrator.addColumn(journalEntries, journalEntries.mood);
+        await migrator.addColumn(journalEntries, journalEntries.energy);
+        await migrator.addColumn(journalEntries, journalEntries.sleepMinutes);
+        await migrator.addColumn(journalEntries, journalEntries.tags);
       }
     },
     beforeOpen: (OpeningDetails details) async {

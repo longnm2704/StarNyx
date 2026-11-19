@@ -123,7 +123,22 @@
     "editor_edit_title": "Chỉnh sửa ghi chép",
     "editor_save": "Lưu",
     "editor_close": "Quay lại",
-    "editor_open_semantics": "Mở trình soạn thảo đầy đủ"
+    "editor_open_semantics": "Mở trình soạn thảo đầy đủ",
+    "mood_title": "Cảm xúc",
+    "mood_calm": "Bình an",
+    "mood_energized": "Đầy năng lượng",
+    "mood_focused": "Tập trung",
+    "mood_tired": "Mỏi mệt",
+    "energy_title": "Năng lượng",
+    "energy_level_semantics": "Năng lượng {} trên 5",
+    "sleep_title": "Giấc ngủ",
+    "sleep_empty": "Chưa ghi",
+    "sleep_value": "{}h {}m",
+    "sleep_clear": "Xóa giấc ngủ",
+    "sleep_done": "Xong",
+    "tags_title": "Từ khóa",
+    "tags_hint": "Thêm từ khóa",
+    "tag_remove_semantics": "Xóa từ khóa {}"
   },
   "settings": {
     "title": "Cài đặt",

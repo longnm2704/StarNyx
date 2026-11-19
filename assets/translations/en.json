@@ -123,7 +123,22 @@
     "editor_edit_title": "Edit entry",
     "editor_save": "Save",
     "editor_close": "Back",
-    "editor_open_semantics": "Open full editor"
+    "editor_open_semantics": "Open full editor",
+    "mood_title": "Mood",
+    "mood_calm": "Calm",
+    "mood_energized": "Energized",
+    "mood_focused": "Focused",
+    "mood_tired": "Tired",
+    "energy_title": "Energy",
+    "energy_level_semantics": "Energy {} of 5",
+    "sleep_title": "Sleep",
+    "sleep_empty": "Not set",
+    "sleep_value": "{}h {}m",
+    "sleep_clear": "Clear sleep",
+    "sleep_done": "Done",
+    "tags_title": "Tags",
+    "tags_hint": "Add a tag",
+    "tag_remove_semantics": "Remove tag {}"
   },
   "settings": {
     "title": "Settings",
