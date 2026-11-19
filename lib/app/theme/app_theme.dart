@@ -4,20 +4,40 @@ import 'package:starnyx/core/constants/core_constants.dart';
 // Central theme entrypoint for the StarNyx cosmic visual baseline.
 abstract final class AppTheme {
   static ThemeData dark() {
-    final colorScheme =
-        ColorScheme.fromSeed(
-          seedColor: AppColors.accentViolet,
-          brightness: Brightness.dark,
-        ).copyWith(
-          primary: AppColors.accentBlue,
-          secondary: AppColors.accentPink,
-          tertiary: AppColors.accentOrange,
-          surface: AppColors.surface,
-          surfaceContainerHighest: AppColors.surfaceElevated,
-          outline: AppColors.outline,
-          onSurface: AppColors.textPrimary,
-          onSurfaceVariant: AppColors.textSecondary,
-        );
+    const colorScheme = ColorScheme(
+      brightness: Brightness.dark,
+      primary: AppColors.primary,
+      onPrimary: AppColors.onPrimary,
+      primaryContainer: AppColors.primary,
+      onPrimaryContainer: AppColors.onPrimary,
+      secondary: AppColors.secondary,
+      onSecondary: AppColors.onSecondary,
+      secondaryContainer: AppColors.secondary,
+      onSecondaryContainer: AppColors.onSecondary,
+      tertiary: AppColors.tertiary,
+      onTertiary: AppColors.onTertiary,
+      tertiaryContainer: AppColors.tertiary,
+      onTertiaryContainer: AppColors.onTertiary,
+      error: AppColors.error,
+      onError: AppColors.black,
+      errorContainer: AppColors.error,
+      onErrorContainer: AppColors.errorOnDark,
+      surface: AppColors.surfaceLevel1,
+      onSurface: AppColors.textPrimary,
+      surfaceContainerLowest: AppColors.background,
+      surfaceContainerLow: AppColors.surfaceLevel1,
+      surfaceContainer: AppColors.surfaceLevel2,
+      surfaceContainerHigh: AppColors.surfaceLevel3,
+      surfaceContainerHighest: AppColors.surfaceLevel3,
+      onSurfaceVariant: AppColors.textSecondary,
+      outline: AppColors.borderFocus,
+      outlineVariant: AppColors.borderSubtle,
+      shadow: AppColors.black,
+      scrim: AppColors.black,
+      inverseSurface: AppColors.textPrimary,
+      onInverseSurface: AppColors.background,
+      inversePrimary: AppColors.primary,
+    );
 
     final baseTheme = ThemeData(
       useMaterial3: true,

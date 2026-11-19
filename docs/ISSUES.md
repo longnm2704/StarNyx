@@ -223,7 +223,7 @@ Tick `[x]` when an issue is done.
     - No runtime network fetch in release builds if `google_fonts` is used (bundle the fonts or use `GoogleFonts.config.allowRuntimeFetching = false`).
     - `flutter test` passes.
 
-- [ ] **STX-U002**: Replace AppColors with the Obsidian Lumina palette
+- [x] **STX-U002**: Replace AppColors with the Obsidian Lumina palette
   - _Must-have · kind:architecture · depends on: —_
   - Design: `obsidian_lumina/DESIGN.md` (Colors, Elevation & Depth)
   - Acceptance criteria:
