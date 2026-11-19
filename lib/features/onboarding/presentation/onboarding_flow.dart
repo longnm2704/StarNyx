@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/features/onboarding/domain/create_onboarding_habits.dart';
 import 'package:starnyx/features/onboarding/domain/onboarding_template.dart';
+import 'package:starnyx/features/onboarding/presentation/pages/onboarding_complete_page.dart';
 import 'package:starnyx/features/onboarding/presentation/pages/onboarding_reminder_page.dart';
 import 'package:starnyx/features/onboarding/presentation/pages/onboarding_template_picker_page.dart';
 import 'package:starnyx/features/onboarding/presentation/pages/onboarding_welcome_page.dart';
@@ -61,13 +65,37 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   // Throws on failure (after rolling back); the reminder page shows the error.
   Future<void> _createHabits(List<OnboardingHabitDraft> drafts) async {
-    await createOnboardingHabits(
+    final habits = await createOnboardingHabits(
       drafts,
       create: serviceLocator<CreateStarNyxUseCase>(),
       delete: serviceLocator<DeleteStarNyxUseCase>(),
       sync: serviceLocator<SyncNotificationsUseCase>(),
     );
-    widget.onFinished();
+    unawaited(_openCompletion(habits));
+  }
+
+  Future<void> _openCompletion(List<StarNyx> habits) async {
+    var done = false;
+    await _navigator.push(
+      MaterialPageRoute<void>(
+        builder: (_) => OnboardingCompletePage(
+          habits: habits,
+          onBack: _navigator.pop,
+          onDone: () {
+            done = true;
+            widget.onFinished();
+          },
+        ),
+      ),
+    );
+    if (done) return;
+    // Backing out to the reminder step undoes the creation, so pressing its
+    // CTA again does not duplicate the habits.
+    await deleteOnboardingHabits(
+      habits,
+      delete: serviceLocator<DeleteStarNyxUseCase>(),
+      sync: serviceLocator<SyncNotificationsUseCase>(),
+    );
   }
 
   Future<void> _createCustomHabit() async {

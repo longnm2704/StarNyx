@@ -401,6 +401,17 @@
       "cta": "Begin your routine",
       "footer": "You can adjust or turn off notifications any time in Settings.",
       "create_error": "Could not create your habits. Nothing was saved, please try again."
+    },
+    "complete": {
+      "overline": "ALL SET · READY TO BEGIN",
+      "title_lead": "Ready to ",
+      "title_emphasis": "begin.",
+      "subtitle": "Your first habit spark is lit. Keep going day by day to fill in your own bright 365-day picture.",
+      "commitment": "YOUR STARTING COMMITMENT",
+      "ready": "Ready",
+      "quote": "“Discipline is not a cage, but the bridge to real freedom.”",
+      "cta": "Go to home screen",
+      "footer": "Every setting can be adjusted any time in Settings"
     }
   }
 }

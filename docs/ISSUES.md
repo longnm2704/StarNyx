@@ -533,7 +533,7 @@ Tick `[x]` when an issue is done.
     - If habit creation fails midway, roll back created habits and show an error.
     - Widget tests: time edit, continue creates habits, skip path.
 
-- [ ] **STX-U023**: Onboarding flow — completion screen (`hoan_tat_onboarding`)
+- [x] **STX-U023**: Onboarding flow — completion screen (`hoan_tat_onboarding`)
   - _Must-have · kind:feature · depends on: STX-U022_
   - Design: `docs/app_ui_redesign/hoan_tat_onboarding/{code.html,screen.png}`
   - Acceptance criteria:
