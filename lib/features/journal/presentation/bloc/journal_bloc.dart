@@ -61,7 +61,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         deleteStatus: AsyncStatus.idle,
         undoDeleteStatus: AsyncStatus.idle,
         recentlyDeletedEntry: null,
-        errorMessage: null,
       ),
     );
 
@@ -94,7 +93,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         updateStatus: AsyncStatus.idle,
         deleteStatus: AsyncStatus.idle,
         undoDeleteStatus: AsyncStatus.idle,
-        errorMessage: null,
       ),
     );
   }
@@ -124,7 +122,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         updateStatus: AsyncStatus.idle,
         deleteStatus: AsyncStatus.idle,
         undoDeleteStatus: AsyncStatus.idle,
-        errorMessage: null,
       ),
     );
 
@@ -144,7 +141,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
           saveStatus: AsyncStatus.success,
           draftContent: '',
           feedbackCount: state.feedbackCount + 1,
-          errorMessage: null,
         ),
       );
     } catch (error, stackTrace) {
@@ -158,8 +154,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         state.copyWith(
           saveStatus: AsyncStatus.failure,
           feedbackCount: state.feedbackCount + 1,
-          errorMessage:
-              'Unable to save the journal entry right now. Please try again.',
         ),
       );
     }
@@ -177,7 +171,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         saveStatus: AsyncStatus.idle,
         deleteStatus: AsyncStatus.idle,
         undoDeleteStatus: AsyncStatus.idle,
-        errorMessage: null,
       ),
     );
     try {
@@ -208,8 +201,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         state.copyWith(
           updateStatus: AsyncStatus.failure,
           feedbackCount: state.feedbackCount + 1,
-          errorMessage:
-              'Unable to update the journal entry right now. Please try again.',
         ),
       );
     }
@@ -226,7 +217,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         saveStatus: AsyncStatus.idle,
         updateStatus: AsyncStatus.idle,
         undoDeleteStatus: AsyncStatus.idle,
-        errorMessage: null,
       ),
     );
 
@@ -238,7 +228,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
           deleteStatus: AsyncStatus.success,
           recentlyDeletedEntry: event.entry,
           feedbackCount: state.feedbackCount + 1,
-          errorMessage: null,
         ),
       );
     } catch (error, stackTrace) {
@@ -252,8 +241,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         state.copyWith(
           deleteStatus: AsyncStatus.failure,
           feedbackCount: state.feedbackCount + 1,
-          errorMessage:
-              'Unable to delete the journal entry right now. Please try again.',
         ),
       );
     }
@@ -276,7 +263,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         deleteStatus: AsyncStatus.idle,
         saveStatus: AsyncStatus.idle,
         updateStatus: AsyncStatus.idle,
-        errorMessage: null,
       ),
     );
 
@@ -288,7 +274,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
           undoDeleteStatus: AsyncStatus.success,
           recentlyDeletedEntry: null,
           feedbackCount: state.feedbackCount + 1,
-          errorMessage: null,
         ),
       );
     } catch (error, stackTrace) {
@@ -302,8 +287,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
         state.copyWith(
           undoDeleteStatus: AsyncStatus.failure,
           feedbackCount: state.feedbackCount + 1,
-          errorMessage:
-              'Unable to restore the journal entry right now. Please try again.',
         ),
       );
     }
@@ -323,7 +306,6 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     emit(
       state.copyWith(
         status: JournalStatus.failure,
-        errorMessage: 'Unable to load journal entries right now.',
       ),
     );
   }

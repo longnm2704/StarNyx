@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/core/widgets/app_empty_state.dart';
 import 'package:starnyx/core/widgets/app_error_state.dart';
 import 'package:starnyx/core/widgets/app_icon.dart';
@@ -11,6 +12,7 @@ import 'package:starnyx/domain/entities/overview_stats.dart';
 import 'package:starnyx/features/overview/presentation/bloc/overview_bloc.dart';
 import 'package:starnyx/features/overview/presentation/bloc/overview_event.dart';
 import 'package:starnyx/features/overview/presentation/bloc/overview_state.dart';
+import 'package:starnyx/features/starnyx_form/presentation/pages/starnyx_form_page.dart';
 
 /// Full-screen Overview tab.
 ///
@@ -908,7 +910,7 @@ class _OverviewContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final stats = state.stats!;
     final bloc = context.read<OverviewBloc>();
-    final daysInYear = _daysInYear(state.year);
+    final daysInYear = core_date_utils.DateUtils.daysInYear(state.year);
     final litPct = daysInYear > 0
         ? ((stats.totalLitDays / daysInYear) * 100).round()
         : 0;
@@ -1014,12 +1016,6 @@ class _OverviewContent extends StatelessWidget {
       ],
     );
   }
-
-  int _daysInYear(int year) {
-    if (year % 400 == 0) return 366;
-    if (year % 100 == 0) return 365;
-    return year % 4 == 0 ? 366 : 365;
-  }
 }
 
 class _OverviewSkeleton extends StatelessWidget {
@@ -1103,8 +1099,13 @@ class _OverviewEmptyView extends StatelessWidget {
             title: 'overview.empty_title'.tr(),
             message: 'overview.empty_message'.tr(),
             actionLabel: 'overview.empty_action'.tr(),
-            onActionPressed: () {
-              // TODO: open create habit sheet when integrated
+            onActionPressed: () async {
+              final result = await StarnyxFormPage.open(context);
+              if (result != null && result.hasChanges && context.mounted) {
+                context.read<OverviewBloc>().add(
+                  const OverviewReloadRequested(),
+                );
+              }
             },
           ),
         ],

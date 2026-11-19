@@ -16,7 +16,6 @@ class JournalState extends Equatable {
     required this.undoDeleteStatus,
     required this.recentlyDeletedEntry,
     required this.feedbackCount,
-    required this.errorMessage,
   });
 
   factory JournalState.initial() {
@@ -31,7 +30,6 @@ class JournalState extends Equatable {
       undoDeleteStatus: AsyncStatus.idle,
       recentlyDeletedEntry: null,
       feedbackCount: 0,
-      errorMessage: null,
     );
   }
 
@@ -45,7 +43,6 @@ class JournalState extends Equatable {
   final AsyncStatus undoDeleteStatus;
   final JournalEntry? recentlyDeletedEntry;
   final int feedbackCount;
-  final String? errorMessage;
 
   bool get hasStarnyx => (starnyxId ?? '').isNotEmpty;
   bool get canSaveDraft =>
@@ -64,7 +61,6 @@ class JournalState extends Equatable {
     AsyncStatus? undoDeleteStatus,
     Object? recentlyDeletedEntry = _unset,
     int? feedbackCount,
-    Object? errorMessage = _unset,
   }) {
     return JournalState(
       status: status ?? this.status,
@@ -81,9 +77,6 @@ class JournalState extends Equatable {
           ? this.recentlyDeletedEntry
           : recentlyDeletedEntry as JournalEntry?,
       feedbackCount: feedbackCount ?? this.feedbackCount,
-      errorMessage: identical(errorMessage, _unset)
-          ? this.errorMessage
-          : errorMessage as String?,
     );
   }
 
@@ -99,6 +92,5 @@ class JournalState extends Equatable {
     undoDeleteStatus,
     recentlyDeletedEntry,
     feedbackCount,
-    errorMessage,
   ];
 }

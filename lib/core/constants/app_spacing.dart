@@ -11,15 +11,8 @@ abstract final class AppSpacing {
   static const xxl = 48.0;
 
   static const pageHorizontal = 16.0;
-  static const pageVertical = 24.0;
-  static const section = 24.0;
 
   static const cardPadding = EdgeInsets.all(md);
-  static const sheetPadding = EdgeInsets.all(lg);
-  static const pagePadding = EdgeInsets.symmetric(
-    horizontal: pageHorizontal,
-    vertical: pageVertical,
-  );
   static const inputContentPadding = EdgeInsets.symmetric(
     horizontal: md,
     vertical: md,

@@ -178,7 +178,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       state.copyWith(
         exportStatus: AsyncStatus.inProgress,
         importStatus: AsyncStatus.idle,
-        errorMessage: null,
       ),
     );
     try {
@@ -200,7 +199,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       emit(
         state.copyWith(
           exportStatus: AsyncStatus.success,
-          errorMessage: null,
           exportedFilePath: file.path,
         ),
       );
@@ -214,7 +212,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       emit(
         state.copyWith(
           exportStatus: AsyncStatus.failure,
-          errorMessage: _settingsErrorMessageFor(SettingsFailureArea.export),
         ),
       );
     }
@@ -232,7 +229,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       state.copyWith(
         importStatus: AsyncStatus.inProgress,
         exportStatus: AsyncStatus.idle,
-        errorMessage: null,
       ),
     );
     try {
@@ -240,7 +236,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       await _syncNotificationsUseCase.rebuildAllFromLocalData();
       _logger.debug('SettingsBloc', 'import success');
       emit(
-        state.copyWith(importStatus: AsyncStatus.success, errorMessage: null),
+        state.copyWith(importStatus: AsyncStatus.success),
       );
     } catch (error, stackTrace) {
       _logger.error(
@@ -252,20 +248,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       emit(
         state.copyWith(
           importStatus: AsyncStatus.failure,
-          errorMessage: _settingsErrorMessageFor(SettingsFailureArea.import),
         ),
       );
     }
   }
 }
 
-enum SettingsFailureArea { export, import }
-
-String _settingsErrorMessageFor(SettingsFailureArea area) {
-  switch (area) {
-    case SettingsFailureArea.export:
-      return 'Backup could not be created. Please try again.';
-    case SettingsFailureArea.import:
-      return 'Backup could not be imported. Check the file and try again.';
-  }
-}

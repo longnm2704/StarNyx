@@ -147,7 +147,6 @@ void main() {
     await pumpEventQueue(times: 5);
 
     expect(bloc.state.updateStatus, AsyncStatus.failure);
-    expect(bloc.state.errorMessage, isNotNull);
     expect((await repository.getJournalEntriesForStarnyx('s-1')).single, entry);
   });
 

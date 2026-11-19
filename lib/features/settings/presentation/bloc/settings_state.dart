@@ -9,7 +9,6 @@ class SettingsState extends Equatable {
   const SettingsState({
     this.exportStatus = AsyncStatus.idle,
     this.importStatus = AsyncStatus.idle,
-    this.errorMessage,
     this.exportedFilePath,
     this.starnyxs = const <StarNyx>[],
     this.activeHabitTitle,
@@ -20,7 +19,6 @@ class SettingsState extends Equatable {
 
   final AsyncStatus exportStatus;
   final AsyncStatus importStatus;
-  final String? errorMessage;
   final String? exportedFilePath;
 
   /// All habits; drives the reminder row.
@@ -65,7 +63,6 @@ class SettingsState extends Equatable {
   SettingsState copyWith({
     AsyncStatus? exportStatus,
     AsyncStatus? importStatus,
-    Object? errorMessage = _unset,
     Object? exportedFilePath = _unset,
     List<StarNyx>? starnyxs,
     Object? activeHabitTitle = _unset,
@@ -76,9 +73,6 @@ class SettingsState extends Equatable {
     return SettingsState(
       exportStatus: exportStatus ?? this.exportStatus,
       importStatus: importStatus ?? this.importStatus,
-      errorMessage: identical(errorMessage, _unset)
-          ? this.errorMessage
-          : errorMessage as String?,
       exportedFilePath: identical(exportedFilePath, _unset)
           ? this.exportedFilePath
           : exportedFilePath as String?,
@@ -96,7 +90,6 @@ class SettingsState extends Equatable {
   List<Object?> get props => [
     exportStatus,
     importStatus,
-    errorMessage,
     exportedFilePath,
     starnyxs,
     activeHabitTitle,
