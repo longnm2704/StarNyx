@@ -402,9 +402,7 @@ class _LoadingPill extends StatelessWidget {
                 color.withValues(alpha: opacity * 0.62),
               ],
             ),
-            border: Border.all(
-              color: AppColors.white.withValues(alpha: opacity * 0.18),
-            ),
+            border: Border.all(color: AppColors.borderSubtle),
           ),
         );
       },
