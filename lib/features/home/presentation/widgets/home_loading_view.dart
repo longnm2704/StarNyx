@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/features/home/presentation/widgets/home_grid_utils.dart';
 
 class HomeLoadingView extends StatefulWidget {
@@ -88,13 +89,8 @@ class _HomeLoadingViewState extends State<HomeLoadingView>
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Expanded(
-                  child: Container(
+                  child: AppCard(
                     padding: const EdgeInsets.all(AppSpacing.sm),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceLevel1,
-                      borderRadius: BorderRadius.circular(AppRadius.card),
-                      border: Border.all(color: AppColors.borderSubtle),
-                    ),
                     child: _LoadingStarGrid(
                       animation: _controller,
                       accentColor: widget.accentColor,

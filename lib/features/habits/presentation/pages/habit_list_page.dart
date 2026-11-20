@@ -253,7 +253,13 @@ class _HabitListPageState extends State<HabitListPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _HabitListTitleBar(onBackPressed: _pop),
+        AppPageHeader(
+          title: 'habits.title'.tr(),
+          subtitle: 'habits.subtitle'.tr(),
+          backKey: const Key('habit-list-back'),
+          centerTitle: true,
+          onBack: _pop,
+        ),
         const SizedBox(height: AppSpacing.lg),
         if (activeHabit != null) ...<Widget>[
           _ActiveHabitPill(habit: activeHabit),
@@ -370,66 +376,6 @@ class _HabitListPageState extends State<HabitListPage> {
   }
 }
 
-class _HabitListTitleBar extends StatelessWidget {
-  const _HabitListTitleBar({required this.onBackPressed});
-
-  final VoidCallback onBackPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            key: const Key('habit-list-back'),
-            onTap: onBackPressed,
-            customBorder: const CircleBorder(),
-            child: const SizedBox.square(
-              dimension: 44,
-              child: Center(
-                child: AppIcon(
-                  icon: HugeIconsStrokeRounded.strokeRoundedArrowLeft01,
-                  size: 22,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.xxs),
-        Expanded(
-          child: Column(
-            children: <Widget>[
-              Text(
-                'habits.title'.tr(),
-                textAlign: TextAlign.center,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontFamily: AppFonts.headline,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.6,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xxs),
-              Text(
-                'habits.subtitle'.tr(),
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 48),
-      ],
-    );
-  }
-}
-
 class _ActiveHabitPill extends StatelessWidget {
   const _ActiveHabitPill({required this.habit});
 
@@ -516,12 +462,8 @@ class _ActionTile extends StatelessWidget {
     return Semantics(
       button: true,
       label: semanticsLabel,
-      child: Material(
-        color: AppColors.surfaceLevel1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          side: const BorderSide(color: AppColors.borderSubtle),
-        ),
+      child: AppCard(
+        padding: null,
         child: InkWell(
           key: tileKey,
           onTap: onPressed,

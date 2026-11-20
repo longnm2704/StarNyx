@@ -6,8 +6,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/app/reminder_permission.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
-import 'package:starnyx/core/widgets/app_icon.dart';
-import 'package:starnyx/core/widgets/app_sheet.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/domain/usecases/sync_notifications_use_case.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_event.dart';
@@ -326,55 +325,52 @@ class _ProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final title = state.activeHabitTitle;
-    return _Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Row(
-          children: <Widget>[
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceLevel2,
-                borderRadius: BorderRadius.circular(AppRadius.md),
-                border: Border.all(color: AppColors.borderSubtle),
+    return AppCard(
+      child: Row(
+        children: <Widget>[
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLevel2,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(color: AppColors.borderSubtle),
+            ),
+            child: const Center(
+              child: AppIcon(
+                icon: HugeIconsStrokeRounded.strokeRoundedSparkles,
+                color: AppColors.primary,
+                size: 26,
               ),
-              child: const Center(
-                child: AppIcon(
-                  icon: HugeIconsStrokeRounded.strokeRoundedSparkles,
-                  color: AppColors.primary,
-                  size: 26,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  title ?? 'app.title'.tr(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontFamily: AppFonts.headline,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    title ?? 'app.title'.tr(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontFamily: AppFonts.headline,
-                      fontWeight: FontWeight.w700,
-                    ),
+                const SizedBox(height: 2),
+                Text(
+                  title == null
+                      ? 'settings.profile_empty'.tr()
+                      : 'settings.profile_streak'.plural(state.currentStreak),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textSecondary,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    title == null
-                        ? 'settings.profile_empty'.tr()
-                        : 'settings.profile_streak'.plural(state.currentStreak),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -389,41 +385,16 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final overline = Theme.of(context).textTheme.labelSmall?.copyWith(
-      fontFamily: AppFonts.mono,
-      fontWeight: FontWeight.w600,
-      letterSpacing: 1.1,
-      color: AppColors.textSecondary,
-    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.xxs,
-            0,
-            AppSpacing.xxs,
-            AppSpacing.xs,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Flexible(child: Text(title.toUpperCase(), style: overline)),
-              if (trailing != null) ...<Widget>[
-                const SizedBox(width: AppSpacing.xs),
-                Flexible(
-                  child: Text(
-                    trailing!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: overline?.copyWith(color: AppColors.primary),
-                  ),
-                ),
-              ],
-            ],
-          ),
+        AppSectionLabel(
+          title,
+          trailing: trailing,
+          padding: AppSectionLabel.aboveCard,
         ),
-        _Card(
+        AppCard(
+          padding: null,
           child: Column(
             children: <Widget>[
               for (var i = 0; i < children.length; i++) ...<Widget>[
@@ -439,25 +410,6 @@ class _Section extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _Card extends StatelessWidget {
-  const _Card({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surfaceLevel1,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        side: const BorderSide(color: AppColors.borderSubtle),
-      ),
-      child: child,
     );
   }
 }

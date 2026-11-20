@@ -24,13 +24,8 @@ class StarnyxFormReminderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLevel1,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
+    return AppCard(
+      radius: AppRadius.lg,
       child: Column(
         children: <Widget>[
           Row(

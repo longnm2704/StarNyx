@@ -208,13 +208,8 @@ class _CommitmentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Container(
-      padding: AppSpacing.cardPadding,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLevel1,
-        borderRadius: BorderRadius.circular(AppRadius.sheet),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
+    return AppCard(
+      radius: AppRadius.sheet,
       child: Column(
         children: <Widget>[
           Row(
@@ -320,13 +315,7 @@ class _Quote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: AppSpacing.cardPadding,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLevel1,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
+    return AppCard(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

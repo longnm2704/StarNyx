@@ -185,7 +185,7 @@ void main() {
     await openForm(tester, host);
 
     // Category chip narrows the grid to that group.
-    await tapVisible(tester, find.text('ENERGY'));
+    await tapVisible(tester, find.text('Energy'));
     expect(find.byKey(const Key('starnyx-form-symbol-flame')), findsOneWidget);
     expect(find.byKey(const Key('starnyx-form-symbol-clover')), findsNothing);
 

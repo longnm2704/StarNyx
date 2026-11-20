@@ -106,7 +106,6 @@ class _JournalDetailPageState extends State<JournalDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return BlocBuilder<JournalBloc, JournalState>(
       builder: (context, state) {
         final entry =
@@ -114,86 +113,90 @@ class _JournalDetailPageState extends State<JournalDetailPage> {
             widget.entry;
         return Scaffold(
           backgroundColor: AppColors.background,
-          appBar: AppBar(
-            backgroundColor: AppColors.background,
-            leading: IconButton(
-              key: const Key('journal-detail-back'),
-              tooltip: 'journal.editor_close'.tr(),
-              onPressed: () => Navigator.of(context).maybePop(),
-              icon: const AppIcon(
-                icon: HugeIconsStrokeRounded.strokeRoundedArrowLeft01,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            title: Text(
-              'journal.detail_title'.tr(),
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontFamily: AppFonts.headline,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
           body: SafeArea(
-            top: false,
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.pageHorizontal,
-                AppSpacing.xs,
-                AppSpacing.pageHorizontal,
-                AppSpacing.xl,
-              ),
+            child: Column(
               children: <Widget>[
-                _MetaRow(habit: widget.habit, entry: entry, stats: _stats),
-                if (entry.mood != null ||
-                    entry.energy != null ||
-                    entry.sleepMinutes != null) ...<Widget>[
-                  const SizedBox(height: AppSpacing.lg),
-                  _ReflectionCard(entry: entry),
-                ],
-                const SizedBox(height: AppSpacing.lg),
-                _ContentCard(entry: entry, habit: widget.habit),
-                _StreakSection(stats: _stats),
-                if (entry.tags.isNotEmpty) ...<Widget>[
-                  const SizedBox(height: AppSpacing.lg),
-                  _SectionLabel('journal.tags_title'.tr()),
-                  const SizedBox(height: AppSpacing.xs),
-                  Wrap(
-                    spacing: AppSpacing.xs,
-                    runSpacing: AppSpacing.xs,
-                    children: <Widget>[
-                      for (final tag in entry.tags)
-                        JournalMetaChip(
-                          label: '#$tag',
-                          color: AppColors.textSecondary,
-                        ),
-                    ],
+                Padding(
+                  // Same 56px band the Material app bar used to take.
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.xxs,
+                    AppSpacing.xxs,
+                    AppSpacing.pageHorizontal,
+                    AppSpacing.xxs,
                   ),
-                ],
-                const SizedBox(height: AppSpacing.xl),
-                AppPrimaryButton(
-                  key: const Key('journal-detail-edit'),
-                  label: 'journal.editor_edit_title'.tr(),
-                  onPressed: () => JournalEditorPage.open(
-                    context,
-                    bloc: context.read<JournalBloc>(),
-                    entry: entry,
+                  child: AppPageHeader(
+                    title: 'journal.detail_title'.tr(),
+                    backKey: const Key('journal-detail-back'),
+                    backTooltip: 'journal.editor_close'.tr(),
+                    onBack: () => Navigator.of(context).maybePop(),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                Center(
-                  child: TextButton.icon(
-                    key: const Key('journal-detail-delete'),
-                    onPressed: () => _onDeletePressed(entry),
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppColors.error,
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.pageHorizontal,
+                      AppSpacing.xs,
+                      AppSpacing.pageHorizontal,
+                      AppSpacing.xl,
                     ),
-                    icon: const AppIcon(
-                      icon: HugeIconsStrokeRounded.strokeRoundedDelete02,
-                      size: 16,
-                      color: AppColors.error,
-                    ),
-                    label: Text('journal.detail_delete'.tr()),
+                    children: <Widget>[
+                      _MetaRow(
+                        habit: widget.habit,
+                        entry: entry,
+                        stats: _stats,
+                      ),
+                      if (entry.mood != null ||
+                          entry.energy != null ||
+                          entry.sleepMinutes != null) ...<Widget>[
+                        const SizedBox(height: AppSpacing.lg),
+                        _ReflectionCard(entry: entry),
+                      ],
+                      const SizedBox(height: AppSpacing.lg),
+                      _ContentCard(entry: entry, habit: widget.habit),
+                      _StreakSection(stats: _stats),
+                      if (entry.tags.isNotEmpty) ...<Widget>[
+                        const SizedBox(height: AppSpacing.lg),
+                        AppSectionLabel('journal.tags_title'.tr()),
+                        const SizedBox(height: AppSpacing.xs),
+                        Wrap(
+                          spacing: AppSpacing.xs,
+                          runSpacing: AppSpacing.xs,
+                          children: <Widget>[
+                            for (final tag in entry.tags)
+                              JournalMetaChip(
+                                label: '#$tag',
+                                color: AppColors.textSecondary,
+                              ),
+                          ],
+                        ),
+                      ],
+                      const SizedBox(height: AppSpacing.xl),
+                      AppPrimaryButton(
+                        key: const Key('journal-detail-edit'),
+                        label: 'journal.editor_edit_title'.tr(),
+                        onPressed: () => JournalEditorPage.open(
+                          context,
+                          bloc: context.read<JournalBloc>(),
+                          entry: entry,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Center(
+                        child: TextButton.icon(
+                          key: const Key('journal-detail-delete'),
+                          onPressed: () => _onDeletePressed(entry),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.error,
+                          ),
+                          icon: const AppIcon(
+                            icon: HugeIconsStrokeRounded.strokeRoundedDelete02,
+                            size: 16,
+                            color: AppColors.error,
+                          ),
+                          label: Text('journal.detail_delete'.tr()),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -201,26 +204,6 @@ class _JournalDetailPageState extends State<JournalDetailPage> {
           ),
         );
       },
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text, {this.color = AppColors.textSecondary});
-
-  final String text;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text.toUpperCase(),
-      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-        fontFamily: AppFonts.mono,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 1.2,
-        color: color,
-      ),
     );
   }
 }
@@ -345,12 +328,6 @@ class _MetaRow extends StatelessWidget {
   }
 }
 
-BoxDecoration _cardDecoration() => BoxDecoration(
-  color: AppColors.surfaceLevel1,
-  borderRadius: BorderRadius.circular(AppRadius.lg),
-  border: Border.all(color: AppColors.borderSubtle),
-);
-
 class _ReflectionCard extends StatelessWidget {
   const _ReflectionCard({required this.entry});
 
@@ -361,14 +338,13 @@ class _ReflectionCard extends StatelessWidget {
     final mood = entry.mood;
     final energy = entry.energy;
     final sleep = entry.sleepMinutes;
-    return Container(
+    return AppCard(
       key: const Key('journal-detail-reflection'),
-      padding: AppSpacing.cardPadding,
-      decoration: _cardDecoration(),
+      radius: AppRadius.lg,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _SectionLabel('journal.detail_reflection_title'.tr()),
+          AppSectionLabel('journal.detail_reflection_title'.tr()),
           const SizedBox(height: AppSpacing.sm),
           Row(
             children: <Widget>[
@@ -505,9 +481,9 @@ class _ContentCard extends StatelessWidget {
               .where((line) => journalPullQuote(line) != quote)
               .join('\n')
               .trim();
-    return Container(
+    return AppCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: _cardDecoration(),
+      radius: AppRadius.lg,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -519,7 +495,9 @@ class _ContentCard extends StatelessWidget {
                 color: AppColors.primary,
               ),
               const SizedBox(width: AppSpacing.xs),
-              _SectionLabel('journal.detail_deep_title'.tr()),
+              Expanded(
+                child: AppSectionLabel('journal.detail_deep_title'.tr()),
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -560,7 +538,7 @@ class _ContentCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  _SectionLabel(
+                  AppSectionLabel(
                     'journal.detail_quote_title'.tr(),
                     color: AppColors.primary,
                   ),
@@ -610,10 +588,9 @@ class _StreakSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
-              Container(
+              AppCard(
                 key: const Key('journal-detail-streak'),
-                padding: AppSpacing.cardPadding,
-                decoration: _cardDecoration(),
+                radius: AppRadius.lg,
                 child: Row(
                   children: <Widget>[
                     Expanded(

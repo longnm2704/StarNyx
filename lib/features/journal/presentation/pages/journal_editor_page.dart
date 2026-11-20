@@ -8,8 +8,7 @@ import 'package:starnyx/app/confirm_discard.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
-import 'package:starnyx/core/widgets/app_icon.dart';
-import 'package:starnyx/core/widgets/app_sheet.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/domain/entities/journal_entry.dart';
 import 'package:starnyx/domain/usecases/save_journal_entry_use_case.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
@@ -192,260 +191,266 @@ class _JournalEditorPageState extends State<JournalEditorPage> {
         dirty: _hasUnsavedEdits,
         child: Scaffold(
           backgroundColor: AppColors.background,
-          appBar: AppBar(
-            backgroundColor: AppColors.background,
-            leading: IconButton(
-              key: const Key('journal-editor-close'),
-              tooltip: 'journal.editor_close'.tr(),
-              onPressed: () => Navigator.of(context).maybePop(),
-              icon: const AppIcon(
-                icon: HugeIconsStrokeRounded.strokeRoundedArrowLeft01,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            title: Text(
-              (_isEdit
-                      ? 'journal.editor_edit_title'
-                      : 'journal.editor_new_title')
-                  .tr(),
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontFamily: AppFonts.headline,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            actions: <Widget>[
-              BlocBuilder<JournalBloc, JournalState>(
-                builder: (context, state) {
-                  final busy = _status(state) == AsyncStatus.inProgress;
-                  final enabled =
-                      !busy &&
-                      _controller.text.trim().isNotEmpty &&
-                      (_isEdit || state.hasStarnyx);
-                  return TextButton(
-                    key: const Key('journal-editor-save'),
-                    onPressed: enabled ? _onSavePressed : null,
-                    child: Text('journal.editor_save'.tr()),
-                  );
-                },
-              ),
-              const SizedBox(width: AppSpacing.xs),
-            ],
-          ),
           body: SafeArea(
-            top: false,
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.pageHorizontal,
-                0,
-                AppSpacing.pageHorizontal,
-                AppSpacing.xl,
-              ),
+            child: Column(
               children: <Widget>[
-                Text(
-                  core_date_utils.DateUtils.formatShortDateTime(
-                    date,
-                    context.locale.toLanguageTag(),
+                Padding(
+                  // Same 56px band the Material app bar used to take.
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.xxs,
+                    AppSpacing.xxs,
+                    AppSpacing.pageHorizontal,
+                    AppSpacing.xxs,
                   ),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontFamily: AppFonts.mono,
-                    fontFeatures: AppFonts.tabularFigures,
-                    letterSpacing: 0.6,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                // ponytail: text first, metadata after; the list scrolls instead
-                // of an expanding field so the inputs fit small screens.
-                TextField(
-                  key: const Key('journal-editor-input'),
-                  controller: _controller,
-                  onChanged: _onChanged,
-                  autofocus: true,
-                  minLines: 8,
-                  maxLines: null,
-                  keyboardType: TextInputType.multiline,
-                  textCapitalization: TextCapitalization.sentences,
-                  inputFormatters: <TextInputFormatter>[
-                    LengthLimitingTextInputFormatter(4000),
-                  ],
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontFamily: AppFonts.body,
-                    height: 1.6,
-                    color: AppColors.textPrimary,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'journal.today_hint'.tr(),
-                    filled: false,
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
+                  child: AppPageHeader(
+                    title:
+                        (_isEdit
+                                ? 'journal.editor_edit_title'
+                                : 'journal.editor_new_title')
+                            .tr(),
+                    backKey: const Key('journal-editor-close'),
+                    backTooltip: 'journal.editor_close'.tr(),
+                    onBack: () => Navigator.of(context).maybePop(),
+                    trailing: BlocBuilder<JournalBloc, JournalState>(
+                      builder: (context, state) {
+                        final busy = _status(state) == AsyncStatus.inProgress;
+                        final enabled =
+                            !busy &&
+                            _controller.text.trim().isNotEmpty &&
+                            (_isEdit || state.hasStarnyx);
+                        return TextButton(
+                          key: const Key('journal-editor-save'),
+                          onPressed: enabled ? _onSavePressed : null,
+                          child: Text('journal.editor_save'.tr()),
+                        );
+                      },
+                    ),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                _MetaSection(
-                  title: 'journal.mood_title'.tr(),
-                  child: Wrap(
-                    spacing: AppSpacing.xs,
-                    runSpacing: AppSpacing.xs,
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.pageHorizontal,
+                      AppSpacing.xs,
+                      AppSpacing.pageHorizontal,
+                      AppSpacing.xl,
+                    ),
                     children: <Widget>[
-                      for (final mood in JournalMood.values)
-                        ChoiceChip(
-                          key: Key('journal-mood-${mood.name}'),
-                          selected: _mood == mood,
-                          avatar: AppIcon(
-                            icon: mood.icon,
-                            size: 16,
-                            color: mood.color,
-                          ),
-                          label: Text(mood.label),
-                          labelStyle: theme.textTheme.labelMedium?.copyWith(
-                            color: _mood == mood
-                                ? AppColors.textPrimary
-                                : AppColors.textSecondary,
-                          ),
-                          side: BorderSide(
-                            color: _mood == mood
-                                ? mood.color
-                                : AppColors.borderSubtle,
-                          ),
-                          onSelected: (selected) =>
-                              setState(() => _mood = selected ? mood : null),
+                      Text(
+                        core_date_utils.DateUtils.formatShortDateTime(
+                          date,
+                          context.locale.toLanguageTag(),
                         ),
-                    ],
-                  ),
-                ),
-                _MetaSection(
-                  title: 'journal.energy_title'.tr(),
-                  child: Row(
-                    children: <Widget>[
-                      for (
-                        var level = JournalEntry.minEnergy;
-                        level <= JournalEntry.maxEnergy;
-                        level++
-                      )
-                        Semantics(
-                          button: true,
-                          selected: _energy == level,
-                          label: 'journal.energy_level_semantics'.tr(
-                            args: <String>['$level'],
-                          ),
-                          child: InkResponse(
-                            key: Key('journal-energy-$level'),
-                            radius: 22,
-                            onTap: () => setState(
-                              () => _energy = _energy == level ? null : level,
-                            ),
-                            child: SizedBox.square(
-                              dimension: 44,
-                              child: Center(
-                                child: Container(
-                                  width: 14,
-                                  height: 14,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: (_energy ?? 0) >= level
-                                        ? AppColors.primary
-                                        : AppColors.surfaceLevel3,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontFamily: AppFonts.mono,
+                          fontFeatures: AppFonts.tabularFigures,
+                          letterSpacing: 0.6,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      // ponytail: text first, metadata after; the list scrolls instead
+                      // of an expanding field so the inputs fit small screens.
+                      TextField(
+                        key: const Key('journal-editor-input'),
+                        controller: _controller,
+                        onChanged: _onChanged,
+                        autofocus: true,
+                        minLines: 8,
+                        maxLines: null,
+                        keyboardType: TextInputType.multiline,
+                        textCapitalization: TextCapitalization.sentences,
+                        inputFormatters: <TextInputFormatter>[
+                          LengthLimitingTextInputFormatter(4000),
+                        ],
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontFamily: AppFonts.body,
+                          height: 1.6,
+                          color: AppColors.textPrimary,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'journal.today_hint'.tr(),
+                          filled: false,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      _MetaSection(
+                        title: 'journal.mood_title'.tr(),
+                        child: Wrap(
+                          spacing: AppSpacing.xs,
+                          runSpacing: AppSpacing.xs,
+                          children: <Widget>[
+                            for (final mood in JournalMood.values)
+                              ChoiceChip(
+                                key: Key('journal-mood-${mood.name}'),
+                                selected: _mood == mood,
+                                avatar: AppIcon(
+                                  icon: mood.icon,
+                                  size: 16,
+                                  color: mood.color,
+                                ),
+                                label: Text(mood.label),
+                                labelStyle: theme.textTheme.labelMedium
+                                    ?.copyWith(
+                                      color: _mood == mood
+                                          ? AppColors.textPrimary
+                                          : AppColors.textSecondary,
+                                    ),
+                                side: BorderSide(
+                                  color: _mood == mood
+                                      ? mood.color
+                                      : AppColors.borderSubtle,
+                                ),
+                                onSelected: (selected) => setState(
+                                  () => _mood = selected ? mood : null,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      _MetaSection(
+                        title: 'journal.energy_title'.tr(),
+                        child: Row(
+                          children: <Widget>[
+                            for (
+                              var level = JournalEntry.minEnergy;
+                              level <= JournalEntry.maxEnergy;
+                              level++
+                            )
+                              Semantics(
+                                button: true,
+                                selected: _energy == level,
+                                label: 'journal.energy_level_semantics'.tr(
+                                  args: <String>['$level'],
+                                ),
+                                child: InkResponse(
+                                  key: Key('journal-energy-$level'),
+                                  radius: 22,
+                                  onTap: () => setState(
+                                    () => _energy = _energy == level
+                                        ? null
+                                        : level,
+                                  ),
+                                  child: SizedBox.square(
+                                    dimension: 44,
+                                    child: Center(
+                                      child: Container(
+                                        width: 14,
+                                        height: 14,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: (_energy ?? 0) >= level
+                                              ? AppColors.primary
+                                              : AppColors.surfaceLevel3,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
+                          ],
                         ),
-                    ],
-                  ),
-                ),
-                _MetaSection(
-                  title: 'journal.sleep_title'.tr(),
-                  child: Row(
-                    children: <Widget>[
-                      ActionChip(
-                        key: const Key('journal-sleep-button'),
-                        avatar: const AppIcon(
-                          icon: HugeIconsStrokeRounded.strokeRoundedMoon02,
-                          size: 16,
-                          color: AppColors.tertiary,
-                        ),
-                        label: Text(
-                          _sleepMinutes == null
-                              ? 'journal.sleep_empty'.tr()
-                              : formatSleepMinutes(_sleepMinutes!),
-                        ),
-                        labelStyle: theme.textTheme.labelMedium?.copyWith(
-                          fontFamily: AppFonts.mono,
-                          fontFeatures: AppFonts.tabularFigures,
-                          color: AppColors.textPrimary,
-                        ),
-                        onPressed: _pickSleep,
                       ),
-                      if (_sleepMinutes != null)
-                        IconButton(
-                          key: const Key('journal-sleep-clear'),
-                          tooltip: 'journal.sleep_clear'.tr(),
-                          onPressed: () => setState(() => _sleepMinutes = null),
-                          icon: const AppIcon(
-                            icon: HugeIconsStrokeRounded.strokeRoundedCancel01,
-                            size: 18,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                _MetaSection(
-                  title: 'journal.tags_title'.tr(),
-                  child: Wrap(
-                    spacing: AppSpacing.xs,
-                    runSpacing: AppSpacing.xs,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: <Widget>[
-                      for (final tag in _tags)
-                        InputChip(
-                          label: Text('#$tag'),
-                          labelStyle: theme.textTheme.labelMedium?.copyWith(
-                            fontFamily: AppFonts.mono,
-                            color: AppColors.textPrimary,
-                          ),
-                          deleteButtonTooltipMessage:
-                              'journal.tag_remove_semantics'.tr(
-                                args: <String>[tag],
+                      _MetaSection(
+                        title: 'journal.sleep_title'.tr(),
+                        child: Row(
+                          children: <Widget>[
+                            ActionChip(
+                              key: const Key('journal-sleep-button'),
+                              avatar: const AppIcon(
+                                icon:
+                                    HugeIconsStrokeRounded.strokeRoundedMoon02,
+                                size: 16,
+                                color: AppColors.tertiary,
                               ),
-                          onDeleted: () => setState(
-                            () => _tags = <String>[
-                              for (final t in _tags)
-                                if (t != tag) t,
-                            ],
-                          ),
-                        ),
-                      if (_tags.length < JournalEntry.maxTags)
-                        SizedBox(
-                          width: 160,
-                          child: TextField(
-                            key: const Key('journal-tag-input'),
-                            controller: _tagController,
-                            onSubmitted: _addTag,
-                            textInputAction: TextInputAction.done,
-                            inputFormatters: <TextInputFormatter>[
-                              LengthLimitingTextInputFormatter(
-                                JournalEntry.maxTagLength,
+                              label: Text(
+                                _sleepMinutes == null
+                                    ? 'journal.sleep_empty'.tr()
+                                    : formatSleepMinutes(_sleepMinutes!),
                               ),
-                            ],
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textPrimary,
+                              labelStyle: theme.textTheme.labelMedium?.copyWith(
+                                fontFamily: AppFonts.mono,
+                                fontFeatures: AppFonts.tabularFigures,
+                                color: AppColors.textPrimary,
+                              ),
+                              onPressed: _pickSleep,
                             ),
-                            decoration: InputDecoration(
-                              hintText: 'journal.tags_hint'.tr(),
-                              isDense: true,
-                              // Chip height, so the field reads as one more pill.
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.sm,
-                                vertical: AppSpacing.xs,
+                            if (_sleepMinutes != null)
+                              IconButton(
+                                key: const Key('journal-sleep-clear'),
+                                tooltip: 'journal.sleep_clear'.tr(),
+                                onPressed: () =>
+                                    setState(() => _sleepMinutes = null),
+                                icon: const AppIcon(
+                                  icon: HugeIconsStrokeRounded
+                                      .strokeRoundedCancel01,
+                                  size: 18,
+                                  color: AppColors.textSecondary,
+                                ),
                               ),
-                            ),
-                          ),
+                          ],
                         ),
+                      ),
+                      _MetaSection(
+                        title: 'journal.tags_title'.tr(),
+                        child: Wrap(
+                          spacing: AppSpacing.xs,
+                          runSpacing: AppSpacing.xs,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: <Widget>[
+                            for (final tag in _tags)
+                              InputChip(
+                                label: Text('#$tag'),
+                                labelStyle: theme.textTheme.labelMedium
+                                    ?.copyWith(
+                                      fontFamily: AppFonts.mono,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                deleteButtonTooltipMessage:
+                                    'journal.tag_remove_semantics'.tr(
+                                      args: <String>[tag],
+                                    ),
+                                onDeleted: () => setState(
+                                  () => _tags = <String>[
+                                    for (final t in _tags)
+                                      if (t != tag) t,
+                                  ],
+                                ),
+                              ),
+                            if (_tags.length < JournalEntry.maxTags)
+                              SizedBox(
+                                width: 160,
+                                child: TextField(
+                                  key: const Key('journal-tag-input'),
+                                  controller: _tagController,
+                                  onSubmitted: _addTag,
+                                  textInputAction: TextInputAction.done,
+                                  inputFormatters: <TextInputFormatter>[
+                                    LengthLimitingTextInputFormatter(
+                                      JournalEntry.maxTagLength,
+                                    ),
+                                  ],
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: 'journal.tags_hint'.tr(),
+                                    isDense: true,
+                                    // Chip height, so the field reads as one more pill.
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.sm,
+                                      vertical: AppSpacing.xs,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -472,14 +477,7 @@ class _MetaSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            title.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              fontFamily: AppFonts.mono,
-              letterSpacing: 1.2,
-              color: AppColors.textSecondary,
-            ),
-          ),
+          AppSectionLabel(title),
           const SizedBox(height: AppSpacing.xs),
           child,
         ],

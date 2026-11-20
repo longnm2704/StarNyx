@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
-import 'package:starnyx/features/settings/presentation/widgets/settings_page_widgets.dart';
 
 /// Full-screen "About StarNyx" page pushed from Settings; same header,
 /// overlines and hairline cards as the backup screen.
@@ -26,7 +25,7 @@ class AboutPage extends StatelessWidget {
           AppSpacing.xxl + MediaQuery.paddingOf(context).bottom,
         ),
         children: <Widget>[
-          SettingsBackHeader(
+          AppPageHeader(
             title: 'settings.about_title'.tr(),
             backKey: const Key('about-back-button'),
             onBack: onBack,
@@ -76,8 +75,8 @@ class AboutPage extends StatelessWidget {
               'settings.about_experience_content',
             ),
           ]) ...<Widget>[
-            SettingsSectionLabel(title.tr()),
-            SettingsCard(
+            AppSectionLabel(title.tr(), padding: AppSectionLabel.aboveCard),
+            AppCard(
               child: Text(
                 content.tr(),
                 style: theme.textTheme.bodyMedium?.copyWith(

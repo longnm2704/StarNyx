@@ -14,7 +14,8 @@ import 'package:starnyx/domain/entities/storage_stats.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_event.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_state.dart';
-import 'package:starnyx/features/settings/presentation/widgets/settings_page_widgets.dart';
+
+const _buttonHeight = 48.0;
 
 /// How the backup screen replaced local data; it pops with one of these.
 enum BackupOutcome { imported, deletedAll }
@@ -101,14 +102,17 @@ class _BackupPageState extends State<BackupPage> {
               AppSpacing.xxl,
             ),
             children: <Widget>[
-              SettingsBackHeader(
+              AppPageHeader(
                 title: 'settings.backup_title'.tr(),
                 backKey: const Key('backup-back-button'),
                 onBack: widget.onBack,
               ),
               const SizedBox(height: AppSpacing.lg),
-              SettingsSectionLabel('settings.files_section'.tr()),
-              SettingsCard(
+              AppSectionLabel(
+                'settings.files_section'.tr(),
+                padding: AppSectionLabel.aboveCard,
+              ),
+              AppCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
@@ -117,15 +121,15 @@ class _BackupPageState extends State<BackupPage> {
                       iconColor: AppColors.primary,
                       title: 'settings.export_label'.tr(),
                       description: 'settings.export_hint'.tr(),
-                      button: _PillButton(
+                      button: AppPrimaryButton(
                         key: const Key('backup-export-button'),
+                        variant: AppPrimaryButtonVariant.dark,
+                        height: _buttonHeight,
                         icon: HugeIconsStrokeRounded.strokeRoundedDownload04,
                         label: 'settings.export_button'.tr(),
-                        color: AppColors.primary,
+                        foregroundColor: AppColors.primary,
                         isLoading: state.isExporting,
-                        onTap: state.isExporting
-                            ? null
-                            : () => _handleExportTap(context),
+                        onPressed: () => _handleExportTap(context),
                       ),
                     ),
                     const Padding(
@@ -137,31 +141,34 @@ class _BackupPageState extends State<BackupPage> {
                       iconColor: AppColors.secondary,
                       title: 'settings.import_label'.tr(),
                       description: 'settings.import_hint'.tr(),
-                      button: _PillButton(
+                      button: AppPrimaryButton(
                         key: const Key('backup-import-button'),
+                        variant: AppPrimaryButtonVariant.dark,
+                        height: _buttonHeight,
                         icon: HugeIconsStrokeRounded.strokeRoundedFolderOpen,
                         label: 'settings.import_button'.tr(),
-                        color: AppColors.textPrimary,
                         isLoading: state.importStatus == AsyncStatus.inProgress,
-                        onTap: state.importStatus == AsyncStatus.inProgress
-                            ? null
-                            : () => _handleImportTap(context),
+                        onPressed: () => _handleImportTap(context),
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              SettingsSectionLabel('settings.storage_section'.tr()),
+              AppSectionLabel(
+                'settings.storage_section'.tr(),
+                padding: AppSectionLabel.aboveCard,
+              ),
               _StorageCard(stats: state.storage),
               if (widget.showDangerZone) ...<Widget>[
                 const SizedBox(height: AppSpacing.lg),
-                SettingsSectionLabel(
+                AppSectionLabel(
                   'settings.danger_section'.tr(),
+                  padding: AppSectionLabel.aboveCard,
                   color: AppColors.error,
                   icon: HugeIconsStrokeRounded.strokeRoundedAlert01,
                 ),
-                SettingsCard(
+                AppCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
@@ -182,17 +189,15 @@ class _BackupPageState extends State<BackupPage> {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      _PillButton(
+                      AppPrimaryButton(
                         key: const Key('backup-delete-all-button'),
+                        variant: AppPrimaryButtonVariant.destructive,
+                        height: _buttonHeight,
                         icon: HugeIconsStrokeRounded.strokeRoundedDelete02,
                         label: 'settings.delete_all_button'.tr(),
-                        color: AppColors.black,
-                        background: AppColors.error,
                         isLoading:
                             state.deleteAllStatus == AsyncStatus.inProgress,
-                        onTap: state.deleteAllStatus == AsyncStatus.inProgress
-                            ? null
-                            : () => _handleDeleteAllTap(context),
+                        onPressed: () => _handleDeleteAllTap(context),
                       ),
                     ],
                   ),
@@ -593,66 +598,6 @@ class _ActionBlock extends StatelessWidget {
   }
 }
 
-class _PillButton extends StatelessWidget {
-  const _PillButton({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-    this.background = AppColors.black,
-    this.isLoading = false,
-    super.key,
-  });
-
-  final List<List<dynamic>> icon;
-  final String label;
-  final Color color;
-  final Color background;
-  final VoidCallback? onTap;
-  final bool isLoading;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: background,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-        side: background == AppColors.black
-            ? const BorderSide(color: AppColors.borderSubtle)
-            : BorderSide.none,
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: SizedBox(
-          height: 48,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              if (isLoading)
-                AppLoadingIndicator.small(color: color)
-              else
-                AppIcon(icon: icon, size: 18, color: color),
-              const SizedBox(width: AppSpacing.xs),
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _StorageCard extends StatelessWidget {
   const _StorageCard({required this.stats});
 
@@ -667,7 +612,7 @@ class _StorageCard extends StatelessWidget {
       (stats?.completionCount ?? 0, AppColors.secondary),
       (stats?.journalCount ?? 0, AppColors.tertiary),
     ];
-    return SettingsCard(
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

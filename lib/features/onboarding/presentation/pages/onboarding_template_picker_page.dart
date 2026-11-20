@@ -118,14 +118,14 @@ class _OnboardingTemplatePickerPageState
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: <Widget>[
-                        _CategoryChip(
+                        AppFilterChip(
                           key: const Key('onboarding-category-all'),
                           label: 'onboarding.picker.category_all'.tr(),
                           selected: _category == null,
                           onTap: () => setState(() => _category = null),
                         ),
                         for (final category in OnboardingCategory.values)
-                          _CategoryChip(
+                          AppFilterChip(
                             key: Key('onboarding-category-${category.name}'),
                             label: 'onboarding.picker.category_${category.name}'
                                 .tr(),
@@ -166,67 +166,6 @@ class _OnboardingTemplatePickerPageState
                     ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    super.key,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: AppSpacing.xs),
-      child: Semantics(
-        selected: selected,
-        button: true,
-        child: Material(
-          color: selected
-              ? AppColors.primary.withValues(alpha: 0.12)
-              : AppColors.surfaceLevel2,
-          shape: StadiumBorder(
-            side: BorderSide(
-              color: selected
-                  ? AppColors.primary.withValues(alpha: 0.4)
-                  : AppColors.borderSubtle,
-            ),
-          ),
-          child: InkWell(
-            customBorder: const StadiumBorder(),
-            onTap: onTap,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: AppSize.iconButton),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.xs,
-                ),
-                child: Center(
-                  widthFactor: 1,
-                  child: Text(
-                    label,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: selected
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
         ),
       ),
     );

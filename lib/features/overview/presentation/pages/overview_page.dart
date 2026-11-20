@@ -5,10 +5,7 @@ import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
-import 'package:starnyx/core/widgets/app_empty_state.dart';
-import 'package:starnyx/core/widgets/app_error_state.dart';
-import 'package:starnyx/core/widgets/app_icon.dart';
-import 'package:starnyx/core/widgets/route_guard.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/domain/entities/overview_stats.dart';
 import 'package:starnyx/features/overview/presentation/bloc/overview_bloc.dart';
 import 'package:starnyx/features/overview/presentation/bloc/overview_event.dart';
@@ -147,17 +144,7 @@ class _OverviewAppBar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  'app.title'.tr().toUpperCase(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontFamily: AppFonts.mono,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.1,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
+                AppSectionLabel('app.title'.tr()),
                 Text(
                   'overview.title'.tr(),
                   maxLines: 1,
@@ -171,51 +158,11 @@ class _OverviewAppBar extends StatelessWidget {
               ],
             ),
           ),
-          _ProfileButton(onPressed: onProfilePressed),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProfileButton extends StatelessWidget {
-  const _ProfileButton({this.onPressed});
-
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: 'home.profile_semantics'.tr(),
-      // 36px avatar, 44px tap target around it.
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onPressed,
-        child: SizedBox.square(
-          dimension: 44,
-          child: Center(
-            child: Material(
-              color: AppColors.primary,
-              shape: const CircleBorder(),
-              child: InkWell(
-                key: const Key('overview-profile-button'),
-                onTap: onPressed,
-                customBorder: const CircleBorder(),
-                child: const SizedBox.square(
-                  dimension: 36,
-                  child: Center(
-                    child: AppIcon(
-                      icon: HugeIconsStrokeRounded.strokeRoundedUser,
-                      size: 20,
-                      color: AppColors.onPrimary,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+          AppProfileButton(
+            onPressed: onProfilePressed,
+            inkKey: const Key('overview-profile-button'),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -334,26 +281,12 @@ class _HeroCard extends StatelessWidget {
     final theme = Theme.of(context);
     final pct = (completionRate * 100).round();
 
-    return Container(
-      width: double.infinity,
+    return AppCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLevel1,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            'overview.completion_rate'.tr().toUpperCase(),
-            style: theme.textTheme.labelSmall?.copyWith(
-              fontFamily: AppFonts.mono,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.1,
-              color: AppColors.textSecondary,
-            ),
-          ),
+          AppSectionLabel('overview.completion_rate'.tr()),
           const SizedBox(height: AppSpacing.md),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,31 +433,14 @@ class _StatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLevel1,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Expanded(
-                child: Text(
-                  title.toUpperCase(),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontFamily: AppFonts.mono,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.1,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
+              Expanded(child: AppSectionLabel(title)),
               const SizedBox(width: AppSpacing.xxs),
               AppIcon(icon: icon, size: 18, color: accentColor),
             ],
@@ -585,14 +501,7 @@ class _HeatmapCard extends StatelessWidget {
         ? 1
         : dailyLitCounts.values.reduce((a, b) => a > b ? a : b);
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLevel1,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -770,14 +679,7 @@ class _HabitListSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLevel1,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

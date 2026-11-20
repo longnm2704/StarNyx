@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
-import 'package:starnyx/core/widgets/app_icon.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 
 const int _kGridColumns = 6;
 const double _kPreviewSize = 30;
@@ -43,13 +43,8 @@ class _StarnyxFormSymbolPickerState extends State<StarnyxFormSymbolPicker> {
         if (_category == null || _category == group.id) ...group.keys,
     ];
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLevel1,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
+    return AppCard(
+      radius: AppRadius.lg,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -73,14 +68,14 @@ class _StarnyxFormSymbolPickerState extends State<StarnyxFormSymbolPicker> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: <Widget>[
-                _CategoryChip(
+                AppFilterChip(
                   label: 'starnyx_form.symbol_category_all'.tr(),
                   color: widget.color,
                   selected: _category == null,
                   onTap: () => setState(() => _category = null),
                 ),
                 for (final group in HabitSymbols.groups)
-                  _CategoryChip(
+                  AppFilterChip(
                     label: 'starnyx_form.symbol_category_${group.id}'.tr(),
                     color: widget.color,
                     selected: _category == group.id,
@@ -116,62 +111,6 @@ class _StarnyxFormSymbolPickerState extends State<StarnyxFormSymbolPicker> {
             color: widget.color,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({
-    required this.label,
-    required this.color,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final Color color;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: AppSpacing.xs),
-      child: Semantics(
-        button: true,
-        selected: selected,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-          child: AnimatedContainer(
-            duration: AppDurations.fast,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
-            ),
-            decoration: BoxDecoration(
-              color: selected
-                  ? color.withValues(alpha: 0.16)
-                  : AppColors.surfaceLevel2,
-              borderRadius: BorderRadius.circular(AppRadius.pill),
-              border: Border.all(
-                color: selected
-                    ? color.withValues(alpha: 0.4)
-                    : AppColors.borderSubtle,
-              ),
-            ),
-            child: Text(
-              label.toUpperCase(),
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontFamily: AppFonts.mono,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1.2,
-                color: selected ? color : AppColors.textSecondary,
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -258,14 +197,7 @@ class _SevenDayPreview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          'starnyx_form.preview_label'.tr().toUpperCase(),
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            fontFamily: AppFonts.mono,
-            letterSpacing: 1.2,
-            color: AppColors.textSecondary,
-          ),
-        ),
+        AppSectionLabel('starnyx_form.preview_label'.tr()),
         const SizedBox(height: AppSpacing.xs),
         Container(
           padding: const EdgeInsets.symmetric(

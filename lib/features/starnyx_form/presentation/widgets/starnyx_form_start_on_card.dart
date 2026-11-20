@@ -19,13 +19,9 @@ class StarnyxFormStartOnCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Material(
-      color: AppColors.surfaceLevel1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        side: const BorderSide(color: AppColors.borderSubtle),
-      ),
-      clipBehavior: Clip.antiAlias,
+    return AppCard(
+      padding: null,
+      radius: AppRadius.lg,
       child: InkWell(
         key: const Key('starnyx-form-start-on'),
         onTap: onTap,

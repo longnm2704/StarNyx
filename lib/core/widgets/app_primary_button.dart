@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
-enum AppPrimaryButtonVariant { primary, ghost }
+import 'app_icon.dart';
+import 'app_loading_indicator.dart';
+
+/// primary: emerald fill. ghost: `#0A0A0C` + hairline. dark: black +
+/// hairline (secondary actions on a card). destructive: coral fill.
+enum AppPrimaryButtonVariant { primary, ghost, dark, destructive }
 
 // Primary CTA used throughout the StarNyx mockups.
 //
 // Primary: pill, `#10B981` fill, black w700 label, 52px height, pressed
 // scale 0.98 with a soft emerald glow. Ghost: `#0A0A0C` fill, hairline
-// border, `#F9FAFB` label. A null [onPressed] renders the disabled state.
+// border, `#F9FAFB` label. A null [onPressed] renders the disabled state;
+// [isLoading] keeps the variant colors, swaps the [icon] for a spinner and
+// ignores taps.
 class AppPrimaryButton extends StatefulWidget {
   const AppPrimaryButton({
     required this.label,
@@ -15,12 +22,21 @@ class AppPrimaryButton extends StatefulWidget {
     super.key,
     this.variant = AppPrimaryButtonVariant.primary,
     this.height = AppSize.ctaHeight,
+    this.icon,
+    this.isLoading = false,
+    this.foregroundColor,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final AppPrimaryButtonVariant variant;
   final double height;
+  final List<List<dynamic>>? icon;
+  final bool isLoading;
+
+  /// Overrides the variant's label/icon color (e.g. an emerald label on a
+  /// [AppPrimaryButtonVariant.dark] button).
+  final Color? foregroundColor;
 
   @override
   State<AppPrimaryButton> createState() => _AppPrimaryButtonState();
@@ -30,25 +46,45 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
   bool _pressed = false;
 
   bool get _isPrimary => widget.variant == AppPrimaryButtonVariant.primary;
-  bool get _enabled => widget.onPressed != null;
+  bool get _enabled => widget.onPressed != null || widget.isLoading;
+  VoidCallback? get _onTap => widget.isLoading ? null : widget.onPressed;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    final Color fill = !_enabled
-        ? AppColors.surfaceLevel3
-        : _isPrimary
-        ? AppColors.primary
-        : AppColors.surfaceLevel1;
+    final (
+      Color fill,
+      Color variantLabel,
+      bool outlined,
+    ) = switch (widget.variant) {
+      AppPrimaryButtonVariant.primary => (
+        AppColors.primary,
+        AppColors.onPrimary,
+        false,
+      ),
+      AppPrimaryButtonVariant.ghost => (
+        AppColors.surfaceLevel1,
+        AppColors.textPrimary,
+        true,
+      ),
+      AppPrimaryButtonVariant.dark => (
+        AppColors.black,
+        AppColors.textPrimary,
+        true,
+      ),
+      AppPrimaryButtonVariant.destructive => (
+        AppColors.error,
+        AppColors.black,
+        false,
+      ),
+    };
     final Color labelColor = !_enabled
         ? AppColors.textTertiary
-        : _isPrimary
-        ? AppColors.onPrimary
-        : AppColors.textPrimary;
+        : widget.foregroundColor ?? variantLabel;
 
     return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = _enabled),
+      onTapDown: (_) => setState(() => _pressed = _onTap != null),
       onTapUp: (_) => setState(() => _pressed = false),
       onTapCancel: () => setState(() => _pressed = false),
       child: AnimatedScale(
@@ -57,11 +93,9 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
         curve: Curves.easeOut,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: fill,
+            color: _enabled ? fill : AppColors.surfaceLevel3,
             borderRadius: BorderRadius.circular(AppRadius.pill),
-            border: _isPrimary
-                ? null
-                : Border.all(color: AppColors.borderSubtle),
+            border: outlined ? Border.all(color: AppColors.borderSubtle) : null,
             boxShadow: _isPrimary && _enabled
                 ? const <BoxShadow>[
                     BoxShadow(
@@ -75,7 +109,7 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(AppRadius.pill),
-              onTap: widget.onPressed,
+              onTap: _onTap,
               // Min height so large text scales grow the pill instead of
               // clipping the label.
               child: ConstrainedBox(
@@ -91,14 +125,31 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
                   child: Center(
                     widthFactor: 1,
                     heightFactor: 1,
-                    child: Text(
-                      widget.label,
-                      textAlign: TextAlign.center,
-                      style: textTheme.titleMedium?.copyWith(
-                        color: labelColor,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.15,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        if (widget.isLoading)
+                          AppLoadingIndicator.small(color: labelColor)
+                        else if (widget.icon != null)
+                          AppIcon(
+                            icon: widget.icon!,
+                            size: 18,
+                            color: labelColor,
+                          ),
+                        if (widget.isLoading || widget.icon != null)
+                          const SizedBox(width: AppSpacing.xs),
+                        Flexible(
+                          child: Text(
+                            widget.label,
+                            textAlign: TextAlign.center,
+                            style: textTheme.titleMedium?.copyWith(
+                              color: labelColor,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.15,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
