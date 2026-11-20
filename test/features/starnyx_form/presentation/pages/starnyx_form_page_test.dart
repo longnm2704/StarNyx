@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/core/services/core_services.dart';
+import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/domain/entities/domain_entities.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
@@ -60,7 +61,7 @@ void main() {
   }
 
   bool submitEnabled(WidgetTester tester) =>
-      tester.widget<InkWell>(submit).onTap != null;
+      tester.widget<AppPrimaryButton>(submit).onPressed != null;
 
   testWidgets('create flow saves the habit and pops a result', (tester) async {
     final host = _FormHost();

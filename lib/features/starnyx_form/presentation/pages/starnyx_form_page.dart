@@ -17,8 +17,6 @@ import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_sta
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_widgets.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
-const _violet = Color(0xFF9D50FF);
-
 class StarnyxFormResult {
   const StarnyxFormResult({this.savedStarnyx, this.deletedStarnyxId});
 
@@ -379,11 +377,7 @@ class _StarnyxFormPageState extends State<StarnyxFormPage> {
                             if (isBusy)
                               const SizedBox(
                                 height: AppSize.ctaHeight,
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    color: AppColors.primary,
-                                  ),
-                                ),
+                                child: AppLoadingIndicator(),
                               )
                             else ...<Widget>[
                               if (state.isEditing) ...<Widget>[
@@ -414,13 +408,13 @@ class _StarnyxFormPageState extends State<StarnyxFormPage> {
                                 ),
                                 const SizedBox(height: AppSpacing.sm),
                               ],
-                              _SubmitButton(
+                              AppPrimaryButton(
+                                key: const Key('starnyx-form-submit'),
                                 label:
                                     (state.isEditing
                                             ? 'starnyx_form.update_button'
                                             : 'starnyx_form.save_button')
                                         .tr(),
-                                isEditing: state.isEditing,
                                 onPressed: state.canSubmit
                                     ? () =>
                                           bloc.add(const StarnyxFormSubmitted())
@@ -434,87 +428,6 @@ class _StarnyxFormPageState extends State<StarnyxFormPage> {
                   ],
                 );
               },
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Full-width pill CTA: violet→emerald gradient (create) or solid emerald
-/// (edit), black w700 label with a check icon. Dimmed when disabled.
-class _SubmitButton extends StatelessWidget {
-  const _SubmitButton({
-    required this.label,
-    required this.isEditing,
-    required this.onPressed,
-  });
-
-  final String label;
-  final bool isEditing;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final enabled = onPressed != null;
-
-    return Opacity(
-      opacity: enabled ? 1 : 0.4,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: isEditing ? AppColors.primary : null,
-          gradient: isEditing
-              ? null
-              : const LinearGradient(
-                  colors: <Color>[_violet, AppColors.primary],
-                ),
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-          boxShadow: enabled
-              ? const <BoxShadow>[
-                  BoxShadow(
-                    color: Color(0x4010B981), // emerald 25%
-                    blurRadius: 24,
-                  ),
-                ]
-              : null,
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            key: const Key('starnyx-form-submit'),
-            borderRadius: BorderRadius.circular(AppRadius.pill),
-            onTap: onPressed,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: AppSize.ctaHeight),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Flexible(
-                      child: Text(
-                        label,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: AppColors.black,
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                    const AppIcon(
-                      icon: HugeIconsStrokeRounded.strokeRoundedTick02,
-                      size: 18,
-                      color: AppColors.black,
-                    ),
-                  ],
-                ),
-              ),
             ),
           ),
         ),

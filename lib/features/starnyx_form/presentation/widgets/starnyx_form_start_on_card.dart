@@ -44,7 +44,7 @@ class StarnyxFormStartOnCard extends StatelessWidget {
                   child: AppIcon(
                     icon: HugeIconsStrokeRounded.strokeRoundedCalendar03,
                     size: 20,
-                    color: Color(0xFF9D50FF),
+                    color: AppColors.secondary,
                   ),
                 ),
               ),
