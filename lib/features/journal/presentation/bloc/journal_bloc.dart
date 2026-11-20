@@ -52,10 +52,14 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
   ) async {
     _logger.debug('JournalBloc', 'start starnyxId=${event.starnyxId}');
     await _entriesSubscription?.cancel();
+    // A draft belongs to the habit it was typed for: switching habits drops
+    // it so it can't be saved to the wrong one.
+    final sameHabit = event.starnyxId == state.starnyxId;
     emit(
       state.copyWith(
         status: JournalStatus.loading,
         starnyxId: event.starnyxId,
+        draftContent: sameHabit ? state.draftContent : '',
         saveStatus: AsyncStatus.idle,
         updateStatus: AsyncStatus.idle,
         deleteStatus: AsyncStatus.idle,

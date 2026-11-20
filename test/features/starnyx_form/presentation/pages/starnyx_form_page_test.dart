@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,7 +10,9 @@ import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/domain/entities/domain_entities.dart';
 import 'package:starnyx/domain/repositories/domain_repositories.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_bloc.dart';
+import 'package:starnyx/features/starnyx_form/presentation/bloc/starnyx_form_event.dart';
 import 'package:starnyx/features/starnyx_form/presentation/pages/starnyx_form_page.dart';
 
 void main() {
@@ -107,6 +110,71 @@ void main() {
 
     expect(host.result?.savedStarnyx?.id, habit.id);
     expect((await repository.getStarnyxById(habit.id))?.title, 'Gym daily');
+  });
+
+  testWidgets('leaving with unsaved edits asks first', (tester) async {
+    final habit = _habit();
+    await repository.saveStarnyx(habit);
+    await openForm(tester, _FormHost(starnyx: habit));
+
+    // No edits: back just closes.
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Edit habit'), findsNothing);
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.descendant(
+        of: find.byKey(const Key('starnyx-form-title')),
+        matching: find.byType(EditableText),
+      ),
+      'Gym daily',
+    );
+    await tester.pump();
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Discard changes?'), findsOneWidget);
+    await tester.tap(find.text('Keep editing'));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit habit'), findsOneWidget);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Discard'));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit habit'), findsNothing);
+    expect((await repository.getStarnyxById(habit.id))?.title, 'Gym');
+  });
+
+  testWidgets('edit keeps an old start date valid in the picker', (
+    tester,
+  ) async {
+    final today = DateTime.now();
+    final habit = _habit().copyWith(
+      startDate: DateTime(today.year, today.month, today.day - 30),
+    );
+    await repository.saveStarnyx(habit);
+    await openForm(tester, _FormHost(starnyx: habit));
+
+    await tapVisible(tester, find.byKey(const Key('starnyx-form-start-on')));
+    expect(tester.takeException(), isNull);
+    expect(find.byType(CupertinoDatePicker), findsOneWidget);
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+
+    // Another day older than 7 days is rejected, and the form says why.
+    tester
+        .element(find.byType(StarnyxFormPage))
+        .read<StarnyxFormBloc>()
+        .add(
+          StarnyxFormStartDateChanged(
+            DateTime(today.year, today.month, today.day - 20),
+          ),
+        );
+    await tester.pumpAndSettle();
+    expect(find.text('Start date can be at most 7 days ago'), findsOneWidget);
   });
 
   testWidgets('selecting a symbol and filtering by category', (tester) async {

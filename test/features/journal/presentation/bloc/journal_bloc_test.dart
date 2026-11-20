@@ -69,6 +69,21 @@ void main() {
     expect(bloc.state.draftContent, 'A quick reflection.');
   });
 
+  test('switching habits drops the draft of the previous one', () async {
+    bloc.add(const JournalStarted('s-1'));
+    await pumpEventQueue(times: 3);
+    bloc.add(const JournalDraftChanged('For habit one'));
+    await pumpEventQueue();
+
+    bloc.add(const JournalStarted('s-1'));
+    await pumpEventQueue(times: 3);
+    expect(bloc.state.draftContent, 'For habit one');
+
+    bloc.add(const JournalStarted('s-2'));
+    await pumpEventQueue(times: 3);
+    expect(bloc.state.draftContent, isEmpty);
+  });
+
   test('save creates today journal entry and clears draft', () async {
     bloc.add(const JournalStarted('s-1'));
     await pumpEventQueue(times: 3);

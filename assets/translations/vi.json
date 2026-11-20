@@ -1,6 +1,10 @@
 {
   "app": {
-    "title": "StarNyx"
+    "title": "StarNyx",
+    "discard_title": "Bỏ các thay đổi?",
+    "discard_message": "Những chỉnh sửa của bạn chưa được lưu.",
+    "discard_confirm": "Bỏ thay đổi",
+    "discard_cancel": "Tiếp tục sửa"
   },
   "home": {
     "active_constellation_title": "Đang tập trung",
@@ -80,7 +84,11 @@
     "color_blue": "Xanh lam",
     "color_amber": "Hổ phách",
     "color_emerald": "Ngọc lục bảo",
-    "color_custom": "Tùy chỉnh"
+    "color_custom": "Tùy chỉnh",
+    "start_date_error_future": "Ngày bắt đầu không thể ở tương lai",
+    "start_date_error_too_old": "Ngày bắt đầu chỉ có thể lùi tối đa 7 ngày",
+    "reminder_time_error_missing": "Hãy chọn giờ nhắc",
+    "reminder_time_error_invalid": "Giờ nhắc không hợp lệ"
   },
   "journal": {
     "title": "Nhật ký",

@@ -293,6 +293,56 @@ void main() {
     expect(saved, entry(1, 'Mệt', DateTime(2026, 11, 19, 22)));
   });
 
+  testWidgets('no habits offers a create button; load errors are errors', (
+    tester,
+  ) async {
+    await _render(tester, _InMemoryJournalEntryRepository([]), null);
+    expect(find.text('Chưa có thói quen'), findsOneWidget);
+    expect(find.text('Tạo thói quen'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox());
+    await _render(
+      tester,
+      _InMemoryJournalEntryRepository([]),
+      null,
+      loadActive: _ThrowingLoadActiveStarNyxUseCase(),
+    );
+    expect(find.text('Không tải được nhật ký'), findsOneWidget);
+    expect(find.text('Chưa có thói quen'), findsNothing);
+  });
+
+  testWidgets('editor asks before dropping unsaved edits', (tester) async {
+    final original = entry(1, 'Buổi sáng', DateTime(2026, 11, 19, 7));
+    final repository = _InMemoryJournalEntryRepository([original]);
+    await _render(tester, repository, habit);
+
+    final context = tester.element(find.byType(JournalEntryCard));
+    unawaited(
+      JournalEditorPage.open(
+        context,
+        bloc: context.read<JournalBloc>(),
+        entry: original,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('journal-editor-input')),
+      'Buổi sáng yên',
+    );
+    await tester.pump();
+
+    await tester.tap(find.byKey(const Key('journal-editor-close')));
+    await tester.pumpAndSettle();
+    expect(find.text('Bỏ các thay đổi?'), findsOneWidget);
+    await tester.tap(find.text('Bỏ thay đổi'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('journal-editor-input')), findsNothing);
+    expect(
+      (await repository.getJournalEntriesForStarnyx('habit-1')).single.content,
+      'Buổi sáng',
+    );
+  });
+
   testWidgets('shows empty state when there are no entries', (tester) async {
     await _render(tester, _InMemoryJournalEntryRepository([]), habit);
 
@@ -471,8 +521,9 @@ void main() {
 Future<void> _render(
   WidgetTester tester,
   _InMemoryJournalEntryRepository repository,
-  StarNyx habit,
-) async {
+  StarNyx? habit, {
+  LoadActiveStarNyxUseCase? loadActive,
+}) async {
   final bloc = JournalBloc(
     saveJournalEntryUseCase: SaveJournalEntryUseCase(repository),
     watchJournalEntriesForStarnyxUseCase: WatchJournalEntriesForStarnyxUseCase(
@@ -495,13 +546,19 @@ Future<void> _render(
           localizationsDelegates: context.localizationDelegates,
           home: JournalPage(
             bloc: bloc,
-            loadActiveStarNyxUseCase: _FakeLoadActiveStarNyxUseCase(habit),
+            loadActiveStarNyxUseCase:
+                loadActive ?? _FakeLoadActiveStarNyxUseCase(habit),
           ),
         ),
       ),
     ),
   );
   await tester.pumpAndSettle();
+}
+
+class _ThrowingLoadActiveStarNyxUseCase implements LoadActiveStarNyxUseCase {
+  @override
+  Future<StarNyx?> call({DateTime? now}) async => throw StateError('db');
 }
 
 class _FakeLoadActiveStarNyxUseCase implements LoadActiveStarNyxUseCase {

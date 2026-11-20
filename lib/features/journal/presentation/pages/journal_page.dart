@@ -16,6 +16,7 @@ import 'package:starnyx/features/journal/presentation/bloc/journal_state.dart';
 import 'package:starnyx/features/journal/presentation/pages/journal_detail_page.dart';
 import 'package:starnyx/features/journal/presentation/pages/journal_editor_page.dart';
 import 'package:starnyx/features/journal/presentation/widgets/journal_metadata.dart';
+import 'package:starnyx/features/starnyx_form/presentation/pages/starnyx_form_page.dart';
 import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
 /// Full-screen Journal tab.
@@ -53,6 +54,9 @@ class _JournalPageState extends State<JournalPage> {
 
   StarNyx? _habit;
   bool _resolving = true;
+
+  /// Reading the active habit failed (not the same as "no habits").
+  bool _loadFailed = false;
   bool _searchOpen = false;
 
   @override
@@ -89,17 +93,32 @@ class _JournalPageState extends State<JournalPage> {
     try {
       habit = await _loadActive();
     } catch (_) {
-      habit = null;
+      if (mounted) {
+        setState(() {
+          _loadFailed = true;
+          _resolving = false;
+        });
+      }
+      return;
     }
     if (!mounted) return;
     final changed = habit?.id != _habit?.id;
+    // The bloc drops the draft too (JournalStarted for another habit).
+    if (changed) _draftController.clear();
     setState(() {
       _habit = habit;
       _resolving = false;
+      _loadFailed = false;
     });
     if (habit != null && (changed || _bloc.state.starnyxId != habit.id)) {
       _bloc.add(JournalStarted(habit.id));
     }
+  }
+
+  Future<void> _createHabit() async {
+    if (!context.isTopRoute) return;
+    final result = await StarnyxFormPage.open(context);
+    if (mounted && (result?.hasChanges ?? false)) await _resolveHabit();
   }
 
   void _toggleSearch() {
@@ -205,6 +224,16 @@ class _JournalPageState extends State<JournalPage> {
     if (_resolving) {
       return const Center(child: AppLoadingIndicator());
     }
+    if (_loadFailed) {
+      return _CenteredPadding(
+        child: AppErrorState(
+          title: 'journal.load_error_title'.tr(),
+          message: 'journal.load_error_message'.tr(),
+          retryLabel: 'home.retry'.tr(),
+          onRetry: _resolveHabit,
+        ),
+      );
+    }
     final habit = _habit;
     if (habit == null) {
       return _CenteredPadding(
@@ -212,6 +241,8 @@ class _JournalPageState extends State<JournalPage> {
           title: 'habits.empty_title'.tr(),
           message: 'habits.empty_message'.tr(),
           icon: HugeIconsStrokeRounded.strokeRoundedBookOpen01,
+          actionLabel: 'habits.empty_action'.tr(),
+          onActionPressed: _createHabit,
         ),
       );
     }

@@ -1,6 +1,10 @@
 {
   "app": {
-    "title": "StarNyx"
+    "title": "StarNyx",
+    "discard_title": "変更を破棄しますか？",
+    "discard_message": "編集内容はまだ保存されていません。",
+    "discard_confirm": "破棄する",
+    "discard_cancel": "編集を続ける"
   },
   "home": {
     "active_constellation_title": "現在のフォーカス",
@@ -80,7 +84,11 @@
     "color_blue": "ブルー",
     "color_amber": "アンバー",
     "color_emerald": "エメラルド",
-    "color_custom": "カスタム"
+    "color_custom": "カスタム",
+    "start_date_error_future": "開始日を未来の日付にはできません",
+    "start_date_error_too_old": "開始日は7日前までしか選べません",
+    "reminder_time_error_missing": "リマインダーの時刻を選んでください",
+    "reminder_time_error_invalid": "リマインダーの時刻が正しくありません"
   },
   "journal": {
     "title": "ジャーナル",

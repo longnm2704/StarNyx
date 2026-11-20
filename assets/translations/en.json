@@ -1,6 +1,10 @@
 {
   "app": {
-    "title": "StarNyx"
+    "title": "StarNyx",
+    "discard_title": "Discard changes?",
+    "discard_message": "Your edits haven't been saved yet.",
+    "discard_confirm": "Discard",
+    "discard_cancel": "Keep editing"
   },
   "home": {
     "active_constellation_title": "Current focus",
@@ -80,7 +84,11 @@
     "color_blue": "Blue",
     "color_amber": "Amber",
     "color_emerald": "Emerald",
-    "color_custom": "Custom"
+    "color_custom": "Custom",
+    "start_date_error_future": "Start date can't be in the future",
+    "start_date_error_too_old": "Start date can be at most 7 days ago",
+    "reminder_time_error_missing": "Pick a reminder time",
+    "reminder_time_error_invalid": "This reminder time isn't valid"
   },
   "journal": {
     "title": "Journal",

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
+import 'package:starnyx/app/confirm_discard.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/app/reminder_permission.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
@@ -64,6 +65,22 @@ class _StarnyxFormPageState extends State<StarnyxFormPage> {
   // Title errors show once the user has typed, not on a fresh form.
   bool _titleTouched = false;
 
+  /// The form as opened, to tell whether leaving would lose edits.
+  late final StarnyxFormState _initial = context.read<StarnyxFormBloc>().state;
+
+  bool _hasEdits(StarnyxFormState state) {
+    return state.title != _initial.title ||
+        state.description != _initial.description ||
+        state.color != _initial.color ||
+        state.icon != _initial.icon ||
+        !core_date_utils.DateUtils.isSameDate(
+          state.startDate,
+          _initial.startDate,
+        ) ||
+        state.reminderEnabled != _initial.reminderEnabled ||
+        (state.reminderEnabled && state.reminderTime != _initial.reminderTime);
+  }
+
   Future<void> _pickReminderTime(StarnyxFormState state) async {
     final now = DateTime.now();
     final initialTime = _parseTime(state.reminderTime) ?? TimeOfDay.now();
@@ -94,11 +111,17 @@ class _StarnyxFormPageState extends State<StarnyxFormPage> {
   Future<void> _pickStartDate(StarnyxFormState state) async {
     final today = core_date_utils.DateUtils.nowDate();
 
+    // Editing may keep an older start date (the domain allows it), so the
+    // picker must accept it as its initial value; picking another day older
+    // than 7 days shows the start date error.
     final picked = await showStarnyxCupertinoDateTimePicker(
       context: context,
       mode: CupertinoDatePickerMode.date,
       initialDateTime: state.startDate,
-      minimumDate: today.subtract(const Duration(days: 7)),
+      minimumDate: core_date_utils.DateUtils.minDate(
+        core_date_utils.DateUtils.dateOnly(state.startDate),
+        core_date_utils.DateUtils.addDays(today, -7),
+      ),
       maximumDate: today,
     );
 
@@ -178,211 +201,241 @@ class _StarnyxFormPageState extends State<StarnyxFormPage> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        bottom: false,
-        child: BlocConsumer<StarnyxFormBloc, StarnyxFormState>(
-          listenWhen: (previous, current) =>
-              previous.submissionStatus != current.submissionStatus ||
-              previous.deletionStatus != current.deletionStatus,
-          listener: _onSubmissionChanged,
-          builder: (BuildContext context, StarnyxFormState state) {
-            final bloc = context.read<StarnyxFormBloc>();
-            final accent = starnyxColorFromHex(state.color);
-            final titleError = _titleTouched ? state.titleError : null;
-            final descriptionError = state.descriptionError;
-            final isBusy =
-                state.submissionStatus == AsyncStatus.inProgress ||
-                state.deletionStatus == AsyncStatus.inProgress;
+    return BlocSelector<StarnyxFormBloc, StarnyxFormState, bool>(
+      selector: _hasEdits,
+      builder: (context, hasEdits) => DiscardChangesScope(
+        dirty: hasEdits,
+        child: Scaffold(
+          backgroundColor: AppColors.background,
+          body: SafeArea(
+            bottom: false,
+            child: BlocConsumer<StarnyxFormBloc, StarnyxFormState>(
+              listenWhen: (previous, current) =>
+                  previous.submissionStatus != current.submissionStatus ||
+                  previous.deletionStatus != current.deletionStatus,
+              listener: _onSubmissionChanged,
+              builder: (BuildContext context, StarnyxFormState state) {
+                final bloc = context.read<StarnyxFormBloc>();
+                final accent = starnyxColorFromHex(state.color);
+                final titleError = _titleTouched ? state.titleError : null;
+                final descriptionError = state.descriptionError;
+                final isBusy =
+                    state.submissionStatus == AsyncStatus.inProgress ||
+                    state.deletionStatus == AsyncStatus.inProgress;
 
-            return Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.pageHorizontal,
-                    AppSpacing.sm,
-                    AppSpacing.pageHorizontal,
-                    AppSpacing.sm,
-                  ),
-                  child: StarnyxFormHeader(
-                    title:
-                        (state.isEditing
-                                ? 'starnyx_form.edit_sheet_title'
-                                : 'starnyx_form.create_sheet_title')
-                            .tr(),
-                    leadingIcon: state.isEditing
-                        ? HugeIconsStrokeRounded.strokeRoundedCancel01
-                        : HugeIconsStrokeRounded.strokeRoundedArrowLeft01,
-                    leadingTooltip: state.isEditing
-                        ? MaterialLocalizations.of(context).closeButtonTooltip
-                        : MaterialLocalizations.of(context).backButtonTooltip,
-                    onClosePressed: () => Navigator.of(context).maybePop(),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () => FocusScope.of(context).unfocus(),
-                    child: ListView(
-                      keyboardDismissBehavior:
-                          ScrollViewKeyboardDismissBehavior.onDrag,
-                      padding: EdgeInsets.fromLTRB(
+                return Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
                         AppSpacing.pageHorizontal,
-                        AppSpacing.xs,
+                        AppSpacing.sm,
                         AppSpacing.pageHorizontal,
-                        AppSpacing.lg + mediaQuery.padding.bottom,
+                        AppSpacing.sm,
                       ),
-                      children: <Widget>[
-                        StarnyxFormFieldLabel(
-                          label: 'starnyx_form.title_label'.tr(),
-                          trailing: _CharacterCounter(
-                            currentLength: state.title.characters.length,
-                            maxLength: StarnyxFormBloc.maxTitleLength,
-                            hasError: titleError != null,
+                      child: StarnyxFormHeader(
+                        title:
+                            (state.isEditing
+                                    ? 'starnyx_form.edit_sheet_title'
+                                    : 'starnyx_form.create_sheet_title')
+                                .tr(),
+                        leadingIcon: state.isEditing
+                            ? HugeIconsStrokeRounded.strokeRoundedCancel01
+                            : HugeIconsStrokeRounded.strokeRoundedArrowLeft01,
+                        leadingTooltip: state.isEditing
+                            ? MaterialLocalizations.of(
+                                context,
+                              ).closeButtonTooltip
+                            : MaterialLocalizations.of(
+                                context,
+                              ).backButtonTooltip,
+                        onClosePressed: () => Navigator.of(context).maybePop(),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () => FocusScope.of(context).unfocus(),
+                        child: ListView(
+                          keyboardDismissBehavior:
+                              ScrollViewKeyboardDismissBehavior.onDrag,
+                          padding: EdgeInsets.fromLTRB(
+                            AppSpacing.pageHorizontal,
+                            AppSpacing.xs,
+                            AppSpacing.pageHorizontal,
+                            AppSpacing.lg + mediaQuery.padding.bottom,
                           ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        StarnyxFormPillTextField(
-                          key: const Key('starnyx-form-title'),
-                          initialValue: state.title,
-                          hintText: 'starnyx_form.title_hint'.tr(),
-                          hasError: titleError != null,
-                          inputFormatters: <TextInputFormatter>[
-                            LengthLimitingTextInputFormatter(
-                              StarnyxFormBloc.maxTitleLength,
-                            ),
-                          ],
-                          onChanged: (String value) {
-                            if (!_titleTouched) {
-                              setState(() => _titleTouched = true);
-                            }
-                            bloc.add(StarnyxFormTitleChanged(value));
-                          },
-                        ),
-                        if (titleError != null)
-                          _ErrorText(
-                            switch (titleError) {
-                              StarnyxFormTitleError.empty =>
-                                'starnyx_form.title_error_required',
-                              StarnyxFormTitleError.tooLong =>
-                                'starnyx_form.title_error_too_long',
-                            }.tr(),
-                          ),
-                        const SizedBox(height: AppSpacing.lg),
-                        StarnyxFormFieldLabel(
-                          label: 'starnyx_form.description_label'.tr(),
-                          trailing: _CharacterCounter(
-                            currentLength: state.description.characters.length,
-                            maxLength: StarnyxFormBloc.maxDescriptionLength,
-                            hasError: descriptionError != null,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        StarnyxFormPillTextField(
-                          key: const Key('starnyx-form-description'),
-                          initialValue: state.description,
-                          hintText: 'starnyx_form.description_hint'.tr(),
-                          minLines: 3,
-                          maxLines: 5,
-                          hasError: descriptionError != null,
-                          inputFormatters: <TextInputFormatter>[
-                            LengthLimitingTextInputFormatter(
-                              StarnyxFormBloc.maxDescriptionLength,
-                            ),
-                          ],
-                          onChanged: (String value) {
-                            bloc.add(StarnyxFormDescriptionChanged(value));
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        StarnyxFormSymbolPicker(
-                          selectedSymbol: state.icon,
-                          color: accent,
-                          onSymbolSelected: (String symbol) {
-                            bloc.add(StarnyxFormIconChanged(symbol));
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        StarnyxFormColorCard(
-                          selectedColorHex: state.color,
-                          onColorSelected: (String colorHex) {
-                            bloc.add(StarnyxFormColorChanged(colorHex));
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        StarnyxFormReminderCard(
-                          reminderEnabled: state.reminderEnabled,
-                          reminderTime: state.reminderTime,
-                          onToggle: (bool enabled) {
-                            bloc.add(StarnyxFormReminderToggled(enabled));
-                            if (enabled) requestReminderPermission(context);
-                          },
-                          onTapTime: () => _pickReminderTime(state),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        StarnyxFormStartOnCard(
-                          value: _startDateLabel(state.startDate),
-                          onTap: () => _pickStartDate(state),
-                        ),
-                        const SizedBox(height: AppSpacing.xl),
-                        if (isBusy)
-                          const SizedBox(
-                            height: AppSize.ctaHeight,
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.primary,
+                          children: <Widget>[
+                            StarnyxFormFieldLabel(
+                              label: 'starnyx_form.title_label'.tr(),
+                              trailing: _CharacterCounter(
+                                currentLength: state.title.characters.length,
+                                maxLength: StarnyxFormBloc.maxTitleLength,
+                                hasError: titleError != null,
                               ),
                             ),
-                          )
-                        else ...<Widget>[
-                          if (state.isEditing) ...<Widget>[
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextButton.icon(
-                                key: const Key('starnyx-form-delete'),
-                                onPressed: state.canDelete
-                                    ? _confirmDelete
-                                    : null,
-                                style: TextButton.styleFrom(
-                                  foregroundColor: AppColors.error,
+                            const SizedBox(height: AppSpacing.xs),
+                            StarnyxFormPillTextField(
+                              key: const Key('starnyx-form-title'),
+                              initialValue: state.title,
+                              hintText: 'starnyx_form.title_hint'.tr(),
+                              hasError: titleError != null,
+                              inputFormatters: <TextInputFormatter>[
+                                LengthLimitingTextInputFormatter(
+                                  StarnyxFormBloc.maxTitleLength,
                                 ),
-                                icon: const AppIcon(
-                                  icon: HugeIconsStrokeRounded
-                                      .strokeRoundedDelete02,
-                                  size: 18,
-                                  color: AppColors.error,
+                              ],
+                              onChanged: (String value) {
+                                if (!_titleTouched) {
+                                  setState(() => _titleTouched = true);
+                                }
+                                bloc.add(StarnyxFormTitleChanged(value));
+                              },
+                            ),
+                            if (titleError != null)
+                              _ErrorText(
+                                switch (titleError) {
+                                  StarnyxFormTitleError.empty =>
+                                    'starnyx_form.title_error_required',
+                                  StarnyxFormTitleError.tooLong =>
+                                    'starnyx_form.title_error_too_long',
+                                }.tr(),
+                              ),
+                            const SizedBox(height: AppSpacing.lg),
+                            StarnyxFormFieldLabel(
+                              label: 'starnyx_form.description_label'.tr(),
+                              trailing: _CharacterCounter(
+                                currentLength:
+                                    state.description.characters.length,
+                                maxLength: StarnyxFormBloc.maxDescriptionLength,
+                                hasError: descriptionError != null,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            StarnyxFormPillTextField(
+                              key: const Key('starnyx-form-description'),
+                              initialValue: state.description,
+                              hintText: 'starnyx_form.description_hint'.tr(),
+                              minLines: 3,
+                              maxLines: 5,
+                              hasError: descriptionError != null,
+                              inputFormatters: <TextInputFormatter>[
+                                LengthLimitingTextInputFormatter(
+                                  StarnyxFormBloc.maxDescriptionLength,
                                 ),
-                                label: Text(
-                                  'starnyx_form.delete_button'.tr(),
-                                  style: const TextStyle(
-                                    fontFamily: AppFonts.body,
-                                    fontWeight: FontWeight.w600,
+                              ],
+                              onChanged: (String value) {
+                                bloc.add(StarnyxFormDescriptionChanged(value));
+                              },
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            StarnyxFormSymbolPicker(
+                              selectedSymbol: state.icon,
+                              color: accent,
+                              onSymbolSelected: (String symbol) {
+                                bloc.add(StarnyxFormIconChanged(symbol));
+                              },
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            StarnyxFormColorCard(
+                              selectedColorHex: state.color,
+                              onColorSelected: (String colorHex) {
+                                bloc.add(StarnyxFormColorChanged(colorHex));
+                              },
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            StarnyxFormReminderCard(
+                              reminderEnabled: state.reminderEnabled,
+                              reminderTime: state.reminderTime,
+                              onToggle: (bool enabled) {
+                                bloc.add(StarnyxFormReminderToggled(enabled));
+                                if (enabled) requestReminderPermission(context);
+                              },
+                              onTapTime: () => _pickReminderTime(state),
+                            ),
+                            if (state.reminderTimeError case final error?)
+                              _ErrorText(
+                                switch (error) {
+                                  StarnyxFormReminderTimeError.missing =>
+                                    'starnyx_form.reminder_time_error_missing',
+                                  StarnyxFormReminderTimeError.invalid =>
+                                    'starnyx_form.reminder_time_error_invalid',
+                                }.tr(),
+                              ),
+                            const SizedBox(height: AppSpacing.md),
+                            StarnyxFormStartOnCard(
+                              value: _startDateLabel(state.startDate),
+                              onTap: () => _pickStartDate(state),
+                            ),
+                            if (state.startDateError case final error?)
+                              _ErrorText(
+                                switch (error) {
+                                  StarnyxFormStartDateError.inFuture =>
+                                    'starnyx_form.start_date_error_future',
+                                  StarnyxFormStartDateError.tooFarInPast =>
+                                    'starnyx_form.start_date_error_too_old',
+                                }.tr(),
+                              ),
+                            const SizedBox(height: AppSpacing.xl),
+                            if (isBusy)
+                              const SizedBox(
+                                height: AppSize.ctaHeight,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.primary,
                                   ),
                                 ),
+                              )
+                            else ...<Widget>[
+                              if (state.isEditing) ...<Widget>[
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: TextButton.icon(
+                                    key: const Key('starnyx-form-delete'),
+                                    onPressed: state.canDelete
+                                        ? _confirmDelete
+                                        : null,
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: AppColors.error,
+                                    ),
+                                    icon: const AppIcon(
+                                      icon: HugeIconsStrokeRounded
+                                          .strokeRoundedDelete02,
+                                      size: 18,
+                                      color: AppColors.error,
+                                    ),
+                                    label: Text(
+                                      'starnyx_form.delete_button'.tr(),
+                                      style: const TextStyle(
+                                        fontFamily: AppFonts.body,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.sm),
+                              ],
+                              _SubmitButton(
+                                label:
+                                    (state.isEditing
+                                            ? 'starnyx_form.update_button'
+                                            : 'starnyx_form.save_button')
+                                        .tr(),
+                                isEditing: state.isEditing,
+                                onPressed: state.canSubmit
+                                    ? () =>
+                                          bloc.add(const StarnyxFormSubmitted())
+                                    : null,
                               ),
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
+                            ],
                           ],
-                          _SubmitButton(
-                            label:
-                                (state.isEditing
-                                        ? 'starnyx_form.update_button'
-                                        : 'starnyx_form.save_button')
-                                    .tr(),
-                            isEditing: state.isEditing,
-                            onPressed: state.canSubmit
-                                ? () => bloc.add(const StarnyxFormSubmitted())
-                                : null,
-                          ),
-                        ],
-                      ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            );
-          },
+                  ],
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

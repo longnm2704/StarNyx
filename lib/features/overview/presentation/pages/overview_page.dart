@@ -8,6 +8,7 @@ import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/core/widgets/app_empty_state.dart';
 import 'package:starnyx/core/widgets/app_error_state.dart';
 import 'package:starnyx/core/widgets/app_icon.dart';
+import 'package:starnyx/core/widgets/route_guard.dart';
 import 'package:starnyx/domain/entities/overview_stats.dart';
 import 'package:starnyx/features/overview/presentation/bloc/overview_bloc.dart';
 import 'package:starnyx/features/overview/presentation/bloc/overview_event.dart';
@@ -1105,6 +1106,7 @@ class _OverviewEmptyView extends StatelessWidget {
             message: 'overview.empty_message'.tr(),
             actionLabel: 'overview.empty_action'.tr(),
             onActionPressed: () async {
+              if (!context.isTopRoute) return;
               final result = await StarnyxFormPage.open(context);
               if (result != null && result.hasChanges && context.mounted) {
                 context.read<OverviewBloc>().add(
