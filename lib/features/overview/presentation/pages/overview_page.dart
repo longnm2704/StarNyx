@@ -153,7 +153,7 @@ class _OverviewAppBar extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontFamily: AppFonts.mono,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     letterSpacing: 1.1,
                     color: AppColors.textSecondary,
                   ),
@@ -306,7 +306,7 @@ class _RangePill extends StatelessWidget {
                 maxLines: 1,
                 style: theme.textTheme.labelLarge?.copyWith(
                   color: isActive ? AppColors.primary : AppColors.textSecondary,
-                  fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                   letterSpacing: 0.2,
                 ),
               ),
@@ -349,7 +349,7 @@ class _HeroCard extends StatelessWidget {
             'overview.completion_rate'.tr().toUpperCase(),
             style: theme.textTheme.labelSmall?.copyWith(
               fontFamily: AppFonts.mono,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               letterSpacing: 1.1,
               color: AppColors.textSecondary,
             ),
@@ -519,7 +519,7 @@ class _StatTile extends StatelessWidget {
                   title.toUpperCase(),
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontFamily: AppFonts.mono,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     letterSpacing: 1.1,
                     color: AppColors.textSecondary,
                   ),
@@ -653,6 +653,7 @@ class _HeatmapLegend extends StatelessWidget {
               decoration: BoxDecoration(
                 color: color,
                 borderRadius: BorderRadius.circular(3),
+                boxShadow: color == AppColors.primary ? _glow : null,
               ),
             ),
           ),
@@ -670,12 +671,17 @@ class _HeatmapLegend extends StatelessWidget {
     );
   }
 
-  static const List<Color> _legendColors = <Color>[
-    Color(0xFF0A0A0C),
-    Color(0xFF1E4D2E),
-    Color(0xFF34A853),
-    Color(0xFF10B981),
-    Color(0xFF6CE79A),
+  static final List<BoxShadow> _glow = <BoxShadow>[
+    BoxShadow(color: AppColors.primary.withValues(alpha: 0.5), blurRadius: 4),
+  ];
+
+  // Mockup ramp: empty tier → amber 40% → amber → emerald 50% → emerald.
+  static final List<Color> _legendColors = <Color>[
+    AppColors.surfaceLevel3,
+    AppColors.tertiary.withValues(alpha: 0.4),
+    AppColors.tertiary,
+    AppColors.primary.withValues(alpha: 0.5),
+    AppColors.primary,
   ];
 }
 
@@ -717,27 +723,20 @@ class _HeatmapGrid extends StatelessWidget {
           final lit = dailyLitCounts[day] ?? 0;
           final valid = dailyValidCounts[day] ?? 0;
 
-          Color cellColor;
-          if (valid == 0) {
-            cellColor = AppColors.surfaceLevel2;
-          } else if (lit == 0) {
-            cellColor = _HeatmapLegend._legendColors[0];
-          } else {
-            final ratio = lit / maxLit;
-            if (ratio >= 0.8) {
-              cellColor = _HeatmapLegend._legendColors[4];
-            } else if (ratio >= 0.6) {
-              cellColor = _HeatmapLegend._legendColors[3];
-            } else if (ratio >= 0.4) {
-              cellColor = _HeatmapLegend._legendColors[2];
-            } else if (ratio >= 0.2) {
-              cellColor = _HeatmapLegend._legendColors[1];
-            } else {
-              cellColor = _HeatmapLegend._legendColors[0].withValues(
-                alpha: 0.6,
-              );
-            }
-          }
+          // Days with no active habit stay one tier below "nothing lit".
+          final ratio = lit / maxLit;
+          final level = valid == 0 || lit == 0
+              ? 0
+              : ratio >= 0.8
+              ? 4
+              : ratio >= 0.55
+              ? 3
+              : ratio >= 0.3
+              ? 2
+              : 1;
+          final cellColor = valid == 0
+              ? AppColors.surfaceLevel2
+              : _HeatmapLegend._legendColors[level];
 
           return Semantics(
             label: 'overview.heatmap_cell'.tr(
@@ -752,6 +751,7 @@ class _HeatmapGrid extends StatelessWidget {
               decoration: BoxDecoration(
                 color: cellColor,
                 borderRadius: BorderRadius.circular(3),
+                boxShadow: level == 4 ? _HeatmapLegend._glow : null,
               ),
             ),
           );
@@ -874,7 +874,7 @@ class _HabitRow extends StatelessWidget {
                 '$pct%',
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontFamily: AppFonts.mono,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: accent,
                 ),
               ),

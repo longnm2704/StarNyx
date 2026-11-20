@@ -593,7 +593,6 @@ class _ContentCard extends StatelessWidget {
                     '“$quote”',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontFamily: AppFonts.headline,
-                      fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
@@ -658,7 +657,7 @@ class _StreakSection extends StatelessWidget {
                               style: theme.textTheme.headlineSmall?.copyWith(
                                 fontFamily: AppFonts.mono,
                                 fontFeatures: AppFonts.tabularFigures,
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
                               ),
                               children: <InlineSpan>[

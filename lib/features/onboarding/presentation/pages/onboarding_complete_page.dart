@@ -338,10 +338,9 @@ class _Quote extends StatelessWidget {
           Expanded(
             child: Text(
               'onboarding.complete.quote'.tr(),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontStyle: FontStyle.italic,
-                color: AppColors.textSecondary,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
             ),
           ),
         ],

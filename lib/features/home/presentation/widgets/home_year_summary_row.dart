@@ -146,7 +146,7 @@ class HomeYearSummaryRow extends StatelessWidget {
   Widget _buildDaysLeftLabel(ThemeData theme) {
     final numberStyle = theme.textTheme.labelMedium?.copyWith(
       color: accentColor,
-      fontWeight: FontWeight.w700,
+      fontWeight: FontWeight.w600,
       letterSpacing: 0.4,
     );
     final suffixStyle = theme.textTheme.labelMedium?.copyWith(
