@@ -14,6 +14,7 @@ import 'package:starnyx/domain/entities/storage_stats.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_event.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_state.dart';
+import 'package:starnyx/features/settings/presentation/widgets/settings_page_widgets.dart';
 
 /// How the backup screen replaced local data; it pops with one of these.
 enum BackupOutcome { imported, deletedAll }
@@ -100,10 +101,14 @@ class _BackupPageState extends State<BackupPage> {
               AppSpacing.xxl,
             ),
             children: <Widget>[
-              _Header(onBack: widget.onBack),
+              SettingsBackHeader(
+                title: 'settings.backup_title'.tr(),
+                backKey: const Key('backup-back-button'),
+                onBack: widget.onBack,
+              ),
               const SizedBox(height: AppSpacing.lg),
-              _SectionLabel('settings.files_section'.tr()),
-              _Card(
+              SettingsSectionLabel('settings.files_section'.tr()),
+              SettingsCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
@@ -147,16 +152,16 @@ class _BackupPageState extends State<BackupPage> {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              _SectionLabel('settings.storage_section'.tr()),
+              SettingsSectionLabel('settings.storage_section'.tr()),
               _StorageCard(stats: state.storage),
               if (widget.showDangerZone) ...<Widget>[
                 const SizedBox(height: AppSpacing.lg),
-                _SectionLabel(
+                SettingsSectionLabel(
                   'settings.danger_section'.tr(),
                   color: AppColors.error,
                   icon: HugeIconsStrokeRounded.strokeRoundedAlert01,
                 ),
-                _Card(
+                SettingsCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
@@ -510,98 +515,6 @@ String formatBytes(int bytes) {
   return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
 }
 
-class _Header extends StatelessWidget {
-  const _Header({required this.onBack});
-
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        IconButton(
-          key: const Key('backup-back-button'),
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-          onPressed: onBack,
-          icon: const AppIcon(
-            icon: HugeIconsStrokeRounded.strokeRoundedArrowLeft01,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.xs),
-        Expanded(
-          child: Text(
-            'settings.backup_title'.tr(),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontFamily: AppFonts.headline,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text, {this.color, this.icon});
-
-  final String text;
-  final Color? color;
-  final List<List<dynamic>>? icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final effectiveColor = color ?? AppColors.textSecondary;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.xxs,
-        0,
-        AppSpacing.xxs,
-        AppSpacing.xs,
-      ),
-      child: Row(
-        children: <Widget>[
-          if (icon != null) ...<Widget>[
-            AppIcon(icon: icon!, size: 16, color: effectiveColor),
-            const SizedBox(width: AppSpacing.xxs),
-          ],
-          Text(
-            text.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              fontFamily: AppFonts.mono,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.1,
-              color: effectiveColor,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Card extends StatelessWidget {
-  const _Card({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLevel1,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
-      child: child,
-    );
-  }
-}
-
 class _IconBox extends StatelessWidget {
   const _IconBox({required this.icon, required this.color});
 
@@ -754,7 +667,7 @@ class _StorageCard extends StatelessWidget {
       (stats?.completionCount ?? 0, AppColors.secondary),
       (stats?.journalCount ?? 0, AppColors.tertiary),
     ];
-    return _Card(
+    return SettingsCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

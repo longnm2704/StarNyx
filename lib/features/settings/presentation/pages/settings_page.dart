@@ -12,7 +12,7 @@ import 'package:starnyx/domain/usecases/sync_notifications_use_case.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_event.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_state.dart';
-import 'package:starnyx/features/settings/presentation/pages/about_starnyx_sheet.dart';
+import 'package:starnyx/features/settings/presentation/pages/about_page.dart';
 import 'package:starnyx/features/settings/presentation/pages/backup_page.dart';
 
 /// Full-screen Settings tab (Obsidian Lumina `cai_dat`).
@@ -122,8 +122,7 @@ class _SettingsPageState extends State<SettingsPage> {
               onLanguageTap: () => _showLanguagePicker(context),
               onRemindersChanged: _onRemindersChanged,
               onBackupTap: () => _push((onBack) => BackupPage(onBack: onBack)),
-              onAboutTap: () =>
-                  _push((onBack) => AboutStarnyxSheet(onBack: onBack)),
+              onAboutTap: () => _push((onBack) => AboutPage(onBack: onBack)),
             ),
           ),
         ),
@@ -241,7 +240,7 @@ class _SettingsContent extends StatelessWidget {
               icon: HugeIconsStrokeRounded.strokeRoundedMoon02,
               iconColor: AppColors.primary,
               title: 'settings.appearance_label'.tr(),
-              value: 'Obsidian Lumina',
+              value: 'settings.appearance_value'.tr(),
             ),
           ],
         ),
@@ -407,9 +406,11 @@ class _Section extends StatelessWidget {
             AppSpacing.xs,
           ),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Expanded(child: Text(title.toUpperCase(), style: overline)),
-              if (trailing != null)
+              Flexible(child: Text(title.toUpperCase(), style: overline)),
+              if (trailing != null) ...<Widget>[
+                const SizedBox(width: AppSpacing.xs),
                 Flexible(
                   child: Text(
                     trailing!,
@@ -418,6 +419,7 @@ class _Section extends StatelessWidget {
                     style: overline?.copyWith(color: AppColors.primary),
                   ),
                 ),
+              ],
             ],
           ),
         ),
@@ -507,7 +509,6 @@ class _SettingsRow extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                flex: 2,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -534,14 +535,17 @@ class _SettingsRow extends StatelessWidget {
               if (value != null) ...<Widget>[
                 const SizedBox(width: AppSpacing.xs),
                 Flexible(
-                  child: Text(
-                    value!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      fontFamily: AppFonts.mono,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      value!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontFamily: AppFonts.mono,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
                 ),
@@ -549,7 +553,10 @@ class _SettingsRow extends StatelessWidget {
               if (trailing != null) ...<Widget>[
                 const SizedBox(width: AppSpacing.xs),
                 Flexible(
-                  child: FittedBox(fit: BoxFit.scaleDown, child: trailing),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: FittedBox(fit: BoxFit.scaleDown, child: trailing),
+                  ),
                 ),
               ],
               if (onTap != null) ...<Widget>[

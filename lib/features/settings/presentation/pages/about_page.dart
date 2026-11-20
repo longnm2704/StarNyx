@@ -1,131 +1,95 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_header.dart';
+import 'package:starnyx/features/settings/presentation/widgets/settings_page_widgets.dart';
 
-class AboutStarnyxSheet extends StatelessWidget {
-  const AboutStarnyxSheet({required this.onBack, super.key});
+/// Full-screen "About StarNyx" page pushed from Settings; same header,
+/// overlines and hairline cards as the backup screen.
+class AboutPage extends StatelessWidget {
+  const AboutPage({required this.onBack, super.key});
 
   final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final topInset = mediaQuery.viewPadding.top > 0
-        ? mediaQuery.viewPadding.top
-        : mediaQuery.padding.top;
-    final bottomSafeInset = mediaQuery.viewPadding.bottom > 0
-        ? mediaQuery.viewPadding.bottom
-        : mediaQuery.padding.bottom;
-    final headerTopPadding = (topInset < 24 ? 24.0 : topInset) + AppSpacing.lg;
+    final theme = Theme.of(context);
 
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(
-            AppSpacing.pageHorizontal,
-            headerTopPadding,
-            AppSpacing.pageHorizontal,
-            AppSpacing.md,
-          ),
-          child: StarnyxFormHeader(
+    return SafeArea(
+      bottom: false,
+      child: ListView(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.pageHorizontal,
+          AppSpacing.md,
+          AppSpacing.pageHorizontal,
+          AppSpacing.xxl + MediaQuery.paddingOf(context).bottom,
+        ),
+        children: <Widget>[
+          SettingsBackHeader(
             title: 'settings.about_title'.tr(),
-            onClosePressed: onBack,
+            backKey: const Key('about-back-button'),
+            onBack: onBack,
           ),
-        ),
-        Expanded(
-          child: ListView(
-            padding: EdgeInsets.fromLTRB(
-              AppSpacing.pageHorizontal,
-              0,
-              AppSpacing.pageHorizontal,
-              bottomSafeInset,
+          const SizedBox(height: AppSpacing.xl),
+          Center(
+            child: Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primary,
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.15),
+                    blurRadius: 24,
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: AppIcon(
+                  icon: HugeIconsStrokeRounded.strokeRoundedSparkles,
+                  size: 34,
+                  color: AppColors.onPrimary,
+                ),
+              ),
             ),
-            children: [
-              const SizedBox(height: AppSpacing.xl),
-              Center(
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primary,
-                    boxShadow: const [
-                      BoxShadow(color: Color(0x2610B981), blurRadius: 24),
-                    ],
-                  ),
-                  child: const Center(
-                    child: AppIcon(
-                      icon: HugeIconsStrokeRounded.strokeRoundedSparkles,
-                      size: 50,
-                      color: AppColors.white,
-                    ),
-                  ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'app.title'.tr(),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineMedium,
+          ),
+          const SizedBox(height: AppSpacing.xxs),
+          Text(
+            'settings.about_made_with'.tr(),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          for (final (title, content) in <(String, String)>[
+            ('settings.about_mission_title', 'settings.about_mission_content'),
+            ('settings.about_privacy_title', 'settings.about_privacy_content'),
+            (
+              'settings.about_experience_title',
+              'settings.about_experience_content',
+            ),
+          ]) ...<Widget>[
+            SettingsSectionLabel(title.tr()),
+            SettingsCard(
+              child: Text(
+                content.tr(),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textPrimary,
+                  height: 1.6,
                 ),
               ),
-              const SizedBox(height: AppSpacing.xl * 2),
-              _AboutSection(
-                title: 'settings.about_mission_title'.tr(),
-                content: 'settings.about_mission_content'.tr(),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              _AboutSection(
-                title: 'settings.about_privacy_title'.tr(),
-                content: 'settings.about_privacy_content'.tr(),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              _AboutSection(
-                title: 'settings.about_experience_title'.tr(),
-                content: 'settings.about_experience_content'.tr(),
-              ),
-              const SizedBox(height: AppSpacing.xl * 2),
-              Center(
-                child: Text(
-                  'settings.about_made_with'.tr(),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textTertiary,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _AboutSection extends StatelessWidget {
-  const _AboutSection({required this.title, required this.content});
-
-  final String title;
-  final String content;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: AppColors.primary,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          content,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: AppColors.textSecondary,
-            height: 1.6,
-          ),
-        ),
-      ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+          ],
+        ],
+      ),
     );
   }
 }
