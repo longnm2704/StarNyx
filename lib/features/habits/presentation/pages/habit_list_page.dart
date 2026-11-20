@@ -180,7 +180,7 @@ class _HabitListPageState extends State<HabitListPage> {
                         state.status == HabitListStatus.initial ||
                         state.status == HabitListStatus.loading;
                     if (isLoading && state.habits.isEmpty) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const AppLoadingIndicator();
                     }
 
                     if (state.habits.isEmpty) {

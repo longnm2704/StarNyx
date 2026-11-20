@@ -773,12 +773,8 @@ class _JournalInputBar extends StatelessWidget {
                           dimension: AppSize.iconButton,
                           child: Center(
                             child: state.saveStatus == AsyncStatus.inProgress
-                                ? const SizedBox.square(
-                                    dimension: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: AppColors.onTertiary,
-                                    ),
+                                ? const AppLoadingIndicator.small(
+                                    color: AppColors.onTertiary,
                                   )
                                 : AppIcon(
                                     icon: HugeIconsStrokeRounded
