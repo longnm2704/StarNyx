@@ -205,10 +205,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         passphrase: event.passphrase,
       );
       final tempDir = await _tempDirectoryProvider();
-      await _deleteOldExports(tempDir);
+      await deleteStaleBackupExports(tempDir, logger: _logger);
       final timestamp = DateFormat('yyyyMMdd_HHmmss').format(_nowProvider());
       final file = File(
-        '${tempDir.path}/starnyx_backup_$timestamp.$backupFileExtension',
+        '${tempDir.path}/$backupExportFilePrefix$timestamp.$backupFileExtension',
       );
       await file.writeAsString(backupText);
       _logger.debug(
@@ -232,26 +232,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     }
   }
 
-  /// Backups may be unencrypted: never leave earlier exports lying around in
-  /// the temp directory.
-  Future<void> _deleteOldExports(Directory tempDir) async {
-    try {
-      await for (final entity in tempDir.list()) {
-        final name = entity.uri.pathSegments.last;
-        if (entity is File && name.startsWith('starnyx_backup_')) {
-          await entity.delete();
-        }
-      }
-    } catch (error, stackTrace) {
-      _logger.error(
-        'SettingsBloc',
-        'old export cleanup failed',
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
   Future<void> _onImportRequested(
     SettingsImportRequested event,
     Emitter<SettingsState> emit,
@@ -269,8 +249,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     try {
       await _importDataUseCase(event.jsonPayload);
       await _syncNotificationsUseCase.rebuildAllFromLocalData();
+      // Fresh habits ride along with success so the backup screen knows
+      // whether the imported data needs notification permission.
+      final starnyxs = await _loadStarnyxsUseCase();
       _logger.debug('SettingsBloc', 'import success');
-      emit(state.copyWith(importStatus: AsyncStatus.success));
+      emit(
+        state.copyWith(importStatus: AsyncStatus.success, starnyxs: starnyxs),
+      );
     } catch (error, stackTrace) {
       _logger.error(
         'SettingsBloc',

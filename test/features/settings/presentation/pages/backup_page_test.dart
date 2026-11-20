@@ -5,9 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:starnyx/app/di/service_locator.dart';
+import 'package:starnyx/core/services/core_services.dart';
 import 'package:starnyx/domain/entities/domain_entities.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:starnyx/features/settings/presentation/bloc/settings_event.dart';
 import 'package:starnyx/features/settings/presentation/pages/backup_page.dart';
 
 class _MockExport extends Mock implements ExportDataUseCase {}
@@ -32,6 +35,8 @@ void main() {
   late _MockExport export;
   late _MockDeleteAll deleteAll;
   late SettingsBloc Function() makeBloc;
+
+  setUpAll(() => registerFallbackValue(<String, dynamic>{}));
 
   setUp(() async {
     rootBundle.clear();
@@ -122,14 +127,79 @@ void main() {
 
     verify(deleteAll.call).called(1);
   });
+
+  testWidgets(
+    'import with reminders asks for permission and explains a denial',
+    (tester) async {
+      final notifications = _DenyingNotificationService();
+      serviceLocator.registerSingleton<NotificationService>(notifications);
+      addTearDown(serviceLocator.unregister<NotificationService>);
+
+      final import = _MockImport();
+      final sync = _MockSync();
+      final loadAll = _MockLoadAll();
+      when(() => import.call(any())).thenAnswer((_) async {});
+      when(sync.rebuildAllFromLocalData).thenAnswer((_) async {});
+      when(loadAll.call).thenAnswer(
+        (_) async => <StarNyx>[
+          StarNyx(
+            id: 'h1',
+            title: 'Hydrate',
+            description: null,
+            color: '#10B981',
+            startDate: DateTime(2026),
+            reminderEnabled: true,
+            reminderTime: '09:30',
+            createdAt: DateTime(2026),
+            updatedAt: DateTime(2026),
+          ),
+        ],
+      );
+      final bloc = SettingsBloc(
+        exportDataUseCase: export,
+        importDataUseCase: import,
+        syncNotificationsUseCase: sync,
+        loadStarnyxsUseCase: loadAll,
+        loadActiveStarNyxUseCase: _MockLoadActive(),
+        loadStarNyxProgressStatsUseCase: _MockStats(),
+        setAllRemindersEnabledUseCase: _MockSetReminders(),
+        deleteAllDataUseCase: deleteAll,
+        loadStorageStats: () async => const StorageStats(
+          bytes: 0,
+          habitCount: 0,
+          completionCount: 0,
+          journalCount: 0,
+        ),
+      );
+      await _render(tester, bloc, pushed: true);
+      expect(find.byType(BackupPage), findsOneWidget);
+
+      bloc.add(const SettingsImportRequested(<String, dynamic>{}));
+      await tester.pumpAndSettle();
+
+      expect(notifications.requests, 1);
+      expect(find.byType(BackupPage), findsNothing);
+      expect(
+        find.text('settings.reminders_permission_denied'.tr()),
+        findsOneWidget,
+      );
+    },
+  );
 }
 
 Future<void> _render(
   WidgetTester tester,
   SettingsBloc bloc, {
   bool showDangerZone = true,
+  bool pushed = false,
 }) async {
   addTearDown(bloc.close);
+  final page = Scaffold(
+    body: BlocProvider<SettingsBloc>.value(
+      value: bloc,
+      child: BackupPage(onBack: () {}, showDangerZone: showDangerZone),
+    ),
+  );
   await tester.pumpWidget(
     EasyLocalization(
       supportedLocales: const <Locale>[Locale('en')],
@@ -142,15 +212,58 @@ Future<void> _render(
           locale: context.locale,
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
-          home: Scaffold(
-            body: BlocProvider<SettingsBloc>.value(
-              value: bloc,
-              child: BackupPage(onBack: () {}, showDangerZone: showDangerZone),
-            ),
-          ),
+          home: pushed
+              ? Builder(
+                  builder: (context) => Scaffold(
+                    body: TextButton(
+                      onPressed: () => Navigator.of(
+                        context,
+                      ).push(MaterialPageRoute<void>(builder: (_) => page)),
+                      child: const Text('open'),
+                    ),
+                  ),
+                )
+              : page,
         ),
       ),
     ),
   );
   await tester.pumpAndSettle();
+  if (pushed) {
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+  }
+}
+
+class _DenyingNotificationService implements NotificationService {
+  int requests = 0;
+
+  @override
+  Future<bool> requestPermission() async {
+    requests++;
+    return false;
+  }
+
+  @override
+  Future<bool> hasPermission() async => false;
+
+  @override
+  Future<void> initialize() async {}
+
+  @override
+  Future<void> createReminder(StarNyx starnyx) async {}
+
+  @override
+  Future<void> updateReminder(StarNyx starnyx) async {}
+
+  @override
+  Future<void> cancelReminder(String starnyxId) async {}
+
+  @override
+  Future<void> cancelAllReminders() async {}
+
+  @override
+  void setTranslator(
+    String Function(String key, {Map<String, dynamic>? namedArgs}) tr,
+  ) {}
 }

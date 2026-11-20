@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:starnyx/core/utils/backup_file_codec.dart';
 import 'package:flutter/widgets.dart';
 import 'package:starnyx/app/app.dart';
 import 'package:starnyx/app/app_bloc_observer.dart';
@@ -26,6 +30,22 @@ Future<void> main() async {
       key,
       namedArgs: namedArgs?.map((k, v) => MapEntry<String, String>(k, '$v')),
     ),
+  );
+
+  // Exports from earlier sessions may still sit in the temp dir (a shared
+  // file is only deleted at the next export). Fire and forget: never delays
+  // the first frame, and the helper logs its own failures.
+  unawaited(
+    getTemporaryDirectory()
+        .then((dir) => deleteStaleBackupExports(dir, logger: logger))
+        .catchError(
+          (Object error, StackTrace stackTrace) => logger.error(
+            'Bootstrap',
+            'temp dir unavailable for export cleanup',
+            error: error,
+            stackTrace: stackTrace,
+          ),
+        ),
   );
 
   runApp(

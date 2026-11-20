@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:starnyx/app/reminder_permission.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/utils/backup_file_codec.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
@@ -63,9 +64,15 @@ class _BackupPageState extends State<BackupPage> {
           BlocListener<SettingsBloc, SettingsState>(
             listenWhen: (previous, current) =>
                 previous.importStatus != current.importStatus,
-            listener: (context, state) {
+            listener: (context, state) async {
               if (state.importStatus == AsyncStatus.success) {
                 _showSnackBar(context, 'settings.import_success'.tr());
+                // Imported reminders can't fire until notifications are
+                // allowed; ask now (denial shows the calm snackbar).
+                if (state.needsReminderPermission) {
+                  await requestReminderPermission(context);
+                }
+                if (!context.mounted) return;
                 Navigator.of(context).pop(BackupOutcome.imported);
               } else if (state.hasImportFailure) {
                 _showSnackBar(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starnyx/core/utils/backup_file_codec.dart';
@@ -75,6 +76,26 @@ void main() {
           ),
         ),
       );
+    });
+  });
+
+  group('deleteStaleBackupExports', () {
+    test('removes only earlier backup exports', () async {
+      final dir = await Directory.systemTemp.createTemp('starnyx_cleanup');
+      addTearDown(() => dir.delete(recursive: true));
+      final stale = File('${dir.path}/starnyx_backup_20260101.starnyxbak')
+        ..writeAsStringSync('x');
+      final other = File('${dir.path}/unrelated.txt')..writeAsStringSync('y');
+
+      await deleteStaleBackupExports(dir);
+
+      expect(stale.existsSync(), isFalse);
+      expect(other.existsSync(), isTrue);
+    });
+
+    test('a missing directory is logged, not thrown', () async {
+      final dir = Directory('${Directory.systemTemp.path}/starnyx_missing_x');
+      await expectLater(deleteStaleBackupExports(dir), completes);
     });
   });
 }

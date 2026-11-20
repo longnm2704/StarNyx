@@ -222,6 +222,7 @@ void main() {
     await pumpEventQueue(times: 10);
 
     expect(bloc.state.importStatus, AsyncStatus.success);
+    expect(bloc.state.needsReminderPermission, isTrue);
     expect(notificationService.cancelAllCount, 1);
     expect(notificationService.createdReminderIds, <String>['habit-1']);
   });

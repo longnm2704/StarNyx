@@ -1,9 +1,37 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cryptography/cryptography.dart';
+import 'package:starnyx/core/services/app_log_service.dart';
 
 const String backupFileExtension = 'starnyxbak';
+const String backupExportFilePrefix = 'starnyx_backup_';
+
+/// Backups may be unencrypted: deletes earlier exports left in [tempDir]
+/// (by a previous export or a previous session). Never throws; failures are
+/// logged.
+Future<void> deleteStaleBackupExports(
+  Directory tempDir, {
+  AppLogService logger = const NoOpAppLogService(),
+}) async {
+  try {
+    await for (final entity in tempDir.list()) {
+      final name = entity.uri.pathSegments.last;
+      if (entity is File && name.startsWith(backupExportFilePrefix)) {
+        await entity.delete();
+      }
+    }
+  } catch (error, stackTrace) {
+    logger.error(
+      'Backup',
+      'stale export cleanup failed',
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
+}
+
 const String backupFileFormat = 'starnyx-backup';
 const int backupFileVersion = 1;
 

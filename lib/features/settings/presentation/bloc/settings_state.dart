@@ -68,6 +68,9 @@ class SettingsState extends Equatable {
   bool get hasExportFailure => exportStatus == AsyncStatus.failure;
   bool get hasImportFailure => importStatus == AsyncStatus.failure;
 
+  /// Some habit wants reminders, so notification permission is needed.
+  bool get needsReminderPermission => starnyxs.any((s) => s.reminderEnabled);
+
   SettingsState copyWith({
     AsyncStatus? exportStatus,
     AsyncStatus? importStatus,
