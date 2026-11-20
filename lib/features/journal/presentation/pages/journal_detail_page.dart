@@ -133,28 +133,6 @@ class _JournalDetailPageState extends State<JournalDetailPage> {
                 color: AppColors.textPrimary,
               ),
             ),
-            actions: <Widget>[
-              PopupMenuButton<bool>(
-                key: const Key('journal-detail-menu'),
-                onSelected: (_) => _onDeletePressed(entry),
-                tooltip: 'journal.detail_menu_semantics'.tr(),
-                color: AppColors.sheet,
-                icon: const AppIcon(
-                  icon: HugeIconsStrokeRounded.strokeRoundedMoreVertical,
-                  color: AppColors.textSecondary,
-                ),
-                itemBuilder: (_) => <PopupMenuEntry<bool>>[
-                  PopupMenuItem<bool>(
-                    key: const Key('journal-detail-menu-delete'),
-                    value: true,
-                    child: Text(
-                      'journal.detail_delete'.tr(),
-                      style: const TextStyle(color: AppColors.error),
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ),
           body: SafeArea(
             top: false,
@@ -207,17 +185,15 @@ class _JournalDetailPageState extends State<JournalDetailPage> {
                   child: TextButton.icon(
                     key: const Key('journal-detail-delete'),
                     onPressed: () => _onDeletePressed(entry),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.error,
+                    ),
                     icon: const AppIcon(
                       icon: HugeIconsStrokeRounded.strokeRoundedDelete02,
                       size: 16,
                       color: AppColors.error,
                     ),
-                    label: Text(
-                      'journal.detail_delete'.tr(),
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: AppColors.error,
-                      ),
-                    ),
+                    label: Text('journal.detail_delete'.tr()),
                   ),
                 ),
               ],

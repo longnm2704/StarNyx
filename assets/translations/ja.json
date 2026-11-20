@@ -7,8 +7,6 @@
     "discard_cancel": "編集を続ける"
   },
   "home": {
-    "active_constellation_title": "現在のフォーカス",
-    "active_constellation_hint": "StarNyx を開いたときに表示される習慣です。",
     "days_left_suffix": {
       "one": "日残り",
       "other": "日残り"
@@ -137,7 +135,6 @@
     "tags_hint": "タグを追加",
     "tag_remove_semantics": "タグ {} を削除",
     "detail_title": "日記の詳細",
-    "detail_menu_semantics": "日記のオプション",
     "detail_habit_goal": "{} · 目標 {}",
     "detail_lumen": "光 #{}",
     "detail_saved_at": "{} · {} に保存",

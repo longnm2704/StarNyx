@@ -7,8 +7,6 @@
     "discard_cancel": "Keep editing"
   },
   "home": {
-    "active_constellation_title": "Current focus",
-    "active_constellation_hint": "This is the habit StarNyx opens to when you come back.",
     "days_left_suffix": {
       "one": "day left",
       "other": "days left"
@@ -137,7 +135,6 @@
     "tags_hint": "Add a tag",
     "tag_remove_semantics": "Remove tag {}",
     "detail_title": "Journal detail",
-    "detail_menu_semantics": "Journal options",
     "detail_habit_goal": "{} · Goal {}",
     "detail_lumen": "Light #{}",
     "detail_saved_at": "{} · Saved at {}",

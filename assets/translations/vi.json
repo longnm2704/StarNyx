@@ -7,8 +7,6 @@
     "discard_cancel": "Tiếp tục sửa"
   },
   "home": {
-    "active_constellation_title": "Đang tập trung",
-    "active_constellation_hint": "Đây là thói quen StarNyx sẽ mở khi bạn quay lại.",
     "days_left_suffix": {
       "one": "ngày còn lại",
       "other": "ngày còn lại"
@@ -137,7 +135,6 @@
     "tags_hint": "Thêm từ khóa",
     "tag_remove_semantics": "Xóa từ khóa {}",
     "detail_title": "Chi tiết nhật ký",
-    "detail_menu_semantics": "Tùy chọn nhật ký",
     "detail_habit_goal": "{} · Mục tiêu {}",
     "detail_lumen": "Chấm sáng #{}",
     "detail_saved_at": "{} · Đã lưu lúc {}",

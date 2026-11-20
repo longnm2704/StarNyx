@@ -399,10 +399,6 @@ class _StarnyxFormPageState extends State<StarnyxFormPage> {
                                     ),
                                     label: Text(
                                       'starnyx_form.delete_button'.tr(),
-                                      style: const TextStyle(
-                                        fontFamily: AppFonts.body,
-                                        fontWeight: FontWeight.w600,
-                                      ),
                                     ),
                                   ),
                                 ),
