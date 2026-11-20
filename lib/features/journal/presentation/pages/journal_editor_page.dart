@@ -438,6 +438,11 @@ class _JournalEditorPageState extends State<JournalEditorPage> {
                             decoration: InputDecoration(
                               hintText: 'journal.tags_hint'.tr(),
                               isDense: true,
+                              // Chip height, so the field reads as one more pill.
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.sm,
+                                vertical: AppSpacing.xs,
+                              ),
                             ),
                           ),
                         ),
