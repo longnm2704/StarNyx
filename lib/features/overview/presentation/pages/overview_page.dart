@@ -11,6 +11,7 @@ import 'package:starnyx/features/overview/presentation/bloc/overview_bloc.dart';
 import 'package:starnyx/features/overview/presentation/bloc/overview_event.dart';
 import 'package:starnyx/features/overview/presentation/bloc/overview_state.dart';
 import 'package:starnyx/features/starnyx_form/presentation/pages/starnyx_form_page.dart';
+import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_color_utils.dart';
 
 /// Full-screen Overview tab.
 ///
@@ -303,12 +304,10 @@ class _HeroCard extends StatelessWidget {
                         style: theme.textTheme.displaySmall?.copyWith(
                           fontFamily: AppFonts.headline,
                           fontWeight: FontWeight.w700,
-                          fontSize: 40,
+                          fontSize: AppFonts.heroMetricSize,
                           height: 1.0,
                           color: AppColors.primary,
-                          fontFeatures: <FontFeature>[
-                            const FontFeature.tabularFigures(),
-                          ],
+                          fontFeatures: AppFonts.tabularFigures,
                         ),
                       ),
                     ),
@@ -715,7 +714,7 @@ class _HabitRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final accent = _accentColor(habit.color);
+    final accent = starnyxColorFromHex(habit.color);
     final pct = (habit.completionRateInRange * 100).round();
 
     return Container(
@@ -796,16 +795,6 @@ class _HabitRow extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Color _accentColor(String hex) {
-    try {
-      final cleaned = hex.replaceFirst('#', '');
-      final value = int.parse(cleaned, radix: 16);
-      return Color(0xFF000000 | value);
-    } catch (_) {
-      return AppColors.primary;
-    }
   }
 }
 

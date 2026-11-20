@@ -11,6 +11,11 @@ abstract final class AppFonts {
   static const body = 'Plus Jakarta Sans';
   static const mono = 'JetBrains Mono';
 
+  // Display sizes above the text theme's largest slots (`displaySmall` 36).
+  static const onboardingTitleSize = 34.0;
+  static const heroMetricSize = 40.0;
+  static const heroTimeSize = 44.0;
+
   /// Enables tabular (monospaced) figures so numeric metrics align.
   static const tabularFigures = [FontFeature.tabularFigures()];
 }

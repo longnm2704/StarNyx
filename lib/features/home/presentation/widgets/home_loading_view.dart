@@ -18,7 +18,7 @@ class _HomeLoadingViewState extends State<HomeLoadingView>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 1800),
+    duration: AppDurations.loadingPulse,
   );
 
   @override

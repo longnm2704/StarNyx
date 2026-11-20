@@ -5,8 +5,6 @@ import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 
-const _violet = Color(0xFF9D50FF);
-
 /// Onboarding step 1/3: welcome (`chao_mung`).
 class OnboardingWelcomePage extends StatelessWidget {
   const OnboardingWelcomePage({
@@ -52,7 +50,7 @@ class OnboardingWelcomePage extends StatelessWidget {
                         children: <Widget>[
                           Text(
                             'onboarding.skip'.tr(),
-                            style: const TextStyle(
+                            style: textTheme.labelLarge?.copyWith(
                               color: AppColors.textSecondary,
                             ),
                           ),
@@ -103,7 +101,9 @@ class OnboardingWelcomePage extends StatelessWidget {
                     ],
                   ),
                   textAlign: TextAlign.center,
-                  style: textTheme.headlineLarge?.copyWith(fontSize: 34),
+                  style: textTheme.headlineLarge?.copyWith(
+                    fontSize: AppFonts.onboardingTitleSize,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
@@ -121,7 +121,7 @@ class OnboardingWelcomePage extends StatelessWidget {
                 ),
                 _FeatureRow(
                   icon: HugeIconsStrokeRounded.strokeRoundedShield01,
-                  color: _violet,
+                  color: AppColors.violet,
                   title: 'onboarding.welcome.feature_privacy_title'.tr(),
                   subtitle: 'onboarding.welcome.feature_privacy_subtitle'.tr(),
                   trailing: _Badge(
@@ -245,7 +245,7 @@ class _Hero extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: AppColors.primary.withValues(alpha: 0.12),
                 boxShadow: const <BoxShadow>[
-                  BoxShadow(color: Color(0x2610B981), blurRadius: 24),
+                  BoxShadow(color: AppColors.primaryGlow, blurRadius: 24),
                 ],
               ),
               alignment: Alignment.center,
@@ -265,7 +265,7 @@ class _Hero extends StatelessWidget {
             ),
             const Align(
               alignment: Alignment(-0.45, 0.7),
-              child: _AccentDot(color: _violet, size: 8),
+              child: _AccentDot(color: AppColors.violet, size: 8),
             ),
           ],
         ),
@@ -441,7 +441,7 @@ class _Badge extends StatelessWidget {
           vertical: AppSpacing.xxs,
         ),
         decoration: BoxDecoration(
-          color: _violet.withValues(alpha: 0.14),
+          color: AppColors.violet.withValues(alpha: 0.14),
           borderRadius: BorderRadius.circular(AppRadius.sm),
         ),
         child: Text(
@@ -449,7 +449,7 @@ class _Badge extends StatelessWidget {
           textAlign: TextAlign.center,
           style: Theme.of(
             context,
-          ).textTheme.labelSmall?.copyWith(color: _violet),
+          ).textTheme.labelSmall?.copyWith(color: AppColors.violet),
         ),
       ),
     );

@@ -28,8 +28,15 @@ abstract final class AppColors {
 
   static const error = Color(0xFFF43F5E);
 
+  // Accent from the habit preset palette (privacy feature on onboarding).
+  static const violet = Color(0xFF9D50FF);
+
+  // Emerald glows: 15% for CTAs and hero icons, 25% for the completion ring.
+  static const primaryGlow = Color(0x2610B981);
+  static const primaryGlowStrong = Color(0x4010B981);
+
   static const List<String> starnyxPresetColorHexes = <String>[
-    '#9D50FF',
+    '#9D50FF', // violet
     '#2563EB',
     '#FFB95F',
     '#10B981',

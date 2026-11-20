@@ -90,7 +90,9 @@ class OnboardingCompletePage extends StatelessWidget {
                       ],
                     ),
                     textAlign: TextAlign.center,
-                    style: textTheme.headlineLarge?.copyWith(fontSize: 34),
+                    style: textTheme.headlineLarge?.copyWith(
+                      fontSize: AppFonts.onboardingTitleSize,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
@@ -159,7 +161,7 @@ class _Hero extends StatelessWidget {
                   ],
                 ),
                 boxShadow: <BoxShadow>[
-                  BoxShadow(color: Color(0x4010B981), blurRadius: 32),
+                  BoxShadow(color: AppColors.primaryGlowStrong, blurRadius: 32),
                 ],
               ),
               child: Container(

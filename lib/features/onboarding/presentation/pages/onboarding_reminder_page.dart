@@ -424,7 +424,7 @@ class _SharedTimeCard extends StatelessWidget {
                       time,
                       key: const Key('onboarding-shared-time'),
                       style: textTheme.headlineLarge?.copyWith(
-                        fontSize: 44,
+                        fontSize: AppFonts.heroTimeSize,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary,
                         fontFeatures: AppFonts.tabularFigures,

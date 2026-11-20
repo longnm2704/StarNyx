@@ -480,7 +480,11 @@ void _showSnackBar(
           Expanded(
             child: Text(
               message,
-              style: isError ? const TextStyle(color: AppColors.error) : null,
+              style: isError
+                  ? Theme.of(context).snackBarTheme.contentTextStyle?.copyWith(
+                      color: AppColors.error,
+                    )
+                  : null,
             ),
           ),
         ],

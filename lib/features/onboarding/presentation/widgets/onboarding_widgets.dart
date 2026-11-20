@@ -59,7 +59,9 @@ class OnboardingHeader extends StatelessWidget {
                 skipLabel ?? 'onboarding.skip'.tr(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: AppColors.textSecondary),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
           ),

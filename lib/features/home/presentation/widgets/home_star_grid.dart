@@ -208,7 +208,7 @@ class _GridStarCellState extends State<_GridStarCell>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 760),
+    duration: AppDurations.gridReveal,
   );
   late final Animation<double> _pulse =
       TweenSequence<double>(<TweenSequenceItem<double>>[

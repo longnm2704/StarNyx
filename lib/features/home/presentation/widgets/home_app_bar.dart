@@ -53,7 +53,6 @@ class HomeAppBar extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontFamily: AppFonts.headline,
-                  fontSize: 20,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.4,
                 ),

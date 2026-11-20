@@ -6,8 +6,6 @@ import 'package:starnyx/core/constants/core_constants.dart';
 
 import 'app_icon.dart';
 
-const _ghostFill = Color(0xFF1F1E24);
-
 /// Shows the shared confirmation dialog (`xac_nhan_xoa_thoi_quen`).
 ///
 /// Black ~78% barrier with a subtle blur; the card scales 0.94→1 and fades
@@ -92,9 +90,7 @@ Future<T?> _showAppDialog<T>({
     barrierDismissible: true,
     barrierLabel: barrierLabel,
     barrierColor: AppColors.black.withValues(alpha: 0.78),
-    transitionDuration: reduceMotion
-        ? Duration.zero
-        : const Duration(milliseconds: 220),
+    transitionDuration: reduceMotion ? Duration.zero : AppDurations.dialog,
     pageBuilder: (_, _, _) => child,
     transitionBuilder: (context, animation, _, child) {
       final curved = CurvedAnimation(
@@ -287,7 +283,7 @@ class _DialogActions extends StatelessWidget {
           child: _DialogButton(
             key: const Key('app-confirm-cancel'),
             label: cancelLabel,
-            fill: _ghostFill,
+            fill: AppColors.surfaceLevel3,
             labelColor: AppColors.textPrimary,
             outlined: true,
             onPressed: onCancel,
@@ -298,12 +294,13 @@ class _DialogActions extends StatelessWidget {
           child: _DialogButton(
             key: const Key('app-confirm-confirm'),
             label: confirmLabel,
+            // Emerald for a normal confirm, coral when it destroys data.
             fill: switch (actionStyle) {
-              AppConfirmActionStyle.neutral => AppColors.white,
+              AppConfirmActionStyle.neutral => AppColors.primary,
               AppConfirmActionStyle.destructive => AppColors.error,
             },
             labelColor: AppColors.black,
-            glow: actionStyle == AppConfirmActionStyle.destructive,
+            glow: true,
             onPressed: onConfirm,
           ),
         ),

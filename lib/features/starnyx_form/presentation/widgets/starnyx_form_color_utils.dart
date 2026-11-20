@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
 
 Color starnyxColorFromHex(String hex) {
   final normalized = normalizeStarnyxHex(hex).replaceFirst('#', '');
-  return Color(int.parse('FF$normalized', radix: 16));
+  final value = int.tryParse('FF$normalized', radix: 16);
+  return value == null ? AppColors.primary : Color(value);
 }
 
 String normalizeStarnyxHex(String value) {
@@ -15,7 +17,7 @@ String normalizeStarnyxHex(String value) {
     return '#$normalized';
   }
 
-  return '#AF2395';
+  return starnyxHexFromColor(AppColors.primary);
 }
 
 String starnyxHexFromColor(Color color) {

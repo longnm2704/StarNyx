@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:starnyx/core/constants/core_constants.dart';
 
 /// Wraps any [child] in an [AnimatedSwitcher] that uses a combined fade +
 /// subtle upward-slide transition when a new child arrives, and a plain fade
@@ -11,7 +12,7 @@ class HomeScreenSwitcher extends StatelessWidget {
 
   final Widget child;
 
-  static const Duration _duration = Duration(milliseconds: 500);
+  static const Duration _duration = AppDurations.screenSwitch;
 
   @override
   Widget build(BuildContext context) {

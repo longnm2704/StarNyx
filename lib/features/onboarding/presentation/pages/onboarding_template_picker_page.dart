@@ -204,7 +204,7 @@ class _TemplateCard extends StatelessWidget {
           ),
           boxShadow: selected
               ? const <BoxShadow>[
-                  BoxShadow(color: Color(0x2610B981), blurRadius: 24),
+                  BoxShadow(color: AppColors.primaryGlow, blurRadius: 24),
                 ]
               : null,
         ),

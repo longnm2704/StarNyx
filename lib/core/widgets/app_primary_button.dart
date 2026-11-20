@@ -89,7 +89,7 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
       onTapCancel: () => setState(() => _pressed = false),
       child: AnimatedScale(
         scale: _pressed ? 0.98 : 1.0,
-        duration: const Duration(milliseconds: 120),
+        duration: AppDurations.press,
         curve: Curves.easeOut,
         child: DecoratedBox(
           decoration: BoxDecoration(
@@ -98,10 +98,7 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
             border: outlined ? Border.all(color: AppColors.borderSubtle) : null,
             boxShadow: _isPrimary && _enabled
                 ? const <BoxShadow>[
-                    BoxShadow(
-                      color: Color(0x2610B981), // rgba(16,185,129,0.15)
-                      blurRadius: 24,
-                    ),
+                    BoxShadow(color: AppColors.primaryGlow, blurRadius: 24),
                   ]
                 : null,
           ),
