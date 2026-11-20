@@ -16,16 +16,28 @@
     "checkin_unlight_success": "Đã hoàn tác check-in.",
     "header_semantics": "Biểu tượng thói quen {}",
     "reminder_body": "{title}: hôm nay bạn đã thắp chưa?",
-    "stats_days_lit": "{} ngày đã thắp",
+    "stats_days_lit": {
+      "one": "{} ngày đã thắp",
+      "other": "{} ngày đã thắp"
+    },
     "stats_streak": "{} ngày liền",
     "stats_best": "{} tốt nhất",
     "stats_rate": "{}% tỉ lệ",
     "profile_semantics": "Mở cài đặt",
-    "search_semantics": "Tìm thói quen",
+    "search_semantics": "Mở danh sách thói quen",
     "switch_error_message": "Không thể chuyển thói quen lúc này.",
     "load_error_title": "Không thể tải dữ liệu StarNyx",
     "load_error_message": "Không thể tải dữ liệu trên máy. Vui lòng thử lại sau.",
-    "retry": "Thử lại"
+    "retry": "Thử lại",
+    "checkin_light_day": "Thắp ngày này",
+    "checkin_lit_day": "Đã thắp ngày này.",
+    "checkin_light_day_semantics": "Bấm để đánh dấu ngày này đã làm",
+    "checkin_lit_day_semantics": "Ngày này đã làm. Bấm để hoàn tác.",
+    "checkin_blocked_future": "Ngày này chưa đến",
+    "checkin_blocked_before_start": "Trước ngày bắt đầu thói quen",
+    "checkin_blocked_too_old": "Chỉ có thể sửa 7 ngày gần nhất",
+    "previous_year_semantics": "Năm trước",
+    "next_year_semantics": "Năm sau"
   },
   "starnyx_form": {
     "create_sheet_title": "Thói quen mới",
@@ -232,7 +244,7 @@
     "reorder_habit_semantics": "Sắp xếp lại {}",
     "active_habit_semantics": "Đang tập trung: {}",
     "no_description": "Chưa có mô tả",
-    "footer": "CHUỖI {}/{} HOÀN THÀNH",
+    "footer": "HÔM NAY {}/{} ĐÃ XONG",
     "empty_title": "Chưa có thói quen",
     "empty_message": "Thêm thói quen đầu tiên để bắt đầu một nhịp điệu yên tĩnh mỗi ngày.",
     "empty_action": "Tạo thói quen",
@@ -248,11 +260,17 @@
     "monthly": "Tháng này",
     "yearly": "Năm {year}",
     "completion_rate": "Tỷ lệ hoàn thành",
-    "completion_sub": "Đã thắp {lit} / {total} ngày",
+    "completion_sub": {
+      "one": "Đã thắp {lit} / {total} ngày",
+      "other": "Đã thắp {lit} / {total} ngày"
+    },
     "lit_days": "Đã thắp sáng",
     "lit_sub": "{pct}% chặng đường",
     "longest_streak": "Chuỗi dài nhất",
-    "longest_streak_sub": "{days} ngày",
+    "longest_streak_sub": {
+      "one": "{days} ngày",
+      "other": "{days} ngày"
+    },
     "longest_streak_note": "Kỷ lục cá nhân",
     "discipline_matrix": "Ma Trận Kỷ Luật",
     "discipline_sub": "Mật độ duy trì trong năm {year}",
@@ -347,7 +365,10 @@
       "title_lead": "Nhắc nhở đúng ",
       "title_emphasis": "nhịp sinh học",
       "subtitle": "Khoảng lặng nhắc nhở nhẹ nhàng vào mỗi ngày giúp bạn không bao giờ bỏ lỡ cam kết với bản thân.",
-      "selected_count": "{} THÓI QUEN ĐÃ CHỌN",
+      "selected_count": {
+        "one": "{} THÓI QUEN ĐÃ CHỌN",
+        "other": "{} THÓI QUEN ĐÃ CHỌN"
+      },
       "time_label": "Giờ nhắc: {} {}",
       "morning": "Sáng",
       "afternoon": "Chiều",

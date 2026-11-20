@@ -52,6 +52,7 @@ class HomeShellView extends StatelessWidget {
     this.onToggleCompletionPressed,
     this.isCheckingIn = false,
     this.completionSuccessAnimationToken,
+    this.checkInBlockedReasonKey,
     super.key,
   });
 
@@ -72,6 +73,9 @@ class HomeShellView extends StatelessWidget {
   final VoidCallback? onToggleCompletionPressed;
   final bool isCheckingIn;
   final int? completionSuccessAnimationToken;
+
+  /// Why check-in is disabled for the selected day (translation key).
+  final String? checkInBlockedReasonKey;
 
   @override
   Widget build(BuildContext context) {
@@ -186,6 +190,11 @@ class HomeShellView extends StatelessWidget {
                       isLit: isLit,
                       onSelectedDatePressed: onToggleCompletionPressed,
                       isCheckingIn: isCheckingIn,
+                      isToday:
+                          selectedDate.year == todayDate.year &&
+                          selectedDate.month == todayDate.month &&
+                          selectedDate.day == todayDate.day,
+                      blockedReason: checkInBlockedReasonKey?.tr(),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -335,9 +344,7 @@ class _StatsPill extends StatelessWidget {
           runSpacing: 2,
           children: <Widget>[
             Text(
-              'home.stats_days_lit'.tr(
-                args: <String>[totalCompleted.toString()],
-              ),
+              'home.stats_days_lit'.plural(totalCompleted),
               style: baseStyle,
             ),
             separator,

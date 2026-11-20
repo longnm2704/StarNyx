@@ -15,6 +15,8 @@ class SelectedDateBar extends StatelessWidget {
     required this.isLit,
     this.onSelectedDatePressed,
     this.isCheckingIn = false,
+    this.isToday = true,
+    this.blockedReason,
     super.key,
   });
 
@@ -32,6 +34,12 @@ class SelectedDateBar extends StatelessWidget {
   final VoidCallback? onSelectedDatePressed;
   final bool isCheckingIn;
 
+  /// Labels say "today" only for today; past days say "this day".
+  final bool isToday;
+
+  /// Short muted explanation shown when check-in is disabled.
+  final String? blockedReason;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -44,12 +52,23 @@ class SelectedDateBar extends StatelessWidget {
         ? Color.lerp(AppColors.surfaceLevel1, accentColor, 0.04)!
         : AppColors.surfaceLevel1.withValues(alpha: 0.4);
     final iconData = HabitSymbols.iconFor(symbolKey);
-    final actionText = isLit
-        ? 'home.checkin_lit'.tr()
-        : 'home.checkin_light_today'.tr();
-    final actionSemantics = isLit
-        ? 'home.checkin_lit_semantics'.tr()
-        : 'home.checkin_light_today_semantics'.tr();
+    final reason = canShowActiveState ? null : blockedReason;
+    final actionText =
+        reason ??
+        switch ((isLit, isToday)) {
+          (true, true) => 'home.checkin_lit'.tr(),
+          (false, true) => 'home.checkin_light_today'.tr(),
+          (true, false) => 'home.checkin_lit_day'.tr(),
+          (false, false) => 'home.checkin_light_day'.tr(),
+        };
+    final actionSemantics =
+        reason ??
+        switch ((isLit, isToday)) {
+          (true, true) => 'home.checkin_lit_semantics'.tr(),
+          (false, true) => 'home.checkin_light_today_semantics'.tr(),
+          (true, false) => 'home.checkin_lit_day_semantics'.tr(),
+          (false, false) => 'home.checkin_light_day_semantics'.tr(),
+        };
     final textOpacity = canShowActiveState ? 1.0 : 0.34;
 
     return Row(
@@ -133,9 +152,11 @@ class SelectedDateBar extends StatelessWidget {
                             child: Text(
                               actionText,
                               style: theme.textTheme.labelSmall?.copyWith(
-                                color: accentColor.withValues(
-                                  alpha: canShowActiveState ? 0.92 : 0.34,
-                                ),
+                                color: reason != null
+                                    ? AppColors.textSecondary
+                                    : accentColor.withValues(
+                                        alpha: canShowActiveState ? 0.92 : 0.34,
+                                      ),
                                 fontWeight: FontWeight.w500,
                               ),
                               overflow: TextOverflow.ellipsis,

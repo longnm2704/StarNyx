@@ -10,20 +10,38 @@ bool canToggleCompletionForSelectedDate({
   required DateTime todayDate,
   required DateTime startDate,
 }) {
+  return completionBlockedReasonKey(
+        selectedDate: selectedDate,
+        todayDate: todayDate,
+        startDate: startDate,
+      ) ==
+      null;
+}
+
+/// Translation key explaining why the selected day can't be checked in, or
+/// null when it can.
+String? completionBlockedReasonKey({
+  required DateTime selectedDate,
+  required DateTime todayDate,
+  required DateTime startDate,
+}) {
   if (core_date_utils.DateUtils.isFutureDate(selectedDate, today: todayDate)) {
-    return false;
+    return 'home.checkin_blocked_future';
   }
   if (core_date_utils.DateUtils.isBeforeStartDate(
     selectedDate,
     startDate: startDate,
   )) {
-    return false;
+    return 'home.checkin_blocked_before_start';
   }
-  return core_date_utils.DateUtils.isEditableWithinDays(
+  if (!core_date_utils.DateUtils.isEditableWithinDays(
     selectedDate,
     days: 7,
     today: todayDate,
-  );
+  )) {
+    return 'home.checkin_blocked_too_old';
+  }
+  return null;
 }
 
 class ActiveStarnyxHomeView extends StatelessWidget {
@@ -68,11 +86,12 @@ class ActiveStarnyxHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final canToggleCompletion = canToggleCompletionForSelectedDate(
+    final blockedReasonKey = completionBlockedReasonKey(
       selectedDate: selectedDate,
       todayDate: todayDate,
       startDate: activeStarnyx.startDate,
     );
+    final canToggleCompletion = blockedReasonKey == null;
     final canMoveToNextYear = viewedYear < todayDate.year;
 
     return HomeShellView(
@@ -95,6 +114,7 @@ class ActiveStarnyxHomeView extends StatelessWidget {
           : null,
       isCheckingIn: isCheckingIn,
       completionSuccessAnimationToken: completionSuccessAnimationToken,
+      checkInBlockedReasonKey: blockedReasonKey,
     );
   }
 }

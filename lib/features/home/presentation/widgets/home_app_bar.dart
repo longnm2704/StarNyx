@@ -101,7 +101,7 @@ class _CircleActionButton extends StatelessWidget {
           onTap: onPressed,
           customBorder: const CircleBorder(),
           child: SizedBox.square(
-            dimension: 40,
+            dimension: 44,
             child: Center(
               child: AppIcon(
                 icon: icon,
@@ -126,20 +126,30 @@ class _ProfileButton extends StatelessWidget {
     return Semantics(
       button: true,
       label: 'home.profile_semantics'.tr(),
-      child: Material(
-        color: AppColors.primary,
-        shape: const CircleBorder(),
-        child: InkWell(
-          key: const Key('home-profile-button'),
-          onTap: onPressed,
-          customBorder: const CircleBorder(),
-          child: SizedBox.square(
-            dimension: 36,
-            child: Center(
-              child: AppIcon(
-                icon: HugeIconsStrokeRounded.strokeRoundedUser,
-                size: 20,
-                color: AppColors.onPrimary,
+      // 36px avatar, 44px tap target around it.
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onPressed,
+        child: SizedBox.square(
+          dimension: 44,
+          child: Center(
+            child: Material(
+              color: AppColors.primary,
+              shape: const CircleBorder(),
+              child: InkWell(
+                key: const Key('home-profile-button'),
+                onTap: onPressed,
+                customBorder: const CircleBorder(),
+                child: const SizedBox.square(
+                  dimension: 36,
+                  child: Center(
+                    child: AppIcon(
+                      icon: HugeIconsStrokeRounded.strokeRoundedUser,
+                      size: 20,
+                      color: AppColors.onPrimary,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

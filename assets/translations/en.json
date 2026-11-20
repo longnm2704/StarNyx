@@ -16,16 +16,28 @@
     "checkin_unlight_success": "Check-in undone.",
     "header_semantics": "{} habit icon",
     "reminder_body": "{title}: ready to light today?",
-    "stats_days_lit": "{} days lit",
+    "stats_days_lit": {
+      "one": "{} day lit",
+      "other": "{} days lit"
+    },
     "stats_streak": "{} in a row",
     "stats_best": "{} best",
     "stats_rate": "{}% rate",
     "profile_semantics": "Open settings",
-    "search_semantics": "Search habits",
+    "search_semantics": "Open habit list",
     "switch_error_message": "Couldn't switch habits right now.",
     "load_error_title": "Unable to load StarNyx data",
     "load_error_message": "Your local data couldn't be loaded. Try again in a moment.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "checkin_light_day": "Light this day",
+    "checkin_lit_day": "Lit for this day.",
+    "checkin_light_day_semantics": "Tap to mark this day as done",
+    "checkin_lit_day_semantics": "This day is done. Tap to undo.",
+    "checkin_blocked_future": "This day hasn't come yet",
+    "checkin_blocked_before_start": "Before this habit started",
+    "checkin_blocked_too_old": "Only the last 7 days can be changed",
+    "previous_year_semantics": "Previous year",
+    "next_year_semantics": "Next year"
   },
   "starnyx_form": {
     "create_sheet_title": "New habit",
@@ -232,7 +244,7 @@
     "reorder_habit_semantics": "Reorder {}",
     "active_habit_semantics": "Current focus: {}",
     "no_description": "No description yet",
-    "footer": "STREAK {}/{} COMPLETE",
+    "footer": "TODAY {}/{} DONE",
     "empty_title": "No habits yet",
     "empty_message": "Add your first habit to begin a quiet daily ritual.",
     "empty_action": "Create habit",
@@ -248,11 +260,17 @@
     "monthly": "This month",
     "yearly": "{year}",
     "completion_rate": "Completion rate",
-    "completion_sub": "{lit} / {total} days lit",
+    "completion_sub": {
+      "one": "{lit} / {total} day lit",
+      "other": "{lit} / {total} days lit"
+    },
     "lit_days": "Days lit",
     "lit_sub": "{pct}% of the way",
     "longest_streak": "Longest streak",
-    "longest_streak_sub": "{days} days",
+    "longest_streak_sub": {
+      "one": "{days} day",
+      "other": "{days} days"
+    },
     "longest_streak_note": "Personal best",
     "discipline_matrix": "Consistency matrix",
     "discipline_sub": "How steadily you showed up in {year}",
@@ -347,7 +365,10 @@
       "title_lead": "Reminders that fit your ",
       "title_emphasis": "natural rhythm",
       "subtitle": "A gentle daily nudge so you never miss the promise you made to yourself.",
-      "selected_count": "{} HABITS SELECTED",
+      "selected_count": {
+        "one": "{} HABIT SELECTED",
+        "other": "{} HABITS SELECTED"
+      },
       "time_label": "Reminder: {} {}",
       "morning": "Morning",
       "afternoon": "Afternoon",

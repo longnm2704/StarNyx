@@ -174,8 +174,8 @@ class _OnboardingReminderPageState extends State<OnboardingReminderPage> {
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     Text(
-                      'onboarding.reminder.selected_count'.tr(
-                        args: <String>['${widget.templates.length}'],
+                      'onboarding.reminder.selected_count'.plural(
+                        widget.templates.length,
                       ),
                       style: textTheme.labelMedium,
                     ),

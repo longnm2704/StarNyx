@@ -187,20 +187,30 @@ class _ProfileButton extends StatelessWidget {
     return Semantics(
       button: true,
       label: 'home.profile_semantics'.tr(),
-      child: Material(
-        color: AppColors.primary,
-        shape: const CircleBorder(),
-        child: InkWell(
-          key: const Key('overview-profile-button'),
-          onTap: onPressed,
-          customBorder: const CircleBorder(),
-          child: const SizedBox.square(
-            dimension: 36,
-            child: Center(
-              child: AppIcon(
-                icon: HugeIconsStrokeRounded.strokeRoundedUser,
-                size: 20,
-                color: AppColors.onPrimary,
+      // 36px avatar, 44px tap target around it.
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onPressed,
+        child: SizedBox.square(
+          dimension: 44,
+          child: Center(
+            child: Material(
+              color: AppColors.primary,
+              shape: const CircleBorder(),
+              child: InkWell(
+                key: const Key('overview-profile-button'),
+                onTap: onPressed,
+                customBorder: const CircleBorder(),
+                child: const SizedBox.square(
+                  dimension: 36,
+                  child: Center(
+                    child: AppIcon(
+                      icon: HugeIconsStrokeRounded.strokeRoundedUser,
+                      size: 20,
+                      color: AppColors.onPrimary,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -370,7 +380,8 @@ class _HeroCard extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'overview.completion_sub'.tr(
+                      'overview.completion_sub'.plural(
+                        totalValidDays,
                         namedArgs: <String, String>{
                           'lit': '$litDays',
                           'total': '$totalValidDays',
@@ -971,7 +982,8 @@ class _OverviewContent extends StatelessWidget {
                         child: _StatTile(
                           icon: HugeIconsStrokeRounded.strokeRoundedAward02,
                           title: 'overview.longest_streak'.tr(),
-                          value: 'overview.longest_streak_sub'.tr(
+                          value: 'overview.longest_streak_sub'.plural(
+                            stats.bestLongestStreak,
                             namedArgs: {'days': '${stats.bestLongestStreak}'},
                           ),
                           subtitle: 'overview.longest_streak_note'.tr(),

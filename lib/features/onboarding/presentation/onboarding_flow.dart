@@ -98,7 +98,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           create: (_) => serviceLocator<SettingsBloc>(),
           child: Scaffold(
             backgroundColor: AppColors.background,
-            body: BackupPage(onBack: () => Navigator.of(routeContext).pop()),
+            body: BackupPage(
+              onBack: () => Navigator.of(routeContext).pop(),
+              showDangerZone: false,
+            ),
           ),
         ),
       ),

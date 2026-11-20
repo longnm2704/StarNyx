@@ -16,16 +16,28 @@
     "checkin_unlight_success": "チェックインを元に戻しました。",
     "header_semantics": "{}の習慣アイコン",
     "reminder_body": "{title}: 今日の灯しは？",
-    "stats_days_lit": "{}日灯った",
+    "stats_days_lit": {
+      "one": "{}日灯った",
+      "other": "{}日灯った"
+    },
     "stats_streak": "{}日連続",
     "stats_best": "{}最高",
     "stats_rate": "{}% 達成率",
     "profile_semantics": "設定を開く",
-    "search_semantics": "習慣を検索",
+    "search_semantics": "習慣リストを開く",
     "switch_error_message": "現在習慣を切り替えられません。",
     "load_error_title": "StarNyx のデータを読み込めません",
     "load_error_message": "端末内のデータを読み込めませんでした。しばらくしてから再度お試しください。",
-    "retry": "再試行"
+    "retry": "再試行",
+    "checkin_light_day": "この日を灯す",
+    "checkin_lit_day": "この日の灯しは完了です。",
+    "checkin_light_day_semantics": "この日を達成としてマークするにはタップ",
+    "checkin_lit_day_semantics": "この日は達成済み。元に戻すにはタップ",
+    "checkin_blocked_future": "この日はまだ来ていません",
+    "checkin_blocked_before_start": "習慣を始める前の日です",
+    "checkin_blocked_too_old": "変更できるのは直近7日間のみです",
+    "previous_year_semantics": "前の年",
+    "next_year_semantics": "次の年"
   },
   "starnyx_form": {
     "create_sheet_title": "新しい習慣",
@@ -232,7 +244,7 @@
     "reorder_habit_semantics": "{}を並べ替え",
     "active_habit_semantics": "現在のフォーカス: {}",
     "no_description": "説明はまだありません",
-    "footer": "連続 {}/{} 達成",
+    "footer": "今日 {}/{} 達成",
     "empty_title": "習慣がまだありません",
     "empty_message": "最初の習慣を追加して、静かな毎日のリズムを始めましょう。",
     "empty_action": "習慣を作成",
@@ -248,11 +260,17 @@
     "monthly": "今月",
     "yearly": "{year}年",
     "completion_rate": "完了率",
-    "completion_sub": "{lit} / {total} 日完了",
+    "completion_sub": {
+      "one": "{lit} / {total} 日完了",
+      "other": "{lit} / {total} 日完了"
+    },
     "lit_days": "点灯日数",
     "lit_sub": "{pct}% 達成",
     "longest_streak": "最長連続",
-    "longest_streak_sub": "{days} 日",
+    "longest_streak_sub": {
+      "one": "{days} 日",
+      "other": "{days} 日"
+    },
     "longest_streak_note": "自己記録",
     "discipline_matrix": "規律マトリックス",
     "discipline_sub": "{year}年の維持密度",
@@ -347,7 +365,10 @@
       "title_lead": "リマインダーは",
       "title_emphasis": "自分のリズムで",
       "subtitle": "毎日のやさしいリマインダーで、自分との約束を忘れずに続けられます。",
-      "selected_count": "選択した習慣: {}件",
+      "selected_count": {
+        "one": "選択した習慣: {}件",
+        "other": "選択した習慣: {}件"
+      },
       "time_label": "リマインダー: {} {}",
       "morning": "朝",
       "afternoon": "昼",

@@ -60,7 +60,8 @@ class HomeYearSummaryRow extends StatelessWidget {
               Expanded(
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: yearControl,
+                  // 44px chevrons: shrink rather than overflow on tight rows.
+                  child: FittedBox(fit: BoxFit.scaleDown, child: yearControl),
                 ),
               ),
               jumpToTodayButton,
@@ -90,6 +91,7 @@ class HomeYearSummaryRow extends StatelessWidget {
         _YearChevronButton(
           buttonKey: const Key('home-previous-year-button'),
           icon: HugeIconsStrokeRounded.strokeRoundedChevronLeft,
+          semanticsLabel: 'home.previous_year_semantics'.tr(),
           onPressed: onPreviousYearPressed,
         ),
         SizedBox(
@@ -109,6 +111,7 @@ class HomeYearSummaryRow extends StatelessWidget {
         _YearChevronButton(
           buttonKey: const Key('home-next-year-button'),
           icon: HugeIconsStrokeRounded.strokeRoundedChevronRight,
+          semanticsLabel: 'home.next_year_semantics'.tr(),
           onPressed: onNextYearPressed,
         ),
       ],
@@ -120,7 +123,10 @@ class HomeYearSummaryRow extends StatelessWidget {
       key: const Key('home-jump-today-button'),
       onTap: onJumpToTodayPressed,
       borderRadius: BorderRadius.circular(AppRadius.pill),
-      child: Padding(
+      child: Container(
+        // 44px tap target; the label itself stays a small chip.
+        constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
+        alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.sm,
           vertical: AppSpacing.xxs + 2,
@@ -178,16 +184,18 @@ class HomeYearSummaryRow extends StatelessWidget {
 }
 
 class _YearChevronButton extends StatelessWidget {
-  static const double _buttonSize = 28;
+  static const double _buttonSize = 44;
 
   const _YearChevronButton({
     required this.buttonKey,
     required this.icon,
+    required this.semanticsLabel,
     required this.onPressed,
   });
 
   final Key buttonKey;
   final List<List<dynamic>> icon;
+  final String semanticsLabel;
   final VoidCallback? onPressed;
 
   @override
@@ -196,16 +204,23 @@ class _YearChevronButton extends StatelessWidget {
       alpha: onPressed == null ? 0.3 : 1,
     );
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        key: buttonKey,
-        onTap: onPressed,
-        customBorder: const CircleBorder(),
-        child: SizedBox(
-          width: _buttonSize,
-          height: _buttonSize,
-          child: AppIcon(icon: icon, size: 20, color: color),
+    return Semantics(
+      button: true,
+      enabled: onPressed != null,
+      label: semanticsLabel,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          key: buttonKey,
+          onTap: onPressed,
+          customBorder: const CircleBorder(),
+          child: SizedBox(
+            width: _buttonSize,
+            height: _buttonSize,
+            child: Center(
+              child: AppIcon(icon: icon, size: 20, color: color),
+            ),
+          ),
         ),
       ),
     );

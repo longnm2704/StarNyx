@@ -72,6 +72,12 @@ void main() {
     expect(find.text('42'), findsOneWidget);
   });
 
+  testWidgets('onboarding restore hides the delete-all zone', (tester) async {
+    await _render(tester, makeBloc(), showDangerZone: false);
+
+    expect(find.byKey(const Key('backup-delete-all-button')), findsNothing);
+  });
+
   testWidgets('export button runs passphrase and privacy steps then exports', (
     tester,
   ) async {
@@ -118,7 +124,11 @@ void main() {
   });
 }
 
-Future<void> _render(WidgetTester tester, SettingsBloc bloc) async {
+Future<void> _render(
+  WidgetTester tester,
+  SettingsBloc bloc, {
+  bool showDangerZone = true,
+}) async {
   addTearDown(bloc.close);
   await tester.pumpWidget(
     EasyLocalization(
@@ -135,7 +145,7 @@ Future<void> _render(WidgetTester tester, SettingsBloc bloc) async {
           home: Scaffold(
             body: BlocProvider<SettingsBloc>.value(
               value: bloc,
-              child: BackupPage(onBack: () {}),
+              child: BackupPage(onBack: () {}, showDangerZone: showDangerZone),
             ),
           ),
         ),

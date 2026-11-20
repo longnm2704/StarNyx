@@ -114,4 +114,33 @@ void main() {
     );
     expect(button.onTap, isNull);
   });
+
+  testWidgets('past days say "this day"; disabled days explain why', (
+    WidgetTester tester,
+  ) async {
+    Widget bar({required bool isToday, VoidCallback? onPressed}) {
+      return MaterialApp(
+        home: Scaffold(
+          body: SelectedDateBar(
+            selectedDateLabel: 'Friday, 17 Apr',
+            onPreviousDayPressed: () {},
+            onNextDayPressed: () {},
+            accentColor: const Color(0xFFDE7B30),
+            symbolKey: 'star',
+            isLit: false,
+            isToday: isToday,
+            blockedReason: 'Only the last 7 days can be changed',
+            onSelectedDatePressed: onPressed,
+          ),
+        ),
+      );
+    }
+
+    await tester.pumpWidget(bar(isToday: false, onPressed: () {}));
+    expect(find.text('home.checkin_light_day'), findsOneWidget);
+    expect(find.text('home.checkin_light_today'), findsNothing);
+
+    await tester.pumpWidget(bar(isToday: false));
+    expect(find.text('Only the last 7 days can be changed'), findsOneWidget);
+  });
 }

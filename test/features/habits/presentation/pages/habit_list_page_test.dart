@@ -53,7 +53,7 @@ void main() {
       expect(find.text('Hydrate'), findsOneWidget);
       expect(find.text('Read'), findsWidgets);
       expect(find.text('09:00 · Drink water'), findsOneWidget);
-      expect(find.text('STREAK 1/2 COMPLETE'), findsOneWidget);
+      expect(find.text('TODAY 1/2 DONE'), findsOneWidget);
       expect(find.byKey(const Key('habit-list-settings')), findsOneWidget);
       expect(find.byKey(const Key('habit-list-journal')), findsOneWidget);
       expect(find.byKey(const Key('habit-list-add')), findsOneWidget);
@@ -111,7 +111,7 @@ void main() {
 
       expect(find.text('No habits yet'), findsOneWidget);
       expect(find.text('Create habit'), findsOneWidget);
-      expect(find.text('STREAK 0/0 COMPLETE'), findsNothing);
+      expect(find.text('TODAY 0/0 DONE'), findsNothing);
 
       // ── Selecting a row stores the active habit and pops ────────────────
       await tester.tap(find.byKey(const Key('habit-list-back')));

@@ -26,9 +26,17 @@ enum BackupOutcome { imported, deletedAll }
 /// [BackupOutcome] after an import or delete-all replaced local data so the
 /// caller can reload (onboarding only finishes on an import).
 class BackupPage extends StatefulWidget {
-  const BackupPage({required this.onBack, super.key});
+  const BackupPage({
+    required this.onBack,
+    this.showDangerZone = true,
+    super.key,
+  });
 
   final VoidCallback onBack;
+
+  /// False when opened from onboarding's "restore": there is nothing to
+  /// delete yet, only something to import.
+  final bool showDangerZone;
 
   @override
   State<BackupPage> createState() => _BackupPageState();
@@ -143,48 +151,50 @@ class _BackupPageState extends State<BackupPage> {
               const SizedBox(height: AppSpacing.lg),
               _SectionLabel('settings.storage_section'.tr()),
               _StorageCard(stats: state.storage),
-              const SizedBox(height: AppSpacing.lg),
-              _SectionLabel(
-                'settings.danger_section'.tr(),
-                color: AppColors.errorOnDark,
-                icon: HugeIconsStrokeRounded.strokeRoundedAlert01,
-              ),
-              _Card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Text(
-                      'settings.delete_all_title'.tr(),
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontFamily: AppFonts.headline,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.errorOnDark,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      'settings.delete_all_message'.tr(),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    _PillButton(
-                      key: const Key('backup-delete-all-button'),
-                      icon: HugeIconsStrokeRounded.strokeRoundedDelete02,
-                      label: 'settings.delete_all_button'.tr(),
-                      color: AppColors.white,
-                      background: _danger,
-                      isLoading:
-                          state.deleteAllStatus == AsyncStatus.inProgress,
-                      onTap: state.deleteAllStatus == AsyncStatus.inProgress
-                          ? null
-                          : () => _handleDeleteAllTap(context),
-                    ),
-                  ],
+              if (widget.showDangerZone) ...<Widget>[
+                const SizedBox(height: AppSpacing.lg),
+                _SectionLabel(
+                  'settings.danger_section'.tr(),
+                  color: AppColors.errorOnDark,
+                  icon: HugeIconsStrokeRounded.strokeRoundedAlert01,
                 ),
-              ),
+                _Card(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Text(
+                        'settings.delete_all_title'.tr(),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontFamily: AppFonts.headline,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.errorOnDark,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        'settings.delete_all_message'.tr(),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _PillButton(
+                        key: const Key('backup-delete-all-button'),
+                        icon: HugeIconsStrokeRounded.strokeRoundedDelete02,
+                        label: 'settings.delete_all_button'.tr(),
+                        color: AppColors.white,
+                        background: _danger,
+                        isLoading:
+                            state.deleteAllStatus == AsyncStatus.inProgress,
+                        onTap: state.deleteAllStatus == AsyncStatus.inProgress
+                            ? null
+                            : () => _handleDeleteAllTap(context),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         ),
