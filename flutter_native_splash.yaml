@@ -1,3 +1,11 @@
+# Regenerate with `fvm dart run flutter_native_splash:create`. Verified with
+# 2.4.8: Android styles.xml is only patched inside LaunchTheme, so the manual
+# black NormalTheme windowBackground in values*/styles.xml survives. The tool
+# does rewrite ios/Runner/Base.lproj/LaunchScreen.storyboard with a white view
+# backgroundColor (no option for it while background_image is set; `color`
+# and `background_image` are mutually exclusive). The full-screen black
+# background image covers it, but restore red/green/blue="0.0" there after
+# regenerating to keep the manual override.
 flutter_native_splash:
   background_image: assets/splash_background.png
   background_image_dark: assets/splash_background.png

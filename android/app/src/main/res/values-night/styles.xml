@@ -16,6 +16,9 @@
          running.
 
          This Theme is only used starting with V2 of Flutter's Android embedding. -->
+    <!-- Manual override: black window behind the Flutter UI (Obsidian
+         Lumina). flutter_native_splash only patches LaunchTheme, so this
+         survives regeneration; keep it if the file is ever recreated. -->
     <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:windowBackground">@android:color/black</item>
     </style>
