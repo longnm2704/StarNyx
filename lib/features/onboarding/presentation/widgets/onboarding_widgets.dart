@@ -12,14 +12,19 @@ class OnboardingHeader extends StatelessWidget {
     required this.step,
     required this.onBack,
     required this.onSkip,
+    this.skipLabel,
     super.key,
   });
 
   /// Localized step label, e.g. "BƯỚC 2/3".
   final String step;
 
-  final VoidCallback onBack;
-  final VoidCallback onSkip;
+  /// Null while a step is busy (disables both actions).
+  final VoidCallback? onBack;
+  final VoidCallback? onSkip;
+
+  /// Defaults to "Skip".
+  final String? skipLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +51,16 @@ class OnboardingHeader extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          TextButton(
-            key: const Key('onboarding-skip'),
-            onPressed: onSkip,
-            child: Text(
-              'onboarding.skip'.tr(),
-              style: const TextStyle(color: AppColors.textSecondary),
+          Flexible(
+            child: TextButton(
+              key: const Key('onboarding-skip'),
+              onPressed: onSkip,
+              child: Text(
+                skipLabel ?? 'onboarding.skip'.tr(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: AppColors.textSecondary),
+              ),
             ),
           ),
         ],

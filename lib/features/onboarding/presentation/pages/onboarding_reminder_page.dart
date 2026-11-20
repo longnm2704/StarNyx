@@ -24,14 +24,14 @@ class OnboardingReminderPage extends StatefulWidget {
   const OnboardingReminderPage({
     required this.templates,
     required this.onBack,
-    required this.onSkip,
     required this.onStart,
     super.key,
   });
 
   final List<OnboardingTemplate> templates;
   final VoidCallback onBack;
-  final VoidCallback onSkip;
+
+  /// Creates the habits; the header "skip" calls it too, with reminders off.
   final Future<void> Function(List<OnboardingHabitDraft> drafts) onStart;
 
   @override
@@ -74,10 +74,13 @@ class _OnboardingReminderPageState extends State<OnboardingReminderPage> {
     setState(() => _times.updateAll((_, _) => _sharedTime));
   }
 
-  Future<void> _start() async {
+  /// [withReminders] false is the header "skip": the habits are still
+  /// created, just with reminders off.
+  Future<void> _start({bool withReminders = true}) async {
+    if (_saving) return;
     setState(() => _saving = true);
     // First reminder the user turns on: ask for notification permission now.
-    await requestReminderPermission(context);
+    if (withReminders) await requestReminderPermission(context);
     if (!mounted) return;
     try {
       await widget.onStart(<OnboardingHabitDraft>[
@@ -88,6 +91,7 @@ class _OnboardingReminderPageState extends State<OnboardingReminderPage> {
             icon: template.symbol,
             color: template.colorHex,
             reminderTime: _times[template.id]!,
+            reminderEnabled: withReminders,
           ),
       ]);
     } catch (_) {
@@ -106,128 +110,134 @@ class _OnboardingReminderPageState extends State<OnboardingReminderPage> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            OnboardingHeader(
-              step: 'onboarding.reminder.step'.tr(),
-              onBack: widget.onBack,
-              onSkip: widget.onSkip,
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.pageHorizontal,
-                  AppSpacing.xs,
-                  AppSpacing.pageHorizontal,
-                  AppSpacing.lg,
-                ),
-                children: <Widget>[
-                  OnboardingDotLabel(
-                    child: Text.rich(
+    return PopScope<Object?>(
+      canPop: !_saving,
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: Column(
+            children: <Widget>[
+              OnboardingHeader(
+                step: 'onboarding.reminder.step'.tr(),
+                // Leaving while habits are being saved would let the completion
+                // screen appear on top of an earlier step later.
+                onBack: _saving ? null : widget.onBack,
+                onSkip: _saving ? null : () => _start(withReminders: false),
+                skipLabel: 'onboarding.reminder.skip'.tr(),
+              ),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.pageHorizontal,
+                    AppSpacing.xs,
+                    AppSpacing.pageHorizontal,
+                    AppSpacing.lg,
+                  ),
+                  children: <Widget>[
+                    OnboardingDotLabel(
+                      child: Text.rich(
+                        TextSpan(
+                          children: <InlineSpan>[
+                            TextSpan(
+                              text: 'onboarding.reminder.overline_step'.tr(),
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            TextSpan(
+                              text:
+                                  ' · ${'onboarding.reminder.overline_label'.tr()}',
+                            ),
+                          ],
+                        ),
+                        style: textTheme.labelMedium,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text.rich(
                       TextSpan(
                         children: <InlineSpan>[
+                          TextSpan(text: 'onboarding.reminder.title_lead'.tr()),
                           TextSpan(
-                            text: 'onboarding.reminder.overline_step'.tr(),
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          TextSpan(
-                            text:
-                                ' · ${'onboarding.reminder.overline_label'.tr()}',
+                            text: 'onboarding.reminder.title_emphasis'.tr(),
+                            style: const TextStyle(color: AppColors.primary),
                           ),
                         ],
                       ),
+                      style: textTheme.headlineLarge,
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'onboarding.reminder.subtitle'.tr(),
+                      style: textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      'onboarding.reminder.selected_count'.tr(
+                        args: <String>['${widget.templates.length}'],
+                      ),
                       style: textTheme.labelMedium,
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text.rich(
-                    TextSpan(
-                      children: <InlineSpan>[
-                        TextSpan(text: 'onboarding.reminder.title_lead'.tr()),
-                        TextSpan(
-                          text: 'onboarding.reminder.title_emphasis'.tr(),
-                          style: const TextStyle(color: AppColors.primary),
+                    const SizedBox(height: AppSpacing.sm),
+                    for (final template in widget.templates) ...<Widget>[
+                      _ReminderRow(
+                        template: template,
+                        time: _times[template.id]!,
+                        onEdit: () => _pickTime(template),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
+                    const SizedBox(height: AppSpacing.sm),
+                    _SharedTimeCard(
+                      time: _sharedTime,
+                      onEarlier: () => _shiftShared(-15),
+                      onLater: () => _shiftShared(15),
+                      onApply: _applyShared,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.pageHorizontal,
+                  AppSpacing.sm,
+                  AppSpacing.pageHorizontal,
+                  AppSpacing.sm,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    AppPrimaryButton(
+                      key: const Key('onboarding-reminder-start'),
+                      label: '${'onboarding.reminder.cta'.tr()} →',
+                      onPressed: _saving ? null : _start,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        const AppIcon(
+                          icon: HugeIconsStrokeRounded
+                              .strokeRoundedSlidersHorizontal,
+                          color: AppColors.textTertiary,
+                          size: 14,
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Flexible(
+                          child: Text(
+                            'onboarding.reminder.footer'.tr(),
+                            textAlign: TextAlign.center,
+                            style: textTheme.labelSmall,
+                          ),
                         ),
                       ],
                     ),
-                    style: textTheme.headlineLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'onboarding.reminder.subtitle'.tr(),
-                    style: textTheme.bodyLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'onboarding.reminder.selected_count'.tr(
-                      args: <String>['${widget.templates.length}'],
-                    ),
-                    style: textTheme.labelMedium,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  for (final template in widget.templates) ...<Widget>[
-                    _ReminderRow(
-                      template: template,
-                      time: _times[template.id]!,
-                      onEdit: () => _pickTime(template),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
                   ],
-                  const SizedBox(height: AppSpacing.sm),
-                  _SharedTimeCard(
-                    time: _sharedTime,
-                    onEarlier: () => _shiftShared(-15),
-                    onLater: () => _shiftShared(15),
-                    onApply: _applyShared,
-                  ),
-                ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.pageHorizontal,
-                AppSpacing.sm,
-                AppSpacing.pageHorizontal,
-                AppSpacing.sm,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  AppPrimaryButton(
-                    key: const Key('onboarding-reminder-start'),
-                    label: '${'onboarding.reminder.cta'.tr()} →',
-                    onPressed: _saving ? null : _start,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      const AppIcon(
-                        icon: HugeIconsStrokeRounded
-                            .strokeRoundedSlidersHorizontal,
-                        color: AppColors.textTertiary,
-                        size: 14,
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Flexible(
-                        child: Text(
-                          'onboarding.reminder.footer'.tr(),
-                          textAlign: TextAlign.center,
-                          style: textTheme.labelSmall,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

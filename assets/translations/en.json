@@ -361,13 +361,14 @@
       "apply_all": "Apply to all",
       "cta": "Begin your routine",
       "footer": "You can adjust or turn off notifications any time in Settings.",
-      "create_error": "Could not create your habits. Nothing was saved, please try again."
+      "create_error": "Could not create your habits. Nothing was saved, please try again.",
+      "skip": "Skip reminders"
     },
     "complete": {
       "overline": "ALL SET · READY TO BEGIN",
       "title_lead": "Ready to ",
       "title_emphasis": "begin.",
-      "subtitle": "Your first habit spark is lit. Keep going day by day to fill in your own bright 365-day picture.",
+      "subtitle": "Your first habits are ready. Light your first star today, then keep going day by day to fill in your own 365-day picture.",
       "commitment": "YOUR STARTING COMMITMENT",
       "ready": "Ready",
       "quote": "“Discipline is not a cage, but the bridge to real freedom.”",

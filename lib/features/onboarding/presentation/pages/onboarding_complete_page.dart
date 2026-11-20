@@ -16,111 +16,106 @@ import 'package:starnyx/features/starnyx_form/presentation/widgets/starnyx_form_
 class OnboardingCompletePage extends StatelessWidget {
   const OnboardingCompletePage({
     required this.habits,
-    required this.onBack,
     required this.onDone,
     super.key,
   });
 
   final List<StarNyx> habits;
-  final VoidCallback onBack;
+
+  /// Enters the app. Back / system back do the same: the habits are already
+  /// saved, so there is nothing to undo here.
   final VoidCallback onDone;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: AppLayout.contentMaxWidth,
-            ),
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.pageHorizontal,
-                AppSpacing.xxs,
-                AppSpacing.pageHorizontal,
-                AppSpacing.lg,
+    return PopScope<Object?>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) onDone();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppLayout.contentMaxWidth,
               ),
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    IconButton(
-                      key: const Key('onboarding-back'),
-                      tooltip: MaterialLocalizations.of(
-                        context,
-                      ).backButtonTooltip,
-                      onPressed: onBack,
-                      icon: const AppIcon(
-                        icon: HugeIconsStrokeRounded.strokeRoundedArrowLeft01,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                    Flexible(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.xxs,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceLevel1,
-                          borderRadius: BorderRadius.circular(AppRadius.pill),
-                          border: Border.all(color: AppColors.borderSubtle),
-                        ),
-                        child: OnboardingDotLabel(
-                          child: Text(
-                            'onboarding.complete.overline'.tr(),
-                            style: textTheme.labelMedium?.copyWith(
-                              color: AppColors.primary,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.pageHorizontal,
+                  AppSpacing.xxs,
+                  AppSpacing.pageHorizontal,
+                  AppSpacing.lg,
+                ),
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: AppSpacing.xxs,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceLevel1,
+                            borderRadius: BorderRadius.circular(AppRadius.pill),
+                            border: Border.all(color: AppColors.borderSubtle),
+                          ),
+                          child: OnboardingDotLabel(
+                            child: Text(
+                              'onboarding.complete.overline'.tr(),
+                              style: textTheme.labelMedium?.copyWith(
+                                color: AppColors.primary,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.md),
-                const _Hero(),
-                const SizedBox(height: AppSpacing.lg),
-                Text.rich(
-                  TextSpan(
-                    children: <InlineSpan>[
-                      TextSpan(text: 'onboarding.complete.title_lead'.tr()),
-                      TextSpan(
-                        text: 'onboarding.complete.title_emphasis'.tr(),
-                        style: const TextStyle(color: AppColors.primary),
-                      ),
                     ],
                   ),
-                  textAlign: TextAlign.center,
-                  style: textTheme.headlineLarge?.copyWith(fontSize: 34),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  'onboarding.complete.subtitle'.tr(),
-                  textAlign: TextAlign.center,
-                  style: textTheme.bodyLarge,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                _CommitmentCard(habits: habits),
-                const SizedBox(height: AppSpacing.md),
-                const _Quote(),
-                const SizedBox(height: AppSpacing.lg),
-                AppPrimaryButton(
-                  key: const Key('onboarding-complete-done'),
-                  label: '${'onboarding.complete.cta'.tr()} →',
-                  onPressed: onDone,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  'onboarding.complete.footer'.tr(),
-                  textAlign: TextAlign.center,
-                  style: textTheme.labelSmall,
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.md),
+                  const _Hero(),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text.rich(
+                    TextSpan(
+                      children: <InlineSpan>[
+                        TextSpan(text: 'onboarding.complete.title_lead'.tr()),
+                        TextSpan(
+                          text: 'onboarding.complete.title_emphasis'.tr(),
+                          style: const TextStyle(color: AppColors.primary),
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                    style: textTheme.headlineLarge?.copyWith(fontSize: 34),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'onboarding.complete.subtitle'.tr(),
+                    textAlign: TextAlign.center,
+                    style: textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  _CommitmentCard(habits: habits),
+                  const SizedBox(height: AppSpacing.md),
+                  const _Quote(),
+                  const SizedBox(height: AppSpacing.lg),
+                  AppPrimaryButton(
+                    key: const Key('onboarding-complete-done'),
+                    label: '${'onboarding.complete.cta'.tr()} →',
+                    onPressed: onDone,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'onboarding.complete.footer'.tr(),
+                    textAlign: TextAlign.center,
+                    style: textTheme.labelSmall,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

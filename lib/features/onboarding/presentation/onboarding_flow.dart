@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
-import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/domain/usecases/domain_usecases.dart';
 import 'package:starnyx/features/onboarding/domain/create_onboarding_habits.dart';
 import 'package:starnyx/features/onboarding/domain/onboarding_template.dart';
@@ -56,7 +55,6 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         builder: (_) => OnboardingReminderPage(
           templates: templates,
           onBack: _navigator.pop,
-          onSkip: widget.onFinished,
           onStart: _createHabits,
         ),
       ),
@@ -71,30 +69,19 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       delete: serviceLocator<DeleteStarNyxUseCase>(),
       sync: serviceLocator<SyncNotificationsUseCase>(),
     );
-    unawaited(_openCompletion(habits));
-  }
-
-  Future<void> _openCompletion(List<StarNyx> habits) async {
-    var done = false;
-    await _navigator.push(
-      MaterialPageRoute<void>(
-        builder: (_) => OnboardingCompletePage(
-          habits: habits,
-          onBack: _navigator.pop,
-          onDone: () {
-            done = true;
-            widget.onFinished();
-          },
+    // The reminder step blocks back while saving; still never push onto a
+    // flow that is gone.
+    if (!mounted) return;
+    // The habits now exist: the completion screen replaces the steps, and
+    // leaving it (CTA, back or system back) simply enters the app.
+    unawaited(
+      _navigator.pushAndRemoveUntil(
+        MaterialPageRoute<void>(
+          builder: (_) =>
+              OnboardingCompletePage(habits: habits, onDone: widget.onFinished),
         ),
+        (_) => false,
       ),
-    );
-    if (done) return;
-    // Backing out to the reminder step undoes the creation, so pressing its
-    // CTA again does not duplicate the habits.
-    await deleteOnboardingHabits(
-      habits,
-      delete: serviceLocator<DeleteStarNyxUseCase>(),
-      sync: serviceLocator<SyncNotificationsUseCase>(),
     );
   }
 

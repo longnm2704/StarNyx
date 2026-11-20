@@ -26,6 +26,7 @@ void main() {
       icon: 'droplet',
       color: '#10B981',
       reminderTime: '06:45',
+      reminderEnabled: true,
     ),
     (
       title: 'Sleep',
@@ -33,6 +34,7 @@ void main() {
       icon: 'moon',
       color: '#FFB95F',
       reminderTime: '22:15',
+      reminderEnabled: false,
     ),
   ];
 
@@ -46,24 +48,24 @@ void main() {
     sync: SyncNotificationsUseCase(notifications, repository),
   );
 
-  test('creates every draft with a daily reminder and schedules it', () async {
+  test('creates every draft; reminders only where enabled', () async {
     await run();
 
     final saved = await repository.getAllStarnyxs();
     expect(saved.map((s) => s.title), <String>['Water', 'Sleep']);
-    expect(saved.map((s) => s.reminderTime), <String>['06:45', '22:15']);
-    expect(saved.every((s) => s.reminderEnabled), isTrue);
+    expect(saved.map((s) => s.reminderTime), <String?>['06:45', null]);
+    expect(saved.map((s) => s.reminderEnabled), <bool>[true, false]);
     expect(saved.map((s) => s.icon), <String>['droplet', 'moon']);
-    expect(notifications.scheduled, hasLength(2));
+    expect(notifications.scheduled, hasLength(1));
   });
 
   test('rolls back created habits when a later step fails', () async {
-    notifications.failOnCall = 2;
+    // Second habit is created, then its reminder sync fails.
+    notifications.failCancel = true;
 
     await expectLater(run(), throwsA(isA<StateError>()));
 
     expect(await repository.getAllStarnyxs(), isEmpty);
-    expect(notifications.cancelled, hasLength(2));
   });
 }
 
@@ -78,9 +80,16 @@ class _FakeNotificationService implements NotificationService {
     scheduled.add(starnyx.id);
   }
 
+  bool failCancel = false;
+
   @override
-  Future<void> cancelReminder(String starnyxId) async =>
-      cancelled.add(starnyxId);
+  Future<void> cancelReminder(String starnyxId) async {
+    if (failCancel) {
+      failCancel = false;
+      throw StateError('boom');
+    }
+    cancelled.add(starnyxId);
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

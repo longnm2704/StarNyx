@@ -104,7 +104,7 @@ void main() {
     expect(finished, 2);
   });
 
-  testWidgets('continue opens reminder setup, skip there finishes', (
+  testWidgets('continue opens reminder setup; its skip skips reminders', (
     tester,
   ) async {
     await render(tester);
@@ -120,9 +120,10 @@ void main() {
         .onPressed!();
     await tester.pumpAndSettle();
     expect(find.text('STEP 3/3'), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key('onboarding-skip')));
-    expect(finished, 1);
+    // Step 3 skip still creates the habits (reminders off), so it is no
+    // longer a way to leave with nothing.
+    expect(find.text('Skip reminders'), findsOneWidget);
+    expect(finished, 0);
   });
 
   testWidgets('fits 320px at 2.0 text scale', (tester) async {

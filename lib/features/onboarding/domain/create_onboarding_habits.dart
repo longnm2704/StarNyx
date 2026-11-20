@@ -3,16 +3,20 @@ import 'package:starnyx/domain/usecases/domain_usecases.dart';
 
 /// A starter habit ready to be saved: copy already localized, reminder
 /// time (`HH:mm`) already chosen on the reminder setup step (STX-U022).
+/// [reminderEnabled] is false when the user skipped reminders (the habit is
+/// then saved without a time, like the habit form does).
 typedef OnboardingHabitDraft = ({
   String title,
   String description,
   String icon,
   String color,
   String reminderTime,
+  bool reminderEnabled,
 });
 
-/// Creates every draft with a daily reminder and schedules it the same way
-/// the habit form does (`CreateStarNyxUseCase` + `onStarnyxSaved`).
+/// Creates every draft (daily reminder on unless skipped) and schedules it
+/// the same way the habit form does (`CreateStarNyxUseCase` +
+/// `onStarnyxSaved`).
 ///
 /// All-or-nothing: if any step fails, habits created so far are removed with
 /// [deleteOnboardingHabits] and the error is rethrown.
@@ -33,7 +37,7 @@ Future<List<StarNyx>> createOnboardingHabits(
         color: draft.color,
         icon: draft.icon,
         startDate: timestamp,
-        reminderEnabled: true,
+        reminderEnabled: draft.reminderEnabled,
         reminderTime: draft.reminderTime,
         now: timestamp,
       );

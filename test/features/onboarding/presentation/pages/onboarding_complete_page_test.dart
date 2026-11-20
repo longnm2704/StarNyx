@@ -11,7 +11,6 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late int done;
-  late int back;
 
   final habits = <StarNyx>[
     StarNyx(
@@ -45,7 +44,6 @@ void main() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     await EasyLocalization.ensureInitialized();
     done = 0;
-    back = 0;
   });
 
   Future<void> render(WidgetTester tester, {double textScale = 1}) async {
@@ -68,11 +66,7 @@ void main() {
               ).copyWith(textScaler: TextScaler.linear(textScale)),
               child: child!,
             ),
-            home: OnboardingCompletePage(
-              habits: habits,
-              onBack: () => back++,
-              onDone: () => done++,
-            ),
+            home: OnboardingCompletePage(habits: habits, onDone: () => done++),
           ),
         ),
       ),
@@ -91,22 +85,21 @@ void main() {
     expect(find.text('22:15 · Daily'), findsOneWidget);
   });
 
-  testWidgets('CTA finishes and back returns', (tester) async {
+  testWidgets('CTA finishes; system back also finishes, never undoes', (
+    tester,
+  ) async {
     await render(tester);
 
+    expect(find.byKey(const Key('onboarding-back')), findsNothing);
     final cta = find.byKey(const Key('onboarding-complete-done'));
     await tester.scrollUntilVisible(cta, 200);
     await tester.pumpAndSettle();
     await tester.tap(cta);
     expect(done, 1);
 
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('onboarding-back')),
-      -200,
-    );
+    await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('onboarding-back')));
-    expect(back, 1);
+    expect(done, 2);
   });
 
   testWidgets('fits 320px at 2.0 text scale', (tester) async {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +15,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late List<List<OnboardingHabitDraft>> started;
-  late int skipped;
   late bool failStart;
+  Completer<void>? gate;
 
   final templates = <OnboardingTemplate>[
     onboardingTemplates.firstWhere((t) => t.id == 'water'),
@@ -26,8 +28,8 @@ void main() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     await EasyLocalization.ensureInitialized();
     started = <List<OnboardingHabitDraft>>[];
-    skipped = 0;
     failStart = false;
+    gate = null;
   });
 
   Future<void> render(WidgetTester tester, {double textScale = 1}) async {
@@ -53,8 +55,8 @@ void main() {
             home: OnboardingReminderPage(
               templates: templates,
               onBack: () {},
-              onSkip: () => skipped++,
               onStart: (drafts) async {
+                await gate?.future;
                 if (failStart) throw StateError('boom');
                 started.add(drafts);
               },
@@ -136,7 +138,31 @@ void main() {
       'Sleep before 23:00',
     ]);
     expect(drafts.map((d) => d.reminderTime), <String>['21:45', '21:45']);
+    expect(drafts.map((d) => d.reminderEnabled), <bool>[true, true]);
     expect(drafts.map((d) => d.icon), <String>['droplet', 'moon']);
+  });
+
+  testWidgets('back is blocked while the habits are being saved', (
+    tester,
+  ) async {
+    gate = Completer<void>();
+    await render(tester);
+
+    await tester.tap(find.byKey(const Key('onboarding-skip')));
+    await tester.pump();
+    final back = tester.widget<IconButton>(
+      find.byKey(const Key('onboarding-back')),
+    );
+    expect(back.onPressed, isNull);
+
+    gate!.complete();
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<IconButton>(find.byKey(const Key('onboarding-back')))
+          .onPressed,
+      isNotNull,
+    );
   });
 
   testWidgets('a failed start shows an error', (tester) async {
@@ -156,12 +182,14 @@ void main() {
     );
   });
 
-  testWidgets('skip leaves onboarding', (tester) async {
+  testWidgets('skip creates the habits with reminders off', (tester) async {
     await render(tester);
 
+    expect(find.text('Skip reminders'), findsOneWidget);
     await tester.tap(find.byKey(const Key('onboarding-skip')));
-    expect(skipped, 1);
-    expect(started, isEmpty);
+    await tester.pumpAndSettle();
+    expect(started, hasLength(1));
+    expect(started.single.map((d) => d.reminderEnabled), <bool>[false, false]);
   });
 
   testWidgets('fits 320px at 2.0 text scale', (tester) async {

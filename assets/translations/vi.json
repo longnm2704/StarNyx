@@ -361,13 +361,14 @@
       "apply_all": "Áp dụng cho tất cả",
       "cta": "Bắt đầu hành trình kỷ luật",
       "footer": "Bạn luôn có thể tùy chỉnh hoặc tắt thông báo bất cứ lúc nào trong Cài đặt.",
-      "create_error": "Chưa thể tạo thói quen. Không có gì được lưu, hãy thử lại."
+      "create_error": "Chưa thể tạo thói quen. Không có gì được lưu, hãy thử lại.",
+      "skip": "Bỏ qua nhắc nhở"
     },
     "complete": {
       "overline": "HOÀN TẤT · SẴN SÀNG BẮT ĐẦU",
       "title_lead": "Sẵn sàng ",
       "title_emphasis": "bứt phá.",
-      "subtitle": "Ngọn lửa thói quen đầu tiên đã được thắp sáng. Hãy kiên trì từng ngày để hoàn thiện bức tranh 365 ngày rực rỡ của chính bạn.",
+      "subtitle": "Thói quen đầu tiên đã sẵn sàng. Hãy thắp ngôi sao đầu tiên hôm nay, rồi kiên trì từng ngày để hoàn thiện bức tranh 365 ngày của chính bạn.",
       "commitment": "CAM KẾT KHỞI ĐIỂM CỦA BẠN",
       "ready": "Đã sẵn sàng",
       "quote": "“Kỷ luật không phải là sự gò bó, mà là cây cầu dẫn tới tự do đích thực.”",
