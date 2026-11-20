@@ -9,7 +9,10 @@
   "home": {
     "active_constellation_title": "Đang tập trung",
     "active_constellation_hint": "Đây là thói quen StarNyx sẽ mở khi bạn quay lại.",
-    "days_left_suffix": "ngày còn lại",
+    "days_left_suffix": {
+      "one": "ngày còn lại",
+      "other": "ngày còn lại"
+    },
     "reset_current_date": "Hôm nay",
     "checkin_error_message": "Không thể cập nhật ngày này lúc này.",
     "checkin_light_today": "Thắp hôm nay",

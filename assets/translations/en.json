@@ -9,7 +9,10 @@
   "home": {
     "active_constellation_title": "Current focus",
     "active_constellation_hint": "This is the habit StarNyx opens to when you come back.",
-    "days_left_suffix": "days left",
+    "days_left_suffix": {
+      "one": "day left",
+      "other": "days left"
+    },
     "reset_current_date": "Today",
     "checkin_error_message": "Couldn't update this day right now.",
     "checkin_light_today": "Light today",

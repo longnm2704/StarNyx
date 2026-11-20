@@ -9,7 +9,10 @@
   "home": {
     "active_constellation_title": "現在のフォーカス",
     "active_constellation_hint": "StarNyx を開いたときに表示される習慣です。",
-    "days_left_suffix": "日残り",
+    "days_left_suffix": {
+      "one": "日残り",
+      "other": "日残り"
+    },
     "reset_current_date": "今日",
     "checkin_error_message": "現在この日を更新できません。",
     "checkin_light_today": "今日を灯す",

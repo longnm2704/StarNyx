@@ -174,7 +174,10 @@ class HomeYearSummaryRow extends StatelessWidget {
           TextSpan(
             children: <TextSpan>[
               TextSpan(text: '$daysLeft ', style: numberStyle),
-              TextSpan(text: 'home.days_left_suffix'.tr(), style: suffixStyle),
+              TextSpan(
+                text: 'home.days_left_suffix'.plural(daysLeft),
+                style: suffixStyle,
+              ),
             ],
           ),
         ),
