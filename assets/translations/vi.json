@@ -207,7 +207,10 @@
     "delete_all_final_message": "Đây là bước cuối. Mọi thói quen, lượt thắp sáng và ghi chú sẽ bị xóa vĩnh viễn.",
     "delete_all_final_confirm": "Xóa vĩnh viễn",
     "delete_all_success": "Đã xóa toàn bộ dữ liệu.",
-    "delete_all_error": "Không thể xóa dữ liệu. Vui lòng thử lại."
+    "delete_all_error": "Không thể xóa dữ liệu. Vui lòng thử lại.",
+    "reminders_permission_denied": "Nhắc nhở cần quyền gửi thông báo. Bạn có thể bật quyền này trong cài đặt hệ thống.",
+    "reminders_permission_off": "Thông báo đang tắt trong cài đặt hệ thống",
+    "reminders_toggle_error": "Chưa thể cập nhật nhắc nhở lúc này."
   },
   "nav": {
     "habits": "Thói quen",

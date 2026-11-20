@@ -805,6 +805,12 @@ class _InMemoryAppSettingsRepository implements AppSettingsRepository {
 
 class _FakeNotificationService implements NotificationService {
   @override
+  Future<bool> requestPermission() async => true;
+
+  @override
+  Future<bool> hasPermission() async => true;
+
+  @override
   Future<void> initialize() async {}
 
   @override

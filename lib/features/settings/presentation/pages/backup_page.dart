@@ -204,12 +204,22 @@ class _BackupPageState extends State<BackupPage> {
         state.exportedFilePath == null) {
       return;
     }
+    final path = state.exportedFilePath!;
     final result = await SharePlus.instance.share(
       ShareParams(
-        files: <XFile>[XFile(state.exportedFilePath!)],
+        files: <XFile>[XFile(path)],
         subject: 'settings.export_success'.tr(),
       ),
     );
+    // ponytail: a dismissed share deletes the temp file right away. After a
+    // successful share the receiving app may still be reading it (Android
+    // reads the content URI asynchronously), so it is deleted at the next
+    // export instead (SettingsBloc), or by the OS temp cleanup.
+    if (result.status == ShareResultStatus.dismissed) {
+      try {
+        await File(path).delete();
+      } catch (_) {}
+    }
     if (result.status == ShareResultStatus.success && context.mounted) {
       _showSnackBar(context, 'settings.export_success'.tr());
     }

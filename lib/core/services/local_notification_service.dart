@@ -52,8 +52,6 @@ class LocalNotificationService implements NotificationService {
     return key;
   }
 
-  /// Replaces the translator used for notification body text. Call this when
-  /// the app locale changes, then re-sync reminders.
   @override
   void setTranslator(
     String Function(String key, {Map<String, dynamic>? namedArgs}) tr,
@@ -63,7 +61,6 @@ class LocalNotificationService implements NotificationService {
 
   bool _initialized = false;
   bool _timeZonesInitialized = false;
-  bool _permissionsGranted = true;
 
   @override
   Future<void> initialize() async {
@@ -88,11 +85,19 @@ class LocalNotificationService implements NotificationService {
         importance: Importance.high,
       ),
     );
-    _permissionsGranted = await _client.requestPermissions();
-
     _initialized = true;
     _logger.debug('LocalNotificationService', 'initialize success');
   }
+
+  @override
+  Future<bool> requestPermission() async {
+    final granted = await _client.requestPermissions();
+    _logger.debug('LocalNotificationService', 'permission granted=$granted');
+    return granted;
+  }
+
+  @override
+  Future<bool> hasPermission() => _client.arePermissionsGranted();
 
   @override
   Future<void> createReminder(StarNyx starnyx) async {
@@ -104,14 +109,8 @@ class LocalNotificationService implements NotificationService {
       );
       return;
     }
-    if (!_permissionsGranted) {
-      _logger.debug(
-        'LocalNotificationService',
-        'create skipped permissions denied id=${starnyx.id}',
-      );
-      return;
-    }
-
+    // Scheduled even without permission: the OS drops it silently, and it
+    // starts showing as soon as the user allows notifications.
     _logger.debug(
       'LocalNotificationService',
       'create begin id=${starnyx.id} reminderTime=$reminderTime',
@@ -264,6 +263,8 @@ abstract class NotificationClient {
 
   Future<bool> requestPermissions();
 
+  Future<bool> arePermissionsGranted();
+
   Future<void> zonedSchedule({
     required int id,
     required String title,
@@ -318,6 +319,21 @@ class FlutterLocalNotificationClient implements NotificationClient {
     );
 
     return androidGranted ?? iosGranted ?? true;
+  }
+
+  @override
+  Future<bool> arePermissionsGranted() async {
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    final ios = _plugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
+    final androidEnabled = await android?.areNotificationsEnabled();
+    final iosOptions = await ios?.checkPermissions();
+    return androidEnabled ?? iosOptions?.isEnabled ?? true;
   }
 
   @override

@@ -85,13 +85,40 @@ void main() {
       expect(onboarding.completed, isFalse);
     },
   );
+
+  test('a reminder cancel failure after the wipe is not fatal', () async {
+    var cleared = false;
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      'onboarding_completed': true,
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final onboarding = OnboardingPreferences(prefs);
+    final notifications = _FakeNotificationService()..throwOnCancel = true;
+
+    await DeleteAllDataUseCase(
+      () async => cleared = true,
+      SyncNotificationsUseCase(
+        notifications,
+        DriftStarNyxRepository(AppDatabase(NativeDatabase.memory())),
+      ),
+      ActiveStarnyxColorCache(prefs),
+      onboarding,
+    ).call();
+
+    expect(cleared, isTrue);
+    expect(onboarding.completed, isFalse);
+  });
 }
 
 class _FakeNotificationService implements NotificationService {
   int cancelAllCount = 0;
+  bool throwOnCancel = false;
 
   @override
-  Future<void> cancelAllReminders() async => cancelAllCount += 1;
+  Future<void> cancelAllReminders() async {
+    if (throwOnCancel) throw StateError('plugin');
+    cancelAllCount += 1;
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

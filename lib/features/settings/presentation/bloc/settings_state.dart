@@ -15,6 +15,8 @@ class SettingsState extends Equatable {
     this.currentStreak = 0,
     this.storage,
     this.deleteAllStatus = AsyncStatus.idle,
+    this.notificationsAllowed = true,
+    this.remindersToggleFailureCount = 0,
   });
 
   final AsyncStatus exportStatus;
@@ -29,6 +31,12 @@ class SettingsState extends Equatable {
   /// Null until the backup screen loads it.
   final StorageStats? storage;
   final AsyncStatus deleteAllStatus;
+
+  /// False when the OS blocks notifications: reminders are on but won't show.
+  final bool notificationsAllowed;
+
+  /// Bumped on each failed master-switch toggle (snackbar trigger).
+  final int remindersToggleFailureCount;
 
   /// True when at least one habit reminder is scheduled.
   bool get remindersOn => starnyxs.any((s) => s.hasReminder);
@@ -69,6 +77,8 @@ class SettingsState extends Equatable {
     int? currentStreak,
     StorageStats? storage,
     AsyncStatus? deleteAllStatus,
+    bool? notificationsAllowed,
+    int? remindersToggleFailureCount,
   }) {
     return SettingsState(
       exportStatus: exportStatus ?? this.exportStatus,
@@ -83,6 +93,9 @@ class SettingsState extends Equatable {
       currentStreak: currentStreak ?? this.currentStreak,
       storage: storage ?? this.storage,
       deleteAllStatus: deleteAllStatus ?? this.deleteAllStatus,
+      notificationsAllowed: notificationsAllowed ?? this.notificationsAllowed,
+      remindersToggleFailureCount:
+          remindersToggleFailureCount ?? this.remindersToggleFailureCount,
     );
   }
 
@@ -96,5 +109,7 @@ class SettingsState extends Equatable {
     currentStreak,
     storage,
     deleteAllStatus,
+    notificationsAllowed,
+    remindersToggleFailureCount,
   ];
 }

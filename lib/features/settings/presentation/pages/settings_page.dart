@@ -4,8 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:starnyx/app/di/service_locator.dart';
+import 'package:starnyx/app/reminder_permission.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
-import 'package:starnyx/core/services/notification_service.dart';
 import 'package:starnyx/core/widgets/app_icon.dart';
 import 'package:starnyx/domain/usecases/sync_notifications_use_case.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
@@ -91,6 +91,12 @@ class _SettingsPageState extends State<SettingsPage> {
     if (outcome != null) widget.onDataReplaced?.call();
   }
 
+  Future<void> _onRemindersChanged(bool enabled) async {
+    // Permission is asked when reminders are turned on, never at launch.
+    if (enabled) await requestReminderPermission(context);
+    _bloc.add(SettingsRemindersToggled(enabled));
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<SettingsBloc>.value(
@@ -99,13 +105,21 @@ class _SettingsPageState extends State<SettingsPage> {
         backgroundColor: AppColors.background,
         body: SafeArea(
           bottom: false,
-          child: BlocBuilder<SettingsBloc, SettingsState>(
+          child: BlocConsumer<SettingsBloc, SettingsState>(
+            listenWhen: (previous, current) =>
+                previous.remindersToggleFailureCount !=
+                current.remindersToggleFailureCount,
+            listener: (context, state) =>
+                ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+                  SnackBar(
+                    content: Text('settings.reminders_toggle_error'.tr()),
+                  ),
+                ),
             builder: (context, state) => _SettingsContent(
               state: state,
               version: _version,
               onLanguageTap: () => _showLanguagePicker(context),
-              onRemindersChanged: (enabled) =>
-                  _bloc.add(SettingsRemindersToggled(enabled)),
+              onRemindersChanged: _onRemindersChanged,
               onBackupTap: () => _push((onBack) => BackupPage(onBack: onBack)),
               onAboutTap: () =>
                   _push((onBack) => AboutStarnyxSheet(onBack: onBack)),
@@ -175,17 +189,12 @@ Future<void> _showLanguagePicker(BuildContext context) {
                     locale.languageCode,
                 flagAsset: _languages[locale.languageCode]?.flag,
                 selected: locale == context.locale,
-                onTap: () {
+                onTap: () async {
                   Navigator.of(sheetContext).pop();
-                  context.setLocale(locale);
-                  // Scheduled reminder copy must follow the new language.
-                  serviceLocator<NotificationService>().setTranslator(
-                    (key, {namedArgs}) => context.tr(
-                      key,
-                      namedArgs: namedArgs?.cast<String, String>(),
-                    ),
-                  );
-                  serviceLocator<SyncNotificationsUseCase>()
+                  await context.setLocale(locale);
+                  // Scheduled reminder copy must follow the new language
+                  // (the translator set at app start reads the new locale).
+                  await serviceLocator<SyncNotificationsUseCase>()
                       .rebuildAllFromLocalData();
                 },
               ),
@@ -218,7 +227,9 @@ class _SettingsContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nextReminder = state.nextReminderTime(DateTime.now());
-    final reminderSubtitle = nextReminder != null
+    final reminderSubtitle = nextReminder != null && !state.notificationsAllowed
+        ? 'settings.reminders_permission_off'.tr()
+        : nextReminder != null
         ? 'settings.reminders_next'.tr(args: <String>[nextReminder])
         : state.canToggleReminders
         ? 'settings.reminders_off'.tr()

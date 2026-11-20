@@ -34,6 +34,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     required SetAllRemindersEnabledUseCase setAllRemindersEnabledUseCase,
     required DeleteAllDataUseCase deleteAllDataUseCase,
     required StorageStatsLoader loadStorageStats,
+    Future<bool> Function()? hasNotificationPermission,
     BackupFileCodec? backupFileCodec,
     TempDirectoryProvider? tempDirectoryProvider,
     NowProvider? nowProvider,
@@ -47,6 +48,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
        _setAllRemindersEnabledUseCase = setAllRemindersEnabledUseCase,
        _deleteAllDataUseCase = deleteAllDataUseCase,
        _loadStorageStats = loadStorageStats,
+       _hasNotificationPermission = hasNotificationPermission,
        _backupFileCodec = backupFileCodec ?? BackupFileCodec(),
        _tempDirectoryProvider = tempDirectoryProvider ?? getTemporaryDirectory,
        _nowProvider = nowProvider ?? DateTime.now,
@@ -69,6 +71,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final SetAllRemindersEnabledUseCase _setAllRemindersEnabledUseCase;
   final DeleteAllDataUseCase _deleteAllDataUseCase;
   final StorageStatsLoader _loadStorageStats;
+  final Future<bool> Function()? _hasNotificationPermission;
   final BackupFileCodec _backupFileCodec;
   final TempDirectoryProvider _tempDirectoryProvider;
   final NowProvider _nowProvider;
@@ -105,6 +108,15 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         error: error,
         stackTrace: stackTrace,
       );
+      emit(
+        state.copyWith(
+          remindersToggleFailureCount: state.remindersToggleFailureCount + 1,
+        ),
+      );
+      // Show what actually got saved.
+      try {
+        await _emitSummary(emit);
+      } catch (_) {}
     }
   }
 
@@ -160,11 +172,17 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             year: now.year,
             today: now,
           )).currentStreak;
+    var notificationsAllowed = state.notificationsAllowed;
+    try {
+      notificationsAllowed =
+          await _hasNotificationPermission?.call() ?? notificationsAllowed;
+    } catch (_) {}
     emit(
       state.copyWith(
         starnyxs: starnyxs,
         activeHabitTitle: active?.title,
         currentStreak: streak,
+        notificationsAllowed: notificationsAllowed,
       ),
     );
   }
@@ -187,6 +205,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         passphrase: event.passphrase,
       );
       final tempDir = await _tempDirectoryProvider();
+      await _deleteOldExports(tempDir);
       final timestamp = DateFormat('yyyyMMdd_HHmmss').format(_nowProvider());
       final file = File(
         '${tempDir.path}/starnyx_backup_$timestamp.$backupFileExtension',
@@ -210,6 +229,26 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         stackTrace: stackTrace,
       );
       emit(state.copyWith(exportStatus: AsyncStatus.failure));
+    }
+  }
+
+  /// Backups may be unencrypted: never leave earlier exports lying around in
+  /// the temp directory.
+  Future<void> _deleteOldExports(Directory tempDir) async {
+    try {
+      await for (final entity in tempDir.list()) {
+        final name = entity.uri.pathSegments.last;
+        if (entity is File && name.startsWith('starnyx_backup_')) {
+          await entity.delete();
+        }
+      }
+    } catch (error, stackTrace) {
+      _logger.error(
+        'SettingsBloc',
+        'old export cleanup failed',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 

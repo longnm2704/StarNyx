@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/app/di/service_locator.dart';
+import 'package:starnyx/app/reminder_permission.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -315,6 +316,7 @@ class _StarnyxFormPageState extends State<StarnyxFormPage> {
                           reminderTime: state.reminderTime,
                           onToggle: (bool enabled) {
                             bloc.add(StarnyxFormReminderToggled(enabled));
+                            if (enabled) requestReminderPermission(context);
                           },
                           onTapTime: () => _pickReminderTime(state),
                         ),

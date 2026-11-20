@@ -207,7 +207,10 @@
     "delete_all_final_message": "This is the last step. Every habit, check-in and journal note will be permanently deleted.",
     "delete_all_final_confirm": "Delete permanently",
     "delete_all_success": "All data deleted.",
-    "delete_all_error": "Data couldn't be deleted. Please try again."
+    "delete_all_error": "Data couldn't be deleted. Please try again.",
+    "reminders_permission_denied": "Reminders need notification permission. You can allow it in system settings.",
+    "reminders_permission_off": "Notifications are off in system settings",
+    "reminders_toggle_error": "Couldn't update reminders right now."
   },
   "nav": {
     "habits": "Habits",

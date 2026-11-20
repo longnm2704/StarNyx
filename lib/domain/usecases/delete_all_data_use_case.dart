@@ -25,7 +25,18 @@ class DeleteAllDataUseCase {
   Future<void> call() async {
     _logger.debug('DeleteAllDataUseCase', 'delete all begin');
     await _clearLocalData();
-    await _syncNotificationsUseCase.cancelAll();
+    // The data is already gone: a reminder that fails to cancel must not
+    // report the whole delete as failed.
+    try {
+      await _syncNotificationsUseCase.cancelAll();
+    } catch (error, stackTrace) {
+      _logger.error(
+        'DeleteAllDataUseCase',
+        'cancel reminders failed (ignored)',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
     await _colorCache.clear();
     await _onboarding.setCompleted(false);
     _logger.debug('DeleteAllDataUseCase', 'delete all success');

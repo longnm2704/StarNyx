@@ -13,11 +13,20 @@ Future<void> main() async {
   final logger = serviceLocator<AppLogService>();
   Bloc.observer = AppBlocObserver(logger);
   logger.debug('Bootstrap', 'dependencies configured');
-  await serviceLocator<NotificationService>().initialize();
+  final notifications = serviceLocator<NotificationService>();
+  await notifications.initialize();
   logger.debug('Bootstrap', 'notification service initialized');
   // Localization must be initialized before EasyLocalization wraps the app.
   await EasyLocalization.ensureInitialized();
   logger.debug('Bootstrap', 'localization initialized');
+  // Reminder copy uses the global translator, which always reads the current
+  // locale: no widget context to outlive (Settings, onboarding, delete-all).
+  notifications.setTranslator(
+    (key, {namedArgs}) => tr(
+      key,
+      namedArgs: namedArgs?.map((k, v) => MapEntry<String, String>(k, '$v')),
+    ),
+  );
 
   runApp(
     EasyLocalization(

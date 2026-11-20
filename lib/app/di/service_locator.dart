@@ -55,6 +55,9 @@ void _registerCoreDependencies(SharedPreferences preferences) {
   serviceLocator.registerLazySingleton<OnboardingPreferences>(
     () => OnboardingPreferences(preferences),
   );
+  serviceLocator.registerLazySingleton<PausedRemindersStore>(
+    () => PausedRemindersStore(preferences),
+  );
   serviceLocator.registerLazySingleton<AppBlocObserver>(
     () => AppBlocObserver(serviceLocator<AppLogService>()),
   );
@@ -245,6 +248,7 @@ void _registerUseCases() {
     () => SetAllRemindersEnabledUseCase(
       serviceLocator<StarNyxRepository>(),
       serviceLocator<SyncNotificationsUseCase>(),
+      pausedStore: serviceLocator<PausedRemindersStore>(),
     ),
   );
 }
@@ -303,6 +307,8 @@ void _registerBlocFactories() {
           serviceLocator<SetAllRemindersEnabledUseCase>(),
       deleteAllDataUseCase: serviceLocator<DeleteAllDataUseCase>(),
       loadStorageStats: serviceLocator<AppDatabase>().loadStorageStats,
+      hasNotificationPermission:
+          serviceLocator<NotificationService>().hasPermission,
       logger: serviceLocator<AppLogService>(),
     ),
   );

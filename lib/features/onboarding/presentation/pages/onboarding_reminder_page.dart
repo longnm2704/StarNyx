@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:starnyx/app/reminder_permission.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/core_widgets.dart';
@@ -75,6 +76,9 @@ class _OnboardingReminderPageState extends State<OnboardingReminderPage> {
 
   Future<void> _start() async {
     setState(() => _saving = true);
+    // First reminder the user turns on: ask for notification permission now.
+    await requestReminderPermission(context);
+    if (!mounted) return;
     try {
       await widget.onStart(<OnboardingHabitDraft>[
         for (final template in widget.templates)

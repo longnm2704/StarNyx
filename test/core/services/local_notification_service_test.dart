@@ -23,16 +23,22 @@ void main() {
 
     expect(client.initializeCount, 1);
     expect(client.createChannelCount, 1);
-    expect(client.requestPermissionsCount, 1);
   });
 
-  test('initialize requests notification permissions once', () async {
+  test('launch does not prompt; permission is asked on demand', () async {
     await service.initialize();
+    expect(client.requestPermissionsCount, 0);
 
-    expect(client.requestPermissionsCount, 1);
+    client.permissionsGranted = false;
+    expect(await service.requestPermission(), isFalse);
+    expect(await service.hasPermission(), isFalse);
+    // Not cached: allowing it later in system settings is picked up.
+    client.permissionsGranted = true;
+    expect(await service.requestPermission(), isTrue);
+    expect(client.requestPermissionsCount, 2);
   });
 
-  test('create reminder is ignored when permissions are denied', () async {
+  test('reminders are scheduled even while permission is denied', () async {
     client.permissionsGranted = false;
     await service.initialize();
 
@@ -40,7 +46,8 @@ void main() {
       _sampleStarNyx(reminderEnabled: true, reminderTime: '09:30'),
     );
 
-    expect(client.scheduled, isEmpty);
+    // The OS shows it once the user allows notifications.
+    expect(client.scheduled, hasLength(1));
   });
 
   test('create reminder schedules once when reminder is enabled', () async {
@@ -240,6 +247,9 @@ class _FakeNotificationClient implements NotificationClient {
     requestPermissionsCount += 1;
     return permissionsGranted;
   }
+
+  @override
+  Future<bool> arePermissionsGranted() async => permissionsGranted;
 
   @override
   Future<void> zonedSchedule({

@@ -82,6 +82,12 @@ StarNyx _sampleStarnyx({
 }
 
 class _FakeNotificationService implements NotificationService {
+  @override
+  Future<bool> requestPermission() async => true;
+
+  @override
+  Future<bool> hasPermission() async => true;
+
   final List<String> createdReminders = <String>[];
   final List<String> updatedReminders = <String>[];
   final List<String> cancelledReminderIds = <String>[];

@@ -151,6 +151,48 @@ void main() {
     expect(decoded.jsonText, contains('"title": "Hydrate"'));
   });
 
+  test('a second export removes the earlier temp backup file', () async {
+    bloc.add(const SettingsExportRequested());
+    await pumpEventQueue();
+    while (bloc.state.exportStatus == AsyncStatus.inProgress) {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
+    final stale = File('${tempDirectory.path}/starnyx_backup_old.starnyxbak');
+    await stale.writeAsString('{}');
+
+    bloc.add(const SettingsExportRequested());
+    await pumpEventQueue();
+    while (bloc.state.exportStatus == AsyncStatus.inProgress) {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
+
+    expect(await stale.exists(), isFalse);
+    expect(await File(bloc.state.exportedFilePath!).exists(), isTrue);
+  });
+
+  test('a failed reminders toggle is reported', () async {
+    await starNyxRepository.saveStarnyx(
+      StarNyx(
+        id: 'habit-1',
+        title: 'Hydrate',
+        description: null,
+        color: '#102030',
+        startDate: DateTime(2026, 4, 1),
+        reminderEnabled: true,
+        reminderTime: '09:00',
+        createdAt: DateTime(2026, 4, 1, 8),
+        updatedAt: DateTime(2026, 4, 2, 9),
+      ),
+    );
+    starNyxRepository.saveError = StateError('db');
+
+    bloc.add(const SettingsRemindersToggled(false));
+    await pumpEventQueue();
+
+    expect(bloc.state.remindersToggleFailureCount, 1);
+    expect(bloc.state.remindersOn, isTrue);
+  });
+
   test('import success rebuilds reminders from imported local data', () async {
     bloc.add(
       SettingsImportRequested(<String, dynamic>{
@@ -273,6 +315,12 @@ void main() {
 }
 
 class _FakeNotificationService implements NotificationService {
+  @override
+  Future<bool> requestPermission() async => true;
+
+  @override
+  Future<bool> hasPermission() async => true;
+
   int cancelAllCount = 0;
   final List<String> createdReminderIds = <String>[];
 

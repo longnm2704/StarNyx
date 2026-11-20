@@ -207,7 +207,10 @@
     "delete_all_final_message": "これが最後の確認です。すべての習慣、チェックイン、ジャーナルが完全に削除されます。",
     "delete_all_final_confirm": "完全に削除",
     "delete_all_success": "すべてのデータを削除しました。",
-    "delete_all_error": "データを削除できませんでした。もう一度お試しください。"
+    "delete_all_error": "データを削除できませんでした。もう一度お試しください。",
+    "reminders_permission_denied": "リマインダーには通知の許可が必要です。システム設定から許可できます。",
+    "reminders_permission_off": "システム設定で通知がオフになっています",
+    "reminders_toggle_error": "リマインダーを今は更新できませんでした。"
   },
   "nav": {
     "habits": "習慣",
