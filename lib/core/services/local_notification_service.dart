@@ -2,12 +2,16 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:starnyx/domain/entities/starnyx.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:starnyx/core/constants/app_colors.dart';
 import 'package:starnyx/core/services/app_log_service.dart';
 import 'package:starnyx/core/utils/reminder_time_utils.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'notification_service.dart';
 
+// Monochrome status-bar glyph (res/drawable/ic_stat_starnyx.xml); Android
+// renders a full-color launcher icon as a white square there.
+const String _smallIcon = 'ic_stat_starnyx';
 const String _channelId = 'starnyx.daily.reminder';
 const String _channelName = 'StarNyx Daily Reminder';
 const String _channelDescription = 'Daily reminders for active StarNyx habits.';
@@ -73,7 +77,7 @@ class LocalNotificationService implements NotificationService {
     await _configureLocalTimeZone();
 
     const settings = InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      android: AndroidInitializationSettings(_smallIcon),
       iOS: DarwinInitializationSettings(),
     );
     await _client.initialize(settings);
@@ -138,6 +142,8 @@ class LocalNotificationService implements NotificationService {
         channelDescription: _channelDescription,
         importance: Importance.high,
         priority: Priority.high,
+        icon: _smallIcon,
+        color: AppColors.primary,
       ),
       iOS: DarwinNotificationDetails(),
     );
