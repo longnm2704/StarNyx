@@ -90,7 +90,7 @@ void main() {
     expect(find.text('Backup privacy warning'), findsOneWidget);
     verifyNever(export.call);
 
-    await tester.tap(find.widgetWithText(FilledButton, 'Export backup'));
+    await tester.tap(find.byKey(const Key('app-confirm-confirm')));
     await tester.pump();
 
     verify(export.call).called(1);

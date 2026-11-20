@@ -34,9 +34,7 @@ class AppErrorState extends StatelessWidget {
         children: <Widget>[
           Text(
             title,
-            style: textTheme.titleMedium?.copyWith(
-              color: AppColors.errorOnDark,
-            ),
+            style: textTheme.titleMedium?.copyWith(color: AppColors.error),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(

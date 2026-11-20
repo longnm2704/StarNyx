@@ -50,7 +50,7 @@ abstract final class AppTheme {
       error: AppColors.error,
       onError: AppColors.black,
       errorContainer: AppColors.error,
-      onErrorContainer: AppColors.errorOnDark,
+      onErrorContainer: AppColors.black,
       surface: AppColors.surfaceLevel1,
       onSurface: AppColors.textPrimary,
       surfaceContainerLowest: AppColors.background,
@@ -344,38 +344,41 @@ abstract final class AppTheme {
           side: const BorderSide(color: AppColors.borderSubtle),
         ),
       ),
+      // Fields that keep the theme border are single-line (search, tags,
+      // passphrases), so they are pills like the rest of the controls.
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceLevel2,
         hintStyle: textTheme.bodyMedium?.copyWith(
           color: AppColors.textTertiary,
         ),
-        labelStyle: textTheme.titleMedium?.copyWith(
+        labelStyle: textTheme.bodyMedium?.copyWith(
           color: AppColors.textSecondary,
         ),
-        contentPadding: AppSpacing.inputContentPadding,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.borderSubtle),
+        errorStyle: textTheme.bodySmall?.copyWith(color: AppColors.error),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 14,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.borderSubtle),
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(AppRadius.pill)),
+          borderSide: hairline,
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(
-            color: AppColors.borderFocus,
-            width: 1.4,
-          ),
+        enabledBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(AppRadius.pill)),
+          borderSide: hairline,
         ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.error),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(AppRadius.pill)),
+          borderSide: BorderSide(color: AppColors.borderFocus, width: 1.4),
         ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.error, width: 1.4),
+        errorBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(AppRadius.pill)),
+          borderSide: BorderSide(color: AppColors.error),
+        ),
+        focusedErrorBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(AppRadius.pill)),
+          borderSide: BorderSide(color: AppColors.error, width: 1.4),
         ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(

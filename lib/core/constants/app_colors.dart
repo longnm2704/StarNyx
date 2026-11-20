@@ -27,7 +27,6 @@ abstract final class AppColors {
   static const onTertiary = Color(0xFF000000);
 
   static const error = Color(0xFFF43F5E);
-  static const errorOnDark = Color(0xFFFFB4AB);
 
   static const List<String> starnyxPresetColorHexes = <String>[
     '#9D50FF',

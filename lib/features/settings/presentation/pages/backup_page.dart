@@ -15,8 +15,6 @@ import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_event.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_state.dart';
 
-const _danger = Color(0xFFDC2626);
-
 /// How the backup screen replaced local data; it pops with one of these.
 enum BackupOutcome { imported, deletedAll }
 
@@ -155,7 +153,7 @@ class _BackupPageState extends State<BackupPage> {
                 const SizedBox(height: AppSpacing.lg),
                 _SectionLabel(
                   'settings.danger_section'.tr(),
-                  color: AppColors.errorOnDark,
+                  color: AppColors.error,
                   icon: HugeIconsStrokeRounded.strokeRoundedAlert01,
                 ),
                 _Card(
@@ -167,7 +165,7 @@ class _BackupPageState extends State<BackupPage> {
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontFamily: AppFonts.headline,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.errorOnDark,
+                          color: AppColors.error,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xs),
@@ -183,8 +181,8 @@ class _BackupPageState extends State<BackupPage> {
                         key: const Key('backup-delete-all-button'),
                         icon: HugeIconsStrokeRounded.strokeRoundedDelete02,
                         label: 'settings.delete_all_button'.tr(),
-                        color: AppColors.white,
-                        background: _danger,
+                        color: AppColors.black,
+                        background: AppColors.error,
                         isLoading:
                             state.deleteAllStatus == AsyncStatus.inProgress,
                         onTap: state.deleteAllStatus == AsyncStatus.inProgress
@@ -370,139 +368,76 @@ class _BackupPageState extends State<BackupPage> {
     }
   }
 
-  Future<String?> _showExportDialog(BuildContext context) {
+  Future<String?> _showExportDialog(BuildContext context) async {
     final passphraseController = TextEditingController();
     final confirmController = TextEditingController();
+    String? mismatch;
 
-    return showDialog<String>(
+    final passphrase = await showAppFormDialog<String>(
       context: context,
-      builder: (dialogContext) {
-        var validationMessage = '';
-
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text('settings.backup_export_dialog_title'.tr()),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text('settings.backup_export_dialog_message'.tr()),
-                  const SizedBox(height: AppSpacing.md),
-                  TextField(
-                    controller: passphraseController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'settings.backup_passphrase_label'.tr(),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  TextField(
-                    controller: confirmController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'settings.backup_passphrase_confirm_label'
-                          .tr(),
-                      errorText: validationMessage.isEmpty
-                          ? null
-                          : validationMessage,
-                    ),
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: Text('settings.backup_cancel'.tr()),
-                ),
-                FilledButton(
-                  onPressed: () {
-                    final passphrase = passphraseController.text.trim();
-                    final confirmation = confirmController.text.trim();
-                    if (passphrase.isNotEmpty && passphrase != confirmation) {
-                      setState(() {
-                        validationMessage =
-                            'settings.backup_passphrase_mismatch'.tr();
-                      });
-                      return;
-                    }
-
-                    Navigator.of(dialogContext).pop(passphrase);
-                  },
-                  child: Text('settings.backup_export_confirm'.tr()),
-                ),
-              ],
-            );
-          },
-        );
+      title: 'settings.backup_export_dialog_title'.tr(),
+      message: 'settings.backup_export_dialog_message'.tr(),
+      cancelLabel: 'settings.backup_cancel'.tr(),
+      confirmLabel: 'settings.backup_export_confirm'.tr(),
+      content: (context, _) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          _PassphraseField(
+            controller: passphraseController,
+            label: 'settings.backup_passphrase_label'.tr(),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          _PassphraseField(
+            controller: confirmController,
+            label: 'settings.backup_passphrase_confirm_label'.tr(),
+            errorText: mismatch,
+          ),
+        ],
+      ),
+      onConfirm: (setState) {
+        final passphrase = passphraseController.text.trim();
+        if (passphrase.isNotEmpty &&
+            passphrase != confirmController.text.trim()) {
+          setState(() => mismatch = 'settings.backup_passphrase_mismatch'.tr());
+          return null;
+        }
+        return passphrase;
       },
     );
+    return passphrase;
   }
 
   Future<bool> _showBackupPrivacyWarningDialog(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppConfirmDialog(
       context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text('settings.backup_privacy_warning_title'.tr()),
-          content: Text('settings.backup_privacy_warning_message'.tr()),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text('settings.backup_cancel'.tr()),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text('settings.backup_privacy_warning_confirm'.tr()),
-            ),
-          ],
-        );
-      },
+      title: 'settings.backup_privacy_warning_title'.tr(),
+      message: 'settings.backup_privacy_warning_message'.tr(),
+      cancelLabel: 'settings.backup_cancel'.tr(),
+      confirmLabel: 'settings.backup_privacy_warning_confirm'.tr(),
+      icon: HugeIconsStrokeRounded.strokeRoundedShieldUser,
     );
-
     return confirmed ?? false;
   }
 
   Future<String?> _showImportPassphraseDialog(
     BuildContext context, {
     String? errorText,
-  }) {
+  }) async {
     final controller = TextEditingController();
-
-    return showDialog<String>(
+    final passphrase = await showAppFormDialog<String>(
       context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text('settings.backup_import_passphrase_title'.tr()),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text('settings.backup_import_passphrase_message'.tr()),
-              const SizedBox(height: AppSpacing.md),
-              TextField(
-                controller: controller,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'settings.backup_passphrase_label'.tr(),
-                  errorText: errorText,
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text('settings.backup_cancel'.tr()),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop(controller.text.trim());
-              },
-              child: Text('settings.backup_export_confirm'.tr()),
-            ),
-          ],
-        );
-      },
+      title: 'settings.backup_import_passphrase_title'.tr(),
+      message: 'settings.backup_import_passphrase_message'.tr(),
+      cancelLabel: 'settings.backup_cancel'.tr(),
+      confirmLabel: 'settings.backup_export_confirm'.tr(),
+      content: (context, _) => _PassphraseField(
+        controller: controller,
+        label: 'settings.backup_passphrase_label'.tr(),
+        errorText: errorText,
+      ),
+      onConfirm: (_) => controller.text.trim(),
     );
+    return passphrase;
   }
 
   Map<String, dynamic> _decodeJsonMap(String jsonString) {
@@ -514,6 +449,7 @@ class _BackupPageState extends State<BackupPage> {
   }
 }
 
+// Neutral theme snackbar; errors only tint the icon and text.
 void _showSnackBar(
   BuildContext context,
   String message, {
@@ -521,10 +457,50 @@ void _showSnackBar(
 }) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text(message),
-      backgroundColor: isError ? Theme.of(context).colorScheme.error : null,
+      content: Row(
+        children: <Widget>[
+          if (isError) ...<Widget>[
+            const AppIcon(
+              icon: HugeIconsStrokeRounded.strokeRoundedAlert02,
+              size: 18,
+              color: AppColors.error,
+            ),
+            const SizedBox(width: AppSpacing.xs),
+          ],
+          Expanded(
+            child: Text(
+              message,
+              style: isError ? const TextStyle(color: AppColors.error) : null,
+            ),
+          ),
+        ],
+      ),
     ),
   );
+}
+
+class _PassphraseField extends StatelessWidget {
+  const _PassphraseField({
+    required this.controller,
+    required this.label,
+    this.errorText,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final String? errorText;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      obscureText: true,
+      style: Theme.of(
+        context,
+      ).textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary),
+      decoration: InputDecoration(hintText: label, errorText: errorText),
+    );
+  }
 }
 
 /// Human-readable size, e.g. `48 KB` or `1.4 MB`.
@@ -741,13 +717,7 @@ class _PillButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               if (isLoading)
-                SizedBox.square(
-                  dimension: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: color,
-                  ),
-                )
+                AppLoadingIndicator.small(color: color)
               else
                 AppIcon(icon: icon, size: 18, color: color),
               const SizedBox(width: AppSpacing.xs),

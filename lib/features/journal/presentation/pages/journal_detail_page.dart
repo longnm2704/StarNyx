@@ -149,7 +149,7 @@ class _JournalDetailPageState extends State<JournalDetailPage> {
                     value: true,
                     child: Text(
                       'journal.detail_delete'.tr(),
-                      style: const TextStyle(color: AppColors.errorOnDark),
+                      style: const TextStyle(color: AppColors.error),
                     ),
                   ),
                 ],
@@ -210,12 +210,12 @@ class _JournalDetailPageState extends State<JournalDetailPage> {
                     icon: const AppIcon(
                       icon: HugeIconsStrokeRounded.strokeRoundedDelete02,
                       size: 16,
-                      color: AppColors.errorOnDark,
+                      color: AppColors.error,
                     ),
                     label: Text(
                       'journal.detail_delete'.tr(),
                       style: theme.textTheme.labelMedium?.copyWith(
-                        color: AppColors.errorOnDark,
+                        color: AppColors.error,
                       ),
                     ),
                   ),

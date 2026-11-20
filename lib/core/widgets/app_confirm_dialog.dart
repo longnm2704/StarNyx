@@ -24,27 +24,78 @@ Future<bool?> showAppConfirmDialog({
   AppConfirmActionStyle actionStyle = AppConfirmActionStyle.neutral,
   Widget? subject,
 }) {
+  return _showAppDialog<bool>(
+    context: context,
+    barrierLabel: cancelLabel,
+    child: AppConfirmDialog(
+      title: title,
+      message: message,
+      cancelLabel: cancelLabel,
+      confirmLabel: confirmLabel,
+      icon: icon,
+      actionStyle: actionStyle,
+      subject: subject,
+    ),
+  );
+}
+
+/// Same shell as [showAppConfirmDialog] with form fields in place of the
+/// subject chip. [content] gets a `setState` for validation messages;
+/// [onConfirm] returns the value to pop with, or null to stay open.
+/// Resolves to null on cancel or dismiss.
+Future<T?> showAppFormDialog<T>({
+  required BuildContext context,
+  required String title,
+  required String message,
+  required String cancelLabel,
+  required String confirmLabel,
+  required Widget Function(BuildContext context, StateSetter setState) content,
+  required T? Function(StateSetter setState) onConfirm,
+  List<List<dynamic>> icon = HugeIconsStrokeRounded.strokeRoundedLockPassword,
+}) {
+  return _showAppDialog<T>(
+    context: context,
+    barrierLabel: cancelLabel,
+    child: StatefulBuilder(
+      builder: (dialogContext, setState) => _DialogCard(
+        title: title,
+        message: message,
+        icon: icon,
+        accent: AppColors.textPrimary,
+        body: content(dialogContext, setState),
+        actions: _DialogActions(
+          cancelLabel: cancelLabel,
+          confirmLabel: confirmLabel,
+          actionStyle: AppConfirmActionStyle.neutral,
+          onCancel: () => Navigator.of(dialogContext).pop(),
+          onConfirm: () {
+            final value = onConfirm(setState);
+            if (value != null) Navigator.of(dialogContext).pop(value);
+          },
+        ),
+      ),
+    ),
+  );
+}
+
+// Black ~78% barrier with a subtle blur; the card scales 0.94→1 and fades
+// in, or appears instantly when the platform asks for reduced motion.
+Future<T?> _showAppDialog<T>({
+  required BuildContext context,
+  required String barrierLabel,
+  required Widget child,
+}) {
   final reduceMotion = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
-  return showGeneralDialog<bool>(
+  return showGeneralDialog<T>(
     context: context,
     barrierDismissible: true,
-    barrierLabel: cancelLabel,
+    barrierLabel: barrierLabel,
     barrierColor: AppColors.black.withValues(alpha: 0.78),
     transitionDuration: reduceMotion
         ? Duration.zero
         : const Duration(milliseconds: 220),
-    pageBuilder: (_, _, _) {
-      return AppConfirmDialog(
-        title: title,
-        message: message,
-        cancelLabel: cancelLabel,
-        confirmLabel: confirmLabel,
-        icon: icon,
-        actionStyle: actionStyle,
-        subject: subject,
-      );
-    },
+    pageBuilder: (_, _, _) => child,
     transitionBuilder: (context, animation, _, child) {
       final curved = CurvedAnimation(
         parent: animation,
@@ -96,12 +147,55 @@ class AppConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return _DialogCard(
+      title: title,
+      message: message,
+      icon: icon,
+      accent: _accent,
+      subject: subject,
+      actions: _DialogActions(
+        cancelLabel: cancelLabel,
+        confirmLabel: confirmLabel,
+        actionStyle: actionStyle,
+        onCancel: () => Navigator.of(context).pop(false),
+        onConfirm: () => Navigator.of(context).pop(true),
+      ),
+    );
+  }
+}
+
+class _DialogCard extends StatelessWidget {
+  const _DialogCard({
+    required this.title,
+    required this.message,
+    required this.icon,
+    required this.accent,
+    required this.actions,
+    this.subject,
+    this.body,
+  });
+
+  final String title;
+  final String message;
+  final List<List<dynamic>> icon;
+  final Color accent;
+  final Widget? subject;
+  final Widget? body;
+  final Widget actions;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return SafeArea(
       child: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg + MediaQuery.viewInsetsOf(context).bottom,
+          ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 420),
             child: Material(
@@ -122,17 +216,17 @@ class AppConfirmDialog extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: AppColors.surfaceLevel3,
                         border: Border.all(
-                          color: _accent.withValues(alpha: 0.3),
+                          color: accent.withValues(alpha: 0.3),
                         ),
                         boxShadow: <BoxShadow>[
                           BoxShadow(
-                            color: _accent.withValues(alpha: 0.2),
+                            color: accent.withValues(alpha: 0.2),
                             blurRadius: 24,
                           ),
                         ],
                       ),
                       child: Center(
-                        child: AppIcon(icon: icon, color: _accent, size: 26),
+                        child: AppIcon(icon: icon, color: accent, size: 26),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -140,9 +234,7 @@ class AppConfirmDialog extends StatelessWidget {
                       title,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.headlineSmall?.copyWith(
-                        fontFamily: AppFonts.headline,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
                       ),
                     ),
                     if (subject != null) ...<Widget>[
@@ -153,43 +245,14 @@ class AppConfirmDialog extends StatelessWidget {
                     Text(
                       message,
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                        height: 1.5,
-                      ),
+                      style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
                     ),
+                    if (body != null) ...<Widget>[
+                      const SizedBox(height: AppSpacing.md),
+                      body!,
+                    ],
                     const SizedBox(height: AppSpacing.lg),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: _DialogButton(
-                            key: const Key('app-confirm-cancel'),
-                            label: cancelLabel,
-                            fill: _ghostFill,
-                            labelColor: AppColors.textPrimary,
-                            outlined: true,
-                            onPressed: () => Navigator.of(context).pop(false),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: _DialogButton(
-                            key: const Key('app-confirm-confirm'),
-                            label: confirmLabel,
-                            fill: switch (actionStyle) {
-                              AppConfirmActionStyle.neutral => AppColors.white,
-                              AppConfirmActionStyle.destructive =>
-                                AppColors.error,
-                            },
-                            labelColor: AppColors.black,
-                            glow:
-                                actionStyle ==
-                                AppConfirmActionStyle.destructive,
-                            onPressed: () => Navigator.of(context).pop(true),
-                          ),
-                        ),
-                      ],
-                    ),
+                    actions,
                   ],
                 ),
               ),
@@ -197,6 +260,54 @@ class AppConfirmDialog extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DialogActions extends StatelessWidget {
+  const _DialogActions({
+    required this.cancelLabel,
+    required this.confirmLabel,
+    required this.actionStyle,
+    required this.onCancel,
+    required this.onConfirm,
+  });
+
+  final String cancelLabel;
+  final String confirmLabel;
+  final AppConfirmActionStyle actionStyle;
+  final VoidCallback onCancel;
+  final VoidCallback onConfirm;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: _DialogButton(
+            key: const Key('app-confirm-cancel'),
+            label: cancelLabel,
+            fill: _ghostFill,
+            labelColor: AppColors.textPrimary,
+            outlined: true,
+            onPressed: onCancel,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: _DialogButton(
+            key: const Key('app-confirm-confirm'),
+            label: confirmLabel,
+            fill: switch (actionStyle) {
+              AppConfirmActionStyle.neutral => AppColors.white,
+              AppConfirmActionStyle.destructive => AppColors.error,
+            },
+            labelColor: AppColors.black,
+            glow: actionStyle == AppConfirmActionStyle.destructive,
+            onPressed: onConfirm,
+          ),
+        ),
+      ],
     );
   }
 }
