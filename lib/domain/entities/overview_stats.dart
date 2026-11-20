@@ -17,6 +17,8 @@ class OverviewHabitStats extends Equatable {
     required this.completedCountForYear,
     required this.validDayCountForYear,
     required this.completionRateForYear,
+    this.completedCountInRange = 0,
+    this.validDayCountInRange = 0,
   });
 
   final String id;
@@ -29,6 +31,14 @@ class OverviewHabitStats extends Equatable {
   final int validDayCountForYear;
   final double completionRateForYear;
 
+  /// Lit / valid days inside the selected Overview range (week, month, year).
+  final int completedCountInRange;
+  final int validDayCountInRange;
+
+  double get completionRateInRange => validDayCountInRange == 0
+      ? 0
+      : completedCountInRange / validDayCountInRange;
+
   @override
   List<Object?> get props => <Object?>[
     id,
@@ -40,6 +50,8 @@ class OverviewHabitStats extends Equatable {
     completedCountForYear,
     validDayCountForYear,
     completionRateForYear,
+    completedCountInRange,
+    validDayCountInRange,
   ];
 }
 

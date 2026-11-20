@@ -90,7 +90,8 @@ class _OverviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<OverviewBloc, OverviewState>(
       listener: (BuildContext context, OverviewState state) {
-        if (state.status == OverviewStatus.failure) {
+        // Without stats the full error view already explains the failure.
+        if (state.status == OverviewStatus.failure && state.stats != null) {
           ScaffoldMessenger.maybeOf(context)?.showSnackBar(
             SnackBar(content: Text('overview.error_message'.tr())),
           );
@@ -563,7 +564,7 @@ class _HeatmapCard extends StatelessWidget {
     for (
       var day = rangeStart!;
       !day.isAfter(rangeEnd!);
-      day = day.add(const Duration(days: 1))
+      day = core_date_utils.DateUtils.addDays(day, 1)
     ) {
       days.add(day);
     }
@@ -801,7 +802,7 @@ class _HabitRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final accent = _accentColor(habit.color);
-    final pct = (habit.completionRateForYear * 100).round();
+    final pct = (habit.completionRateInRange * 100).round();
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.sm),
@@ -869,7 +870,7 @@ class _HabitRow extends StatelessWidget {
               SizedBox(
                 width: 60,
                 child: LinearProgressIndicator(
-                  value: habit.completionRateForYear,
+                  value: habit.completionRateInRange,
                   minHeight: 3,
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                   backgroundColor: AppColors.borderSubtle,

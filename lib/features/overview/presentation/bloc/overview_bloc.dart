@@ -60,13 +60,10 @@ class OverviewBloc extends Bloc<OverviewEvent, OverviewState> {
       'OverviewBloc',
       'load begin year=$year range=$range requestId=$requestId',
     );
+    // Previous stats stay on screen while refreshing (no skeleton flash, no
+    // scroll reset on every tab switch).
     emit(
-      state.copyWith(
-        status: OverviewStatus.loading,
-        year: year,
-        range: range,
-        stats: null,
-      ),
+      state.copyWith(status: OverviewStatus.loading, year: year, range: range),
     );
 
     try {
@@ -97,7 +94,7 @@ class OverviewBloc extends Bloc<OverviewEvent, OverviewState> {
         error: error,
         stackTrace: stackTrace,
       );
-      emit(state.copyWith(status: OverviewStatus.failure, stats: null));
+      emit(state.copyWith(status: OverviewStatus.failure));
     }
   }
 }

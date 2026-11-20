@@ -9,9 +9,9 @@ import 'package:starnyx/domain/usecases/load_starnyxs_use_case.dart';
 /// Aggregates every habit into one Overview snapshot.
 ///
 /// Yearly per-habit numbers come from [LoadStarNyxProgressStatsUseCase] so the
-/// streak rules stay in one place. The selected [range] only narrows the
-/// aggregate totals and the heatmap window; per-habit rows always report the
-/// selected [year] to match the Overview design.
+/// streak rules stay in one place. The selected [range] narrows the aggregate
+/// totals, the heatmap window and each habit's `*InRange` counts; streaks stay
+/// yearly.
 class LoadOverviewStatsUseCase {
   const LoadOverviewStatsUseCase(
     this._loadStarnyxsUseCase,
@@ -62,6 +62,47 @@ class LoadOverviewStatsUseCase {
         year: year,
         today: normalizedToday,
       );
+      if (yearlyStats.currentStreak > bestCurrentStreak) {
+        bestCurrentStreak = yearlyStats.currentStreak;
+      }
+      if (yearlyStats.longestStreak > bestLongestStreak) {
+        bestLongestStreak = yearlyStats.longestStreak;
+      }
+
+      var litInRange = 0;
+      var validInRange = 0;
+      final validStart = window == null
+          ? null
+          : DateUtils.maxDate(
+              window.start,
+              DateUtils.dateOnly(habit.startDate),
+            );
+      if (window != null && !window.end.isBefore(validStart!)) {
+        for (
+          var day = validStart;
+          !day.isAfter(window.end);
+          day = DateUtils.addDays(day, 1)
+        ) {
+          dailyValidCounts[day] = (dailyValidCounts[day] ?? 0) + 1;
+          validInRange += 1;
+        }
+
+        final completions = await _completionRepository
+            .getCompletionsForStarnyx(habit.id);
+        final completedDates = completions
+            .where((completion) => completion.completed)
+            .map((completion) => DateUtils.dateOnly(completion.date))
+            .toSet();
+        for (final date in completedDates) {
+          if (date.isBefore(validStart) || date.isAfter(window.end)) {
+            continue;
+          }
+          dailyLitCounts[date] = (dailyLitCounts[date] ?? 0) + 1;
+          litInRange += 1;
+        }
+      }
+      totalValidDays += validInRange;
+      totalLitDays += litInRange;
       habitStats.add(
         OverviewHabitStats(
           id: habit.id,
@@ -73,47 +114,10 @@ class LoadOverviewStatsUseCase {
           completedCountForYear: yearlyStats.completedCountForYear,
           validDayCountForYear: yearlyStats.validDayCountForYear,
           completionRateForYear: yearlyStats.completionRateForYear,
+          completedCountInRange: litInRange,
+          validDayCountInRange: validInRange,
         ),
       );
-      if (yearlyStats.currentStreak > bestCurrentStreak) {
-        bestCurrentStreak = yearlyStats.currentStreak;
-      }
-      if (yearlyStats.longestStreak > bestLongestStreak) {
-        bestLongestStreak = yearlyStats.longestStreak;
-      }
-
-      if (window == null) {
-        continue;
-      }
-
-      final validStart = DateUtils.maxDate(window.start, habit.startDate);
-      if (window.end.isBefore(validStart)) {
-        continue;
-      }
-
-      for (
-        var day = validStart;
-        !day.isAfter(window.end);
-        day = day.add(const Duration(days: 1))
-      ) {
-        dailyValidCounts[day] = (dailyValidCounts[day] ?? 0) + 1;
-        totalValidDays += 1;
-      }
-
-      final completions = await _completionRepository.getCompletionsForStarnyx(
-        habit.id,
-      );
-      final completedDates = completions
-          .where((completion) => completion.completed)
-          .map((completion) => DateUtils.dateOnly(completion.date))
-          .toSet();
-      for (final date in completedDates) {
-        if (date.isBefore(validStart) || date.isAfter(window.end)) {
-          continue;
-        }
-        dailyLitCounts[date] = (dailyLitCounts[date] ?? 0) + 1;
-        totalLitDays += 1;
-      }
     }
 
     final overallCompletionRate = totalValidDays == 0
@@ -142,10 +146,10 @@ class LoadOverviewStatsUseCase {
     );
   }
 
-  /// Returns the inclusive window for [range], clipped to [year] and to the
-  /// current day. Week is a rolling seven-day window ending today; month is
-  /// the current calendar month up to today; year is the selected year up to
-  /// today (or its final day for past years).
+  /// Returns the inclusive window for [range], clipped to the current day.
+  /// Week is the calendar week (Monday–Sunday) containing today, even when it
+  /// starts in the previous year; month is the current calendar month; year is
+  /// the selected [year] (up to today, or its final day for past years).
   _OverviewWindow? _windowFor({
     required int year,
     required OverviewRange range,
@@ -153,14 +157,16 @@ class LoadOverviewStatsUseCase {
   }) {
     final yearStart = DateUtils.startOfYear(year);
     final yearEnd = DateUtils.endOfYear(year);
-    final (rawStart, rawEnd) = switch (range) {
-      OverviewRange.week => (today.subtract(const Duration(days: 6)), today),
+    final (start, rawEnd) = switch (range) {
+      OverviewRange.week => (
+        DateUtils.addDays(today, DateTime.monday - today.weekday),
+        today,
+      ),
       OverviewRange.month => (DateTime(today.year, today.month, 1), today),
       OverviewRange.year => (yearStart, yearEnd),
     };
 
-    final start = DateUtils.maxDate(rawStart, yearStart);
-    final end = DateUtils.minDate(DateUtils.minDate(rawEnd, today), yearEnd);
+    final end = DateUtils.minDate(rawEnd, today);
     if (end.isBefore(start)) {
       return null;
     }

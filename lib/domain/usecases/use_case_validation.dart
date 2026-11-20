@@ -24,9 +24,7 @@ abstract final class UseCaseValidation {
     final normalizedStartDate = DateUtils.dateOnly(startDate);
 
     if (!allowPastStartDate &&
-        normalizedStartDate.isBefore(
-          normalizedToday.subtract(const Duration(days: 7)),
-        )) {
+        normalizedStartDate.isBefore(DateUtils.addDays(normalizedToday, -7))) {
       throw const UseCaseValidationException(
         code: UseCaseValidationCode.startDateTooFarInPast,
         message: 'Start date cannot be earlier than 7 days before today.',

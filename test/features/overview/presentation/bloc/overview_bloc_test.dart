@@ -170,6 +170,35 @@ void main() {
     bloc.add(const OverviewLoadRequested());
     await expectation;
   });
+
+  test('reload keeps the previous stats while loading', () async {
+    final starnyxRepository = _InMemoryStarNyxRepository();
+    final completionRepository = _InMemoryCompletionRepository();
+    final bloc = OverviewBloc(
+      loadOverviewStatsUseCase: LoadOverviewStatsUseCase(
+        LoadStarnyxsUseCase(starnyxRepository),
+        completionRepository,
+        LoadStarNyxProgressStatsUseCase(
+          starnyxRepository,
+          completionRepository,
+        ),
+      ),
+      nowBuilder: () => DateTime(2026, 4, 19),
+    );
+    addTearDown(bloc.close);
+    bloc.add(const OverviewLoadRequested());
+    await bloc.stream.firstWhere((s) => s.status == OverviewStatus.success);
+    final loaded = bloc.state.stats;
+    expect(loaded, isNotNull);
+
+    final states = <OverviewState>[];
+    final sub = bloc.stream.listen(states.add);
+    bloc.add(const OverviewReloadRequested());
+    await bloc.stream.firstWhere((s) => s.status == OverviewStatus.success);
+    await sub.cancel();
+    expect(states.first.status, OverviewStatus.loading);
+    expect(states.first.stats, loaded);
+  });
 }
 
 class _InMemoryStarNyxRepository implements StarNyxRepository {

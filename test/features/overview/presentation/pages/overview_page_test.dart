@@ -42,7 +42,8 @@ void main() {
     await completionRepository.saveCompletion(
       Completion(
         starnyxId: 'habit-1',
-        date: DateTime(2026, 6, 10),
+        // Monday: the calendar week (default range) starts today.
+        date: DateTime(2026, 6, 15),
         completed: true,
       ),
     );
@@ -69,7 +70,7 @@ void main() {
     expect(find.text('Uống nước'), findsOneWidget);
     // Placeholders are filled, not rendered literally.
     expect(find.text('Năm 2026'), findsOneWidget);
-    expect(find.bySemanticsLabel('Ngày 10/6: 1/1 đã thắp'), findsOneWidget);
+    expect(find.bySemanticsLabel('Ngày 15/6: 1/1 đã thắp'), findsOneWidget);
     expect(find.textContaining(RegExp(r'\{\w*\}')), findsNothing);
   });
 

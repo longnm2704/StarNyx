@@ -227,14 +227,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     HomePreviousDayRequested event,
     Emitter<HomeState> emit,
   ) {
-    add(HomeDaySelected(state.selectedDate.subtract(const Duration(days: 1))));
+    add(HomeDaySelected(DateUtils.addDays(state.selectedDate, -1)));
   }
 
   void _onNextDayRequested(
     HomeNextDayRequested event,
     Emitter<HomeState> emit,
   ) {
-    add(HomeDaySelected(state.selectedDate.add(const Duration(days: 1))));
+    add(HomeDaySelected(DateUtils.addDays(state.selectedDate, 1)));
   }
 
   void _onJumpToTodayRequested(

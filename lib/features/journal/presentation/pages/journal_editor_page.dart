@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/core/widgets/app_icon.dart';
 import 'package:starnyx/domain/entities/journal_entry.dart';
 import 'package:starnyx/domain/usecases/save_journal_entry_use_case.dart';
@@ -233,7 +234,10 @@ class _JournalEditorPageState extends State<JournalEditorPage> {
             ),
             children: <Widget>[
               Text(
-                DateFormat('dd/MM/yyyy HH:mm').format(date),
+                core_date_utils.DateUtils.formatShortDateTime(
+                  date,
+                  context.locale.toLanguageTag(),
+                ),
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontFamily: AppFonts.mono,
                   fontFeatures: AppFonts.tabularFigures,

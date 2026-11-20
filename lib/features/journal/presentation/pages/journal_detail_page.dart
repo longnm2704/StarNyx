@@ -349,7 +349,7 @@ class _MetaRow extends StatelessWidget {
                 'journal.detail_saved_at'.tr(
                   args: <String>[
                     toBeginningOfSentenceCase(
-                      DateFormat('EEEE, dd/MM/yyyy', locale).format(entry.date),
+                      DateFormat.yMMMMEEEEd(locale).format(entry.date),
                       locale,
                     ),
                     DateFormat('HH:mm').format(entry.createdAt),

@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 // Inclusive range used by yearly metrics that count both start and end dates.
 class InclusiveDateRange {
   const InclusiveDateRange({required this.start, required this.end});
@@ -6,7 +8,7 @@ class InclusiveDateRange {
   final DateTime end;
 
   // Product metrics count both endpoints as valid days.
-  int get dayCount => end.difference(start).inDays + 1;
+  int get dayCount => DateUtils.daysBetween(start, end) + 1;
 
   bool contains(DateTime value) {
     final normalizedValue = DateUtils.dateOnly(value);
@@ -18,16 +20,36 @@ class InclusiveDateRange {
 abstract final class DateUtils {
   static DateTime nowDate([DateTime? now]) => dateOnly(now ?? DateTime.now());
 
-  static String formatDdMmYyyy(DateTime value) {
-    final normalized = dateOnly(value);
-    final day = normalized.day.toString().padLeft(2, '0');
-    final month = normalized.month.toString().padLeft(2, '0');
-    final year = normalized.year.toString();
-    return '$day/$month/$year';
+  /// Locale-aware short date (e.g. `11/20/2026` en, `20/11/2026` vi,
+  /// `2026/11/20` ja).
+  static String formatShortDate(DateTime value, String locale) {
+    return DateFormat.yMd(locale).format(value);
+  }
+
+  /// Locale-aware short date plus 24h time.
+  static String formatShortDateTime(DateTime value, String locale) {
+    return DateFormat.yMd(locale).addPattern('HH:mm').format(value);
   }
 
   static DateTime dateOnly(DateTime value) {
     return DateTime(value.year, value.month, value.day);
+  }
+
+  /// Calendar-day arithmetic on local dates. Adding `Duration(days: n)` to a
+  /// local midnight lands on the wrong day across a DST change (23/25-hour
+  /// days); building the date from its fields does not.
+  static DateTime addDays(DateTime value, int days) {
+    return DateTime(value.year, value.month, value.day + days);
+  }
+
+  /// Whole calendar days from [from] to [to] (negative when [to] is earlier),
+  /// ignoring time of day and DST.
+  static int daysBetween(DateTime from, DateTime to) {
+    return DateTime.utc(
+      to.year,
+      to.month,
+      to.day,
+    ).difference(DateTime.utc(from.year, from.month, from.day)).inDays;
   }
 
   static bool isSameDate(DateTime left, DateTime right) {
@@ -77,7 +99,7 @@ abstract final class DateUtils {
   }) {
     final normalizedToday = nowDate(today);
     final normalizedValue = dateOnly(value);
-    final diff = normalizedToday.difference(normalizedValue).inDays;
+    final diff = daysBetween(normalizedValue, normalizedToday);
 
     return diff >= 0 && diff < days;
   }

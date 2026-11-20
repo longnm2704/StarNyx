@@ -96,6 +96,43 @@ void main() {
     expect(weekStats.totalLitDays, 3);
     expect(weekStats.totalValidDays, 7);
     expect(weekStats.overallCompletionRate, closeTo(3 / 7, 0.0001));
+    // Per-habit rows follow the selected range, streaks stay yearly.
+    expect(weekStats.habits.single.completedCountInRange, 3);
+    expect(weekStats.habits.single.validDayCountInRange, 7);
+    expect(yearStats.habits.single.validDayCountInRange, 19);
+  });
+
+  test('week is the calendar week Monday-Sunday, crossing the year', () async {
+    await starnyxRepository.saveStarnyx(
+      _habit(id: 'habit-1', title: 'Hydrate', startDate: DateTime(2025, 12, 1)),
+    );
+    await completionRepository.saveCompletion(
+      Completion(
+        starnyxId: 'habit-1',
+        date: DateTime(2025, 12, 30),
+        completed: true,
+      ),
+    );
+
+    // Friday 2027-01-01: the week started Monday 2026-12-28.
+    final stats = await useCase(
+      year: 2027,
+      range: OverviewRange.week,
+      today: DateTime(2027, 1, 1),
+    );
+    expect(stats.rangeStart, DateTime(2026, 12, 28));
+    expect(stats.rangeEnd, DateTime(2027, 1, 1));
+    expect(stats.totalValidDays, 5);
+
+    // Mid-week Wednesday only counts Monday..today.
+    final midWeek = await useCase(
+      year: 2025,
+      range: OverviewRange.week,
+      today: DateTime(2025, 12, 31),
+    );
+    expect(midWeek.rangeStart, DateTime(2025, 12, 29));
+    expect(midWeek.totalValidDays, 3);
+    expect(midWeek.totalLitDays, 1);
   });
 
   test('sums multiple habits with different start dates', () async {
@@ -211,11 +248,12 @@ void main() {
       today: DateTime(2026, 1, 2),
     );
 
-    expect(clippedWeek.rangeStart, DateTime(2026, 1, 1));
+    // Calendar week Mon 2025-12-29..Fri 2026-01-02 crosses the year.
+    expect(clippedWeek.rangeStart, DateTime(2025, 12, 29));
     expect(clippedWeek.rangeEnd, DateTime(2026, 1, 2));
-    expect(clippedWeek.totalLitDays, 2);
-    expect(clippedWeek.totalValidDays, 2);
-    expect(clippedWeek.overallCompletionRate, 1);
+    expect(clippedWeek.totalLitDays, 4);
+    expect(clippedWeek.totalValidDays, 5);
+    expect(clippedWeek.overallCompletionRate, closeTo(0.8, 0.0001));
 
     final previousYearWeek = await useCase(
       year: 2025,
@@ -223,11 +261,9 @@ void main() {
       today: DateTime(2026, 1, 2),
     );
 
-    expect(previousYearWeek.rangeStart, DateTime(2025, 12, 27));
-    expect(previousYearWeek.rangeEnd, DateTime(2025, 12, 31));
-    expect(previousYearWeek.totalLitDays, 2);
-    expect(previousYearWeek.totalValidDays, 5);
-    expect(previousYearWeek.overallCompletionRate, closeTo(0.4, 0.0001));
+    // The week is always the current one, whatever year is viewed.
+    expect(previousYearWeek.rangeStart, DateTime(2025, 12, 29));
+    expect(previousYearWeek.rangeEnd, DateTime(2026, 1, 2));
   });
 }
 

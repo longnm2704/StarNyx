@@ -20,7 +20,7 @@ abstract final class StreakUtils {
       );
     }
 
-    final yesterday = normalizedToday.subtract(const Duration(days: 1));
+    final yesterday = DateUtils.addDays(normalizedToday, -1);
     if (completedDays.contains(_dayKey(yesterday))) {
       return _countBackwardsFrom(
         start: yesterday,
@@ -43,7 +43,10 @@ abstract final class StreakUtils {
     var current = 1;
 
     for (var index = 1; index < sortedDays.length; index++) {
-      final diff = sortedDays[index].difference(sortedDays[index - 1]).inDays;
+      final diff = DateUtils.daysBetween(
+        sortedDays[index - 1],
+        sortedDays[index],
+      );
 
       if (diff == 1) {
         current += 1;
@@ -132,7 +135,7 @@ abstract final class StreakUtils {
 
     while (completedDays.contains(_dayKey(cursor))) {
       streak += 1;
-      cursor = cursor.subtract(const Duration(days: 1));
+      cursor = DateUtils.addDays(cursor, -1);
     }
 
     return streak;

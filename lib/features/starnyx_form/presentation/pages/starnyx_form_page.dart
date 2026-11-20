@@ -160,7 +160,10 @@ class _StarnyxFormPageState extends State<StarnyxFormPage> {
   }
 
   String _startDateLabel(DateTime date) {
-    final formatted = core_date_utils.DateUtils.formatDdMmYyyy(date);
+    final formatted = core_date_utils.DateUtils.formatShortDate(
+      date,
+      context.locale.toLanguageTag(),
+    );
     final isToday = core_date_utils.DateUtils.isSameDate(
       date,
       core_date_utils.DateUtils.nowDate(),
@@ -475,7 +478,12 @@ class _DeleteSubjectChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final textStyle = Theme.of(context).textTheme.bodySmall;
     final startedOn = 'starnyx_form.delete_started_on'.tr(
-      args: <String>[core_date_utils.DateUtils.formatDdMmYyyy(state.startDate)],
+      args: <String>[
+        core_date_utils.DateUtils.formatShortDate(
+          state.startDate,
+          context.locale.toLanguageTag(),
+        ),
+      ],
     );
 
     return Container(

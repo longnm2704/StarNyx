@@ -6,6 +6,7 @@ import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/app/router/app_routes.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
+import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/core/widgets/core_widgets.dart';
 import 'package:starnyx/domain/entities/journal_entry.dart';
 import 'package:starnyx/domain/entities/starnyx.dart';
@@ -564,7 +565,10 @@ class JournalEntryCard extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
-                    DateFormat('dd/MM/yyyy HH:mm').format(entry.createdAt),
+                    core_date_utils.DateUtils.formatShortDateTime(
+                      entry.createdAt,
+                      context.locale.toLanguageTag(),
+                    ),
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontFamily: AppFonts.mono,
                       fontFeatures: AppFonts.tabularFigures,

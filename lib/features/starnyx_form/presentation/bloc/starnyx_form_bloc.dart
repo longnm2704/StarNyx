@@ -440,7 +440,7 @@ class StarnyxFormBloc extends Bloc<StarnyxFormEvent, StarnyxFormState> {
         ? StarnyxFormDescriptionError.tooLong
         : null;
     final today = DateUtils.nowDate(_nowBuilder());
-    final earliestAllowedDate = today.subtract(const Duration(days: 7));
+    final earliestAllowedDate = DateUtils.addDays(today, -7);
     final normalizedStartDate = DateUtils.dateOnly(candidate.startDate);
     final keepsInitialStartDate = _keepsInitialStartDate(normalizedStartDate);
     final startDateError = normalizedStartDate.isAfter(today)
