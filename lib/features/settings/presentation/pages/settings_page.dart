@@ -7,6 +7,7 @@ import 'package:starnyx/app/di/service_locator.dart';
 import 'package:starnyx/app/reminder_permission.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/widgets/app_icon.dart';
+import 'package:starnyx/core/widgets/app_sheet.dart';
 import 'package:starnyx/domain/usecases/sync_notifications_use_case.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:starnyx/features/settings/presentation/bloc/settings_event.dart';
@@ -139,70 +140,31 @@ const _languages = <String, ({String name, String flag})>{
 };
 
 Future<void> _showLanguagePicker(BuildContext context) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
+    key: const Key('settings-language-picker'),
     useRootNavigator: true,
-    backgroundColor: Colors.transparent,
-    barrierColor: AppColors.black.withValues(alpha: 0.72),
-    builder: (sheetContext) => Container(
-      key: const Key('settings-language-picker'),
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.sm,
-        AppSpacing.md,
-        AppSpacing.md,
-      ),
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceLevel1,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
-        border: Border(top: BorderSide(color: AppColors.borderSubtle)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.borderFocus,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              'settings.language_label'.tr(),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontFamily: AppFonts.headline,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            for (final locale in context.supportedLocales) ...<Widget>[
-              _LanguageOption(
-                label:
-                    _languages[locale.languageCode]?.name ??
-                    locale.languageCode,
-                flagAsset: _languages[locale.languageCode]?.flag,
-                selected: locale == context.locale,
-                onTap: () async {
-                  Navigator.of(sheetContext).pop();
-                  await context.setLocale(locale);
-                  // Scheduled reminder copy must follow the new language
-                  // (the translator set at app start reads the new locale).
-                  await serviceLocator<SyncNotificationsUseCase>()
-                      .rebuildAllFromLocalData();
-                },
-              ),
-              const SizedBox(height: AppSpacing.xs),
-            ],
-          ],
-        ),
-      ),
+    title: 'settings.language_label'.tr(),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (final locale in context.supportedLocales) ...<Widget>[
+          _LanguageOption(
+            label: _languages[locale.languageCode]?.name ?? locale.languageCode,
+            flagAsset: _languages[locale.languageCode]?.flag,
+            selected: locale == context.locale,
+            onTap: () async {
+              Navigator.of(context, rootNavigator: true).pop();
+              await context.setLocale(locale);
+              // Scheduled reminder copy must follow the new language
+              // (the translator set at app start reads the new locale).
+              await serviceLocator<SyncNotificationsUseCase>()
+                  .rebuildAllFromLocalData();
+            },
+          ),
+          const SizedBox(height: AppSpacing.xs),
+        ],
+      ],
     ),
   );
 }

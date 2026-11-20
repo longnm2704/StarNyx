@@ -388,6 +388,7 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(AppRadius.sheet),
           ),
+          side: BorderSide(color: AppColors.borderSubtle),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(

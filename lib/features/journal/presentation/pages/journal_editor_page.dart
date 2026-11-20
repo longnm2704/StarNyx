@@ -9,6 +9,7 @@ import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/core/widgets/app_icon.dart';
+import 'package:starnyx/core/widgets/app_sheet.dart';
 import 'package:starnyx/domain/entities/journal_entry.dart';
 import 'package:starnyx/domain/usecases/save_journal_entry_use_case.dart';
 import 'package:starnyx/features/journal/presentation/bloc/journal_bloc.dart';
@@ -110,34 +111,19 @@ class _JournalEditorPageState extends State<JournalEditorPage> {
   Future<void> _pickSleep() async {
     // CupertinoTimerPicker needs a value on its 5-minute grid.
     var minutes = ((_sleepMinutes ?? 7 * 60) ~/ 5) * 5;
-    final picked = await showModalBottomSheet<int>(
+    final picked = await showAppSheet<int>(
       context: context,
-      backgroundColor: AppColors.sheet,
-      builder: (sheetContext) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                key: const Key('journal-sleep-done'),
-                onPressed: () => Navigator.of(sheetContext).pop(minutes),
-                child: Text('journal.sleep_done'.tr()),
-              ),
-            ),
-            SizedBox(
-              height: 216,
-              child: CupertinoTheme(
-                data: const CupertinoThemeData(brightness: Brightness.dark),
-                child: CupertinoTimerPicker(
-                  mode: CupertinoTimerPickerMode.hm,
-                  minuteInterval: 5,
-                  initialTimerDuration: Duration(minutes: minutes),
-                  onTimerDurationChanged: (value) => minutes = value.inMinutes,
-                ),
-              ),
-            ),
-          ],
+      title: 'journal.sleep_title'.tr(),
+      doneLabel: 'journal.sleep_done'.tr(),
+      doneKey: const Key('journal-sleep-done'),
+      onDone: () => minutes,
+      child: SizedBox(
+        height: 216,
+        child: CupertinoTimerPicker(
+          mode: CupertinoTimerPickerMode.hm,
+          minuteInterval: 5,
+          initialTimerDuration: Duration(minutes: minutes),
+          onTimerDurationChanged: (value) => minutes = value.inMinutes,
         ),
       ),
     );
