@@ -3,8 +3,11 @@ import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
+import 'package:starnyx/app/router/app_routes.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
-import 'package:starnyx/core/widgets/app_icon.dart';
+import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
+import 'package:starnyx/core/widgets/core_widgets.dart';
+import 'package:starnyx/features/habits/presentation/pages/habit_list_page.dart';
 import 'package:starnyx/features/home/presentation/pages/home_page.dart';
 import 'package:starnyx/features/journal/presentation/pages/journal_page.dart';
 import 'package:starnyx/features/overview/presentation/pages/overview_page.dart';
@@ -67,12 +70,39 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   late int _index = widget.initialTab.index;
   int _homeReloadToken = 0;
   int _overviewReloadToken = 0;
   int _journalReloadToken = 0;
   int _settingsReloadToken = 0;
+  DateTime _today = core_date_utils.DateUtils.nowDate();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // "Today" must roll over when the app comes back after midnight. Home moves
+  // its selection to the new day if it was on the old one (see HomeBloc).
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    final today = core_date_utils.DateUtils.nowDate();
+    if (core_date_utils.DateUtils.isSameDate(today, _today)) return;
+    setState(() {
+      _today = today;
+      _homeReloadToken++;
+      _overviewReloadToken++;
+    });
+  }
 
   void _selectIndex(int index) {
     if (index == _index) {
@@ -80,14 +110,41 @@ class _AppShellState extends State<AppShell> {
     }
     setState(() {
       _index = index;
-      // Habits, check-ins, or the active habit may have changed on another tab.
+      // Habits, check-ins, or the active habit may have changed on another tab
+      // (habit list opened from Journal, habit created from Overview...).
+      if (index == AppShellTab.habits.index) _homeReloadToken++;
       if (index == AppShellTab.overview.index) _overviewReloadToken++;
       if (index == AppShellTab.journal.index) _journalReloadToken++;
       if (index == AppShellTab.settings.index) _settingsReloadToken++;
     });
   }
 
+  /// Habit list for every tab (Home search icon, Journal header). Its exit
+  /// actions switch tabs here so they work wherever the list was opened.
+  Future<void> _openHabitList() async {
+    if (!context.isTopRoute) return;
+    final action = await Navigator.of(
+      context,
+    ).pushNamed<HabitListExitAction>(AppRoutes.habitList);
+    if (!mounted) return;
+    // Select, edit, create, delete or reorder may have happened in the list.
+    setState(() {
+      _homeReloadToken++;
+      _overviewReloadToken++;
+      _journalReloadToken++;
+    });
+    switch (action) {
+      case HabitListExitAction.settingsRequested:
+        _selectIndex(AppShellTab.settings.index);
+      case HabitListExitAction.journalRequested:
+        _selectIndex(AppShellTab.journal.index);
+      case null:
+        break;
+    }
+  }
+
   Future<void> _openCreateHabit() async {
+    if (!context.isTopRoute) return;
     final result = await StarnyxFormPage.open(context);
     if (!mounted || result == null || !result.hasChanges) {
       return;
@@ -110,7 +167,7 @@ class _AppShellState extends State<AppShell> {
         reloadToken: _homeReloadToken,
         onCreatePressed: _openCreateHabit,
         onSettingsPressed: () => _selectIndex(AppShellTab.settings.index),
-        onJournalPressed: () => _selectIndex(AppShellTab.journal.index),
+        onHabitListPressed: _openHabitList,
       ),
       OverviewPage(
         key: const ValueKey<String>('overview-tab'),
@@ -120,6 +177,7 @@ class _AppShellState extends State<AppShell> {
       JournalPage(
         key: const ValueKey<String>('journal-tab'),
         reloadToken: _journalReloadToken,
+        onHabitListPressed: _openHabitList,
       ),
       SettingsPage(
         key: const ValueKey<String>('settings-tab'),

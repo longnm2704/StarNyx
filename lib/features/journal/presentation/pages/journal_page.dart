@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:starnyx/app/di/service_locator.dart';
-import 'package:starnyx/app/router/app_routes.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 import 'package:starnyx/core/utils/date_utils.dart' as core_date_utils;
 import 'package:starnyx/core/widgets/core_widgets.dart';
@@ -29,12 +28,17 @@ class JournalPage extends StatefulWidget {
     this.bloc,
     this.loadActiveStarNyxUseCase,
     this.reloadToken = 0,
+    this.onHabitListPressed,
     super.key,
   });
 
   final JournalBloc? bloc;
   final LoadActiveStarNyxUseCase? loadActiveStarNyxUseCase;
   final int reloadToken;
+
+  /// Opens the habit switcher (owned by the shell, which also routes its exit
+  /// actions and bumps [reloadToken] afterwards).
+  final VoidCallback? onHabitListPressed;
 
   @override
   State<JournalPage> createState() => _JournalPageState();
@@ -96,11 +100,6 @@ class _JournalPageState extends State<JournalPage> {
     if (habit != null && (changed || _bloc.state.starnyxId != habit.id)) {
       _bloc.add(JournalStarted(habit.id));
     }
-  }
-
-  Future<void> _openHabitSwitcher() async {
-    await Navigator.of(context).pushNamed<Object?>(AppRoutes.habitList);
-    if (mounted) await _resolveHabit();
   }
 
   void _toggleSearch() {
@@ -179,7 +178,7 @@ class _JournalPageState extends State<JournalPage> {
                   habit: _habit,
                   searchOpen: _searchOpen,
                   onSearchPressed: _toggleSearch,
-                  onHabitPressed: _openHabitSwitcher,
+                  onHabitPressed: widget.onHabitListPressed,
                 ),
                 if (_searchOpen)
                   _JournalSearchField(
@@ -325,7 +324,7 @@ class _JournalHeader extends StatelessWidget {
   final StarNyx? habit;
   final bool searchOpen;
   final VoidCallback onSearchPressed;
-  final VoidCallback onHabitPressed;
+  final VoidCallback? onHabitPressed;
 
   @override
   Widget build(BuildContext context) {

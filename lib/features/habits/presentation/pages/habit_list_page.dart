@@ -63,7 +63,7 @@ class _HabitListPageState extends State<HabitListPage> {
     if (state.selectionFeedbackCount != _lastSelectionFeedbackCount) {
       _lastSelectionFeedbackCount = state.selectionFeedbackCount;
       if (state.selectionStatus == AsyncStatus.success) {
-        Navigator.of(context).pop();
+        _pop();
       } else if (state.selectionStatus == AsyncStatus.failure) {
         _showMessage('habits.select_error');
       }
@@ -75,6 +75,25 @@ class _HabitListPageState extends State<HabitListPage> {
         _showMessage('habits.order_error');
       }
     }
+  }
+
+  /// Pops once: a double tap must not pop the screen underneath (the app
+  /// root, leaving a black screen).
+  void _pop([HabitListExitAction? action]) {
+    if (!context.isTopRoute) return;
+    Navigator.of(context).pop(action);
+  }
+
+  /// ponytail: leaving reorder mode by back/swipe saves the new order, the
+  /// same as tapping Done, so a drag is never silently thrown away.
+  void _saveOrderOnPop() {
+    if (!_isReorderMode) return;
+    _isReorderMode = false;
+    _bloc.add(
+      HabitListOrderChanged(
+        _orderedHabits.map((habit) => habit.id).toList(growable: false),
+      ),
+    );
   }
 
   void _toggleReorderMode(List<StarNyx> habits) {
@@ -106,6 +125,7 @@ class _HabitListPageState extends State<HabitListPage> {
   }
 
   Future<void> _openCreate() async {
+    if (!context.isTopRoute) return;
     if (_isReorderMode) {
       setState(() {
         _isReorderMode = false;
@@ -119,6 +139,7 @@ class _HabitListPageState extends State<HabitListPage> {
   }
 
   Future<void> _openEdit(StarNyx habit) async {
+    if (!context.isTopRoute) return;
     final result = await StarnyxFormPage.open(context, starnyx: habit);
     if (!mounted || result == null || !result.hasChanges) {
       return;
@@ -130,87 +151,94 @@ class _HabitListPageState extends State<HabitListPage> {
   Widget build(BuildContext context) {
     return BlocProvider<HabitListBloc>.value(
       value: _bloc,
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: SafeArea(
-          bottom: false,
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 540),
-              child: BlocConsumer<HabitListBloc, HabitListState>(
-                listener: _onStateChanged,
-                builder: (BuildContext context, HabitListState state) {
-                  if (state.status == HabitListStatus.failure) {
-                    return _HabitListMessageView(
-                      icon: HugeIconsStrokeRounded.strokeRoundedAlert01,
-                      title: 'habits.load_error_title'.tr(),
-                      message: 'habits.load_error_message'.tr(),
-                      actionLabel: 'habits.retry'.tr(),
-                      onActionPressed: () =>
-                          _bloc.add(const HabitListReloadRequested()),
-                    );
-                  }
-
-                  final isLoading =
-                      state.status == HabitListStatus.initial ||
-                      state.status == HabitListStatus.loading;
-                  if (isLoading && state.habits.isEmpty) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (state.habits.isEmpty) {
-                    return _HabitListMessageView(
-                      icon:
-                          HugeIconsStrokeRounded.strokeRoundedCheckmarkCircle02,
-                      title: 'habits.empty_title'.tr(),
-                      message: 'habits.empty_message'.tr(),
-                      actionLabel: 'habits.empty_action'.tr(),
-                      onActionPressed: _openCreate,
-                      header: _buildHeader(context, state),
-                    );
-                  }
-
-                  final habits = _isReorderMode ? _orderedHabits : state.habits;
-
-                  return ReorderableListView.builder(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.pageHorizontal,
-                      AppSpacing.xs,
-                      AppSpacing.pageHorizontal,
-                      AppSpacing.xl,
-                    ),
-                    buildDefaultDragHandles: false,
-                    header: _buildHeader(context, state),
-                    itemCount: habits.length,
-                    onReorderItem: _onReorder,
-                    proxyDecorator:
-                        (Widget child, int index, Animation<double> _) {
-                          return Material(
-                            color: Colors.transparent,
-                            elevation: 8,
-                            borderRadius: BorderRadius.circular(AppRadius.md),
-                            child: child,
-                          );
-                        },
-                    itemBuilder: (BuildContext context, int index) {
-                      final habit = habits[index];
-                      return Padding(
-                        key: ValueKey<String>('habit-list-row-${habit.id}'),
-                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                        child: _HabitRow(
-                          habit: habit,
-                          isActive: habit.id == state.activeHabitId,
-                          isReorderMode: _isReorderMode,
-                          dragIndex: index,
-                          onTap: () =>
-                              _bloc.add(HabitListHabitSelected(habit.id)),
-                          onEditPressed: () => _openEdit(habit),
-                        ),
+      child: PopScope<Object?>(
+        onPopInvokedWithResult: (didPop, _) {
+          if (didPop) _saveOrderOnPop();
+        },
+        child: Scaffold(
+          backgroundColor: AppColors.background,
+          body: SafeArea(
+            bottom: false,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 540),
+                child: BlocConsumer<HabitListBloc, HabitListState>(
+                  listener: _onStateChanged,
+                  builder: (BuildContext context, HabitListState state) {
+                    if (state.status == HabitListStatus.failure) {
+                      return _HabitListMessageView(
+                        icon: HugeIconsStrokeRounded.strokeRoundedAlert01,
+                        title: 'habits.load_error_title'.tr(),
+                        message: 'habits.load_error_message'.tr(),
+                        actionLabel: 'habits.retry'.tr(),
+                        onActionPressed: () =>
+                            _bloc.add(const HabitListReloadRequested()),
                       );
-                    },
-                    footer: _buildFooter(context, state),
-                  );
-                },
+                    }
+
+                    final isLoading =
+                        state.status == HabitListStatus.initial ||
+                        state.status == HabitListStatus.loading;
+                    if (isLoading && state.habits.isEmpty) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (state.habits.isEmpty) {
+                      return _HabitListMessageView(
+                        icon: HugeIconsStrokeRounded
+                            .strokeRoundedCheckmarkCircle02,
+                        title: 'habits.empty_title'.tr(),
+                        message: 'habits.empty_message'.tr(),
+                        actionLabel: 'habits.empty_action'.tr(),
+                        onActionPressed: _openCreate,
+                        header: _buildHeader(context, state),
+                      );
+                    }
+
+                    final habits = _isReorderMode
+                        ? _orderedHabits
+                        : state.habits;
+
+                    return ReorderableListView.builder(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.pageHorizontal,
+                        AppSpacing.xs,
+                        AppSpacing.pageHorizontal,
+                        AppSpacing.xl,
+                      ),
+                      buildDefaultDragHandles: false,
+                      header: _buildHeader(context, state),
+                      itemCount: habits.length,
+                      onReorderItem: _onReorder,
+                      proxyDecorator:
+                          (Widget child, int index, Animation<double> _) {
+                            return Material(
+                              color: Colors.transparent,
+                              elevation: 8,
+                              borderRadius: BorderRadius.circular(AppRadius.md),
+                              child: child,
+                            );
+                          },
+                      itemBuilder: (BuildContext context, int index) {
+                        final habit = habits[index];
+                        return Padding(
+                          key: ValueKey<String>('habit-list-row-${habit.id}'),
+                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          child: _HabitRow(
+                            habit: habit,
+                            isActive: habit.id == state.activeHabitId,
+                            isReorderMode: _isReorderMode,
+                            dragIndex: index,
+                            onTap: () =>
+                                _bloc.add(HabitListHabitSelected(habit.id)),
+                            onEditPressed: () => _openEdit(habit),
+                          ),
+                        );
+                      },
+                      footer: _buildFooter(context, state),
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -225,7 +253,7 @@ class _HabitListPageState extends State<HabitListPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _HabitListTitleBar(onBackPressed: () => Navigator.of(context).pop()),
+        _HabitListTitleBar(onBackPressed: _pop),
         const SizedBox(height: AppSpacing.lg),
         if (activeHabit != null) ...<Widget>[
           _ActiveHabitPill(habit: activeHabit),
@@ -238,9 +266,7 @@ class _HabitListPageState extends State<HabitListPage> {
                 tileKey: const Key('habit-list-settings'),
                 icon: HugeIconsStrokeRounded.strokeRoundedSettings01,
                 semanticsLabel: 'habits.settings_action'.tr(),
-                onPressed: () => Navigator.of(
-                  context,
-                ).pop(HabitListExitAction.settingsRequested),
+                onPressed: () => _pop(HabitListExitAction.settingsRequested),
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
@@ -249,9 +275,7 @@ class _HabitListPageState extends State<HabitListPage> {
                 tileKey: const Key('habit-list-journal'),
                 icon: HugeIconsStrokeRounded.strokeRoundedBookOpen01,
                 semanticsLabel: 'habits.journal_action'.tr(),
-                onPressed: () => Navigator.of(
-                  context,
-                ).pop(HabitListExitAction.journalRequested),
+                onPressed: () => _pop(HabitListExitAction.journalRequested),
               ),
             ),
             const SizedBox(width: AppSpacing.sm),

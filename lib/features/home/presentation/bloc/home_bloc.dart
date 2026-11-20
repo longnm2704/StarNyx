@@ -60,27 +60,37 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final DateTime Function() _nowBuilder;
   int _latestDataRequestId = 0;
 
+  /// The "today" of the last load, to notice the date rolling over.
+  DateTime? _loadedToday;
+
   Future<void> _onLoadRequested(
     HomeEvent event,
     Emitter<HomeState> emit,
   ) async {
     final today = DateUtils.nowDate(_nowBuilder());
     final context = _resolveLoadContext(event: event, today: today);
+    _loadedToday = today;
+    // A reload of a screen already showing data refreshes in place instead of
+    // flashing the loading skeleton.
+    final silent =
+        event is HomeReloadRequested && state.status == HomeStatus.success;
     final requestId = _nextDataRequestId();
     _logger.debug(
       'HomeBloc',
       'load begin event=${event.runtimeType} requestId=$requestId '
           'selectedDate=${context.selectedDate} viewedYear=${context.viewedYear}',
     );
-    emit(
-      state.copyWith(
-        status: HomeStatus.loading,
-        selectionStatus: AsyncStatus.idle,
-        completionStatus: AsyncStatus.idle,
-        selectedDate: context.selectedDate,
-        viewedYear: context.viewedYear,
-      ),
-    );
+    if (!silent) {
+      emit(
+        state.copyWith(
+          status: HomeStatus.loading,
+          selectionStatus: AsyncStatus.idle,
+          completionStatus: AsyncStatus.idle,
+          selectedDate: context.selectedDate,
+          viewedYear: context.viewedYear,
+        ),
+      );
+    }
 
     try {
       final starnyxs = await _loadStarnyxsUseCase();
@@ -89,13 +99,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         _logger.debug('HomeBloc', 'load ignored stale requestId=$requestId');
         return;
       }
-      emit(
-        state.copyWith(
-          status: HomeStatus.loading,
-          starnyxs: starnyxs,
-          activeStarnyxId: activeStarnyx?.id,
-        ),
-      );
+      if (!silent) {
+        emit(
+          state.copyWith(
+            status: HomeStatus.loading,
+            starnyxs: starnyxs,
+            activeStarnyxId: activeStarnyx?.id,
+          ),
+        );
+      }
 
       final data = await _loadHomeDataForActiveStarnyx(
         starnyxs: starnyxs,
@@ -486,7 +498,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required HomeEvent event,
     required DateTime today,
   }) {
-    if (event is HomeReloadRequested && state.status != HomeStatus.initial) {
+    final previousToday = _loadedToday;
+    final rolledOver =
+        previousToday != null &&
+        !DateUtils.isSameDate(previousToday, today) &&
+        DateUtils.isSameDate(state.selectedDate, previousToday);
+    // Reloads keep the user's day, unless they were on "today" and the date
+    // has since rolled over: then follow today.
+    if (event is HomeReloadRequested &&
+        state.status != HomeStatus.initial &&
+        !rolledOver) {
       return _HomeLoadContext(
         selectedDate: state.selectedDate,
         viewedYear: state.viewedYear,

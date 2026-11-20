@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:starnyx/core/constants/enums.dart';
@@ -125,6 +127,24 @@ void main() {
     state = await settle();
     expect(state.activeHabitId, '2');
     expect(state.selectionStatus, AsyncStatus.failure);
+  });
+
+  test('taps while a selection is saving are ignored (one pop)', () async {
+    final pending = Completer<void>();
+    when(
+      () => select('2', now: any(named: 'now')),
+    ).thenAnswer((_) => pending.future);
+    bloc.add(const HabitListLoadRequested());
+    await settle();
+
+    bloc.add(const HabitListHabitSelected('2'));
+    await settle();
+    bloc.add(const HabitListHabitSelected('2'));
+    await settle();
+    pending.complete();
+    final state = await settle();
+    expect(state.selectionFeedbackCount, 1);
+    verify(() => select('2', now: any(named: 'now'))).called(1);
   });
 
   test('reorder applies the new order and reports save failures', () async {

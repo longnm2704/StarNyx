@@ -5,3 +5,4 @@ export 'app_error_state.dart';
 export 'app_confirm_dialog.dart';
 export 'app_loading_indicator.dart';
 export 'app_primary_button.dart';
+export 'route_guard.dart';

@@ -126,6 +126,59 @@ void main() {
     },
   );
 
+  testWidgets('double tap pops once and back saves a pending reorder', (
+    WidgetTester tester,
+  ) async {
+    final deps = _TestDeps(
+      habits: <StarNyx>[_hydrate(), _read()],
+      activeId: '2',
+    );
+    final emptyDeps = _TestDeps();
+    addTearDown(deps.bloc.close);
+    addTearDown(emptyDeps.bloc.close);
+
+    await _pumpLocalized(
+      tester,
+      _HabitListHost(populated: deps.bloc, empty: emptyDeps.bloc),
+    );
+
+    // Reorder, then leave with back instead of Done: the order is kept.
+    await tester.tap(find.byKey(const Key('open-populated')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('habit-list-edit-toggle')));
+    await tester.pumpAndSettle();
+    final drag = await tester.startGesture(
+      tester.getCenter(find.byKey(const Key('habit-list-drag-1'))),
+    );
+    await tester.pump();
+    await drag.moveBy(const Offset(0, 100));
+    await tester.pump(const Duration(milliseconds: 120));
+    await drag.moveBy(const Offset(0, 60));
+    await tester.pump(const Duration(milliseconds: 120));
+    await drag.up();
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('habit-list-back')));
+    await tester.pumpAndSettle();
+    expect(deps.starnyxRepository.lastReorderedIds, <String>['2', '1']);
+
+    // Two quick taps on back (or a row) must not pop the host screen too.
+    await tester.tap(find.byKey(const Key('open-populated')));
+    await tester.pumpAndSettle();
+    final back = tester.getCenter(find.byKey(const Key('habit-list-back')));
+    await tester.tapAt(back);
+    await tester.tapAt(back);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('open-habit-list')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('open-populated')));
+    await tester.pumpAndSettle();
+    final row = tester.getCenter(find.text('Hydrate'));
+    await tester.tapAt(row);
+    await tester.tapAt(row);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('open-habit-list')), findsOneWidget);
+  });
+
   testWidgets('habit list shows the error state and retries', (
     WidgetTester tester,
   ) async {

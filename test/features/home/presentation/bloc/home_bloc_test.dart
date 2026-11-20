@@ -282,6 +282,59 @@ void main() {
     },
   );
 
+  test('reload refreshes in place and follows today after midnight', () async {
+    var activeId = '1';
+    final starnyxs = <StarNyx>[
+      _starnyx(id: '1', title: 'Hydrate'),
+      _starnyx(id: '2', title: 'Read'),
+    ];
+    when(() => loadStarnyxsUseCase()).thenAnswer((_) async => starnyxs);
+    when(
+      () => loadActiveStarNyxUseCase(now: any(named: 'now')),
+    ).thenAnswer((_) async => starnyxs.firstWhere((s) => s.id == activeId));
+    when(
+      () => loadStarNyxProgressStatsUseCase(
+        starnyxId: any(named: 'starnyxId'),
+        year: any(named: 'year'),
+        today: any(named: 'today'),
+      ),
+    ).thenAnswer((_) async => _stats());
+    when(
+      () => loadStarNyxCompletionDatesForYearUseCase(
+        starnyxId: any(named: 'starnyxId'),
+        year: any(named: 'year'),
+      ),
+    ).thenAnswer((_) async => <DateTime>[]);
+    var now = DateTime(2026, 4, 14, 23, 50);
+    final bloc = HomeBloc(
+      loadStarnyxsUseCase: loadStarnyxsUseCase,
+      loadActiveStarNyxUseCase: loadActiveStarNyxUseCase,
+      selectActiveStarNyxUseCase: selectActiveStarNyxUseCase,
+      loadStarNyxProgressStatsUseCase: loadStarNyxProgressStatsUseCase,
+      loadStarNyxCompletionDatesForYearUseCase:
+          loadStarNyxCompletionDatesForYearUseCase,
+      toggleCompletionUseCase: toggleCompletionUseCase,
+      nowBuilder: () => now,
+    );
+    addTearDown(bloc.close);
+    bloc.add(const HomeLoadRequested());
+    await pumpEventQueue(times: 10);
+    expect(bloc.state.activeStarnyxId, '1');
+
+    // Active habit switched elsewhere (e.g. habit list opened from Journal).
+    activeId = '2';
+    now = DateTime(2026, 4, 15, 0, 5);
+    final statuses = <HomeStatus>[];
+    final sub = bloc.stream.listen((s) => statuses.add(s.status));
+    bloc.add(const HomeReloadRequested());
+    await pumpEventQueue(times: 10);
+    await sub.cancel();
+
+    expect(statuses, isNot(contains(HomeStatus.loading)));
+    expect(bloc.state.activeStarnyxId, '2');
+    expect(bloc.state.selectedDate, DateTime(2026, 4, 15));
+  });
+
   test(
     'latest year change wins when year requests complete out of order',
     () async {

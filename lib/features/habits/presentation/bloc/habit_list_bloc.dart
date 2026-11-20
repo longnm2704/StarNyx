@@ -98,6 +98,8 @@ class HabitListBloc extends Bloc<HabitListEvent, HabitListState> {
     HabitListHabitSelected event,
     Emitter<HabitListState> emit,
   ) async {
+    // A double tap must not select (and pop) twice.
+    if (state.selectionStatus == AsyncStatus.inProgress) return;
     if (event.id == state.activeHabitId) {
       emit(
         state.copyWith(

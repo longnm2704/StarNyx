@@ -85,6 +85,20 @@ void main() {
     expect(find.byType(AppShell), findsOneWidget);
   });
 
+  testWidgets('a failed first read shows a retry instead of a blank screen', (
+    tester,
+  ) async {
+    repository.failNextRead = true;
+    await render(tester);
+
+    expect(find.text('Retry'), findsOneWidget);
+    expect(find.byType(AppShell), findsNothing);
+
+    await tester.tap(find.text('Retry'));
+    await tester.pumpAndSettle();
+    expect(find.byType(OnboardingFlow), findsOneWidget);
+  });
+
   testWidgets('existing habits skip onboarding and set the flag', (
     tester,
   ) async {
@@ -132,9 +146,16 @@ StarNyx _habit() => StarNyx(
 
 class _FakeStarNyxRepository implements StarNyxRepository {
   final items = <StarNyx>[];
+  bool failNextRead = false;
 
   @override
-  Future<List<StarNyx>> getAllStarnyxs() async => List.of(items);
+  Future<List<StarNyx>> getAllStarnyxs() async {
+    if (failNextRead) {
+      failNextRead = false;
+      throw StateError('db');
+    }
+    return List.of(items);
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
