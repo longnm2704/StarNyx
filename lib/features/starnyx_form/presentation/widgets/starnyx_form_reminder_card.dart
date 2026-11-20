@@ -77,13 +77,6 @@ class StarnyxFormReminderCard extends StatelessWidget {
                 key: const Key('starnyx-form-reminder-switch'),
                 value: reminderEnabled,
                 onChanged: onToggle,
-                activeThumbColor: AppColors.white,
-                activeTrackColor: AppColors.primary,
-                inactiveThumbColor: AppColors.textSecondary,
-                inactiveTrackColor: AppColors.surfaceLevel3,
-                trackOutlineColor: const WidgetStatePropertyAll<Color>(
-                  Colors.transparent,
-                ),
               ),
             ],
           ),

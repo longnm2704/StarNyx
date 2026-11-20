@@ -1,8 +1,37 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:starnyx/core/constants/core_constants.dart';
 
 // Central theme entrypoint for the StarNyx Obsidian Lumina visual baseline.
 abstract final class AppTheme {
+  /// Cupertino pickers (time, date, wheel): mono digits with tabular figures
+  /// so values don't jitter while scrolling.
+  static const CupertinoThemeData cupertino = CupertinoThemeData(
+    brightness: Brightness.dark,
+    primaryColor: AppColors.primary,
+    textTheme: CupertinoTextThemeData(
+      textStyle: TextStyle(
+        fontFamily: AppFonts.body,
+        color: AppColors.textPrimary,
+        fontSize: 16,
+      ),
+      pickerTextStyle: TextStyle(
+        fontFamily: AppFonts.mono,
+        color: AppColors.textPrimary,
+        fontSize: 21,
+        fontWeight: FontWeight.w500,
+        fontFeatures: AppFonts.tabularFigures,
+      ),
+      dateTimePickerTextStyle: TextStyle(
+        fontFamily: AppFonts.mono,
+        color: AppColors.textPrimary,
+        fontSize: 21,
+        fontWeight: FontWeight.w500,
+        fontFeatures: AppFonts.tabularFigures,
+      ),
+    ),
+  );
+
   static ThemeData dark() {
     const colorScheme = ColorScheme(
       brightness: Brightness.dark,
@@ -149,8 +178,24 @@ abstract final class AppTheme {
       ),
     );
 
+    // `labelLarge` stays mono for overlines; Material buttons read it for
+    // their labels, so the button themes below swap in the body font.
+    const buttonLabel = TextStyle(
+      fontFamily: body,
+      fontSize: 15,
+      fontWeight: FontWeight.w600,
+      height: 20 / 15,
+    );
+    const pill = StadiumBorder();
+    const hairline = BorderSide(color: AppColors.borderSubtle);
+    final sheetShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppRadius.sheet),
+      side: hairline,
+    );
+
     return ThemeData(
       useMaterial3: true,
+      cupertinoOverrideTheme: cupertino,
       brightness: Brightness.dark,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
@@ -189,6 +234,104 @@ abstract final class AppTheme {
         thickness: 1,
       ),
       iconTheme: const IconThemeData(color: AppColors.textPrimary),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          disabledForegroundColor: AppColors.textTertiary,
+          textStyle: buttonLabel,
+          shape: pill,
+          minimumSize: const Size(AppSize.iconButton, AppSize.iconButton),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.onPrimary,
+          disabledBackgroundColor: AppColors.surfaceLevel3,
+          disabledForegroundColor: AppColors.textTertiary,
+          textStyle: buttonLabel.copyWith(fontWeight: FontWeight.w700),
+          shape: pill,
+          minimumSize: const Size(AppSize.iconButton, AppSize.iconButton),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          backgroundColor: AppColors.surfaceLevel1,
+          foregroundColor: AppColors.textPrimary,
+          disabledForegroundColor: AppColors.textTertiary,
+          textStyle: buttonLabel,
+          shape: pill,
+          side: hairline,
+          minimumSize: const Size(AppSize.iconButton, AppSize.iconButton),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.sheet,
+        surfaceTintColor: Colors.transparent,
+        barrierColor: AppColors.black.withValues(alpha: 0.78),
+        shape: sheetShape,
+        titleTextStyle: textTheme.headlineSmall,
+        contentTextStyle: textTheme.bodyMedium,
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: AppColors.sheet,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.card),
+          side: hairline,
+        ),
+        textStyle: textTheme.bodyMedium?.copyWith(color: AppColors.textPrimary),
+        labelTextStyle: WidgetStatePropertyAll<TextStyle?>(
+          textTheme.bodyMedium?.copyWith(color: AppColors.textPrimary),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.surfaceLevel2,
+        selectedColor: AppColors.surfaceLevel3,
+        disabledColor: AppColors.surfaceLevel1,
+        side: hairline,
+        shape: pill,
+        showCheckmark: false,
+        labelStyle: textTheme.labelMedium,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xs,
+          vertical: 6,
+        ),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? AppColors.onPrimary
+              : AppColors.textSecondary,
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? AppColors.primary
+              : AppColors.surfaceLevel3,
+        ),
+        trackOutlineColor: const WidgetStatePropertyAll<Color>(
+          Colors.transparent,
+        ),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: AppColors.primary,
+        linearTrackColor: AppColors.surfaceLevel3,
+        circularTrackColor: Colors.transparent,
+      ),
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(
+          color: AppColors.sheet,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          border: Border.fromBorderSide(hairline),
+        ),
+        textStyle: textTheme.labelMedium?.copyWith(
+          color: AppColors.textPrimary,
+        ),
+      ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.sheet,

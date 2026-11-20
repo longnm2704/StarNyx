@@ -271,8 +271,6 @@ class _SettingsContent extends StatelessWidget {
                   ? Switch(
                       key: const Key('settings-reminders-switch'),
                       value: state.remindersOn,
-                      activeThumbColor: AppColors.onPrimary,
-                      activeTrackColor: AppColors.primary,
                       onChanged: onRemindersChanged,
                     )
                   : null,

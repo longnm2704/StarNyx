@@ -308,7 +308,6 @@ class _JournalEditorPageState extends State<JournalEditorPage> {
                         ChoiceChip(
                           key: Key('journal-mood-${mood.name}'),
                           selected: _mood == mood,
-                          showCheckmark: false,
                           avatar: AppIcon(
                             icon: mood.icon,
                             size: 16,
@@ -320,14 +319,11 @@ class _JournalEditorPageState extends State<JournalEditorPage> {
                                 ? AppColors.textPrimary
                                 : AppColors.textSecondary,
                           ),
-                          backgroundColor: AppColors.surfaceLevel1,
-                          selectedColor: AppColors.surfaceLevel3,
                           side: BorderSide(
                             color: _mood == mood
                                 ? mood.color
                                 : AppColors.borderSubtle,
                           ),
-                          shape: const StadiumBorder(),
                           onSelected: (selected) =>
                               setState(() => _mood = selected ? mood : null),
                         ),
@@ -396,9 +392,6 @@ class _JournalEditorPageState extends State<JournalEditorPage> {
                           fontFeatures: AppFonts.tabularFigures,
                           color: AppColors.textPrimary,
                         ),
-                        backgroundColor: AppColors.surfaceLevel1,
-                        side: const BorderSide(color: AppColors.borderSubtle),
-                        shape: const StadiumBorder(),
                         onPressed: _pickSleep,
                       ),
                       if (_sleepMinutes != null)
@@ -429,9 +422,6 @@ class _JournalEditorPageState extends State<JournalEditorPage> {
                             fontFamily: AppFonts.mono,
                             color: AppColors.textPrimary,
                           ),
-                          backgroundColor: AppColors.surfaceLevel1,
-                          side: const BorderSide(color: AppColors.borderSubtle),
-                          shape: const StadiumBorder(),
                           deleteButtonTooltipMessage:
                               'journal.tag_remove_semantics'.tr(
                                 args: <String>[tag],
